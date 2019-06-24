@@ -1,0 +1,8 @@
+# Folders
+node_modules/
+dist/
+
+# Files
+application.yml
+*.lock
+*.log
