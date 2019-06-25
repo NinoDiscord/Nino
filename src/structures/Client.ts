@@ -6,6 +6,7 @@ import GuildSettings from './settings/GuildSettings';
 import CaseSettings from './settings/CaseSettings';
 import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
+import Command from './Command';
 
 export interface NinoConfig {
     databaseUrl: string;
@@ -34,6 +35,13 @@ export default class NinoClient extends Client {
     public settings: GuildSettings;
     public config: NinoConfig;
     public cases: CaseSettings = new CaseSettings();
+    // LIST: August, Dondish, Kyle, Derpy, Wessel
+    public owners: string[] = ['280158289667555328', '239790360728043520', '130442810456408064', '145557815287611393', '107130754189766656'];
+    public stats: CommandStats = {
+        commandsExecuted: 0,
+        messagesSeen: 0,
+        commandUsage: {}
+    };
 
     constructor(config: NinoConfig) {
         super(config.discord.token, {
@@ -88,5 +96,15 @@ export default class NinoClient extends Client {
     getEmbed() {
         return new EmbedBuilder()
             .setColor(0x6D6D99);
+    }
+
+    addCommandUsage(cmd: Command, user: User) {
+        if (!this.stats.commandUsage[cmd.name]) this.stats.commandUsage[cmd.name] = {
+            size: 0,
+            users: []
+        };
+
+        this.stats.commandUsage[cmd.name].size++;
+        this.stats.commandUsage[cmd.name].users.push();
     }
 }
