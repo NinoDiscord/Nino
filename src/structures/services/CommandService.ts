@@ -90,9 +90,9 @@ export default class CommandService {
                     .setDescription(stripIndents`
                         \`\`\`js
                         ${ex.stack.split('\n')[0]}
-                        ${ex.stack.split('\n')[0]}
-                        ${ex.stack.split('\n')[0]}
-                        ${ex.stack.split('\n')[0]}
+                        ${ex.stack.split('\n')[1]}
+                        ${ex.stack.split('\n')[2]}
+                        ${ex.stack.split('\n')[3]}
                         \`\`\`
 
                         Contact ${this.client.owners.map(userID => {
