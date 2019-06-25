@@ -15,9 +15,10 @@
         "eris": "0.10.0",
         "js-yaml": "3.13.1",
         "mongoose": "5.6.0",
-        "pikmin": "0.1.5"
+        "pikmin": "^0.1.5"
     },
     "devDependencies": {
+        "@types/js-yaml": "^3.12.1",
         "@types/mongoose": "5.5.6",
         "@types/node": "12.0.10",
         "typescript": "3.5.2"
