@@ -17,6 +17,7 @@ export interface Subcommand {
 }
 export default class NinoCommand {
     public client: any;
+    public id: number | null = null;
     public name: string;
     public description: string;
     public usage: string;
@@ -47,6 +48,11 @@ export default class NinoCommand {
 
     setParent(category: string, filename: string) {
         this.parent = `${category}:${filename}`;
+        return this;
+    }
+
+    setID(id: number) {
+        this.id = id;
         return this;
     }
 
