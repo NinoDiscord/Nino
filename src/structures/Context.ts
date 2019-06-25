@@ -1,7 +1,7 @@
 import { Message, Guild, TextChannel, User, EmbedOptions } from 'eris';
-// import ArgumentParser from './parsers/ArgumentParser';
-// import MessageCollector from './MessageCollector';
-// import FlagParser from './parsers/FlagParser';
+import MessageCollector from './MessageCollector';
+import ArgumentParser from './parsers/ArgumentParser';
+import FlagParser from './parsers/FlagParser';
 
 export interface DMOptions {
     user: User;
@@ -11,21 +11,22 @@ export interface DMOptions {
 export default class CommandContext {
     public client: any;
     public message: Message;
-    public args: string[];
-    public flags: string[];
-    public collector: any;
+    public args: ArgumentParser;
+    public flags: FlagParser;
+    public collector: MessageCollector;
     public guild: Guild;
     public sender: User;
 
     constructor(client: any, m: Message, args: string[]) {
         Object.assign<this, Message>(this, m);
 
-        this.client  = client;
-        this.message = m;
-        this.args    = args;
-        this.flags   = args;
-        this.guild   = (m.channel as TextChannel).guild;
-        this.sender  = m.author;
+        this.client    = client;
+        this.message   = m;
+        this.args      = new ArgumentParser(args);
+        this.flags     = new FlagParser(args);
+        this.guild     = (m.channel as TextChannel).guild;
+        this.sender    = m.author;
+        this.collector = new MessageCollector(client);
     }
 
     send(content: string) {

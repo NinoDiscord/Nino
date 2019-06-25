@@ -1,10 +1,11 @@
-import { Role, TextChannel, CategoryChannel, VoiceChannel } from 'eris';
+import { Guild, Role, TextChannel, CategoryChannel, VoiceChannel } from 'eris';
+import Client from './Client';
 
 export type AnyRESTChannel = TextChannel | CategoryChannel | VoiceChannel;
 export default class RESTClient {
-    public client: any;
+    public client: Client;
 
-    constructor(client: any) {
+    constructor(client: Client) {
         this.client = client;
     }
 
@@ -14,11 +15,11 @@ export default class RESTClient {
         return new Promise<Role>((resolve, reject) => {
             if (/^\d+$/.test(query)) {
                 const role = guild.roles.get(query);
-                if (role) return resolve(query);
+                if (role) return resolve(role);
             } else if (/<@&(\d+)>$/.test(query)) {
                 const match = query.match(/^<@&(\d+)>$/);
-                const role  = guild.roles.get(match[1]);
-                if (role) return resolve(query);
+                const role  = guild.roles.get(match![1]);
+                if (role) return resolve(role);
             } else {
                 const roles = guild.roles.filter((role) => role.name.toLowerCase().includes(query.toLowerCase()));
                 if (roles.length > 0) return resolve(roles[0]);
@@ -37,16 +38,16 @@ export default class RESTClient {
                     if (!guild.channels.has(query)) reject();
                     resolve(guild.channels.get(query));
                 } else {
-                    const channel = query in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[query]).channels.get(query);
+                    const channel = query in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[query])!.channels.get(query);
                     if (channel) return resolve(channel);
                 }
             } else if (/^<#(\d+)>$/.test(query)) {
                 const match = query.match(/^<#(\d+)>$/);
                 if (guild) {
-                    if (!guild.channels.has(match[1])) reject();
-                    resolve(guild.channels.get(match[1]));
+                    if (!guild.channels.has(match![1])) reject();
+                    resolve(guild.channels.get(match![1]));
                 } else {
-                    const channel = match[1] in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[match[1]]).channels.get(query);
+                    const channel = match![1] in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[match![1]])!.channels.get(query);
                     if (channel) return resolve(channel);
                 }
             } else if (guild) {

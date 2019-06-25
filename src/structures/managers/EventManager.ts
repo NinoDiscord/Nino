@@ -1,16 +1,17 @@
 import { readdir } from 'fs';
 import { sep } from 'path';
+import Client from '../Client';
 import Event from '../Event';
 
 export default class EventManager {
-    public client: any;
+    public client: Client;
     public path: string = `${process.cwd()}${sep}events`;
 
     /**
      * Creates a new instance of the event manager
      * @param client The client instance
      */
-    constructor(client: any) {
+    constructor(client: Client) {
         this.client = client;
     }
 

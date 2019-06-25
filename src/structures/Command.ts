@@ -1,3 +1,5 @@
+import Client from './Client';
+
 export interface CommandInfo {
     name: string;
     description: string | ((client: any) => string);
@@ -16,7 +18,7 @@ export interface Subcommand {
     description: string | ((client: any) => string);
 }
 export default class NinoCommand {
-    public client: any;
+    public client: Client;
     public id: number | null = null;
     public name: string;
     public description: string;
@@ -31,7 +33,7 @@ export default class NinoCommand {
     public subcommands: Subcommand[];
     public parent: string | null = null;
 
-    constructor(client: any, info: CommandInfo) {
+    constructor(client: Client, info: CommandInfo) {
         this.client      = client;
         this.name        = info.name;
         this.description = (typeof info.description === 'function')? info.description(client): info.description;
@@ -64,6 +66,8 @@ export default class NinoCommand {
     }
 
     help() {
-
+        return this
+            .client
+            .getEmbed();
     }
 }

@@ -2,9 +2,10 @@ import { readdir, readdirSync } from 'fs';
 import { Collection } from '@augu/immutable';
 import Command from '../Command';
 import { sep } from 'path';
+import Client from '../Client';
 
 export default class CommandManager {
-    public client: any;
+    public client: Client;
     public service: any;
     public path: string = `${process.cwd()}${sep}commands`;
     public commands: Collection<Command> = new Collection({ name: 'nino:commands' });
@@ -13,7 +14,7 @@ export default class CommandManager {
      * Creates a new instance of the `CommandManager`
      * @param client The client instance
      */
-    constructor(client: any) {
+    constructor(client: Client) {
         this.client  = client;
         // this.service = new CommandService(client);
     }
