@@ -7,6 +7,15 @@ export interface GuildModel extends Document {
     modlog: {
         enabled: boolean;
         channelID: string;
+    },
+    automod: {
+        spam: boolean,
+        invites: boolean,
+        badwords: {
+            enabled: boolean,
+            wordlist: Array<String>
+        },
+        raid: boolean
     }
 }
 
@@ -21,6 +30,27 @@ const schema = new Schema<GuildModel>({
         channelID: {
             type: String,
             default: null
+        }
+    },
+    automod: {
+        spam: {
+            type: Boolean,
+            default: false
+        },
+        invites: {
+            type: Boolean,
+            default: false
+        },
+        badwords: {
+            enabled: {
+                type: Boolean,
+                default: false
+            },
+            wordlist: []
+        },
+        raid: {
+            type: Boolean,
+            default: false
         }
     }
 });
