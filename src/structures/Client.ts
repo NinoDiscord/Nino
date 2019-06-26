@@ -7,12 +7,17 @@ import CaseSettings from './settings/CaseSettings';
 import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
 import Command from './Command';
+import redis, { Redis } from 'ioredis';
 
 export interface NinoConfig {
     databaseUrl: string;
     discord: {
         prefix: string;
         token: string;
+    }
+    redis: {
+        host: string;
+        port: number;
     }
 }
 
@@ -34,6 +39,7 @@ export default class NinoClient extends Client {
     public logger: instance;
     public settings: GuildSettings;
     public config: NinoConfig;
+    public redis: Redis;
     public cases: CaseSettings = new CaseSettings();
     // LIST: August, Dondish, Kyle, Derpy, Wessel
     public owners: string[] = ['280158289667555328', '239790360728043520', '130442810456408064', '145557815287611393', '107130754189766656'];
@@ -51,6 +57,10 @@ export default class NinoClient extends Client {
         });
 
         this.config   = config;
+        this.redis    = new redis({
+            port: config.redis['port'],
+            host: config.redis['host']
+        });
         this.manager  = new CommandManager(this);
         this.events   = new EventManager(this);
         this.database = new DatabaseManager(config.databaseUrl);
@@ -89,6 +99,7 @@ export default class NinoClient extends Client {
         this.manager.start();
         this.events.start();
         this.database.connect();
+        this.redis.connect();
         await super.connect()
             .then(() => this.logger.discord('Now connecting to Discord!'));
     }
@@ -105,6 +116,6 @@ export default class NinoClient extends Client {
         };
 
         this.stats.commandUsage[cmd.name].size++;
-        this.stats.commandUsage[cmd.name].users.push();
+        this.stats.commandUsage[cmd.name].users.push(user);
     }
 }

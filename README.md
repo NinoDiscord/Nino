@@ -21,7 +21,7 @@
 ## Developers
 
 * August#5820 (Lead) ([GitHub](https://github.com/auguwu))
-* controls#9810 ([GitHub](https://github.com/dvhe))
+* Kyle#9810 ([GitHub](https://github.com/dvhe))
 * dondish#0001 ([GitHub](https://github.com/dondish))
 * Wesselgame#0498 ([GitHub](https://github.com/PassTheWessel))
 * ohlookitsderpy#3939 ([GitHub](https://github.com/ohlookitsderpy))
