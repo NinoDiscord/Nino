@@ -147,6 +147,9 @@ declare module 'pikmin' {
         blink: Color;
         inverse: Color;
         strikethrough: Color;
+        hex: (hex: string) => string | undefined;
+        rgb: (val: number[]) => string | undefined;
+        convert: (value: string | number[], to: 'hex' | 'rgb') => string | number[] | undefined;
         strip: (val: string) => string;
         supported: boolean;
     }
@@ -169,5 +172,5 @@ declare module 'pikmin' {
         destroy(): this;
     }
 
-    export type Color = (s: string) => string;
+    export type Color = (s: string | number | object) => string;
 }
