@@ -17,7 +17,7 @@ export interface CommandInfo {
 export interface Subcommand {
     name: string;
     description: string | ((client: Client) => string);
-    run: (client: Client, ctx: Context) => Promise<void>;
+    run: (client: Client, ctx: Context) => Promise<any>;
 }
 export default class NinoCommand {
     public client: Client;
@@ -50,8 +50,8 @@ export default class NinoCommand {
         this.subcommands = info.subcommands || [];
     }
 
-    async run(ctx: Context) {
-        return void ctx.send(`The command \`${this.name}\` is disabled due to no functionality.`);
+    async run(ctx: Context): Promise<any> {
+        return ctx.send(`The command \`${this.name}\` is disabled due to no functionality.`);
     }
 
     setParent(category: string, filename: string) {
