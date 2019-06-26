@@ -2,7 +2,6 @@ import { Message, TextChannel } from 'eris';
 import RedisQueue from '../../util/RedisQueue';
 import NinoClient from '../Client';
 import PermissionUtils from '../../util/PermissionUtils';
-import GuildSettings from '../settings/GuildSettings';
 
 export default class AutoModSpam {
     public client: NinoClient;
@@ -13,7 +12,7 @@ export default class AutoModSpam {
 
     async handle(m: Message) {
         const guild = (m.channel as TextChannel).guild;
-        const me = guild.members[this.client.user.id]
+        const me = guild.members.get(this.client.user.id)!;
         if (!PermissionUtils.above(me, m.member!)) // TODO: add permission checks. I will need to figure out those!
             return;
 

@@ -23,6 +23,6 @@ export default class PermissionUtils {
         if (this.topRole(b) === undefined) {
             return true;
         }
-        return (this.topRole(a) as Role).position > (this.topRole(b) as Role).position;
+        return this.topRole(a)!.position > this.topRole(b)!.position;
     }
 }

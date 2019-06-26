@@ -1,4 +1,3 @@
-// @todo: Dondish, do automod config
 import { Schema, Document, model } from 'mongoose';
 
 export interface GuildModel extends Document {
@@ -13,7 +12,7 @@ export interface GuildModel extends Document {
         invites: boolean,
         badwords: {
             enabled: boolean,
-            wordlist: Array<String>
+            wordlist: string[];
         },
         raid: boolean
     }
