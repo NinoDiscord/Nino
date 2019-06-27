@@ -19,11 +19,12 @@ export interface CaseSettingBase<T extends Document> {
     update(id: string, doc: { [x: string]: any; }, cb: (error: any, raw: any) => void): Query<any>;
 }
 
+// Why is this here?
+// The warning base is different from everything
 export interface WarningBase<T extends Document> {
     model: Model<T, {}>;
     get(guildId: string, userId: string): Promise<T | null>;
     create(guildId: string, userId: string): T;
     remove(guildId: string, userId: string): void;
-    update(guildId: string, userId: string, doc: { [x: string]: any; }, cb: (error: any, raw: any) => void): Query<any>;
-
+    update(guildId: string, userId: string, doc: { [x: string]: any; }): Promise<any>;
 }

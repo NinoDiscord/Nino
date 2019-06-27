@@ -29,7 +29,7 @@ export default class Warning implements Base<WarningModel> {
         return this.model.findOne({ guildID: guildId, userID: userId }).remove().exec();
     }
 
-    update(guildId: string, userId: string, doc: { [x: string]: any }, cb: (error: any, raw: any) => void) {
-        return this.model.updateOne({ guildID: guildId, userID: userId }, doc, cb);
+    async update(guildId: string, userId: string, doc: { [x: string]: any }) {
+        return this.model.updateOne({ guildID: guildId, userID: userId }, doc);
     }
 }

@@ -42,6 +42,7 @@ export default class AutoModInvite {
         
             if (!settings || !settings.automod.invites) return false;
             
+            await this.client.punishments.addWarning(m.member!);
             await m.channel.createMessage(`HEY ${m.member!.mention}! NO ADS ALLOWED!`);
             await m.delete();
             return true;

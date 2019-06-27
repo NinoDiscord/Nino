@@ -23,18 +23,17 @@ export default class CommandService {
         this.client.stats.messagesSeen++;
         if (m.author.bot) return;
 
-        
-        const mention = new RegExp(`^<@!?${this.client.user.id}> `).exec(m.content);
-        const prefixes = [this.client.config.discord.prefix, `${mention}`]
-
         let guild = await this.client.settings.get((m.channel as TextChannel).guild.id);
-        if (!guild) {
-            this.client.settings.create((m.channel as TextChannel).guild.id);
-        } else {
-            prefixes.push('x!')
+        if (!guild || guild === null) this.client.settings.create((m.channel as TextChannel).guild.id);
+
+        const mention = new RegExp(`^<@!?${this.client.user.id}> `).exec(m.content);
+        const prefixes = [this.client.config.discord.prefix, `${mention}`];
+
+        if (!!guild) {
+            prefixes.push(guild.prefix);
         }
 
-        let prefix: string | null = null;;
+        let prefix: string | null = null;
 
         // Prefix checks
         for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;
@@ -80,6 +79,13 @@ export default class CommandService {
                 });
 
             try {
+                const helpFlag = ctx.flags.get('help') || ctx.flags.get('h');
+                if (helpFlag && typeof helpFlag === 'boolean') {
+                    const embed = cmd.help();
+                    ctx.embed(embed.build());
+                    return; // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
+                }
+
                 if (subcommand.is) {
                     args.pop();
                     await subcommand.instance!.run(this.client, ctx);

@@ -17,7 +17,7 @@ const schema = new Schema<WarningModel>({
     },
     amount: {
         type: Number,
-        default: 0,
+        default: 1,
         max: 5
     } 
 });

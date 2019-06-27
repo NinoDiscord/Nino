@@ -10,6 +10,7 @@ import Command from './Command';
 import redis, { Redis } from 'ioredis';
 import Warning from './settings/Warning';
 import AutomodService from './services/AutomodService';
+import PunishmentManager from './managers/PunishmentManager';
 
 export interface NinoConfig {
     environment: string,
@@ -44,6 +45,7 @@ export default class NinoClient extends Client {
     public warnings: Warning;
     public config: NinoConfig;
     public redis: Redis;
+    public punishments = new PunishmentManager(this);
     public autoModService: AutomodService;
     public cases: CaseSettings = new CaseSettings();
     // LIST: August, Dondish, Kyle, Derpy, Wessel
@@ -66,6 +68,7 @@ export default class NinoClient extends Client {
             port: config.redis['port'],
             host: config.redis['host']
         });
+        this.punishments = new PunishmentManager(this);
         this.autoModService = new AutomodService(this);
         this.manager  = new CommandManager(this);
         this.events = new EventManager(this);
@@ -116,7 +119,6 @@ export default class NinoClient extends Client {
             size: 0,
             users: []
         };
-
         this.stats.commandUsage[cmd.name].size++;
         this.stats.commandUsage[cmd.name].users.push(user);
     }

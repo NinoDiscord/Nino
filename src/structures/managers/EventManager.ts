@@ -24,6 +24,7 @@ export default class EventManager {
             this.client.logger.info(`Building ${files.length} event${files.length > 1? 's': ''}!`);
             files.forEach((file) => {
                 const event = require(`${this.path}${sep}${file}`);
+                console.log(event.default);
                 const ev: Event = new event.default(this.client);
                 this.emit(ev);
             });
