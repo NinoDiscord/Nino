@@ -14,6 +14,9 @@ export default class PingCommand extends Command {
     }
 
     async run(ctx: Context) {
-        ctx.send('ping shit');
+        const startedAt = Date.now();
+        const message = await ctx.send(':pong: W-why do you want my l-latency...?');
+        await message.delete();
+        return ctx.send(`:ping_pong: Pong! \`${Date.now() - startedAt}ms\``);
     }
 }

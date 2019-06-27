@@ -14,6 +14,6 @@ export default class InviteCommand extends Command {
     }
 
     async run(ctx: Context) {
-        ctx.send('You can invite the bot here: <insert invite with permissions shit here>');
+        return ctx.send(`:link: Here you go: <https://discordapp.com/authorize?client_id=${this.client.user.id}&scope=bot>`);
     }
 }
