@@ -11,17 +11,20 @@ export default class AutoModInvite {
     }
 
     async handle(m: Message) {
-        const guild = (m.channel as TextChannel).guild;
+        const channel = (m.channel as TextChannel)
+        const guild = channel.guild;
         const me = guild.members.get(this.client.user.id)!;
-        if (!PermissionUtils.above(me, m.member!)) // TODO: add permission checks. I will need to figure out those!
+        
+        if (!PermissionUtils.above(me, m.member!) || !channel.permissionsOf(me.id).has('manageMessages')) // TODO: add permission checks. I will need to figure out those!
             return;
 
         if (m.content.match(this.regex)) {
             const settings = await this.client.settings.get(guild.id);
         
             if (!settings || !settings.automod.invites) return;
-
-            await m.channel.createMessage('HEY! NO ADS ALLOWED!')
+            
+            await m.channel.createMessage(`HEY ${m.member!.mention}! NO ADS ALLOWED!`);
+            await m.delete();
         }
     }
 }

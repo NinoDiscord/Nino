@@ -22,9 +22,11 @@ export default class AutoModSpam {
 
         const queue = new RedisQueue(this.client.redis, `${m.author.id}:${guild.id}`); // go finish the command parser
         await queue.push(m.timestamp.toString());
+
         if ((await queue.length()) >= 5) {
             const oldtime = Number.parseInt(await queue.pop());
-            if (oldtime - m.timestamp <= 5000) {
+            
+            if (m.timestamp - oldtime <= 5000) {
                 await m.channel.createMessage('Stop right there! Spamming is not allowed!')
             }
         }
