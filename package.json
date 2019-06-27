@@ -3,6 +3,10 @@
     "description": "Moderation bot for Discord's hack week entry.",
     "version": "0.0.1",
     "main": "dist/bot.js",
+    "scripts": {
+        "main": "node dist/bot.js",
+        "compileWatch": "tsc -w"
+    },
     "maintainers": [
         "Kyle (dvhe)",
         "August (auguwu)",

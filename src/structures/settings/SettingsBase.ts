@@ -18,3 +18,12 @@ export interface CaseSettingBase<T extends Document> {
     remove(id: string): void;
     update(id: string, doc: { [x: string]: any; }, cb: (error: any, raw: any) => void): Query<any>;
 }
+
+export interface WarningBase<T extends Document> {
+    model: Model<T, {}>;
+    get(guildId: string, userId: string): Promise<T | null>;
+    create(guildId: string, userId: string): T;
+    remove(guildId: string, userId: string): void;
+    update(guildId: string, userId: string, doc: { [x: string]: any; }, cb: (error: any, raw: any) => void): Query<any>;
+
+}

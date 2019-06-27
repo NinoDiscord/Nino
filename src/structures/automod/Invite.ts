@@ -20,9 +20,8 @@ export default class AutoModInvite {
             const settings = await this.client.settings.get(guild.id);
         
             if (!settings || !settings.automod.invites) return;
+
+            await m.channel.createMessage('HEY! NO ADS ALLOWED!')
         }
-
-        
-
     }
 }

@@ -9,5 +9,6 @@ export default class MessageReceivedEvent extends Event {
 
     async emit(m: Message) {
         this.client.manager.service.handle(m);
+        this.client.autoModService.handle(m);
     }
 }

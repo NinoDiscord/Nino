@@ -23,12 +23,18 @@ export default class CommandService {
         this.client.stats.messagesSeen++;
         if (m.author.bot) return;
 
-        const guild = await this.client.settings.get((m.channel as TextChannel).guild.id);
-        if (!guild) this.client.settings.create((m.channel as TextChannel).guild.id);
-
-        let prefix: string | null = null;
+        
         const mention = new RegExp(`^<@!?${this.client.user.id}> `).exec(m.content);
-        const prefixes = [guild!.prefix, this.client.config.discord.prefix, `${mention}`];
+        const prefixes = [this.client.config.discord.prefix, `${mention}`]
+
+        let guild = await this.client.settings.get((m.channel as TextChannel).guild.id);
+        if (!guild) {
+            this.client.settings.create((m.channel as TextChannel).guild.id);
+        } else {
+            prefixes.push('x!')
+        }
+
+        let prefix: string | null = null;;
 
         // Prefix checks
         for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;

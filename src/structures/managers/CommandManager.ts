@@ -8,7 +8,7 @@ import Client from '../Client';
 export default class CommandManager {
     public client: Client;
     public service: CommandService;
-    public path: string = `${process.cwd()}${sep}commands`;
+    public path: string = `${process.cwd()}${sep}dist${sep}commands`;
     public commands: Collection<Command> = new Collection({ name: 'nino:commands' });
 
     /**
@@ -31,15 +31,18 @@ export default class CommandManager {
                 if (error) this.client.logger.error(error.stack);
                 this.client.logger.info(`Building ${files.length} command${files.length > 1? 's': ''}`);
                 files.forEach((file, index) => {
-                    const command = require(`${this.path}${sep}${category}${sep}${file}`);
-                    const cmd: Command = new command.default(this.client);
-
-                    cmd
-                        .setParent(category, file)
-                        .setID(index);
-                        
-                    this.commands.set(cmd.name, cmd);
-                    this.client.logger.info(`Initialized command ${cmd.name}!`);
+                    try {
+                        const command = require(`${this.path}${sep}${category}${sep}${file}`);
+                        const cmd: Command = new command.default(this.client);
+    
+                        cmd
+                            .setParent(category, file)
+                            .setID(index);
+                            
+                        this.commands.set(cmd.name, cmd);
+                        this.client.logger.info(`Initialized command ${cmd.name}!`);
+                    } catch (TypeError) {}
+                    
                 });
             });
         }

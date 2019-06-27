@@ -25,7 +25,7 @@ export default class AutoModSpam {
         if ((await queue.length()) >= 5) {
             const oldtime = Number.parseInt(await queue.pop());
             if (oldtime - m.timestamp <= 5000) {
-                // How do we punish?
+                await m.channel.createMessage('Stop right there! Spamming is not allowed!')
             }
         }
 

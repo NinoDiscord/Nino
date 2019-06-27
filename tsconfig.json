@@ -4,7 +4,7 @@
         "module": "commonjs",
         "lib": [ "es2015", "es2016", "esnext" ],
         "declaration": false,
-        "outDir": "./build",
+        "outDir": "./dist",
         "rootDir": "./src",
         "strict": true,
         "noImplicitAny": false,

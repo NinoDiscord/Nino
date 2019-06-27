@@ -8,6 +8,8 @@ import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
 import Command from './Command';
 import redis, { Redis } from 'ioredis';
+import Warning from './settings/Warning';
+import AutomodService from './services/AutomodService';
 
 export interface NinoConfig {
     environment: string,
@@ -39,8 +41,10 @@ export default class NinoClient extends Client {
     public database: DatabaseManager;
     public logger: instance;
     public settings: GuildSettings;
+    public warnings: Warning;
     public config: NinoConfig;
     public redis: Redis;
+    public autoModService: AutomodService;
     public cases: CaseSettings = new CaseSettings();
     // LIST: August, Dondish, Kyle, Derpy, Wessel
     public owners: string[] = ['280158289667555328', '239790360728043520', '130442810456408064', '145557815287611393', '107130754189766656'];
@@ -62,10 +66,12 @@ export default class NinoClient extends Client {
             port: config.redis['port'],
             host: config.redis['host']
         });
+        this.autoModService = new AutomodService(this);
         this.manager  = new CommandManager(this);
         this.events = new EventManager(this);
         this.database = new DatabaseManager(config.databaseUrl);
         this.settings = new GuildSettings(this);
+        this.warnings = new Warning(this);
         this.logger = new instance({
             name: 'main',
             format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=>`,

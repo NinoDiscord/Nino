@@ -1,5 +1,6 @@
 import model, { GuildModel } from '../../models/GuildSchema';
 import { SettingsBase as Base } from './SettingsBase';
+import Warning from './Warning';
 
 export default class GuildSettings implements Base<GuildModel> {
     public client: any;

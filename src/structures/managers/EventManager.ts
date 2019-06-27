@@ -5,7 +5,7 @@ import Event from '../Event';
 
 export default class EventManager {
     public client: Client;
-    public path: string = `${process.cwd()}${sep}events`;
+    public path: string = `${process.cwd()}${sep}dist${sep}events`;
 
     /**
      * Creates a new instance of the event manager
