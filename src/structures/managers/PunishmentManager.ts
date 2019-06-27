@@ -19,7 +19,8 @@ export enum PunishmentType {
     Mute = "mute",
     AddRole = "role",
     Unmute = "unmute",
-    Unban = "unban"
+    Unban = "unban",
+    RemoveRole = "unrole"
 }
 
 export interface PunishmentOptions {
@@ -63,13 +64,13 @@ export default class PunishmentManager {
      * @param punishment the punishment
      */
     punishmentPerms(punishment: Punishment): number {
-        if (punishment.type === "ban") {
+        if (punishment.type === "ban" || punishment.type === "unban") {
             return Constants.Permissions.banMembers;
         }
         if (punishment.type === "kick") {
             return Constants.Permissions.kickMembers; 
         }
-        if (punishment.type === "mute" || punishment.type === "role") {
+        if (punishment.type === "mute" || punishment.type === "role" || punishment.type === "unmute" || punishment.type === "unrole") {
             return Constants.Permissions.manageRoles;
         }
         return 0;
@@ -80,9 +81,10 @@ export default class PunishmentManager {
      * Returns the punishment for the amount of warnings he now has (if exists)
      * @param member the member to warn
      */
-    async addWarning(member: Member): Promise<Punishment | null> {
+    async addWarning(member: Member): Promise<Punishment[]> {
+        const me = member.guild.members.get(this.client.user.id)!;
         const settings = await this.client.settings.get(member.guild.id);
-        if (!settings) return null;
+        if (!settings) return [];
 
         let warnings = await this.client.warnings.get(member.guild.id, member.id);
         if (!warnings) {
@@ -92,12 +94,12 @@ export default class PunishmentManager {
         }
         const warns = !!warnings ? warnings!.amount : 1;
 
-        if (settings.punishments.has(warns)) {
-            const options = JSON.parse(settings.punishments.get(warns)!.valueOf());
-            return new Punishment(options.type, options)
+        let res: Punishment[] = [];
+        for (let options of settings.punishments.filter(x => x.warnings === warns)) {
+            res.push(new Punishment(options.type as PunishmentType, Object.assign({moderator: me.user}, options)));
         }
 
-        return null;    
+        return res;    
     }
 
     /**

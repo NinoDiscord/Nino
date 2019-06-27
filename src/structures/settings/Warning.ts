@@ -10,26 +10,26 @@ export default class Warning implements Base<WarningModel> {
     }
 
     async get(guildId: string, userId: string) {
-        const document = await this.model.findOne({ guildID: guildId, userID: userId}).exec();
+        const document = await this.model.findOne({ guild: guildId, user: userId}).exec();
         if (!document || document === null) return null;
         return document;
     }
 
     create(guildId: string, userId: string) {
         const query = new this.model({
-            guildID: guildId,
-            userId: userId,
-            amount: 0
+            guild: guildId,
+            user: userId,
+            amount: 1
         });
         query.save();
         return query;
     }
 
     remove(guildId: string, userId: string) {
-        return this.model.findOne({ guildID: guildId, userID: userId }).remove().exec();
+        return this.model.findOne({ guild: guildId, user: userId }).remove().exec();
     }
 
     async update(guildId: string, userId: string, doc: { [x: string]: any }) {
-        return this.model.updateOne({ guildID: guildId, userID: userId }, doc);
+        return this.model.updateOne({ guild: guildId, user: userId }, doc, (error, raw) => {console.log(error)});
     }
 }

@@ -45,7 +45,10 @@ export default class AutoModSpam {
             const oldtime = Number.parseInt(await queue.pop());
             
             if (m.timestamp - oldtime <= 3000) {
-                await this.client.punishments.addWarning(m.member!);
+                let punishments = await this.client.punishments.addWarning(m.member!);
+                for (let punishment of punishments) {
+                    await this.client.punishments.punish(m.member!, punishment, 'Automod');
+                }
                 await m.channel.createMessage('Stop right there! Spamming is not allowed!')
                 return true;
             }
