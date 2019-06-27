@@ -9,8 +9,14 @@ export interface CaseModel extends Document {
 }
 
 const schema = new Schema<CaseModel>({
-    id: Number,
-    guild: String,
+    id: {
+        type: Number,
+        index: true
+    },
+    guild: {
+        type: String,
+        index: true
+    },
     moderator: String,
     victim: String,
     reason: String

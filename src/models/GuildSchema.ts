@@ -15,11 +15,15 @@ export interface GuildModel extends Document {
             wordlist: string[];
         },
         raid: boolean
-    }
+    },
+    punishments: Map<Number, String>
 }
 
 const schema = new Schema<GuildModel>({
-    guildID: String,
+    guildID: {
+        type: String,
+        unique: true
+    },
     prefix: String,
     modlog: {
         enabled: {
@@ -51,6 +55,9 @@ const schema = new Schema<GuildModel>({
             type: Boolean,
             default: false
         }
+    },
+    punishments: {
+        type: Map
     }
 });
 

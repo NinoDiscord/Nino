@@ -10,6 +10,7 @@ import Command from './Command';
 import redis, { Redis } from 'ioredis';
 
 export interface NinoConfig {
+    environment: string,
     databaseUrl: string;
     discord: {
         prefix: string;
