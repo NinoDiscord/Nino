@@ -1,5 +1,5 @@
 import NinoClient from "../Client";
-import { Member, TextChannel, Constants, User } from "eris";
+import { Member, TextChannel, Constants, User, Role, Guild } from "eris";
 import PermissionUtils from "../../util/PermissionUtils";
 import EmbedBuilder from "../EmbedBuilder";
 import { stripIndents } from 'common-tags';
@@ -128,14 +128,17 @@ export default class PunishmentManager {
      * @param punishment the punishment
      * @param reason the reason
      */
-    async punish(member: Member, punishment: Punishment, reason?: string) {
+    async punish(member: Member | {id: string, guild: Guild}, punishment: Punishment, reason?: string) {
         const me = member.guild.members.get(this.client.user.id)!;
+        const guild = member.guild;
 
-        if (!PermissionUtils.above(me, member) || (me.permission.allow & this.punishmentPerms(punishment)) === 0)
+        if ((member instanceof Member && !PermissionUtils.above(me, member)) || (me.permission.allow & this.punishmentPerms(punishment)) === 0)
             return;
 
         switch (punishment.type) {
             case "ban": 
+                if (!(member instanceof Member))
+                    return;
                 const days: number = punishment.options.days ? punishment.options.days : 7;
                 const soft: boolean = !!punishment.options.soft;
                 await member.ban(days, reason);
@@ -144,19 +147,65 @@ export default class PunishmentManager {
                 }
                 break;
             case "kick":
+                if (!(member instanceof Member))
+                    return;
                 await member.kick(reason);
                 break;
             case "mute": 
+                if (!(member instanceof Member))
+                        return;
                 const temp = punishment.options.temp;
+                let muterole = guild.roles.find(x => x.name === 'muted');
+                if (!muterole) {
+                    muterole = await guild.createRole({name: 'muted', permissions: 0, mentionable: false, hoist: false}, 'Creating muted role');
+                    await muterole.editPosition(PermissionUtils.topRole(me)!.position - 1);
+                    for (let [id, channel] of guild.channels) {
+                        if (channel.permissionsOf(me.id).has('manageChannels'))
+                            await channel.editPermission(muterole.id, 0, Constants.Permissions.sendMessages, 'role', 'Overridding permissions for muted role');
+                    }
+                }
+                await member.addRole(muterole.id, reason);
+                if (!!temp) {
+                    setTimeout(async () => {
+                        if (me.permission.has('manageRoles') && PermissionUtils.above(me, member)) {
+                            await this.punish(member, new Punishment('unmute' as PunishmentType, { moderator: !!punishment.options.moderator ? punishment.options.moderator : me.user }), 'time\'s up');
+                        }
+                    }, temp!);
+                }
                 break;
-                // TODO: add mute punishment
             case "role":
+                if (!(member instanceof Member))
+                    return;
                 const role = member.guild.roles.get(punishment.options.roleid!);
                 if (!!role && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > role.position)
                     await member.addRole(role.id, reason);
                 break;
+            case "unmute":
+                if (!(member instanceof Member))
+                    return;
+                const muted = guild.roles.find(x => x.name === 'muted');
+
+                if (!!muted && !!member.roles.find(x => x === muted.id)) {
+                    await member.removeRole(muted.id, reason);
+                }
+                break;
+            case "unban":
+                if (!guild.members.find(x => x.id === member.id)) {
+                    await guild.unbanMember(member.id, reason);
+                }
+                break;
+            case "unrole":
+                const srole = member.guild.roles.get(punishment.options.roleid!);
+                if (member instanceof Member && !!srole && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > role!.position)
+                    await member.removeRole(srole.id, reason);
+                break;
         }
-        this.postToModLog(member, punishment, reason);
+        if (member instanceof Member) {
+            this.postToModLog(member, punishment, reason);
+        } else {
+            const user = await this.client.getRESTUser(member.id);
+            this.postToModLog({username: user.username, discriminator: user.discriminator, guild: member.guild, id: member.id}, punishment, reason);
+        }
     }
 
     /**
@@ -169,26 +218,27 @@ export default class PunishmentManager {
      * @param punishment the punishment
      * @param reason the reason
      */
-    async postToModLog(member: Member, punishment: Punishment, reason?: string) {
+    async postToModLog(member: Member | {guild: Guild, id: string, username: string, discriminator: string}, punishment: Punishment, reason?: string) {
         const settings = await this.client.settings.get(member.guild.id);
-        if (
-            !!settings &&
-            settings!.modlog.enabled &&
-            member.guild.channels.has(settings!.modlog.channelID) &&
-            member.guild.channels.get(settings!.modlog.channelID)!.permissionsOf(this.client.user.id).has('sendMessages')
-        ) {
+        if (!settings || !settings!.modlog.enabled) return;
+        const modlog = member.guild.channels.get(settings!.modlog.channelID) as TextChannel;
+        if (!!modlog && modlog!.permissionsOf(this.client.user.id).has('sendMessages') && modlog!.permissionsOf(this.client.user.id).has('embedLinks')) {
             const actions = {
-                "ban": 0xfff,
-                "kick": 0xfff,
-                "mute": 0xfff
+                "ban": 0xff0000,
+                "kick": 0xfff000,
+                "mute": 0xfff000,
+                "unban": 0xfff00,
+                "unrole": 0xfff000,
+                "unmute": 0xfff00
             }[punishment.type];
-            (member.guild.channels.get(settings!.modlog.channelID!) as TextChannel).createMessage({
-                content: `:pencil: **|** User \`${member.username}#${member.discriminator}\` has been ${punishment.type}ed!`,
+            modlog.createMessage({
                 embed: new EmbedBuilder()
+                    .setTitle( `:pencil: **|** User \`${member.username}#${member.discriminator}\` has been ${punishment.type.endsWith('e') ? punishment.type.substring(0, punishment.type.length - 1) : punishment.type}ed!`)
                     .setDescription(stripIndents`
                         **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}
                         **Reason**: ${reason || 'Unknown'}
                     `)
+                    .setColor(actions)
                     .build()
             });
         }

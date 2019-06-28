@@ -41,7 +41,9 @@ export default class CommandManager {
                             
                         this.commands.set(cmd.name, cmd);
                         this.client.logger.info(`Initialized command ${cmd.name}!`);
-                    } catch (TypeError) {}
+                    } catch (err) {
+                        this.client.logger.error(`Couldn't initialize command ${file}. Error: ${err}`)
+                    }
                     
                 });
             });

@@ -7,7 +7,7 @@ export default class HelpCommand extends Command {
     constructor(client: NinoClient) {
         super(client, {
             name: 'help',
-            description: (client: NinoClient) => `Gives a list of ${client.user.username}'s commands or shows documentation on a command`,
+            description: (client: NinoClient) => `Gives a list of ${client.user ? client.user.username: 'Nino #0989'}'s commands or shows documentation on a command`,
             usage: '[command]',
             aliases: ['cmds', 'commands']
         });

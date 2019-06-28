@@ -5,6 +5,7 @@ import { Collection } from '@augu/immutable';
 import { Subcommand } from '../Command';
 import CommandContext from '../Context';
 import NinoClient from '../Client';
+import PermissionUtils from '../../util/PermissionUtils';
 
 export interface ISubcommand {
     is: boolean;
@@ -21,14 +22,22 @@ export default class CommandService {
 
     async handle(m: Message) {
         this.client.stats.messagesSeen++;
+        
         if (m.author.bot) return;
 
-        let guild = await this.client.settings.get((m.channel as TextChannel).guild.id);
-        if (!guild || guild === null) 
-            guild = this.client.settings.create((m.channel as TextChannel).guild.id);
+        const guild = (m.channel as TextChannel).guild;
+        const me = guild.members.get(this.client.user.id);
+        if (!(m.channel as TextChannel).permissionsOf(me!.id).has('sendMessages'))
+            return;
 
         const mention = new RegExp(`^<@!?${this.client.user.id}> `).exec(m.content);
-        const prefixes = [guild!.prefix, this.client.config.discord.prefix, `${mention}`];
+
+        let settings = await this.client.settings.get((m.channel as TextChannel).guild.id);
+        if (!settings || settings === null) 
+            settings = this.client.settings.create((m.channel as TextChannel).guild.id);
+
+        const prefixes = [settings!.prefix, this.client.config.discord.prefix, `${mention}`];
+
 
         let prefix: string | null = null;
 
@@ -48,6 +57,7 @@ export default class CommandService {
             instance: null
         };
 
+
         if (command.length > 0) {
             if (args.length) {
                 for (const arg of args) {
@@ -62,6 +72,8 @@ export default class CommandService {
             if (cmd.guildOnly && m.channel.type === 1) return void ctx.send('Sorry, but you\'ll be in a guild to execute the `' + cmd.name + '` command.');
             if (cmd.ownerOnly && !this.client.owners.includes(ctx.sender.id)) return void ctx.send(`Sorry, but you will need to be a developer to execute the \`${cmd.name}\` command.`);
             if (cmd.disabled) return void ctx.send(`Command \`${cmd.name}\` is disabled.`);
+            if ((cmd.botpermissions & me!.permission.allow) !== me!.permission.allow) return void ctx.send(`I am missing the following permissions: ${PermissionUtils.toString(cmd.botpermissions & me!.permission.allow)}`);
+            if ((cmd.userpermissions & m.member!.permission.allow) !== m.member!.permission.allow) return void ctx.send(`I am missing the following permissions: ${PermissionUtils.toString(cmd.userpermissions & m.member!.permission.allow)}`);
 
             this
                 .bucket

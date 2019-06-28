@@ -1,4 +1,4 @@
-import { Role, Member } from "eris";
+import { Role, Member, Permission } from "eris";
 
 /**
  * Contains utility functions to help with permission checking and heirarchy.
@@ -24,5 +24,10 @@ export default class PermissionUtils {
             return true;
         }
         return this.topRole(a)!.position > this.topRole(b)!.position;
+    }
+
+    public static toString(permission: number): string {
+        const perm = new Permission(permission, 0).json;
+        return Object.keys(perm).join(' ');
     }
 }

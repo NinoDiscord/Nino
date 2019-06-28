@@ -101,12 +101,18 @@ export default class NinoClient extends Client {
     }
 
     async build() {
-        this.manager.start();
-        this.events.start();
-        this.database.connect();
+        this.logger.info('Connecting to the database...');
+        await this.database.connect();
+        this.logger.info('Success! Connecting to Redis...');
         this.redis.connect();
+        this.logger.info('Success! Intializing events...');
+        await this.events.start();
+        this.logger.info('Success! Connecting to Discord...');
         await super.connect()
-            .then(() => this.logger.discord('Now connecting to Discord!'));
+        this.logger.discord('Connected to Discord!');
+        this.logger.info('Loading commands...');
+        await this.manager.start();
+        this.logger.info('All set!');
     }
 
     getEmbed() {

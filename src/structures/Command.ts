@@ -13,6 +13,8 @@ export interface CommandInfo {
     hidden?: boolean;
     cooldown?: number;
     subcommands?: Subcommand[];
+    botpermissions?: number;
+    userpermissions?: number;
 }
 export interface Subcommand {
     name: string;
@@ -34,6 +36,8 @@ export default class NinoCommand {
     public cooldown: number;
     public subcommands: Subcommand[];
     public parent: string | null = null;
+    public botpermissions: number;
+    public userpermissions: number;
 
     constructor(client: Client, info: CommandInfo) {
         this.client      = client;
@@ -48,6 +52,8 @@ export default class NinoCommand {
         this.hidden      = info.hidden || false;
         this.cooldown    = info.cooldown || 5;
         this.subcommands = info.subcommands || [];
+        this.botpermissions = info.botpermissions || 0;
+        this.userpermissions = info.userpermissions || 0;
     }
 
     async run(ctx: Context): Promise<any> {
