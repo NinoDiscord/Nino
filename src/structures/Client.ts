@@ -105,7 +105,7 @@ export default class NinoClient extends Client {
         this.logger.info('Connecting to the database...');
         await this.database.connect();
         this.logger.info('Success! Connecting to Redis...');
-        this.redis.connect();
+        this.redis.connect().catch(() => {}); // Redis likes to throw errors smh
         this.logger.info('Success! Intializing events...');
         await this.events.start();
         this.logger.info('Success! Connecting to Discord...');

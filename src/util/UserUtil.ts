@@ -1,16 +1,20 @@
 import NinoClient from '../structures/Client';
 import { User } from 'eris';
 
-export default (client: NinoClient, query: string): User | undefined => {
+export function findId(client: NinoClient, query: string): string | undefined {
     if (/^[0-9]+$/.test(query)) {
-        const user = client.users.get(query);
-        if (!user || user === null) return undefined;
-        return user;
-    } else if (/^<@!?[0-9]+>$/.exec(query)) {
-        const user = client.users.get(query.substring(3, query.length - 1));
-        if (!user || user === null) return undefined;
-        return user;
+        return query;
+    } else if (/^<@!?([0-9]+)>$/.test(query)) {
+        return (/^<@!?([0-9]+)>$/.exec(query)![1]);
     }
+    return undefined;
+};
 
-    return client.users.get(query);
+export default function (client: NinoClient, query: string): User | undefined {
+    const id = findId(client, query);
+    if (!!id) {
+        return client.users.get(id);
+    } else {
+        return undefined;
+    }
 };

@@ -22,7 +22,7 @@ export default class ReasonCommand extends Command {
         if (!ctx.args.has(1)) return ctx.send('Missing `<reason>` argument');
 
         const caseID = ctx.args.get(0);
-        const reason = ctx.args.get(1);
+        const reason = ctx.args.args.slice(1).join(' ');
         const _case = await this.client.cases.get(ctx.guild.id, parseInt(caseID));
         const settings = await this.client.settings.get(ctx.guild.id); 
 

@@ -1,7 +1,7 @@
 import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
 import { Constants } from 'eris';
 import NinoClient from '../../structures/Client';
-import findUser from '../../util/UserUtil';
+import { findId } from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 
@@ -22,16 +22,16 @@ export default class UnbanCommand extends Command {
     async run(ctx: Context) {
         if (!ctx.args.has(0)) return ctx.send('Sorry but you will need to specify a user.');
 
-        const u = findUser(this.client, ctx.args.get(0))!;
-        const user = await this.client.getRESTUser(u.id);
-        const member = ctx.guild.members.get(user.id);
+        const id = findId(ctx.client, ctx.args.get(0));
 
-        if (!member || member === null) return ctx.send(`User \`${user.username}#${user.discriminator}\` is not in this guild?`);
+        if (!id) {
+            return ctx.send('Please type the id or mention the user (<@id>/<@!id>)')
+        }
 
         let reason = (ctx.flags.get('reason') || ctx.flags.get('r'));
         if (typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
 
         const punishment = new Punishment(PunishmentType.Unban, { moderator: ctx.sender });
-        await this.client.punishments.punish(member!, punishment, (reason as string));
+        await this.client.punishments.punish({id: id!, guild: ctx.guild}, punishment, (reason as string | undefined));
     }
 }

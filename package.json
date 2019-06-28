@@ -4,8 +4,8 @@
     "version": "0.0.1",
     "main": "dist/bot.js",
     "scripts": {
-        "main": "node dist/bot.js",
-        "dev": "tsc && nodemon dist/bot.js",
+        "main": "tsc && node dist/bot.js",
+        "dev": "nodemon dist/bot.js",
         "compile:watch": "tsc -w"
     },
     "maintainers": [

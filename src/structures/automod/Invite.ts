@@ -13,7 +13,7 @@ import PermissionUtils from '../../util/PermissionUtils';
  */
 export default class AutoModInvite {
     public client: NinoClient;
-    private regex: RegExp = /http(s)?:\/\/(www.)?(discord.gg|discord.io|discord.me)\/\w+/;
+    private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me)\/\w+/;
 
     constructor(client: NinoClient) {
         this.client = client;

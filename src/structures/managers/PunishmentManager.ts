@@ -234,7 +234,7 @@ export default class PunishmentManager {
             const c = await this.client.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
             const message = await modlog.createMessage({
                 embed: new EmbedBuilder()
-                    .setTitle( `:Case #${c.id} **|** ${member.username} has been ${punishment.type + action.suffix}!`)
+                    .setTitle( `Case #${c.id} **|** ${member.username} has been ${punishment.type + action.suffix}!`)
                     .setDescription(stripIndents`
                         **User**: ${member.username}#${member.discriminator} (ID: ${member.id})
                         **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator} (ID: ${punishment.options.moderator.id})
@@ -252,11 +252,11 @@ export default class PunishmentManager {
 
     async editModlog(_case: CaseModel, m: Message) {
         const action = this.determineType(_case.type);
-        const member = (m.channel as TextChannel).guild.members.get(_case.victim)!;
-        const moderator = (m.channel as TextChannel).guild.members.get(_case.moderator)!;
+        const member = await this.client.getRESTUser(_case.victim)!;
+        const moderator =  await this.client.getRESTUser(_case.moderator)!;
         await m.edit({
             embed: new EmbedBuilder()
-                .setTitle( `:Case #${_case.id} **|** ${member.username} has been ${_case.type + action.suffix}!`)
+                .setTitle( `Case #${_case.id} **|** ${member.username} has been ${_case.type + action.suffix}!`)
                 .setDescription(stripIndents`
                     **User**: ${member.username}#${member.discriminator} (ID: ${member.id})
                     **Moderator**: ${moderator.username}#${moderator.discriminator} (ID: ${moderator.id})

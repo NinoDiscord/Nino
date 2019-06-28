@@ -9,6 +9,8 @@ export default class LockdownCommand extends Command {
         super(client, {
             name: 'lockdown',
             description: 'Locks down a channel, multiple channels or all channels for all roles below the specified role.',
+            category: 'Moderation',
+            guildOnly: true,
             botpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
             usage: '[all] <channel> <channel>... [--role] [--release]'
         })

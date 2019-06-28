@@ -1,8 +1,8 @@
 export default class FlagParser {
-    public flags: string[];
+    public flags: string;
 
     constructor(raw: string[]) {
-        this.flags = raw;
+        this.flags = raw.join(' ');
     }
 
     /**
@@ -10,10 +10,14 @@ export default class FlagParser {
      */
     parse(): { [x: string]: string | true } {
         const parsed = {};
-        this.flags.forEach((flag) => {
-            if (!flag.includes('--')) return;
-            parsed[flag.split('--')[1].split('=')[0].toLowerCase()] = (flag.includes('='))? flag.split('=')[1]: true;
-        });
+        if (!this.flags.includes('--')) return {};
+
+        for (let flag of this.flags.split('--').slice(1)) {
+            if (flag === '' || !flag.includes('=') || flag[0] === '=' || flag[flag.length-1] === '=') continue;
+            const a = flag.split('=')[0];
+            const b = flag.slice(flag.indexOf('=') + 1);
+            parsed[a] = b;
+        }
 
         return parsed;
     }
