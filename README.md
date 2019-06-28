@@ -5,12 +5,16 @@ Moderation-based Discord bot created for the official [hackweek](https://discord
 ## Setting up the bot
 
 1. Clone the repository using Git
+
   ``git clone https://github.com/auguwu/nino``
 2. Install dependencies with NPM (included in Node.js)
+
   ``npm i``
 3. Compile TypeScript (install TypeScript with ``npm i -g typescript``)
+
   ``tsc``
 4. Run the bot in the `dist` directory
+
   ``node bot.js``
 
 Bot credentials (+ extra information) and personal touches are obviously your responsibility. You should know this by now, I hope.
