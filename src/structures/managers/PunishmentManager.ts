@@ -1,9 +1,10 @@
 import NinoClient from "../Client";
-import { Member, TextChannel, Constants, User, Role, Guild } from "eris";
+import { Member, TextChannel, Constants, User, Message, Guild } from "eris";
 import PermissionUtils from "../../util/PermissionUtils";
 import EmbedBuilder from "../EmbedBuilder";
 import { stripIndents } from 'common-tags';
 import ms = require("ms");
+import { CaseModel } from "../../models/CaseSchema";
 
 /**
  * Punishment types
@@ -229,30 +230,17 @@ export default class PunishmentManager {
         if (!settings || !settings!.modlog.enabled) return;
         const modlog = member.guild.channels.get(settings!.modlog.channelID) as TextChannel;
         if (!!modlog && modlog!.permissionsOf(this.client.user.id).has('sendMessages') && modlog!.permissionsOf(this.client.user.id).has('embedLinks')) {
-            const actions = {
-                "ban": 0xff0000,
-                "kick": 0xfff000,
-                "mute": 0xfff000,
-                "unban": 0xfff00,
-                "unmute": 0xfff00
-            }[punishment.type];
-            let suffix;
-            if (punishment.type === 'ban')
-                suffix = 'ned';
-            else if (punishment.type.endsWith('e'))
-                suffix = 'd';
-            else
-                suffix = 'ed';
-            const c = await this.client.cases.create(member.guild.id, punishment.options.moderator.id, member.id, reason);
+            const action = this.determineType(punishment.type);
+            const c = await this.client.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
             const message = await modlog.createMessage({
                 embed: new EmbedBuilder()
-                    .setTitle( `:pencil: **|** Case ${c.id} **|** ${member.username} has been ${punishment.type + suffix}!`)
+                    .setTitle( `:Case #${c.id} **|** ${member.username} has been ${punishment.type + action.suffix}!`)
                     .setDescription(stripIndents`
                         **User**: ${member.username}#${member.discriminator} (ID: ${member.id})
                         **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator} (ID: ${punishment.options.moderator.id})
                         **Reason**: ${reason || 'Unknown'}${ !!punishment.options.soft ? '\n**Type**: Soft Ban': ''}${ !punishment.options.soft && !!punishment.options.temp ? `\n**Time**: ${ms(punishment.options.temp, {long: true})}` : ''}
                     `)
-                    .setColor(actions)
+                    .setColor(action.action)
                     .build()
             });
             await this.client.cases.update(member.guild.id, c.id, {message: message.id}, (e) => {
@@ -260,5 +248,44 @@ export default class PunishmentManager {
                     this.client.logger.error(`Couldn't update the case: ${e}`)
             });
         }
+    }
+
+    async editModlog(_case: CaseModel, m: Message) {
+        const action = this.determineType(_case.type);
+        const member = (m.channel as TextChannel).guild.members.get(_case.victim)!;
+        const moderator = (m.channel as TextChannel).guild.members.get(_case.moderator)!;
+        await m.edit({
+            embed: new EmbedBuilder()
+                .setTitle( `:Case #${_case.id} **|** ${member.username} has been ${_case.type + action.suffix}!`)
+                .setDescription(stripIndents`
+                    **User**: ${member.username}#${member.discriminator} (ID: ${member.id})
+                    **Moderator**: ${moderator.username}#${moderator.discriminator} (ID: ${moderator.id})
+                    **Reason**: ${_case.reason}
+                `)
+                .setColor(action.action)
+                .build()
+        });
+    }
+
+    determineType(type: string): { action: number; suffix: string; } {
+        const action = {
+            "ban": 0xff0000,
+            "kick": 0xfff000,
+            "mute": 0xfff000,
+            "unban": 0xfff00,
+            "unmute": 0xfff00
+        }[type];
+        let suffix;
+        if (type === 'ban')
+            suffix = 'ned';
+        else if (type.endsWith('e'))
+            suffix = 'd';
+        else
+            suffix = 'ed';
+
+        return {
+            action,
+            suffix
+        };
     }
 }

@@ -1,7 +1,10 @@
-import { Constants } from 'eris';
+import { Constants, TextChannel } from 'eris';
+import { stripIndents } from 'common-tags';
 import NinoClient from '../../structures/Client';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+
+const weeks = (Date.now() - (1000 * 60 * 60 * 24 * 14));
 
 export default class PruneCommand extends Command {
     public filters: string[];
@@ -32,6 +35,29 @@ export default class PruneCommand extends Command {
         if (typeof filter === 'boolean') return ctx.send('The `filter` flag must be a string.');
         if (!this.filters.includes(filter)) return ctx.send(`Invalid filter. (\`${this.filters.map(s => s).join(', ')}\`)`);
 
-        // do more shit here
+        const toDelete = messages.filter(m =>
+            (filter === 'bot'? m.author.bot: true) &&
+            (filter === 'user'? !m.author.bot: true) &&
+            (filter === 'new'? m.timestamp > weeks: true)
+        );
+        if (toDelete.length < 1) return ctx.send('No messages was found by the `' + filter + '` filter!');
+
+        try {
+            toDelete.map(async(m) => await ctx.message.channel.deleteMessage(m.id));
+            return ctx.send(`I've deleted \`${toDelete.length}\` messages!`);
+        } catch(ex) {
+            if (ex.message.includes(' is more then 2 weeks old.')) {
+                const m = toDelete.filter(m => m.timestamp < weeks);
+                return ctx.send(`There were ${m.length} messages that I c-cant delete because Discord puts messages at bulk after 2 weeks has past.`);
+            } else {
+                return ctx.code('js', stripIndents`
+                    // Unable to delete messages because of:
+                    ${ex.stack.split('\n')[0]}
+                    ${ex.stack.split('\n')[1]}
+                    ${ex.stack.split('\n')[2]}
+                    ${ex.stack.split('\n')[3]}
+                `);
+            }
+        }
     }
 }
