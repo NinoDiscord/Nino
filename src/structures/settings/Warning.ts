@@ -30,6 +30,6 @@ export default class Warning implements Base<WarningModel> {
     }
 
     async update(guildId: string, userId: string, doc: { [x: string]: any }) {
-        return this.model.updateOne({ guild: guildId, user: userId }, doc, (error, raw) => {console.log(error)});
+        return this.model.updateOne({ guild: guildId, user: userId }, doc, (error, raw) => {if (error) console.log(error)});
     }
 }

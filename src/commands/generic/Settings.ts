@@ -2,6 +2,7 @@ import { stripIndents } from 'common-tags';
 import NinoClient from '../../structures/Client';
 import Context from '../../structures/Context';
 import Command from '../../structures/Command';
+import { Constants } from 'eris';
 
 export default class SettingsCommand extends Command {
     constructor(client: NinoClient) {
@@ -9,15 +10,12 @@ export default class SettingsCommand extends Command {
             name: 'settings',
             description: 'Returns the current settings in the current guild.',
             aliases: [],
+            userpermissions: Constants.Permissions.manageGuild,
             subcommands: [
                 {
                     name: 'enable',
                     description: 'Enables a configuration key',
                     run: async(client: NinoClient, ctx: Context) => {
-                        if (
-                            !ctx.guild.members.get(ctx.sender.id)!.permission.has('manageGuild')
-                        ) return ctx.send('Sorry but you will need the `manageGuild` permission to execute the `enable` subcommand');
-
                         const setting = ctx.args.get(0);
                         switch (setting) {
                             case 'prefix': {
@@ -92,9 +90,8 @@ export default class SettingsCommand extends Command {
                 [guild.prefix]: ${settings!.prefix}
                 [guild.modlog.enabled]: ${settings!.modlog.enabled? 'Yes': 'No'}
                 [guild.modlog.channelID]: ${settings!.modlog.channelID === null? 'No channel was set.': ctx.guild.channels.get(this.client.channelGuildMap[settings!.modlog.channelID])!.name}
-                [guild.automod.enabled]: ${settings!.automod.enabled? 'Yes': 'No'}
-                [guild.automod.spam]: ${settings!.automod.enabled? 'Yes': 'No'}
-                [guild.automod.invites]: ${settings!.automod.enabled? 'Yes': 'No'}
+                [guild.automod.spam]: ${settings!.automod.spam? 'Yes': 'No'}
+                [guild.automod.invites]: ${settings!.automod.spam? 'Yes': 'No'}
                 [guild.automod.badwords.enabled]: ${settings!.automod.badwords.enabled? 'Yes': 'No'}
                 [guild.automod.raid]: ${settings!.automod.raid? 'Yes': 'No'}
                 \`\`\`

@@ -90,7 +90,7 @@ export default class PunishmentManager {
         if (!warnings) {
             this.client.warnings.create(member.guild.id, member.id);
         } else {
-            await this.client.warnings.update(member.guild.id, member.id, {'amount': warnings.amount + 1});
+            await this.client.warnings.update(member.guild.id, member.id, {'amount': Math.min(warnings.amount + 1, 5)});
         }
         const warns = !!warnings ? warnings!.amount : 1;
 
@@ -233,9 +233,9 @@ export default class PunishmentManager {
             }[punishment.type];
             modlog.createMessage({
                 embed: new EmbedBuilder()
-                    .setTitle( `:pencil: **|** User \`${member.username}#${member.discriminator}\` has been ${punishment.type.endsWith('e') ? punishment.type.substring(0, punishment.type.length - 1) : punishment.type}ed!`)
+                    .setTitle( `:pencil: **|** User \`${member.username}#${member.discriminator}\`(ID: ${member.id}) has been ${punishment.type.endsWith('e') ? punishment.type.substring(0, punishment.type.length - 1) : punishment.type}ed!`)
                     .setDescription(stripIndents`
-                        **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}
+                        **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}(ID: ${punishment.options.moderator.id})
                         **Reason**: ${reason || 'Unknown'}
                     `)
                     .setColor(actions)

@@ -9,7 +9,6 @@ export interface GuildModel extends Document {
         channelID: string;
     },
     automod: {
-        enabled: boolean,
         spam: boolean,
         invites: boolean,
         badwords: {
@@ -38,10 +37,6 @@ const schema = new Schema<GuildModel>({
         }
     },
     automod: {
-        enabled: {
-            type: Boolean,
-            default: false
-        },
         spam: {
             type: Boolean,
             default: false

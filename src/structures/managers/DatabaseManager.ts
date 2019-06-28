@@ -22,7 +22,7 @@ export default class Database {
     try { this.connection = mongoose.connect(this.uri, options); }
     catch (ex) { throw new Error(ex); }
 
-    this.mongoose.connection.on('error', (err) => console.error(err));
+    this.mongoose.connection.on('error', (err) => {if (!!err) console.error(err) });
 
     return this;
   }

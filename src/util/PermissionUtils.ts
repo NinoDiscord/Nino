@@ -26,6 +26,10 @@ export default class PermissionUtils {
         return this.topRole(a)!.position > this.topRole(b)!.position;
     }
 
+    /**
+     * Shows a string representation of all of the permissions
+     * @param permission the permission
+     */
     public static toString(permission: number): string {
         const perm = new Permission(permission, 0).json;
         return Object.keys(perm).join(' ');
