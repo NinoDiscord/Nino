@@ -8,9 +8,9 @@ export default class LockdownCommand extends Command {
     constructor(client: NinoClient) {
         super(client, {
             name: 'lockdown',
-            description: 'Locks down a channel, multiple channels or all channels for a specific role downwards',
+            description: 'Locks down a channel, multiple channels or all channels for all roles below the specified role.',
             botpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
-            usage: '<channel\\s> [--role] [--release]'
+            usage: '[all] <channel> <channel>... [--role] [--release]'
         })
         this.userpermissions = this.botpermissions;
     }
@@ -52,16 +52,31 @@ export default class LockdownCommand extends Command {
         }
 
         const channels = (ctx.args.args.findIndex(x => x === 'all') !== -1) ? ctx.guild.channels.filter(c => c.type === 0).map(c => c as TextChannel) : ctx.args.args.map(x => this.getChannel(x, ctx)).filter(x => !!x);
+        const roles = ctx.guild.roles.filter(r => r!.position > role!.position && r!.position < PermissionUtils.topRole(ctx.me)!.position);
 
         for (let channel of channels) {
             if (!!channel && ((ctx.me.permission.allow|channel.permissionsOf(ctx.me.id).allow) & Constants.Permissions.manageChannels) !== 0) {
                 if (ctx.flags.get('release') as boolean) {
-                    ctx.send(`Channel <#${channel.id}> is now unlocked.`);
-                    await channel.editPermission(ctx.guild.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown over');
+                    if (!!channel.topic && channel.topic!.startsWith('[LOCKED]')) {
+                        for (let rs of roles) {
+                            await channel.deletePermission(rs!.id, 'Channel Lockdown Over');
+                        }
+                        await channel.edit({topic: channel.topic !== '[LOCKED]' ? channel.topic.substring(9) : ''})
+                        await channel.deletePermission(role!.id, 'Channel Lockdown Over')
+                        await channel.editPermission(ctx.guild.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown Over');
+                        await ctx.send(`Channel <#${channel.id}> is now unlocked.`);
+                    }
                 } else {
-                    ctx.send(`Channel <#${channel.id}> is now locked down.`);
-                    await channel.editPermission(ctx.guild.id, 0, Constants.Permissions.sendMessages, 'role', 'Channel Lockdown');
-                    await channel.editPermission(role!.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown');
+                    if ((PermissionUtils.permissionsOf(role, channel) & Constants.Permissions.sendMessages) !== 0) {
+                        await channel.edit({topic: `[LOCKED]${!!channel.topic ? ' ' + channel.topic : ''}`})
+                        await channel.editPermission(ctx.me.id, Constants.Permissions.sendMessages, 0, 'member', 'Channel Lockdown');
+                        await channel.editPermission(ctx.guild.id, 0, Constants.Permissions.sendMessages, 'role', 'Channel Lockdown');
+                        await channel.editPermission(role!.id, 0, Constants.Permissions.sendMessages, 'role', 'Channel Lockdown');
+                        for (let rs of roles) {
+                            await channel.editPermission(rs!.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown')
+                        }
+                    }
+                    await ctx.send(`Channel <#${channel.id}> is now locked down.`);
                 }
             }
         }

@@ -1,4 +1,4 @@
-import { Role, Member, Permission } from "eris";
+import { Role, Member, Permission, GuildChannel, Constants } from "eris";
 
 /**
  * Contains utility functions to help with permission checking and heirarchy.
@@ -25,6 +25,32 @@ export default class PermissionUtils {
         }
         return this.topRole(a)!.position > this.topRole(b)!.position;
     }
+
+    /**
+     * 
+     * @param role 
+     */
+    public static permissionsOf(role: Role, channel: GuildChannel) {
+        let permission = role.permissions.allow;
+        if(permission & Constants.Permissions.administrator) {
+            return Constants.Permissions.all;
+        }
+        let overwrite = channel.permissionOverwrites.get(channel.guild.id);
+        if(overwrite) {
+            permission = (permission & ~overwrite.deny) | overwrite.allow;
+        }
+        let deny = 0;
+        let allow = 0;
+        const roles = channel.guild.roles.filter(r => r.position <= role.position).map(r => r.id);
+        for(const roleID of roles) {
+            if((overwrite = channel.permissionOverwrites.get(roleID))) {
+                deny |= overwrite.deny;
+                allow |= overwrite.allow;
+            }
+        }
+        permission = (permission & ~deny) | allow;
+        return permission;
+}
 
     /**
      * Shows a string representation of all of the permissions
