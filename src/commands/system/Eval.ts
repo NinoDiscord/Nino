@@ -12,12 +12,13 @@ export default class EvalCommand extends Command {
             usage: '<script>',
             aliases: [ 'js', 'evl' ],
             category: 'System Adminstration',
-            ownerOnly: true
+            ownerOnly: true,
+            hidden: true
         });
     }
 
     async run(ctx: Context) {
-        const message = await ctx.embed(new EmbedBuilder().setTitle('Evaluating...').setColor(0x00ff00).build())
+        const message = await ctx.embed(new EmbedBuilder().setTitle('Evaluating...').setColor(0x00ff00).build());
         const script = ctx.args.join(' ');
         const startTime = Date.now();
         let result;

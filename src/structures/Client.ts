@@ -74,7 +74,7 @@ export default class NinoClient extends Client {
         this.events = new EventManager(this);
         this.database = new DatabaseManager(config.databaseUrl);
         this.settings = new GuildSettings(this);
-        this.warnings = new Warning(this);
+        this.warnings = new Warning();
         this.logger = new instance({
             name: 'main',
             format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=>`,

@@ -6,6 +6,7 @@ export interface CaseModel extends Document {
     moderator: string;
     victim: string;
     reason: string;
+    message: string;
 }
 
 const schema = new Schema<CaseModel>({
@@ -19,7 +20,12 @@ const schema = new Schema<CaseModel>({
     },
     moderator: String,
     victim: String,
-    reason: String
+    reason: String,
+    message: {
+        type: String,
+        required: false,
+        default: null
+    }
 });
 
 const _model = model<CaseModel>('cases', schema, 'cases');

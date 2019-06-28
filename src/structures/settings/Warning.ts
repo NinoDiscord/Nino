@@ -2,12 +2,7 @@ import model, { WarningModel } from '../../models/WarningSchema';
 import { WarningBase as Base } from './SettingsBase';
 
 export default class Warning implements Base<WarningModel> {
-    public client: any;
     public model = model;
-
-    constructor(client: any) {
-        this.client = client;
-    }
 
     async get(guildId: string, userId: string) {
         const document = await this.model.findOne({ guild: guildId, user: userId}).exec();

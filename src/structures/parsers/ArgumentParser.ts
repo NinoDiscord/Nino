@@ -6,7 +6,11 @@ export default class ArgumentParser {
      * @param raw The raw arguments to use
      */
     constructor(raw: string[]) {
-        this.args = raw;
+        this.args = [];
+        let i = 0;
+        while (!raw[i].startsWith('--')) {
+            this.args.push(raw[i]);
+        }
     }
 
     /**
@@ -22,7 +26,7 @@ export default class ArgumentParser {
      * @param i The index number
      */
     has(i: number) {
-        return !this.args[i];
+        return !!this.args[i];
     }
 
     /**

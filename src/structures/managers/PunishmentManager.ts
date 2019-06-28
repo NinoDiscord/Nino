@@ -136,6 +136,8 @@ export default class PunishmentManager {
         const me = member.guild.members.get(this.client.user.id)!;
         const guild = member.guild;
 
+        const settings = await this.client.settings.get(guild.id);
+
         if ((member instanceof Member && !PermissionUtils.above(me, member)) || (me.permission.allow & this.punishmentPerms(punishment)) === 0)
             return;
 
@@ -144,10 +146,15 @@ export default class PunishmentManager {
                 if (!(member instanceof Member))
                     return;
                 const days: number = punishment.options.days ? punishment.options.days : 7;
+                const time = punishment.options.temp;
                 const soft: boolean = !!punishment.options.soft;
                 await member.ban(days, reason);
                 if (soft) {
                     await member.unban(reason);
+                } else if (time !== undefined && time > 0) {
+                    setTimeout(async () => {
+                        await member.unban('time\'s up');
+                    }, time!);
                 }
                 break;
             case "kick":
@@ -159,16 +166,9 @@ export default class PunishmentManager {
                 if (!(member instanceof Member))
                         return;
                 const temp = punishment.options.temp;
-                let muterole = guild.roles.find(x => x.name === 'muted');
-                if (!muterole) {
-                    muterole = await guild.createRole({name: 'muted', permissions: 0, mentionable: false, hoist: false}, 'Creating muted role');
-                    await muterole.editPosition(PermissionUtils.topRole(me)!.position - 1);
-                    for (let [id, channel] of guild.channels) {
-                        if (channel.permissionsOf(me.id).has('manageChannels'))
-                            await channel.editPermission(muterole.id, 0, Constants.Permissions.sendMessages, 'role', 'Overridding permissions for muted role');
-                    }
-                }
-                await member.addRole(muterole.id, reason);
+                let muterole = settings!.mutedRole;
+                if (!muterole) break;
+                await member.addRole(muterole, reason);
                 if (!!temp) {
                     setTimeout(async () => {
                         if (me.permission.has('manageRoles') && PermissionUtils.above(me, member)) {
@@ -243,15 +243,21 @@ export default class PunishmentManager {
                 suffix = 'd';
             else
                 suffix = 'ed';
-            modlog.createMessage({
+            const c = await this.client.cases.create(member.guild.id, punishment.options.moderator.id, member.id, reason);
+            const message = await modlog.createMessage({
                 embed: new EmbedBuilder()
-                    .setTitle( `:pencil: **|** User \`${member.username}#${member.discriminator}\` (ID: ${member.id}) has been ${punishment.type + suffix}!`)
+                    .setTitle( `:pencil: **|** Case ${c.id} **|** ${member.username} has been ${punishment.type + suffix}!`)
                     .setDescription(stripIndents`
+                        **User**: ${member.username}#${member.discriminator} (ID: ${member.id})
                         **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator} (ID: ${punishment.options.moderator.id})
-                        **Reason**: ${reason || 'Unknown'}${punishment.type === 'ban' && !!punishment.options.soft ? '\n**Type**: Soft Ban': ''}${punishment.type === 'mute' && !!punishment.options.temp ? `\n**Time**: ${ms(punishment.options.temp, {long: true})}` : ''}
+                        **Reason**: ${reason || 'Unknown'}${ !!punishment.options.soft ? '\n**Type**: Soft Ban': ''}${ !punishment.options.soft && !!punishment.options.temp ? `\n**Time**: ${ms(punishment.options.temp, {long: true})}` : ''}
                     `)
                     .setColor(actions)
                     .build()
+            });
+            await this.client.cases.update(member.guild.id, c.id, {message: message.id}, (e) => {
+                if (!!e)
+                    this.client.logger.error(`Couldn't update the case: ${e}`)
             });
         }
     }

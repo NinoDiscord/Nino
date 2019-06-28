@@ -19,7 +19,7 @@ export default class HelpCommand extends Command {
             [x: string]: string[];
         } = {};
 
-        if (ctx.args.has(0)) {
+        if (!ctx.args.has(0)) {
             this
                 .client
                 .manager

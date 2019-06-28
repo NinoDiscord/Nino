@@ -4,6 +4,7 @@ import { ok } from 'assert';
 export interface GuildModel extends Document {
     guildID: string;
     prefix: string;
+    mutedRole: string;
     modlog: {
         enabled: boolean;
         channelID: string;
@@ -26,6 +27,7 @@ const schema = new Schema<GuildModel>({
         unique: true
     },
     prefix: String,
+    mutedRole: String,
     modlog: {
         enabled: {
             type: Boolean,
