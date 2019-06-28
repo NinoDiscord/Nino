@@ -1,6 +1,7 @@
 import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
 import { Constants } from 'eris';
 import NinoClient from '../../structures/Client';
+import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 
@@ -21,7 +22,8 @@ export default class KickCommand extends Command {
     async run(ctx: Context) {
         if (!ctx.args.has(0)) return ctx.send('Sorry but you will need to specify a user.');
 
-        const user = await this.client.getRESTUser(ctx.args.get(0));
+        const u = findUser(this.client, ctx.args.get(0))!;
+        const user = await this.client.getRESTUser(u.id);
         const member = ctx.guild.members.get(user.id);
 
         if (!member || member === null) return ctx.send(`User \`${user.username}#${user.discriminator}\` is not in this guild?`);

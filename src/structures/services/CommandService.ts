@@ -1,16 +1,9 @@
 import { Message, TextChannel } from 'eris';
 import { stripIndents } from 'common-tags';
 import RatelimitBucket from '../bucket/RatelimitBucket';
-import { Collection } from '@augu/immutable';
-import { Subcommand } from '../Command';
 import CommandContext from '../Context';
 import NinoClient from '../Client';
 import PermissionUtils from '../../util/PermissionUtils';
-
-export interface ISubcommand {
-    is: boolean;
-    instance: Subcommand | null;
-}
 
 export default class CommandService {
     public client: NinoClient;
@@ -52,22 +45,8 @@ export default class CommandService {
             c.name === name || c.aliases!.includes(name)
         );
         const ctx = new CommandContext(this.client, m, args);
-        const subcommand: ISubcommand = {
-            is: false,
-            instance: null
-        };
-
 
         if (command.length > 0) {
-            if (args.length) {
-                for (const arg of args) {
-                    if (command[0].subcommands.length && command[0].subcommands.find(sub => sub.name === arg)) {
-                        subcommand.is = true;
-                        subcommand.instance = command[0].subcommands.find(s => s.name === arg)!;
-                    }
-                }
-            }
-
             const cmd = command[0];
             if (cmd.guildOnly && m.channel.type === 1) return void ctx.send('Sorry, but you\'ll be in a guild to execute the `' + cmd.name + '` command.');
             if (cmd.ownerOnly && !this.client.owners.includes(ctx.sender.id)) return void ctx.send(`Sorry, but you will need to be a developer to execute the \`${cmd.name}\` command.`);
@@ -93,13 +72,6 @@ export default class CommandService {
                     const embed = cmd.help();
                     ctx.embed(embed);
                     return; // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
-                }
-
-                if (subcommand.is) {
-                    args.pop();
-                    await subcommand.instance!.run(this.client, ctx);
-                    this.client.addCommandUsage(cmd, ctx.sender);
-                    return; // This is here so we won't run the parent command
                 }
 
                 await cmd.run(ctx);
