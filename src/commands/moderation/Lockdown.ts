@@ -1,6 +1,6 @@
 import NinoClient from "../../structures/Client";
 import Command from '../../structures/Command';
-import { Constants, Channel, TextChannel, Role, Permission } from "eris";
+import { Constants, Channel, TextChannel, Role } from "eris";
 import CommandContext from "../../structures/Context";
 import PermissionUtils from "../../util/PermissionUtils";
 
@@ -54,15 +54,16 @@ export default class LockdownCommand extends Command {
         const channels = (ctx.args.args.findIndex(x => x === 'all') !== -1) ? ctx.guild.channels.filter(c => c.type === 0).map(c => c as TextChannel) : ctx.args.args.map(x => this.getChannel(x, ctx)).filter(x => !!x);
 
         for (let channel of channels) {
-            if (!!channel && (channel.permissionsOf(ctx.me.id).allow & Constants.Permissions.manageChannels) !== 0) {
+            if (!!channel && ((ctx.me.permission.allow|channel.permissionsOf(ctx.me.id).allow) & Constants.Permissions.manageChannels) !== 0) {
                 if (ctx.flags.get('release') as boolean) {
-                    await channel.editPermission(role!.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown over')
+                    ctx.send(`Channel <#${channel.id}> is now unlocked.`);
+                    await channel.editPermission(ctx.guild.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown over');
                 } else {
-                    await channel.editPermission(role!.id, 0, Constants.Permissions.sendMessages, 'role', 'Channel Lockdown')
-
+                    ctx.send(`Channel <#${channel.id}> is now locked down.`);
+                    await channel.editPermission(ctx.guild.id, 0, Constants.Permissions.sendMessages, 'role', 'Channel Lockdown');
+                    await channel.editPermission(role!.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown');
                 }
             }
         }
-        return ctx.send('Lockdown successful!')
     }
 }

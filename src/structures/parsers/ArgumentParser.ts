@@ -7,9 +7,9 @@ export default class ArgumentParser {
      */
     constructor(raw: string[]) {
         this.args = [];
-        let i = 0;
-        while (!raw[i].startsWith('--')) {
-            this.args.push(raw[i]);
+        
+        for (let i = 0; i < raw.length; i++) {
+            if (!raw[i].startsWith('--')) this.args.push(raw[i]);
         }
     }
 

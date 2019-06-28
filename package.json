@@ -5,8 +5,8 @@
     "main": "dist/bot.js",
     "scripts": {
         "main": "node dist/bot.js",
-        "dev": "nodemon dist/bot.js",
-        "compileWatch": "tsc -w"
+        "dev": "tsc && nodemon dist/bot.js",
+        "compile:watch": "tsc -w"
     },
     "maintainers": [
         "Kyle (dvhe)",
@@ -22,17 +22,17 @@
         "ioredis": "4.10.0",
         "js-yaml": "3.13.1",
         "mongoose": "5.6.0",
-        "ms": "^2.1.2",
-        "pikmin": "^0.1.7"
+        "ms": "2.1.2",
+        "pikmin": "0.1.7"
     },
     "devDependencies": {
         "@types/common-tags": "1.8.0",
         "@types/ioredis": "4.0.12",
         "@types/js-yaml": "3.12.1",
         "@types/mongoose": "5.5.6",
-        "@types/ms": "^0.7.30",
+        "@types/ms": "0.7.30",
         "@types/node": "12.0.10",
-        "nodemon": "^1.19.1",
+        "nodemon": "1.19.1",
         "typescript": "3.5.2"
     }
 }

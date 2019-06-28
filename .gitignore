@@ -1,6 +1,7 @@
 # Folders
 node_modules/
 dist/
+data/
 
 # Files
 application.yml

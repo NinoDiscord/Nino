@@ -4,8 +4,8 @@ import fs from 'fs';
 
 const file = fs.readFileSync('application.yml').toString();
 
-const config = yaml.safeLoad(file) as NinoConfig;
+const config: NinoConfig = yaml.safeLoad(file);
 const client = new Client(config);
 client.build().then(() => {
-    client.logger.info('We\'re up and running baby!');
-})
+    client.logger.info('Now connecting to Discord...');
+});

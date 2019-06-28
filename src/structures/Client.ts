@@ -77,23 +77,23 @@ export default class NinoClient extends Client {
         this.warnings = new Warning();
         this.logger = new instance({
             name: 'main',
-            format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=>`,
+            format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=> `,
             autogen: false,
             transports: [
                 new ConsoleTransport({
                     name: 'info',
                     process: process,
-                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.green('[INFO]')} <=>`
+                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.green('[INFO]')} <=> `
                 }),
                 new ConsoleTransport({
                     name: 'error',
                     process: process,
-                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.red('[ERROR]')} <=>`
+                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.red('[ERROR]')} <=> `
                 }),
                 new ConsoleTransport({
                     name: 'discord',
                     process: process,
-                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.cyan('[DISCORD]')} <=>`
+                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.cyan('[DISCORD]')} <=> `
                 }),
                 new FileTransport({ file: 'data/Nino.log' })
             ]

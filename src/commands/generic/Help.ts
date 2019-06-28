@@ -41,7 +41,7 @@ export default class HelpCommand extends Command {
 
             for (const cat in categories) embed.addField(cat, categories[cat].map(s => `**\`${s}\`**`).join(', '));
 
-            ctx.embed(embed.build());
+            return ctx.embed(embed.build());
         } else {
             const arg = ctx.args.get(0);
             const command = this.client.manager.commands.filter((s) =>
@@ -51,7 +51,7 @@ export default class HelpCommand extends Command {
             if (!command) return ctx.send(`Sorry, I was not able to find the command \`${arg}\``);
             else {
                 const embed = command.help();
-                return ctx.embed(embed.build());
+                return ctx.embed(embed);
             }
         }
     }

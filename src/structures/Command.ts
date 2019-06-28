@@ -23,7 +23,6 @@ export interface Subcommand {
 }
 export default class NinoCommand {
     public client: Client;
-    public id: number | null = null;
     public name: string;
     public description: string;
     public usage: string;
@@ -65,21 +64,25 @@ export default class NinoCommand {
         return this;
     }
 
-    setID(id: number) {
-        this.id = id;
-        return this;
-    }
-
     format() {
-        return `${this.client.config.discord.prefix}${this.name}${this.usage? (() => {
-            const list = (this.subcommands.length > 1)? ` ${this.subcommands.map(s => s.name)} ${this.usage}`: ` ${this.usage}`;
-            return list;
-        })(): ''}`;
+        return `${this.client.config.discord.prefix}${this.name}${this.usage? ` ${this.usage}`: ''}`;
     }
 
     help() {
-        return this
+        const embed = this
             .client
-            .getEmbed();
+            .getEmbed()
+            .setTitle(`Command ${this.name}`)
+            .setDescription(`**${this.description}**`)
+            .addField('Syntax', this.format(), true)
+            .addField('Category', this.category, true)
+            .addField('Aliases', this.aliases.length > 1? this.aliases.join(', '): 'No aliases available', true)
+            .addField('Guild Only', this.guildOnly? 'Yes': 'No', true)
+            .addField('Owner Only', this.ownerOnly? 'Yes': 'No', true)
+            .addField('Cooldown', `${this.cooldown} seconds`, true);
+
+        if (this.subcommands.length > 1) embed.addField('Subcommands', this.subcommands.map(s => `**${s.name}**: ${s.description}`).join('\n'), false);
+
+        return embed.build();
     }
 }

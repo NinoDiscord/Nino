@@ -30,14 +30,12 @@ export default class CommandManager {
             readdir(`${this.path}${sep}${category}`, (error, files) => {
                 if (error) this.client.logger.error(error.stack);
                 this.client.logger.info(`Building ${files.length} command${files.length > 1? 's': ''}`);
-                files.forEach((file, index) => {
+                files.forEach((file) => {
                     try {
                         const command = require(`${this.path}${sep}${category}${sep}${file}`);
                         const cmd: Command = new command.default(this.client);
     
-                        cmd
-                            .setParent(category, file)
-                            .setID(index);
+                        cmd.setParent(category, file);
                             
                         this.commands.set(cmd.name, cmd);
                         this.client.logger.info(`Initialized command ${cmd.name}!`);

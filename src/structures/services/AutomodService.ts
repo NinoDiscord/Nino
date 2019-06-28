@@ -11,6 +11,7 @@ import AutoModBadWords from "../automod/Badwords";
  * Automod features currently supported:
  * * anti-spam
  * * anti-invites
+ * * swearing
  */
 export default class AutomodService {
     private spamhandler: AutoModSpam;
@@ -31,5 +32,4 @@ export default class AutomodService {
     async handle(m: Message): Promise<boolean> {
         return await this.invitehandler.handle(m) || await this.badwordhandler.handle(m) || await this.spamhandler.handle(m);
     }
-
 }

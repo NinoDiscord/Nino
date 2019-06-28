@@ -91,7 +91,7 @@ export default class CommandService {
                 const helpFlag = ctx.flags.get('help') || ctx.flags.get('h');
                 if (helpFlag && typeof helpFlag === 'boolean') {
                     const embed = cmd.help();
-                    ctx.embed(embed.build());
+                    ctx.embed(embed);
                     return; // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
                 }
 
@@ -107,7 +107,7 @@ export default class CommandService {
             } catch(ex) {
                 const embed = this.client.getEmbed();
                 embed
-                    .setTitle(`Command ${cmd.name} (#${cmd.id}) has failed!`)
+                    .setTitle(`Command ${cmd.name} has failed!`)
                     .setDescription(stripIndents`
                         \`\`\`js
                         ${ex.stack.split('\n')[0]}
@@ -121,7 +121,7 @@ export default class CommandService {
                             return `${user.username}#${user.discriminator}`;
                         }).join(', ')} at https://discord.gg/7TtMP2n
                     `);
-                this.client.logger.error(`Unable to run the "${cmd.name}" (#${cmd.id}) command\n${ex.stack}`);
+                this.client.logger.error(`Unable to run the "${cmd.name}" command\n${ex.stack}`);
             }
         }
     }
