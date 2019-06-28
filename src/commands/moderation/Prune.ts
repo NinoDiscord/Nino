@@ -32,6 +32,8 @@ export default class PruneCommand extends Command {
         if (typeof filter === 'boolean') return ctx.send('The `filter` flag must be a string.');
         if (!this.filters.includes(filter)) return ctx.send(`Invalid filter. (\`${this.filters.map(s => s).join(', ')}\`)`);
 
-        // do more shit here
+        const toDelete = messages.filter(m =>
+            filter === 'bot'? m.author.bot: true
+        );
     }
 }

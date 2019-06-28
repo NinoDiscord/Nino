@@ -56,10 +56,10 @@ export default class LockdownCommand extends Command {
         for (let channel of channels) {
             if (!!channel && ((ctx.me.permission.allow|channel.permissionsOf(ctx.me.id).allow) & Constants.Permissions.manageChannels) !== 0) {
                 if (ctx.flags.get('release') as boolean) {
-                    ctx.send(`Channel <#${channel.id}> is now unlocked.`);
                     await channel.editPermission(ctx.guild.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown over');
+                    await ctx.send(`Channel <#${channel.id}> is now unlocked.`);
                 } else {
-                    ctx.send(`Channel <#${channel.id}> is now locked down.`);
+                    await ctx.send(`Channel <#${channel.id}> is now locked down.`);
                     await channel.editPermission(ctx.guild.id, 0, Constants.Permissions.sendMessages, 'role', 'Channel Lockdown');
                     await channel.editPermission(role!.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown');
                 }
