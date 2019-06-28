@@ -3,6 +3,7 @@ import { Member, TextChannel, Constants, User, Role, Guild } from "eris";
 import PermissionUtils from "../../util/PermissionUtils";
 import EmbedBuilder from "../EmbedBuilder";
 import { stripIndents } from 'common-tags';
+import ms = require("ms");
 
 /**
  * Punishment types
@@ -70,8 +71,11 @@ export default class PunishmentManager {
         if (punishment.type === "kick") {
             return Constants.Permissions.kickMembers; 
         }
-        if (punishment.type === "mute" || punishment.type === "role" || punishment.type === "unmute" || punishment.type === "unrole") {
+        if (punishment.type === "role" || punishment.type === "unmute" || punishment.type === "unrole") {
             return Constants.Permissions.manageRoles;
+        }
+        if (punishment.type === "mute") {
+            return Constants.Permissions.manageRoles | Constants.Permissions.manageChannels; 
         }
         return 0;
     }
@@ -92,7 +96,7 @@ export default class PunishmentManager {
         } else {
             await this.client.warnings.update(member.guild.id, member.id, {'amount': Math.min(warnings.amount + 1, 5)});
         }
-        const warns = !!warnings ? warnings!.amount : 1;
+        const warns = Math.min(!!warnings ? warnings!.amount + 1 : 1, 5);
 
         let res: Punishment[] = [];
         for (let options of settings.punishments.filter(x => x.warnings === warns)) {
@@ -196,15 +200,17 @@ export default class PunishmentManager {
                 break;
             case "unrole":
                 const srole = member.guild.roles.get(punishment.options.roleid!);
-                if (member instanceof Member && !!srole && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > role!.position)
+                if (member instanceof Member && !!srole && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > srole!.position)
                     await member.removeRole(srole.id, reason);
                 break;
         }
-        if (member instanceof Member) {
-            this.postToModLog(member, punishment, reason);
-        } else {
-            const user = await this.client.getRESTUser(member.id);
-            this.postToModLog({username: user.username, discriminator: user.discriminator, guild: member.guild, id: member.id}, punishment, reason);
+        if (punishment.type !== 'role' && punishment.type !== 'unrole') {
+            if (member instanceof Member) {
+                this.postToModLog(member, punishment, reason);
+            } else {
+                const user = await this.client.getRESTUser(member.id);
+                this.postToModLog({username: user.username, discriminator: user.discriminator, guild: member.guild, id: member.id}, punishment, reason);
+            }
         }
     }
 
@@ -228,15 +234,21 @@ export default class PunishmentManager {
                 "kick": 0xfff000,
                 "mute": 0xfff000,
                 "unban": 0xfff00,
-                "unrole": 0xfff000,
                 "unmute": 0xfff00
             }[punishment.type];
+            let suffix;
+            if (punishment.type === 'ban')
+                suffix = 'ned';
+            else if (punishment.type.endsWith('e'))
+                suffix = 'd';
+            else
+                suffix = 'ed';
             modlog.createMessage({
                 embed: new EmbedBuilder()
-                    .setTitle( `:pencil: **|** User \`${member.username}#${member.discriminator}\`(ID: ${member.id}) has been ${punishment.type.endsWith('e') ? punishment.type.substring(0, punishment.type.length - 1) : punishment.type}ed!`)
+                    .setTitle( `:pencil: **|** User \`${member.username}#${member.discriminator}\` (ID: ${member.id}) has been ${punishment.type + suffix}!`)
                     .setDescription(stripIndents`
-                        **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}(ID: ${punishment.options.moderator.id})
-                        **Reason**: ${reason || 'Unknown'}
+                        **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator} (ID: ${punishment.options.moderator.id})
+                        **Reason**: ${reason || 'Unknown'}${punishment.type === 'ban' && !!punishment.options.soft ? '\n**Type**: Soft Ban': ''}${punishment.type === 'mute' && !!punishment.options.temp ? `\n**Time**: ${ms(punishment.options.temp, {long: true})}` : ''}
                     `)
                     .setColor(actions)
                     .build()

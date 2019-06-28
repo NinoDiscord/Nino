@@ -34,13 +34,13 @@ export default class AutoModBadWords {
         if (!settings || !settings.automod.badwords.enabled) return false;
 
         for (let badword of settings.automod.badwords.wordlist) {
-            if (m.content.indexOf(badword) !== -1) {
+            if (m.content.toLowerCase().indexOf(badword.toLowerCase()) !== -1) {
                 const punishments = await this.client.punishments.addWarning(m.member!);
+                await m.channel.createMessage(`HEY ${m.member!.mention}! Watch your language!`);
+                await m.delete();
                 for (let punishment of punishments) {
                     await this.client.punishments.punish(m.member!, punishment, 'Automod');
                 }
-                await m.channel.createMessage(`HEY ${m.member!.mention}! Watch your language!`);
-                await m.delete();
                 return true;
             }
         }

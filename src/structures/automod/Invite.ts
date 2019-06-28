@@ -42,12 +42,12 @@ export default class AutoModInvite {
         
             if (!settings || !settings.automod.invites) return false;
             
+            await m.channel.createMessage(`HEY ${m.member!.mention}! NO ADS ALLOWED!`);
+            await m.delete();
             const punishments = await this.client.punishments.addWarning(m.member!);
             for (let punishment of punishments) {
                 await this.client.punishments.punish(m.member!, punishment, 'Automod');
             }
-            await m.channel.createMessage(`HEY ${m.member!.mention}! NO ADS ALLOWED!`);
-            await m.delete();
             return true;
         }
         return false;
