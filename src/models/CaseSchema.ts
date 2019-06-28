@@ -4,6 +4,7 @@ export interface CaseModel extends Document {
     id: number;
     guild: string;
     moderator: string;
+    type: string;
     victim: string;
     reason: string;
     message: string;
@@ -19,6 +20,7 @@ const schema = new Schema<CaseModel>({
         index: true
     },
     moderator: String,
+    type: String,
     victim: String,
     reason: String,
     message: {

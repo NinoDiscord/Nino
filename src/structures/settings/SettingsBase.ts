@@ -16,7 +16,7 @@ export interface CaseSettingBase<T extends Document> {
     model: Model<T, {}>;
     get(guild: string, id: number): Promise<T | null>;
     getAll(guild: string): Promise<T[] | null>;
-    create(guild: string, moderator: string, user: string, reason?: string): Promise<T | null>;
+    create(guild: string, moderator: string, type: string, user: string, reason?: string): Promise<T | null>;
     remove(guild: string, id: number): void;
     update(guild: string, id: number, doc: { [x: string]: any; }, cb: (error: any, raw: any) => void): Query<any>;
 }

@@ -60,7 +60,8 @@ export default class NinoClient extends Client {
         super(config.discord.token, {
             maxShards: 'auto',
             disableEveryone: true,
-            getAllUsers: true
+            getAllUsers: true,
+            restMode: true
         });
 
         this.config   = config;
