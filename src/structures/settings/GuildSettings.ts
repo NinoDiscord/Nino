@@ -30,6 +30,10 @@ export default class GuildSettings implements Base<GuildModel> {
     }
 
     update(id: string, doc: { [x: string]: any }, cb: (error: any, raw: any) => void) {
-        return this.model.updateOne({ guildID: id }, doc, cb);
+        const search = { guildID: id }
+        if (!!doc.$push) {
+            search['punishments'] = { $not: { $size: 15 }}
+        }
+        return this.model.updateOne(search, doc, cb);
     }
 }

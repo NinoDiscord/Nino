@@ -71,9 +71,13 @@ export default class SettingsCommand extends Command {
                     days: !!days ? Number(days) : null
                 }
             }
-        }, (error) => {
+        }, (error, raw) => {
             if (error) return ctx.send('I was unable to add the punishment.');
-            return ctx.send(`The punishment was successfully added!`)
+            if (raw.n) {
+                return ctx.send(`The punishment was successfully added!`)
+            } else {
+                return ctx.send('We limit the amount of punishments per server to 15. Please remove some of your punishments before further additions.')
+            }
         });
         
     }
