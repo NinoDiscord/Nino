@@ -12,5 +12,6 @@ export default class ReadyEvent extends Event {
             name: `${this.client.config.discord.prefix}help | ${this.client.guilds.size} Guild${this.client.guilds.size > 1? 's': ''}`,
             type: 0
         });
+        this.client.timeouts.reapplyTimeouts()
     }
 }

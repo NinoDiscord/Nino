@@ -11,6 +11,7 @@ import redis, { Redis } from 'ioredis';
 import Warning from './settings/Warning';
 import AutomodService from './services/AutomodService';
 import PunishmentManager from './managers/PunishmentManager';
+import TimeoutsManager from './managers/TimeoutsManager';
 
 export interface NinoConfig {
     environment: string,
@@ -48,6 +49,7 @@ export default class NinoClient extends Client {
     public punishments = new PunishmentManager(this);
     public autoModService: AutomodService;
     public cases: CaseSettings = new CaseSettings();
+    public timeouts: TimeoutsManager;
     // LIST: August, Dondish, Kyle, Derpy, Wessel
     public owners: string[] = ['280158289667555328', '239790360728043520', '130442810456408064', '145557815287611393', '107130754189766656'];
     public stats: CommandStats = {
@@ -76,6 +78,7 @@ export default class NinoClient extends Client {
         this.database = new DatabaseManager(config.databaseUrl);
         this.settings = new GuildSettings(this);
         this.warnings = new Warning();
+        this.timeouts = new TimeoutsManager(this);
         this.logger = new instance({
             name: 'main',
             format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=> `,

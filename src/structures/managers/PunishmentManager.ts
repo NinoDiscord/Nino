@@ -153,9 +153,7 @@ export default class PunishmentManager {
                 if (soft) {
                     await member.unban(reason);
                 } else if (time !== undefined && time > 0) {
-                    setTimeout(async () => {
-                        await member.unban('time\'s up');
-                    }, time!);
+                    await this.client.timeouts.addTimeout(member.id, member.guild, 'unban', time!)
                 }
                 break;
             case "kick":
@@ -168,14 +166,22 @@ export default class PunishmentManager {
                         return;
                 const temp = punishment.options.temp;
                 let muterole = settings!.mutedRole;
-                if (!muterole) break;
+                if (!muterole) {
+                    let muterole = guild.roles.find(x => x.name === 'muted');
+                    if (!muterole) {
+                        muterole = await guild.createRole({name: 'muted', permissions: 0, mentionable: false, hoist: false}, 'Creating muted role');
+                        await muterole.editPosition(PermissionUtils.topRole(me)!.position - 1);
+                        for (let [id, channel] of guild.channels) {
+                            if (channel.permissionsOf(me.id).has('manageChannels'))
+                                await channel.editPermission(muterole.id, 0, Constants.Permissions.sendMessages, 'role', 'Overridding permissions for muted role');
+                        }
+                    }
+                    settings!.mutedRole = muterole.id;
+                    settings!.save();
+                }
                 await member.addRole(muterole, reason);
                 if (!!temp) {
-                    setTimeout(async () => {
-                        if (me.permission.has('manageRoles') && PermissionUtils.above(me, member)) {
-                            await this.punish(member, new Punishment('unmute' as PunishmentType, { moderator: !!punishment.options.moderator ? punishment.options.moderator : me.user }), 'time\'s up');
-                        }
-                    }, temp!);
+                    this.client.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
                 }
                 break;
             case "role":
@@ -186,12 +192,15 @@ export default class PunishmentManager {
                     await member.addRole(role.id, reason);
                 break;
             case "unmute":
+                let mem: Member | {id: string, guild: Guild} | undefined = member;
                 if (!(member instanceof Member))
+                    mem = guild.members.get(mem.id);
+                if (!mem)
                     return;
-                const muted = guild.roles.find(x => x.name === 'muted');
+                const muted = guild.roles.get(settings!.mutedRole);
 
-                if (!!muted && !!member.roles.find(x => x === muted.id)) {
-                    await member.removeRole(muted.id, reason);
+                if (!!muted && !!(mem! as Member).roles.find(x => x === muted.id)) {
+                    await(mem! as Member).removeRole(muted.id, reason);
                 }
                 break;
             case "unban":

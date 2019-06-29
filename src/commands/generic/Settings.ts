@@ -112,6 +112,20 @@ export default class SettingsCommand extends Command {
                     if (error) return ctx.send('I was unable to set the prefix to `' + prefix + '`...');
                     return ctx.send(`The prefix has been set to \`${prefix}\` Run \`${prefix}ping\` to test it!`);
                 });
+                break;
+            }
+            case 'mutedrole': {
+                const mutedRole = ctx.args.get(2);
+                if (!mutedRole || !/^[0-9]+$/.test(mutedRole)) return ctx.send('Please set a valid id!')
+                this.client.settings.update(ctx.guild.id, {
+                    $set: {
+                        mutedRole
+                    }
+                }, (error) => {
+                    if (error) return ctx.send('I was unable to change the role id');
+                    return ctx.send(`The role id has been set to \`${mutedRole}\``);
+                })
+                break;
             }
 
             case 'automod.spam': {
@@ -188,7 +202,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             default: {
-                return ctx.send('Invalid enabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swear` | `automod.invites`)');
+                return ctx.send('Invalid enabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swears` | `automod.invites` | `mutedrole`)');
             }
         }
     }
@@ -199,12 +213,25 @@ export default class SettingsCommand extends Command {
             case 'prefix': {
                 this.client.settings.update(ctx.guild.id, {
                     $set: {
-                        prefix: 's!'
+                        prefix: 'x!'
                     }
                 }, (error) => {
-                    if (error) return ctx.send('I was unable to set the prefix to `s!`...');
-                    return ctx.send(`The prefix has been set to \`s!\` Run \`s!ping\` to test it!`);
+                    if (error) return ctx.send('I was unable to set the prefix to `x!`...');
+                    return ctx.send(`The prefix has been set to \`x!\` Run \`x!ping\` to test it!`);
                 });
+                break;
+            }
+
+            case 'mutedrole': {
+                this.client.settings.update(ctx.guild.id, {
+                    $set: {
+                        mutedRole: null
+                    }
+                }, (error) => {
+                    if (error) return ctx.send('I was unable to reset the muted role id.');
+                    return ctx.send(`The muted role id was reset successfully!`);
+                });
+                break;
             }
 
             case 'automod.spam': {
@@ -257,7 +284,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             default: {
-                return ctx.send('Invalid disabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swear` | `automod.invites`)');
+                return ctx.send('Invalid disabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swears` | `automod.invites` | `mutedrole` )');
             }
         }
     }
@@ -271,6 +298,7 @@ export default class SettingsCommand extends Command {
             .setDescription(stripIndents`
                 \`\`\`ini
                 [guild.prefix]: ${settings!.prefix}
+                [mutedrole]: ${settings!.mutedRole ? ctx.guild.roles.get(settings!.mutedRole)!.name : 'None'}
                 [guild.modlog.enabled]: ${settings!.modlog.enabled? 'Yes': 'No'}
                 [guild.modlog.channelID]: ${settings!.modlog.channelID === null? 'No channel was set.': ctx.guild.channels.get(settings!.modlog.channelID)!.name}
                 [guild.automod.spam]: ${settings!.automod.spam? 'Yes': 'No'}
