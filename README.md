@@ -61,7 +61,7 @@ x!settings reset <setting>
 3. Create an application.yml file in your working directory (see the example for more information)
 4. Compile TypeScript (install TypeScript with ``npm i -g typescript``): ``tsc``
 5. Run the bot in the `dist` directory: ``node bot.js``
-6. 3 and 4 can be bypassed by running npm run main.
+6. 4 and 5 can be bypassed by running npm run main.
 
 Bot credentials (+ extra information) and personal touches are obviously your responsibility. You should know this by now, I hope.
 
