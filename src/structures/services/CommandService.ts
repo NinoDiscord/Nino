@@ -90,7 +90,10 @@ export default class CommandService {
 
                         Contact ${this.client.owners.map(userID => {
                             const user = this.client.users.get(userID)!;
-                            return `${user.username}#${user.discriminator}`;
+                            if (user)
+                                return `${user.username}#${user.discriminator}`;
+                            else 
+                                return `<@${userID}>`
                         }).join(', ')} at https://discord.gg/7TtMP2n
                     `);
                 this.client.logger.error(`Unable to run the "${cmd.name}" command\n${ex.stack}`);

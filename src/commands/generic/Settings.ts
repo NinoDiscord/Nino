@@ -34,7 +34,7 @@ export default class SettingsCommand extends Command {
             case 'remove': return this.remove(ctx);
 
             default: {
-                return ctx.send('Missing the `subcommand` argument. (`set` | `reset` | `view`)');
+                return ctx.send('Missing the `subcommand` argument. (`set` | `reset` | `view` | `add` | `remove`)');
             }
         }
     }
@@ -63,12 +63,12 @@ export default class SettingsCommand extends Command {
         this.client.settings.update(ctx.guild.id, {
             $push: {
                 punishments: {
-                    warnings,
+                    warnings: Number(warnings),
                     type: punishment,
-                    temp: ms(temp as string),
+                    temp: temp ? ms(temp as string) : null,
                     soft,
                     roleid,
-                    days
+                    days: !!days ? Number(days) : null
                 }
             }
         }, (error) => {

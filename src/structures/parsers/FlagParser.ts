@@ -13,12 +13,14 @@ export default class FlagParser {
         if (!this.flags.includes('--')) return {};
 
         for (let flag of this.flags.split('--').slice(1)) {
-            if (flag === '' || !flag.includes('=') || flag[0] === '=' || flag[flag.length-1] === '=') continue;
+            if (flag === '' || !flag.includes('=') || flag[0] === '=' || flag[flag.length-1] === '=') {
+                parsed[flag.split(' ')[0]] = true;
+                continue;
+            }
             const a = flag.split('=')[0];
             const b = flag.slice(flag.indexOf('=') + 1);
             parsed[a] = b;
         }
-
         return parsed;
     }
 
