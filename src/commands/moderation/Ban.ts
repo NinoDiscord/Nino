@@ -45,7 +45,6 @@ export default class BanCommand extends Command {
             temp: t
         });
 
-        await this.client.punishments.addWarning(member!);
         await this.client.punishments.punish(member!, punishment, reason as string | undefined);
     }
 }

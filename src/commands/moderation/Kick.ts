@@ -37,7 +37,6 @@ export default class KickCommand extends Command {
             moderator: ctx.sender
         });
 
-        await this.client.punishments.addWarning(member!);
         await this.client.punishments.punish(member!, punishment, (reason as string | undefined));
     }
 }
