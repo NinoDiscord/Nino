@@ -11,7 +11,7 @@ export default class BanCommand extends Command {
         super(client, {
             name: 'ban',
             description: 'Ban a member in the current guild',
-            usage: '<user> [--reason] [--softban] [--days]',
+            usage: '<user> [--reason] [--soft] [--days] [--time]',
             aliases: ['banne', 'bean'],
             category: 'Moderation',
             guildOnly: true,
