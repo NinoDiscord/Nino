@@ -215,7 +215,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             default: {
-                return ctx.send('Invalid enabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swears` | `automod.invites` | `mutedrole`)');
+                return ctx.send('Invalid enabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swears` | `automod.invites` | `mutedrole` | `modlog`)');
             }
         }
     }
@@ -308,7 +308,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             default: {
-                return ctx.send('Invalid disabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swears` | `automod.invites` | `mutedrole` )');
+                return ctx.send('Invalid disabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swears` | `automod.invites` | `mutedrole` | `modlog`)');
             }
         }
     }

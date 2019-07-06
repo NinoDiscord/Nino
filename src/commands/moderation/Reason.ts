@@ -34,7 +34,7 @@ export default class ReasonCommand extends Command {
             }
         }, async(error) => {
             if (error) return ctx.send(`Unable to update case #${caseID}: \`${reason}\``);
-            const m = await this.client.getMessage(settings!.modlog.channelID, _case.message);
+            const m = await this.client.getMessage(settings!.modlog, _case.message);
             await this.client.punishments.editModlog(_case, m);
         });
     }

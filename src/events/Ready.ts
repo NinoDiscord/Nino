@@ -17,7 +17,7 @@ export default class ReadyEvent extends Event {
         }, 600000)
         
         this.client.timeouts.reapplyTimeouts();
-        if (this.client.webhook)
+        if (!!this.client.webhook)
             this.client.webhook!.send(':white_check_mark: **|** Connected to Discord!');
     }
 }
