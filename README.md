@@ -8,43 +8,7 @@ Join the support server [here](https://discord.gg/7TtMP2n)
 
 # How to use the bot?
 
-x!settings will help you manage the settings for each guild. 
-
-View the settings by running x!settings view
-
-1. Adding and removing a punishment:
-```
-x!settings add <amount of warnings> <punishment> [--soft] [--temp <time can be x timeunit or x(initial of timeunit)>] [--days <amount of days to delete messages of>] [--roleid <role id>]
-```
-Example (This will add a punishment: a soft ban after 3 warnings):
-```
-x!settings add 3 ban --soft
-```
-
-You can have as many punishments as you like! but remember, some punishments can collide with others! Use them cautiously!
-
-To remove a punishment you run (the index is the place of the punishment in the list in x!settings view):
-```
-x!settings remove <index>
-```
-
-2. Enabling and Disabling other settings
-```
-x!settings set <setting> <value>
-```
-Example: Enabling anti-spam in automod:
-```
-x!settings set automod.spam true
-```
-Example: Disabling anti-spam in automod:
-```
-x!settings set automod.spam false
-```
-
-3. Resetting to defaults:
-```
-x!settings reset <setting>
-```
+Check out the [wiki](https://github.com/auguwu/Nino/wiki)!
 
 # Features
 
