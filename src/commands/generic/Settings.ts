@@ -10,7 +10,7 @@ export default class SettingsCommand extends Command {
         super(client, {
             name: 'settings',
             description: 'View or edit the guild\'s settings.',
-            usage: 'set <key> <value> / reset <key> / view / add <warnings> <punishment> [--temp <time> (mute/ban)] [--roleid <id> (role/unrole)] [--soft (ban)] [--days <amount> (ban: delete messages)]/ remove <punishment index>',
+            usage: 'set <key> <value> / reset <key> / view / add <warnings> <punishment> [--time <time> (mute/ban)] [--roleid <id> (role/unrole)] [--soft (ban)] [--days <amount> (ban: delete messages)]/ remove <punishment index>',
             userpermissions: Constants.Permissions.manageGuild,
             guildOnly: true
         });
@@ -46,9 +46,9 @@ export default class SettingsCommand extends Command {
         const punishment = ctx.args.get(2);
         if (!['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].includes(punishment))
             return ctx.send('A punishment is required and it needs to be of the following: ' + ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].join(', '))
-        const temp = ctx.flags.get('temp');
+        const temp = ctx.flags.get('time');
         if (!!temp && (typeof temp === 'boolean' || (typeof temp === 'string' && (!ms(temp as string) || ms(temp as string) < 1000))))
-            return ctx.send('The temp flag needs to be a correct time expression: can be 0.5h or 30m or 0.5 hours or 30 minutes or the amount in milliseconds. It also needs to be more or equal to one second.')
+            return ctx.send('The time flag needs to be a correct time expression: can be 0.5h or 30m or 0.5 hours or 30 minutes or the amount in milliseconds. It also needs to be more or equal to one second.')
         const soft = !!ctx.flags.get('soft');
         const roleid = ctx.flags.get('roleid');
         if (!roleid && (punishment === 'role' || punishment === 'unrole'))
