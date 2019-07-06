@@ -11,7 +11,7 @@ export default class BanCommand extends Command {
         super(client, {
             name: 'ban',
             description: 'Ban a member in the current guild',
-            usage: '<user> [--reason] [--softban]',
+            usage: '<user> [--reason] [--softban] [--days]',
             aliases: ['banne', 'bean'],
             category: 'Moderation',
             guildOnly: true,
@@ -36,13 +36,17 @@ export default class BanCommand extends Command {
 
         let time = (ctx.flags.get('time') || ctx.flags.get('t'));
         if (typeof time === 'boolean') return ctx.send('You will need to specify time to be alloted');
+
+        const days = (ctx.flags.get('days') || ctx.flags.get('d'));
+        if (typeof days === 'boolean' || !/[0-9]+/.test(days)) return ctx.send('You need to specify the amount days to delete messages of.')
         
         const t = !!time ? ms(time) : undefined;
 
         const punishment = new Punishment(PunishmentType.Ban, {
             moderator: ctx.sender,
             soft: (ctx.flags.get('soft') as boolean),
-            temp: t
+            temp: t,
+            days: Number(days)
         });
 
         await this.client.punishments.punish(member!, punishment, reason as string | undefined);

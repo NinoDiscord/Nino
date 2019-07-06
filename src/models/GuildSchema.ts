@@ -5,10 +5,7 @@ export interface GuildModel extends Document {
     guildID: string;
     prefix: string;
     mutedRole: string;
-    modlog: {
-        enabled: boolean;
-        channelID: string;
-    },
+    modlog: string;
     automod: {
         spam: boolean,
         invites: boolean,
@@ -29,14 +26,8 @@ const schema = new Schema<GuildModel>({
     prefix: String,
     mutedRole: String,
     modlog: {
-        enabled: {
-            type: Boolean,
-            default: false
-        },
-        channelID: {
-            type: String,
-            default: null
-        }
+        type: String,
+        default: null
     },
     automod: {
         spam: {

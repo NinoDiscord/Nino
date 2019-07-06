@@ -99,6 +99,19 @@ export default class SettingsCommand extends Command {
     async set(ctx: Context) {
         const setting = ctx.args.get(1);
         switch (setting) {
+            case 'modlog': {
+                const channelId = ctx.args.get(2);
+                if (!channelId || !/^[0-9]+$/.test(channelId)) return ctx.send('Please set a valid id!')
+                this.client.settings.update(ctx.guild.id, {
+                    $set: {
+                        modlog: channelId
+                    }
+                }, (error) => {
+                    if (error) return ctx.send('I was unable to set the modlog channel');
+                    return ctx.send(`The modlog channel has been set to <#${channelId}>`);
+                })
+                break;
+            }
             case 'prefix': {
                 const prefix = ctx.args.get(2);
                 if (!prefix) return ctx.send('Hey! You\'ll need to set a prefix.');
@@ -210,6 +223,17 @@ export default class SettingsCommand extends Command {
     async reset(ctx: Context) {
         const setting = ctx.args.get(1);
         switch (setting) {
+            case 'modlog': {
+                this.client.settings.update(ctx.guild.id, {
+                    $set: {
+                        modlog: null
+                    }
+                }, (error) => {
+                    if (error) return ctx.send('I was unable to disable the modlog')
+                    return ctx.send('Mod-log has been disabled!')
+                })
+                break;
+            }
             case 'prefix': {
                 this.client.settings.update(ctx.guild.id, {
                     $set: {
@@ -297,15 +321,14 @@ export default class SettingsCommand extends Command {
             .setTitle(`Configuration for ${ctx.guild.name}`)
             .setDescription(stripIndents`
                 \`\`\`ini
-                [guild.prefix]: ${settings!.prefix}
+                [prefix]: ${settings!.prefix}
                 [mutedrole]: ${settings!.mutedRole ? ctx.guild.roles.get(settings!.mutedRole)!.name : 'None'}
-                [guild.modlog.enabled]: ${settings!.modlog.enabled? 'Yes': 'No'}
-                [guild.modlog.channelID]: ${settings!.modlog.channelID === null? 'No channel was set.': ctx.guild.channels.get(settings!.modlog.channelID)!.name}
-                [guild.automod.spam]: ${settings!.automod.spam? 'Yes': 'No'}
-                [guild.automod.invites]: ${settings!.automod.spam? 'Yes': 'No'}
-                [guild.automod.swears]: ${settings!.automod.badwords.wordlist? settings!.automod.badwords.wordlist.join(', ') : 'Disabled'}
-                [guild.automod.raid]: ${settings!.automod.raid? 'Yes': 'No'}
-                [guild.punishments]:
+                [modlog]: ${settings!.modlog === null? 'No channel was set.': ctx.guild.channels.get(settings!.modlog)!.name}
+                [automod.spam]: ${settings!.automod.spam? 'Yes': 'No'}
+                [automod.invites]: ${settings!.automod.spam? 'Yes': 'No'}
+                [automod.swears]: ${settings!.automod.badwords.wordlist? settings!.automod.badwords.wordlist.join(', ') : 'Disabled'}
+                [automod.raid]: ${settings!.automod.raid? 'Yes': 'No'}
+                [punishments]:
                 ${settings!.punishments.map((p, i) => `${i+1}. warnings: ${p.warnings}, punishment: ${p.type}, special:${!!p.temp ? ` Time: ${ms(p.temp)}` : ''}${!!p.soft ? ` Soft` : ''}${!!p.roleid ? ` Role: ${!!ctx.guild.roles.get(p.roleid) ? ctx.guild.roles.get(p.roleid)!.name: ''}` : ''}`).join('\n')}
                 \`\`\`
             `)

@@ -236,8 +236,8 @@ export default class PunishmentManager {
      */
     async postToModLog(member: Member | {guild: Guild, id: string, username: string, discriminator: string}, punishment: Punishment, reason?: string) {
         const settings = await this.client.settings.get(member.guild.id);
-        if (!settings || !settings!.modlog.enabled) return;
-        const modlog = member.guild.channels.get(settings!.modlog.channelID) as TextChannel;
+        if (!settings || !settings!.modlog) return;
+        const modlog = member.guild.channels.get(settings!.modlog) as TextChannel;
         if (!!modlog && modlog!.permissionsOf(this.client.user.id).has('sendMessages') && modlog!.permissionsOf(this.client.user.id).has('embedLinks')) {
             const action = this.determineType(punishment.type);
             const c = await this.client.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);

@@ -55,7 +55,7 @@ export default class NinoClient extends Client {
     public autoModService: AutomodService;
     public cases: CaseSettings = new CaseSettings();
     public timeouts: TimeoutsManager;
-    public webhook: WebhookClient;
+    public webhook?: WebhookClient;
     // LIST: August, Dondish, Kyle, Derpy, Wessel
     public owners: string[] = ['280158289667555328', '239790360728043520', '130442810456408064', '145557815287611393', '107130754189766656'];
     public stats: CommandStats = {
@@ -85,7 +85,7 @@ export default class NinoClient extends Client {
         this.settings = new GuildSettings(this);
         this.warnings = new Warning();
         this.timeouts = new TimeoutsManager(this);
-        this.webhook = new WebhookClient(config);
+        this.webhook = config.environment === 'production' ? new WebhookClient(config) : undefined;
         this.logger = new instance({
             name: 'main',
             format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=> `,
