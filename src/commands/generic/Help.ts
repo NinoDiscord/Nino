@@ -35,9 +35,9 @@ export default class HelpCommand extends Command {
                 .getEmbed()
                 .setTitle(`${this.client.user.username}#${this.client.user.discriminator} | Commands List`)
                 .setDescription(stripIndents`
-                    **Use ${settings!.prefix}help [command] to get documentation on a command**
+                    More information is available on the [wiki](https://github.com/auguwu/Nino/wiki)!
                     There are currently **${this.client.manager.commands.size}** commands available
-                `);
+                `).setFooter(`Use ${settings!.prefix}help [command] to get documentation regarding a command`);
 
             for (const cat in categories) embed.addField(cat, categories[cat].map(s => `**\`${s}\`**`).join(', '));
 
