@@ -5,6 +5,7 @@ import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import ms = require('ms');
+import PermissionUtils from '../../util/PermissionUtils';
 
 export default class WarnCommand extends Command {
     constructor(client: NinoClient) {

@@ -31,6 +31,8 @@ export default class UnbanCommand extends Command {
         let reason = (ctx.flags.get('reason') || ctx.flags.get('r'));
         if (typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
 
+        await this.client.timeouts.cancelTimeout(id, ctx.guild, 'unban');
+        await ctx.send('User successfully unbanned.');
         const punishment = new Punishment(PunishmentType.Unban, { moderator: ctx.sender });
         await this.client.punishments.punish({id: id!, guild: ctx.guild}, punishment, (reason as string | undefined));
     }

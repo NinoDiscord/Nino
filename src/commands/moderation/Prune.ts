@@ -33,7 +33,7 @@ export default class PruneCommand extends Command {
         const messages = await ctx.message.channel.getMessages(Number(arg));
         const filter   = (ctx.flags.get('filter') || ctx.flags.get('f'));
         if (typeof filter === 'boolean') return ctx.send('The `filter` flag must be a string.');
-        if (!this.filters.includes(filter)) return ctx.send(`Invalid filter. (\`${this.filters.map(s => s).join(', ')}\`)`);
+        if (!!filter && !this.filters.includes(filter)) return ctx.send(`Invalid filter. (\`${this.filters.map(s => s).join(', ')}\`)`);
 
         const toDelete = messages.filter(m =>
             (filter === 'bot'? m.author.bot: true) &&

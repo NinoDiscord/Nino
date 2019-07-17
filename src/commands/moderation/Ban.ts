@@ -1,10 +1,11 @@
 import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
-import { Constants } from 'eris';
+import { Constants, Member, Guild } from 'eris';
 import NinoClient from '../../structures/Client';
-import findUser from '../../util/UserUtil';
+import findUser, { findId } from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import ms = require('ms');
+import PermissionUtils from '../../util/PermissionUtils';
 
 export default class BanCommand extends Command {
     constructor(client: NinoClient) {
@@ -23,13 +24,18 @@ export default class BanCommand extends Command {
     async run(ctx: Context) {
         if (!ctx.args.has(0)) return ctx.send('Sorry but you will need to specify a user.');
 
-        const u = findUser(this.client, ctx.args.get(0))!;
+        const u = findId(this.client, ctx.args.get(0));
         if (!u) {
-            return ctx.send('I can\'t find this user!')
+            return ctx.send('Invalid format: <@mention> / <user id>')
         }
-        const member = ctx.guild.members.get(u.id);
+        let member: Member | undefined | {id: string, guild: Guild} = ctx.guild.members.get(u);
 
-        if (!member || member === null) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
+        if (!member || !(member instanceof Member)) {
+            member = {id: u, guild: ctx.guild}
+        } else {
+            if (!PermissionUtils.above(ctx.message.member!, member))
+            return ctx.send('The user is above you in the heirarchy.')
+        }
 
         let reason = (ctx.flags.get('reason') || ctx.flags.get('r'));
         if (typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
@@ -49,6 +55,7 @@ export default class BanCommand extends Command {
             days: Number(days)
         });
 
+        await ctx.send('User successfully banned.')
         await this.client.punishments.punish(member!, punishment, reason as string | undefined);
     }
 }

@@ -34,7 +34,7 @@ export default class AutoModInvite {
         const guild = channel.guild;
         const me = guild.members.get(this.client.user.id)!;
         
-        if (!PermissionUtils.above(me, m.member!) || !channel.permissionsOf(me.id).has('manageMessages')) // TODO: add permission checks. I will need to figure out those!
+        if (!PermissionUtils.above(me, m.member!) || !channel.permissionsOf(me.id).has('manageMessages') || m.author.bot) // TODO: add permission checks. I will need to figure out those!
             return false;
 
         if (m.content.match(this.regex)) {

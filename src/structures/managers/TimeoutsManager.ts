@@ -24,12 +24,26 @@ export default class TimeoutsManager {
      * @param time the amount of time before executing
      */
     async addTimeout(member: string, guild: Guild, task: string, time: number) {
-        const key = `Timeout:${task}:${Date.now()}:${time}`;
+        const key = `Timeout:${task}:${guild.id}:${member}`;
         await this.client.redis.set(key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
         setTimeout(async () => {
-            await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
-            await this.client.redis.del(key);
+            if (await this.client.redis.exists(key)) {
+                await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
+                await this.client.redis.del(key);
+            }
+            
         }, time)
+    }
+
+    /**
+     * Cancel a timeout
+     * @param member the member
+     * @param guild the guild
+     * @param task the punishment
+     */
+    async cancelTimeout(member: string, guild: Guild, task: string) {
+        const key = `Timeout:${task}:${guild.id}:${member}`;
+        return this.client.redis.del(key)
     }
 
     /**
@@ -39,7 +53,6 @@ export default class TimeoutsManager {
         const timedates = await this.client.redis.keys('Timeout:*:*:*');
         for (let timedate of timedates) {
             const value = await this.client.redis.get(timedate);
-            this.client.logger.info(value!.split(':'))
             const start = Number(value!.split(':')[0]);
             const amount = Number(value!.split(':')[1]);
             const member = value!.split(':')[2];
@@ -49,8 +62,10 @@ export default class TimeoutsManager {
                 continue;
             
             setTimeout(async () => {
-                await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
-                await this.client.redis.del(timedate);
+                if (await this.client.redis.exists(timedate)) {
+                    await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
+                    await this.client.redis.del(timedate);
+                }
             }, start - Date.now() + amount);
 
         }

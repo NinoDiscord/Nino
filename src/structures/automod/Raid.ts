@@ -42,10 +42,10 @@ export default class AutoModRaid {
         const queue = new RedisQueue(this.client.redis, `raid:${guild.id}`);
         await queue.push(Date.now().toString());
 
-        if ((await queue.length()) >= 5) {
+        if ((await queue.length()) >= 3) {
             const oldtime = Number.parseInt(await queue.pop());
             
-            if (Date.now() - oldtime <= 3000) {
+            if (Date.now() - oldtime <= 1000) {
                 await this.client.punishments.punish(m, new Punishment(PunishmentType.Ban, {moderator: me.user}), 'Automod: Raid detected');
                 return true;
             }

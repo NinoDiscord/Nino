@@ -4,6 +4,7 @@ import NinoClient from '../../structures/Client';
 import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import PermissionUtils from '../../util/PermissionUtils';
 
 export default class PardonCommand extends Command {
     constructor(client: NinoClient) {
@@ -30,6 +31,9 @@ export default class PardonCommand extends Command {
         
 
         if (!member) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
+
+        if (!PermissionUtils.above(ctx.message.member!, member))
+            return ctx.send('The user is above you in the heirarchy.')
 
         await this.client.punishments.pardon(member!, amount);
         const warns = await this.client.warnings.get(ctx.guild.id, member.id);

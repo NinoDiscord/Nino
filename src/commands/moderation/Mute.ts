@@ -5,6 +5,7 @@ import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import ms = require('ms');
+import PermissionUtils from '../../util/PermissionUtils';
 
 export default class MuteCommand extends Command {
     constructor(client: NinoClient) {
@@ -14,7 +15,7 @@ export default class MuteCommand extends Command {
             usage: '<user> [--reason] [--time]',
             aliases: ['slience'],
             category: 'Moderation',
-            userpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
+            userpermissions: Constants.Permissions.manageRoles,
             botpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels
         });
     }
@@ -30,6 +31,9 @@ export default class MuteCommand extends Command {
 
         if (!member) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
 
+        if (!PermissionUtils.above(ctx.message.member!, member))
+            return ctx.send('The user is above you in the heirarchy.')
+
         let reason = (ctx.flags.get('reason') || ctx.flags.get('r'));
         if (typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
 
@@ -42,7 +46,9 @@ export default class MuteCommand extends Command {
             moderator: ctx.sender,
             temp: t
         });
-
+        
+        await this.client.timeouts.cancelTimeout(member.id, ctx.guild, 'unmute');
+        await ctx.send('User successfully muted.');
         await this.client.punishments.punish(member!, punishment, (reason as string | undefined));
     }
 }

@@ -48,6 +48,12 @@ export default class CommandService {
 
         if (command.length > 0) {
             const cmd = command[0];
+            const helpFlag = ctx.flags.get('help') || ctx.flags.get('h');
+            if (helpFlag && typeof helpFlag === 'boolean') {
+                const embed = cmd.help();
+                ctx.embed(embed);
+                return; // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
+            }
             if (cmd.guildOnly && m.channel.type === 1) return void ctx.send('Sorry, but you\'ll be in a guild to execute the `' + cmd.name + '` command.');
             if (cmd.ownerOnly && !this.client.owners.includes(ctx.sender.id)) return void ctx.send(`Sorry, but you will need to be a developer to execute the \`${cmd.name}\` command.`);
             if (cmd.disabled) return void ctx.send(`Command \`${cmd.name}\` is disabled.`);
@@ -67,13 +73,6 @@ export default class CommandService {
                 });
 
             try {
-                const helpFlag = ctx.flags.get('help') || ctx.flags.get('h');
-                if (helpFlag && typeof helpFlag === 'boolean') {
-                    const embed = cmd.help();
-                    ctx.embed(embed);
-                    return; // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
-                }
-
                 await cmd.run(ctx);
                 this.client.addCommandUsage(cmd, ctx.sender);
             } catch(ex) {
