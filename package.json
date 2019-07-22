@@ -1,12 +1,12 @@
 {
     "name": "nino",
     "description": "Moderation bot for Discord's hack week entry.",
-    "version": "0.0.3",
+    "version": "0.0.4",
     "main": "dist/bot.js",
     "scripts": {
-        "main": "tsc && node dist/bot.js",
-        "dev": "nodemon dist/bot.js",
-        "compile:watch": "tsc -w"
+        "build": "rm -fr dist && tsc",
+        "main": "yarn build && node dist/bot.js",
+        "dev": "yarn build && nodemon dist/bot.js"
     },
     "maintainers": [
         "Kyle (dvhe)",

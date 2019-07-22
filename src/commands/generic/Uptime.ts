@@ -1,7 +1,7 @@
+import { humanize } from '../../util';
 import NinoClient from '../../structures/Client';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
-import ms from 'ms';
 
 export default class UptimeCommand extends Command {
     constructor(client: NinoClient) {
@@ -15,6 +15,6 @@ export default class UptimeCommand extends Command {
     }
 
     async run(ctx: Context) {
-        return ctx.send(`My Uptime is ${ms(process.uptime()*1000, { long: true })}`);
+        return ctx.send(humanize(Date.now() - this.client.startTime));
     }
 }

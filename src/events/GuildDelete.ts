@@ -14,7 +14,5 @@ export default class GuildLeftEvent extends Event {
             name: `${this.client.config['discord'].prefix}help | ${this.client.guilds.size.toLocaleString()} Guilds`,
             type: 0
         });
-        if (this.client.webhook)
-            this.client.webhook.send(`:x: **|** Left ${guild.name} (${guild.id}) on shard #${guild.shard.id}`);
     }
 }
