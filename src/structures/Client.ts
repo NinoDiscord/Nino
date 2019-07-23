@@ -15,20 +15,20 @@ import TimeoutsManager from './managers/TimeoutsManager';
 import BotListService from './services/BotListService';
 
 export interface NinoConfig {
-    environment: string,
+    environment: string;
     databaseUrl: string;
     discord: {
         prefix: string;
         token: string;
-    }
+    };
     redis: {
         host: string;
         port: number;
-    }
+    };
     webhook: {
         id: string;
         token: string;
-    },
+    };
     dbltoken: string;
     bfdtoken: string;
     dboatstoken: string;
