@@ -39,7 +39,7 @@ export default class HelpCommand extends Command {
                     There are currently **${this.client.manager.commands.size}** commands available
                 `).setFooter(`Use ${settings!.prefix}help [command] to get documentation regarding a command`);
 
-            for (const cat in categories) embed.addField(cat, categories[cat].map(s => `**\`${s}\`**`).join(', '));
+            for (const cat in categories) embed.addField(cat.toUpperCase(), categories[cat].map(s => `\`${s}\``).join(', '));
 
             return ctx.embed(embed.build());
         } else {

@@ -18,10 +18,7 @@ export default class ReadyEvent extends Event {
                 name: `${this.client.config['discord'].prefix}help | ${this.client.guilds.size.toLocaleString()} Guilds`,
                 type: 0
             });
-        }, 600000)
-        
+        }, 600000);
         this.client.timeouts.reapplyTimeouts();
-        if (!!this.client.webhook)
-            this.client.webhook!.send(':white_check_mark: **|** Connected to Discord!');
     }
 }

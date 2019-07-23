@@ -19,20 +19,11 @@ export default class SettingsCommand extends Command {
     async run(ctx: Context) {
         const subcommand = ctx.args.get(0);
         switch (subcommand) {
-            case 'set': {
-                this.set(ctx);
-            } break;
-
-            case 'reset': {
-                this.reset(ctx);
-            } break;
-
+            case 'set': this.set(ctx); break;
+            case 'reset': this.reset(ctx); break;
             case 'view': return this.view(ctx);
-
             case 'add': return this.add(ctx);
-
             case 'remove': return this.remove(ctx);
-
             default: {
                 return ctx.send('Missing the `subcommand` argument. (`set` | `reset` | `view` | `add` | `remove`)');
             }
