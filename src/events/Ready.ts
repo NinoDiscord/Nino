@@ -19,6 +19,7 @@ export default class ReadyEvent extends Event {
                 type: 0
             });
         }, 600000);
+        this.client.botlistservice.start();
         this.client.timeouts.reapplyTimeouts();
     }
 }

@@ -127,8 +127,6 @@ export default class NinoClient extends Client {
         this.logger.discord('Connected to Discord!');
         this.logger.info('Loading commands...');
         await this.manager.start();
-        this.logger.info("Loading Bot List Service...");
-        this.botlistservice.start();
         this.logger.info('All set!');
     }
 
