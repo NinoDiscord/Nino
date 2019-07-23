@@ -14,5 +14,6 @@ export default class GuildLeftEvent extends Event {
             name: `${this.client.config['discord'].prefix}help | ${this.client.guilds.size.toLocaleString()} Guilds`,
             type: 0
         });
+        await this.client.redis.set("guilds", this.client.guilds.size);
     }
 }

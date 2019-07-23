@@ -1,5 +1,6 @@
-import NinoClient from "../Client";
+import NinoClient, { NinoConfig } from "../Client";
 import wumpfetch from "wumpfetch";
+import { Client } from "eris";
 
 /**
  * Service that posts guild count to botlists.
@@ -18,8 +19,13 @@ export default class BotListService {
      * Start posting guild stats
      */
     start() {
-        this.postCount(this.client);
-        this.interval = setInterval(() => this.postCount(this.client), 60000);
+        this.postCount(this.client.guilds.size, this.client.user.id, this.client.config, this.client.logger);
+        this.interval = setInterval(async () => {
+            const guilds = await this.client.redis.get("guilds");
+            if (guilds)
+                this.postCount(Number(guilds), this.client.user.id, this.client.config, this.client.logger);
+
+        }, 60000);
     }
 
     /**
@@ -34,63 +40,70 @@ export default class BotListService {
     /**
      * Post guild stats
      */
-    postCount(client: NinoClient) {
-        const guilds = client.guilds.size;
-        if (client.config.dbltoken)
+    postCount(guilds: Number, id: string,  config: NinoConfig, logger: any) {
+        if (config.dbltoken)
             wumpfetch({
-                url: `https://discordbots.org/api/bots/${client.user.id}/stats`, 
+                url: `https://discordbots.org/api/bots/${id}/stats`, 
                 method: "POST",
                 headers: {
-                    "Authorization": client.config.dbltoken,
+                    "Authorization": config.dbltoken,
                     "Content-Type": "application/json"
                 },
                 data: {
                     "server_count": guilds
                 }
-            }).send().catch(() => {
-                client.logger.error("Failed to post guild stats to Discord Bot List.")
+            }).send().then(() => {
+                logger.info("Posted guild stats to Discord Bot List.");
+            }).catch(() => {
+                logger.error("Failed to post guild stats to Discord Bot List.");
             })
-        if (client.config.bfdtoken)
+        if (config.bfdtoken)
             wumpfetch({
-                url: `https://botsfordiscord.com/api/bot/${client.user.id}`, 
+                url: `https://botsfordiscord.com/api/bot/${id}`, 
                 method: "POST",
                 headers: {
-                    "Authorization": client.config.bfdtoken,
+                    "Authorization": config.bfdtoken,
                     "Content-Type": "application/json"
                 },
                 data: {
                     "server_count": guilds
                 }
-            }).send().catch(() => {
-                client.logger.error("Failed to post guild stats to Bots For Discord.")
+            }).send().then(() => {
+                logger.info("Posted guild stats to Bots For Discord");
+            }).catch(() => {
+                logger.error("Failed to post guild stats to Bots For Discord.");
             })
-        if (client.config.dboatstoken)
+        if (config.dboatstoken)
             wumpfetch({
-                url: `https://discord.boats/api/v2/bot/${client.user.id}`, 
+                url: `https://discord.boats/api/v2/bot/${id}`, 
                 method: "POST",
                 headers: {
-                    "Authorization": client.config.dboatstoken,
+                    "Authorization": config.dboatstoken,
                     "Content-Type": "application/json"
                 },
                 data: {
                     "server_count": guilds
                 }
-            }).send().catch(() => {
-                client.logger.error("Failed to post guild stats to Discord Boats.")
+            }).send().then(() => {
+                logger.info("Posted guild stats to Discord Boats.");
+            }).catch(() => {
+                logger.error("Failed to post guild stats to Discord Boats.");
             })
-        if (client.config.dbgtoken)
+        if (config.dbgtoken)
             wumpfetch({
-                url: `https://api.discordbots.group/v1/bot/${client.user.id}`, 
+                url: `https://api.discordbots.group/v1/bot/${id}`, 
                 method: "POST",
                 headers: {
-                    "Authorization": client.config.dboatstoken,
+                    "Authorization": config.dboatstoken,
                     "Content-Type": "application/json"
                 },
                 data: {
                     "server_count": guilds
                 }
-            }).send().catch(() => {
-                client.logger.error("Failed to post guild stats to Discord Bots Group.")
+            }).send().then(() => {
+                logger.info("Posted guild stats to Discord Bots Group.");
+            }).catch(() => {
+                logger.error("Failed to post guild stats to Discord Bots Group.");
             })
     }
 }
