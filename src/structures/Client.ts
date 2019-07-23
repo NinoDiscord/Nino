@@ -55,7 +55,7 @@ export default class NinoClient extends Client {
     public warnings: Warning;
     public config: NinoConfig;
     public redis: Redis;
-    public botlistservice = new BotListService(this);
+    public botlistservice: BotListService;
     public punishments = new PunishmentManager(this);
     public autoModService: AutomodService;
     public cases: CaseSettings = new CaseSettings();
@@ -89,6 +89,7 @@ export default class NinoClient extends Client {
         this.settings = new GuildSettings(this);
         this.warnings = new Warning();
         this.timeouts = new TimeoutsManager(this);
+        this.botlistservice = new BotListService(this);
         this.logger = new instance({
             name: 'main',
             format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=> `,
