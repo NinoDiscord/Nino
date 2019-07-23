@@ -13,6 +13,7 @@ import AutomodService from './services/AutomodService';
 import PunishmentManager from './managers/PunishmentManager';
 import TimeoutsManager from './managers/TimeoutsManager';
 import WebhookClient from './WebhookClient';
+import BotListService from './services/BotListService';
 
 export interface NinoConfig {
     environment: string,
@@ -28,7 +29,11 @@ export interface NinoConfig {
     webhook: {
         id: string;
         token: string;
-    }
+    },
+    dbltoken: string;
+    bfdtoken: string;
+    dboatstoken: string;
+    dbgtoken: string;
 }
 
 export interface CommandStats {
@@ -51,6 +56,7 @@ export default class NinoClient extends Client {
     public warnings: Warning;
     public config: NinoConfig;
     public redis: Redis;
+    public botlistservice = new BotListService(this);
     public punishments = new PunishmentManager(this);
     public autoModService: AutomodService;
     public cases: CaseSettings = new CaseSettings();
@@ -123,6 +129,8 @@ export default class NinoClient extends Client {
         this.logger.discord('Connected to Discord!');
         this.logger.info('Loading commands...');
         await this.manager.start();
+        this.logger.info("Loading Bot List Service...");
+        this.botlistservice.start();
         this.logger.info('All set!');
     }
 
