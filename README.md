@@ -34,12 +34,14 @@ Bot credentials (+ extra information) and personal touches are obviously your re
 ```yaml
 environment: "development"
 databaseUrl: "mongodb://localhost:27017/database"
+mode: "development"
+sentryDSN: "your sentry DSN"
 discord:
   token: "TOKEN"
   prefix: "x!"
 redis:
-    host: 'localhost'
-    port: 6379
+  host: 'localhost'
+  port: 6379
 ```
 
 ## Requirements
