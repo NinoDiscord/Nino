@@ -52,7 +52,7 @@ redis:
 ## Participants
 
 * August#5820 (Lead) ([GitHub](https://github.com/auguwu))
+* dondish#0001 (Development Lead) ([GitHub](https://github.com/dondish))
 * Kyle#9810 ([GitHub](https://github.com/dvhe))
-* dondish#0001 ([GitHub](https://github.com/dondish))
 * Wesselgame#0498 ([GitHub](https://github.com/PassTheWessel))
 * ohlookitsderpy#3939 ([GitHub](https://github.com/ohlookitsderpy))
