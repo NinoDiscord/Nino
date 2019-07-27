@@ -96,6 +96,7 @@ export default class CommandService {
                         }).join(', ')} at https://discord.gg/7TtMP2n
                     `);
                 this.client.logger.error(`Unable to run the "${cmd.name}" command\n${ex.stack}`);
+                this.client.report(ex);
             }
         }
     }

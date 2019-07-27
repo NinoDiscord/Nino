@@ -13,6 +13,7 @@ import AutomodService from './services/AutomodService';
 import PunishmentManager from './managers/PunishmentManager';
 import TimeoutsManager from './managers/TimeoutsManager';
 import BotListService from './services/BotListService';
+import { captureException } from '@sentry/node';
 
 export interface NinoConfig {
     environment: string;
@@ -29,6 +30,8 @@ export interface NinoConfig {
         id: string;
         token: string;
     };
+    mode: string;
+    sentryDSN: string;
     dbltoken: string;
     bfdtoken: string;
     dboatstoken: string;
@@ -142,5 +145,9 @@ export default class NinoClient extends Client {
         };
         this.stats.commandUsage[cmd.name].size++;
         this.stats.commandUsage[cmd.name].users.push(user);
+    }
+
+    report(ex: Error) {
+        captureException(ex);
     }
 }

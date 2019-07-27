@@ -1,7 +1,7 @@
 {
     "name": "nino",
     "description": "Moderation bot for Discord's hack week entry.",
-    "version": "0.2.1",
+    "version": "0.2.2",
     "main": "dist/bot.js",
     "scripts": {
         "build": "rm -fr dist && tsc",
@@ -17,6 +17,8 @@
     ],
     "dependencies": {
         "@augu/immutable": "0.0.1",
+        "@sentry/integrations": "^5.5.0",
+        "@sentry/node": "5.5.0",
         "common-tags": "1.8.0",
         "eris": "0.10.0",
         "ioredis": "4.10.0",
