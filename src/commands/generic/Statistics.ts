@@ -63,7 +63,7 @@ export default class StatisticsCommand extends Command {
 
                     **\`Messages Seen\`**: ${this.client.stats.messagesSeen.toLocaleString()}
                     **\`Commands Executed\`**: ${this.client.stats.commandsExecuted.toLocaleString()}
-                    **\`Most Used Command\`**: ${mostUsed.command} (${mostUsed.size} executions; ${mostUsed.users} users)
+                    **\`Most Used Command\`**: ${mostUsed.command} (${mostUsed.size} executions; ${mostUsed.users} user${mostUsed.users > 1? 's': ''})
                 `)
                 .build()
         );
