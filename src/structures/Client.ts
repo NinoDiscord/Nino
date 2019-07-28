@@ -155,13 +155,10 @@ export default class NinoClient extends Client {
     }
 
     addCommandUsage(cmd: Command, user: User) {
-        if (!this.stats.commandUsage[cmd.name]) {
-            this.stats.commandUsage[cmd.name] = {
-                size: 0,
-                users: []
-            }
-            this.addCommandUsage(cmd, user);
-        }
+        if (!this.stats.commandUsage[cmd.name]) this.stats.commandUsage[cmd.name] = {
+            size: 0,
+            users: []
+        };
         this.stats.commandUsage[cmd.name].size = this.stats.commandUsage[cmd.name].size + 1;
         if (!this.stats.commandUsage[cmd.name].users.includes(user)) this.stats.commandUsage[cmd.name].users.push(user);
     }
