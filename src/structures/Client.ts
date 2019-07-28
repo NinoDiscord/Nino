@@ -13,7 +13,7 @@ import AutomodService from './services/AutomodService';
 import PunishmentManager from './managers/PunishmentManager';
 import TimeoutsManager from './managers/TimeoutsManager';
 import BotListService from './services/BotListService';
-import { Counter, Gauge, register, collectDefaultMetrics } from 'prom-client';
+import { Counter, register, collectDefaultMetrics } from 'prom-client';
 import { captureException } from '@sentry/node';
 import { createServer } from 'http';
 import { parse } from 'url';
