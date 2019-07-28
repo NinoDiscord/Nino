@@ -13,7 +13,7 @@ import AutomodService from './services/AutomodService';
 import PunishmentManager from './managers/PunishmentManager';
 import TimeoutsManager from './managers/TimeoutsManager';
 import BotListService from './services/BotListService';
-import { Counter, register, collectDefaultMetrics } from 'prom-client';
+import { Counter, register, collectDefaultMetrics, Gauge } from 'prom-client';
 import { captureException } from '@sentry/node';
 import { createServer } from 'http';
 import { parse } from 'url';
@@ -44,6 +44,7 @@ export interface NinoConfig {
 export interface CommandStats {
     commandsExecuted: number;
     messagesSeen: number;
+    guildCount: number;
     commandUsage: {
         [x: string]: {
             size: number;
@@ -67,8 +68,9 @@ export default class NinoClient extends Client {
     public cases: CaseSettings = new CaseSettings();
     public timeouts: TimeoutsManager;
     public prom = {
-        messagesSeen: new Counter({ name: 'nino_messages_seen', help: 'Total messages has been seen by Nino' }),
-        commandsExecuted: new Counter({ name: 'nino_commands_executed', help: 'Total commands has been executed from users.' })
+        messagesSeen: new Counter({ name: 'nino_messages_seen', help: 'Total messages that have been seen by Nino' }),
+        commandsExecuted: new Counter({ name: 'nino_commands_executed', help: 'The number of times commands have been executed.' }),
+        guildCount: new Gauge({name: 'nino_guild_count', help: 'The number of guilds Nino is in.'})
     }
     public promServer = createServer((req, res) => {
         if (parse(req.url!).pathname === '/metrics') {
@@ -82,6 +84,7 @@ export default class NinoClient extends Client {
     public stats: CommandStats = {
         commandsExecuted: 0,
         messagesSeen: 0,
+        guildCount: 0,
         commandUsage: {}
     };
 

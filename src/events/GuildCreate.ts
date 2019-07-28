@@ -14,6 +14,8 @@ export default class GuildJoinedEvent extends Event {
             name: `${this.client.config['discord'].prefix}help | ${this.client.guilds.size.toLocaleString()} Guilds`,
             type: 0
         });
+        this.client.prom.guildCount.inc();
+        this.client.stats.guildCount++;
         await this.client.redis.set("guilds", this.client.guilds.size);
     }
 }
