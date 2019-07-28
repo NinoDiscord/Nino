@@ -14,6 +14,7 @@ export default class CommandService {
     }
 
     async handle(m: Message) {
+        this.client.prom.messagesSeen.inc();
         this.client.stats.messagesSeen++;
         
         if (m.author.bot) return;
@@ -74,6 +75,8 @@ export default class CommandService {
 
             try {
                 await cmd.run(ctx);
+                this.client.stats.commandsExecuted = (this.client.stats.commandsExecuted || 0) + 1;
+                this.client.prom.commandsExecuted.inc(); 
                 this.client.addCommandUsage(cmd, ctx.sender);
             } catch(ex) {
                 const embed = this.client.getEmbed();

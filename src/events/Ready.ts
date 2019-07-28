@@ -1,6 +1,6 @@
+import { humanize } from '../util';
 import Client from '../structures/Client';
 import Event from '../structures/Event';
-import w from 'wumpfetch';
 
 export default class ReadyEvent extends Event {
     constructor(client: Client) {
@@ -19,6 +19,7 @@ export default class ReadyEvent extends Event {
                 type: 0
             });
         }, 600000);
+        this.client.promServer.listen(5595, () => this.client.logger.info('Metrics is now listening on port "5595"'));
         await this.client.redis.set("guilds", this.client.guilds.size);
         this.client.botlistservice.start();
         this.client.timeouts.reapplyTimeouts();

@@ -13,7 +13,10 @@ import AutomodService from './services/AutomodService';
 import PunishmentManager from './managers/PunishmentManager';
 import TimeoutsManager from './managers/TimeoutsManager';
 import BotListService from './services/BotListService';
+import { Counter, Gauge, register, collectDefaultMetrics } from 'prom-client';
 import { captureException } from '@sentry/node';
+import { createServer } from 'http';
+import { parse } from 'url';
 
 export interface NinoConfig {
     environment: string;
@@ -63,7 +66,18 @@ export default class NinoClient extends Client {
     public autoModService: AutomodService;
     public cases: CaseSettings = new CaseSettings();
     public timeouts: TimeoutsManager;
-    // LIST: August, Dondish, Kyle, Derpy, Wessel
+    public prom = {
+        messagesSeen: new Counter({ name: 'nino_messages_seen', help: 'Total messages has been seen by Nino' }),
+        commandsExecuted: new Counter({ name: 'nino_commands_executed', help: 'Total commands has been executed from users.' })
+    }
+    public promServer = createServer((req, res) => {
+        if (parse(req.url!).pathname === '/metrics') {
+            res.writeHead(200, { 'Content-Type': register.contentType });
+            res.write(register.metrics());
+        }
+
+        res.end();
+    });
     public owners: string[] = ['280158289667555328', '239790360728043520', '130442810456408064', '145557815287611393', '107130754189766656'];
     public stats: CommandStats = {
         commandsExecuted: 0,
@@ -116,6 +130,8 @@ export default class NinoClient extends Client {
                 new FileTransport({ file: 'data/Nino.log' })
             ]
         });
+
+        collectDefaultMetrics();
     }
 
     async build() {
