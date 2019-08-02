@@ -25,7 +25,7 @@
         "eris": "0.10.1",
         "ioredis": "4.10.0"
         "js-yaml": "3.13.1",
-        "mongoose": "5.6.0",
+        "mongoose": "5.6.8",
         "ms": "2.1.2",
         "pikmin": "0.1.7",
         "prom-client": "11.5.3",
@@ -35,7 +35,7 @@
         "@types/common-tags": "1.8.0",
         "@types/ioredis": "4.0.13",
         "@types/js-yaml": "3.12.1",
-        "@types/mongoose": "5.5.6",
+        "@types/mongoose": "5.5.11",
         "@types/ms": "0.7.30",
         "@types/node": "12.6.9",
         "nodemon": "1.19.1",
