@@ -27,7 +27,7 @@
         "ms": "2.1.2",
         "pikmin": "0.1.7",
         "prom-client": "11.5.3",
-        "wumpfetch": "0.2.13"
+        "wumpfetch": "0.2.14"
     },
     "devDependencies": {
         "@types/common-tags": "1.8.0",
