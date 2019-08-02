@@ -21,7 +21,7 @@
         "@sentry/node": "5.5.0",
         "common-tags": "1.8.0",
         "eris": "0.10.0",
-        "ioredis": "4.10.0",
+        "ioredis": "4.14.0",
         "js-yaml": "3.13.1",
         "mongoose": "5.6.0",
         "ms": "2.1.2",
@@ -31,7 +31,7 @@
     },
     "devDependencies": {
         "@types/common-tags": "1.8.0",
-        "@types/ioredis": "4.0.12",
+        "@types/ioredis": "4.0.13",
         "@types/js-yaml": "3.12.1",
         "@types/mongoose": "5.5.6",
         "@types/ms": "0.7.30",
