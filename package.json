@@ -20,8 +20,10 @@
         "@sentry/integrations": "^5.5.0",
         "@sentry/node": "5.5.0",
         "common-tags": "1.8.0",
-        "eris": "0.10.0",
+        "eris": "0.10.1",
         "ioredis": "4.14.0",
+        "eris": "0.10.1",
+        "ioredis": "4.10.0"
         "js-yaml": "3.13.1",
         "mongoose": "5.6.0",
         "ms": "2.1.2",
