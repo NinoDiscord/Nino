@@ -33,6 +33,7 @@ export interface NinoConfig {
         id: string;
         token: string;
     };
+    webserver: number;
     mode: string;
     sentryDSN: string;
     dbltoken: string;

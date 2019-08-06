@@ -1,10 +1,13 @@
-import { humanize } from '../util';
+import Webserver from '../webserver/server';
 import Client from '../structures/Client';
 import Event from '../structures/Event';
 
 export default class ReadyEvent extends Event {
+    public web: Webserver;
+
     constructor(client: Client) {
         super(client, 'ready');
+        this.web = new Webserver(client);
     }
 
     async emit() {
@@ -25,5 +28,6 @@ export default class ReadyEvent extends Event {
         this.client.prom.guildCount.set(this.client.stats.guildCount, Date.now())
         this.client.botlistservice.start();
         this.client.timeouts.reapplyTimeouts();
+        this.web.start();
     }
 }

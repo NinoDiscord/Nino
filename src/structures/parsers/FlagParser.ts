@@ -10,9 +10,10 @@ export default class FlagParser {
      */
     parse(): { [x: string]: string | true } {
         const parsed = {};
-        if (!this.flags.includes('--')) return {};
+        if (!this.flags.includes('--') || !this.flags.includes('-')) return {};
 
-        for (let flag of this.flags.split('--').slice(1)) {
+        const flagPartitioned = (this.flags.includes('--'))? this.flags.split('--'): this.flags.split('-');
+        for (let flag of flagPartitioned.slice(1)) {
             if (flag === '' || !flag.includes('=') || flag[0] === '=' || flag[flag.length-1] === '=') {
                 parsed[flag.split(' ')[0]] = true;
                 continue;
