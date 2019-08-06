@@ -89,21 +89,5 @@ export default class BotListService {
             }).catch(() => {
                 logger.error("Failed to post guild stats to Discord Boats.");
             })
-        if (config.dbgtoken)
-            wumpfetch({
-                url: `https://api.discordbots.group/v1/bot/${id}`, 
-                method: "POST",
-                headers: {
-                    "Authorization": config.dboatstoken,
-                    "Content-Type": "application/json"
-                },
-                data: {
-                    "server_count": guilds
-                }
-            }).send().then(() => {
-                logger.info("Posted guild stats to Discord Bots Group.");
-            }).catch(() => {
-                logger.error("Failed to post guild stats to Discord Bots Group.");
-            })
     }
 }

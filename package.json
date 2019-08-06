@@ -23,13 +23,13 @@
         "eris": "0.10.1",
         "ioredis": "4.14.0",
         "eris": "0.10.1",
-        "ioredis": "4.10.0"
+        "ioredis": "4.10.0",
         "js-yaml": "3.13.1",
         "mongoose": "5.6.8",
         "ms": "2.1.2",
         "pikmin": "0.1.7",
         "prom-client": "11.5.3",
-        "wumpfetch": "0.2.13"
+        "wumpfetch": "0.2.14"
     },
     "devDependencies": {
         "@types/common-tags": "1.8.0",
