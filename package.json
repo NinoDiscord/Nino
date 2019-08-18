@@ -27,7 +27,7 @@
         "js-yaml": "3.13.1",
         "mongoose": "5.6.9",
         "ms": "2.1.2",
-        "pikmin": "0.1.12",
+        "pikmin": "0.1.13",
         "prom-client": "11.5.3",
         "wumpfetch": "0.2.14"
     },
