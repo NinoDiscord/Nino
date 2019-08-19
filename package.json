@@ -34,7 +34,7 @@
         "@types/common-tags": "1.8.0",
         "@types/ioredis": "4.0.13",
         "@types/js-yaml": "3.12.1",
-        "@types/mongoose": "5.5.12",
+        "@types/mongoose": "5.5.13",
         "@types/ms": "0.7.30",
         "@types/node": "12.7.2",
         "eslint": "6.2.0",
