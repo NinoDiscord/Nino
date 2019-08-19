@@ -22,7 +22,7 @@ export default class StatisticsCommand extends Command {
 
     getMostUsedCommand() {
         const name = Object.keys(this.client.stats.commandUsage)
-        .map(key => ({ key, uses: this.client.stats.commandUsage[key].size }) // map key array to {key uses} array
+        .map(key => ({ key, uses: this.client.stats.commandUsage[key].size })) // map key array to {key uses} array
         .sort((a, b) => b.uses - a.uses) // Sort by uses
         [0].key;
 
