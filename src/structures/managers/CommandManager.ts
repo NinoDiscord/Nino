@@ -28,8 +28,8 @@ export default class CommandManager {
         for (let i = 0; i < groups.length; i++) {
             const category = groups[i];
             readdir(`${this.path}${sep}${category}`, (error, files) => {
-                if (error) this.client.logger.error(error.stack);
-                this.client.logger.info(`Building ${files.length} command${files.length > 1? 's': ''}`);
+                if (error && !!error.stack) this.client.logger.log('error', error.stack);
+                this.client.logger.log('info', `Building ${files.length} command${files.length > 1? 's': ''}`);
                 files.forEach((file) => {
                     try {
                         const command = require(`${this.path}${sep}${category}${sep}${file}`);
@@ -38,9 +38,9 @@ export default class CommandManager {
                         cmd.setParent(category, file);
                             
                         this.commands.set(cmd.name, cmd);
-                        this.client.logger.info(`Initialized command ${cmd.name}!`);
+                        this.client.logger.log('info', `Initialized command ${cmd.name}!`);
                     } catch (err) {
-                        this.client.logger.error(`Couldn't initialize command ${file}. Error: ${err}`)
+                        this.client.logger.log('error', `Couldn't initialize command ${file}. Error: ${err}`)
                     }
                     
                 });

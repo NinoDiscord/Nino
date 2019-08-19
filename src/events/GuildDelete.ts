@@ -9,7 +9,7 @@ export default class GuildLeftEvent extends Event {
 
     async emit(guild: Guild) {
         this.client.settings.remove(guild.id);
-        this.client.logger.discord(`Left ${guild.name} (${guild.id})`);
+        this.client.logger.log('discord', `Left ${guild.name} (${guild.id})`); // eslint-disable-line
         this.client.editStatus('online', {
             name: `${this.client.config['discord'].prefix}help | ${this.client.guilds.size.toLocaleString()} Guilds`,
             type: 0

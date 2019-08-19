@@ -24,6 +24,6 @@ export default class NinoWebServer {
     start() {
         this.instance.get('/', (_, res) => res.status(200).body({ success: false, message: this.responses[Math.floor(Math.random() * this.responses.length)] }).end());
         this.instance.get('/commands', (_, res) => res.status(200).body({ success: true, data: this.getAllCommands() }).end());
-        this.instance.listen(this.client.config.webserver, () => this.client.logger.info(`Webserver is now listening on port ${this.client.config.webserver}.`));
+        this.instance.listen(this.client.config.webserver, () => this.client.logger.log('info', `Webserver is now listening on port ${this.client.config.webserver}.`));
     }
 }

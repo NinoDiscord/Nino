@@ -7,6 +7,6 @@ export default class ShardResumedEvent extends Event {
     }
 
     async emit(id: number) {
-        this.client.logger.discord(`Shard #${id} has resumed!`);
+        this.client.logger.log('discord', `Shard #${id} has resumed!`);
     }
 }

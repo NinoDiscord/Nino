@@ -252,7 +252,7 @@ export default class PunishmentManager {
             });
             await this.client.cases.update(member.guild.id, c.id, {message: message.id}, (e) => {
                 if (!!e)
-                    this.client.logger.error(`Couldn't update the case: ${e}`)
+                    this.client.logger.log('error', `Couldn't update the case: ${e}`)
             });
         }
     }

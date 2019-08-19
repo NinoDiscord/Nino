@@ -7,6 +7,6 @@ export default class ShardDisconnectedEvent extends Event {
     }
 
     async emit(id: number, error: any) {
-        this.client.logger.discord(`Shard #${id} has disconnected!\n${error}`);
+        this.client.logger.log('discord', `Shard #${id} has disconnected!\n${error}`);
     }
 }

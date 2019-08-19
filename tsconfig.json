@@ -14,7 +14,10 @@
         "esModuleInterop": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
-        "typeRoots": ["src/@types"]
+        "typeRoots": ["src/@types"],
+        "plugins": [
+            { "name": "typescript-tslint-plugin" }
+        ]
     },
     "include": [ "src/**/*" ],
     "exclude": [ "node_modules" ]

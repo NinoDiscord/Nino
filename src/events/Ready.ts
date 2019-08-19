@@ -11,7 +11,7 @@ export default class ReadyEvent extends Event {
     }
 
     async emit() {
-        this.client.logger.discord(`Logged in as ${this.client.user.username}#${this.client.user.discriminator} (${this.client.user.id})`);
+        this.client.logger.log('discord', `Logged in as ${this.client.user.username}#${this.client.user.discriminator} (${this.client.user.id})`);
         this.client.editStatus('online', {
             name: `${this.client.config['discord'].prefix}help | ${this.client.guilds.size.toLocaleString()} Guilds`,
             type: 0
@@ -22,7 +22,7 @@ export default class ReadyEvent extends Event {
                 type: 0
             });
         }, 600000);
-        this.client.promServer.listen(5595, () => this.client.logger.info('Metrics is now listening on port "5595"'));
+        this.client.promServer.listen(5595, () => this.client.logger.log('info', 'Metrics is now listening on port "5595"'));
         await this.client.redis.set("guilds", this.client.guilds.size);
         this.client.stats.guildCount = this.client.guilds.size;
         this.client.prom.guildCount.set(this.client.stats.guildCount, Date.now())

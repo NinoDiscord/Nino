@@ -1,8 +1,9 @@
-import { init, configureScope } from '@sentry/node';
+import { init, configureScope, Integrations } from '@sentry/node';
 import Client, { NinoConfig } from './structures/Client';
 import { RewriteFrames } from '@sentry/integrations';
 import { readFileSync } from 'fs';
 import { safeLoad } from 'js-yaml';
+import { Integration } from '@sentry/types';
 
 const file = readFileSync('application.yml', 'utf8');
 
@@ -10,10 +11,7 @@ const config: NinoConfig = safeLoad(file);
 const client = new Client(config);
 
 init({
-    dsn: config.sentryDSN,
-    integrations: [new RewriteFrames({
-        root: __dirname || process.cwd()
-    })]
+    dsn: config.sentryDSN
 });
 
 configureScope(scope => {
@@ -21,5 +19,5 @@ configureScope(scope => {
 });
 
 client.build().then(() => {
-    client.logger.info('Now connecting to Discord...');
+    client.logger.log('info', 'Now connecting to Discord...');
 });

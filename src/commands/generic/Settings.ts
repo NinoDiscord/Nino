@@ -131,7 +131,24 @@ export default class SettingsCommand extends Command {
                 })
                 break;
             }
+            case 'automod.dehoist': {
+                const bool = ctx.args.get(2);
+                let boole = false;
 
+                if (!bool) return ctx.send('Missing the `bool` argument');
+                if (bool === 'true') boole = true;
+                else if (bool === 'false') boole = false;
+                else return ctx.send('Invalid boolean');
+                this.client.settings.update(ctx.guild.id, {
+                    $set: {
+                        'automod.dehoist': boole
+                    }
+                }, (error) => {
+                    if (error) return ctx.send(`Unable to ${boole? 'enable': 'disable'} the automod dehoist feature`);
+                    return ctx.send(`${boole? 'Enabled': 'Disabled'} the automod dehoist feature`);
+                })
+                break;
+            }
             case 'automod.spam': {
                 const bool = ctx.args.get(2);
                 let boole = false;
@@ -248,7 +265,16 @@ export default class SettingsCommand extends Command {
                 });
                 break;
             }
-
+            case 'automod.dehoist': {
+                this.client.settings.update(ctx.guild.id, { 
+                    $set: {
+                        'automod.dehoist': false
+                    }
+                }, (error) => {
+                    if (error) return ctx.send(`Unable to disable the automod dehoist feature`);
+                    return ctx.send(`Disabled the automod dehoist feature`);
+                });
+            } break;
             case 'automod.spam': {
                 this.client.settings.update(ctx.guild.id, { 
                     $set: {
@@ -315,6 +341,7 @@ export default class SettingsCommand extends Command {
                 [prefix]: ${settings!.prefix}
                 [mutedrole]: ${settings!.mutedRole ? ctx.guild.roles.get(settings!.mutedRole)!.name : 'None'}
                 [modlog]: ${settings!.modlog === null? 'No channel was set.': ctx.guild.channels.get(settings!.modlog)!.name}
+                [automod.dehoist]: ${settings!.automod.dehoist? 'Yes' : 'No'}
                 [automod.spam]: ${settings!.automod.spam? 'Yes': 'No'}
                 [automod.invites]: ${settings!.automod.spam? 'Yes': 'No'}
                 [automod.swears]: ${settings!.automod.badwords.wordlist? settings!.automod.badwords.wordlist.join(', ') : 'Disabled'}

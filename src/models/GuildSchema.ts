@@ -7,6 +7,7 @@ export interface GuildModel extends Document {
     mutedRole: string;
     modlog: string;
     automod: {
+        dehoist: boolean,
         spam: boolean,
         invites: boolean,
         badwords: {
@@ -30,6 +31,10 @@ const schema = new Schema<GuildModel>({
         default: null
     },
     automod: {
+        dehoist: {
+            type: Boolean,
+            default: false
+        },
         spam: {
             type: Boolean,
             default: false

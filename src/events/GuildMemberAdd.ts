@@ -1,20 +1,16 @@
 import { Guild, Member } from 'eris';
 import Client from '../structures/Client';
 import Event from '../structures/Event';
-import AutoModRaid from '../structures/automod/Raid';
 import { Punishment, PunishmentType } from '../structures/managers/PunishmentManager';
 
 export default class GuildMemberJoined extends Event {
-    private automodraid: AutoModRaid;
-
     constructor(client: Client) {
         super(client, 'guildMemberAdd');
-        this.automodraid = new AutoModRaid(client);
     }
 
 
     async emit(guild: Guild, member: Member) {
-        this.automodraid.handle(member);
+        this.client.autoModService.handleMemberJoin(member);
         const cases = await this.client.cases.getAll(guild.id);
         const his = cases.sort(m => m.id).filter(m => m.victim === member.id);
         if (his.length > 0) {

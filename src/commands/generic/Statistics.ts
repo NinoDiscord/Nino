@@ -14,18 +14,17 @@ export default class StatisticsCommand extends Command {
         super(client, {
             name: 'statistics',
             description: 'Gives you the bot\'s statistics',
-            aliases: ['stats'],
+            aliases: ['stats', 'info'],
             category: 'Generic',
             ownerOnly: false
         });
     }
 
     getMostUsedCommand() {
-        const name = Object.keys(this.client.stats.commandUsage).sort((a, b) => {
-            if (a < b) return 1;
-            if (a > b) return -1;
-            return 0;
-        })[0];
+        const name = Object.keys(this.client.stats.commandUsage)
+        .map(key => { return { key, uses: this.client.stats.commandUsage[key].size}}) // map key array to {key uses} array
+        .sort((a, b) => b.uses - a.uses) // Sort by uses
+        [0].key
 
         return {
             command: name,

@@ -1,12 +1,13 @@
 {
     "name": "nino",
     "description": "Moderation bot for Discord's hack week entry.",
-    "version": "0.2.2",
+    "version": "0.3.0",
     "main": "dist/bot.js",
     "scripts": {
         "build": "rm -fr dist && tsc",
+        "buildDev": "rm -fr dist && tsc -w",
         "main": "yarn build && node dist/bot.js",
-        "dev": "yarn build && nodemon dist/bot.js"
+        "dev": "nodemon dist/bot.js"
     },
     "maintainers": [
         "Kyle (dvhe)",
@@ -21,13 +22,11 @@
         "@sentry/node": "5.6.1",
         "common-tags": "1.8.0",
         "eris": "0.10.1",
-        "ioredis": "4.14.0",
-        "eris": "0.10.1",
         "ioredis": "4.10.0",
         "js-yaml": "3.13.1",
         "mongoose": "5.6.9",
         "ms": "2.1.2",
-        "pikmin": "0.1.11",
+        "pikmin": "^0.1.13",
         "prom-client": "11.5.3",
         "wumpfetch": "0.2.14"
     },
@@ -38,7 +37,11 @@
         "@types/mongoose": "5.5.12",
         "@types/ms": "0.7.30",
         "@types/node": "12.7.2",
+        "eslint": "^6.1.0",
+        "eslint-config-google": "^0.13.0",
         "nodemon": "1.19.1",
-        "typescript": "3.5.3"
+        "tslint": "^5.18.0",
+        "typescript": "3.5.3",
+        "typescript-tslint-plugin": "^0.5.4"
     }
 }

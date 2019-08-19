@@ -17,6 +17,7 @@ import { Counter, register, collectDefaultMetrics, Gauge } from 'prom-client';
 import { captureException } from '@sentry/node';
 import { createServer } from 'http';
 import { parse } from 'url';
+import AutoModDehoist from './automod/Dehoisting';
 
 export interface NinoConfig {
     environment: string;
@@ -131,7 +132,7 @@ export default class NinoClient extends Client {
                     process: process,
                     format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.cyan('[DISCORD]')} <=> `
                 }),
-                new FileTransport({ file: 'data/Nino.log' })
+                new FileTransport({ file: 'data/Nino.log', format: ''})
             ]
         });
 
@@ -139,18 +140,18 @@ export default class NinoClient extends Client {
     }
 
     async build() {
-        this.logger.info('Connecting to the database...');
+        this.logger.log('info', 'Connecting to the database...');
         await this.database.connect();
-        this.logger.info('Success! Connecting to Redis...');
+        this.logger.log('info', 'Success! Connecting to Redis...');
         this.redis.connect().catch(() => {}); // Redis likes to throw errors smh
-        this.logger.info('Success! Intializing events...');
+        this.logger.log('info', 'Success! Intializing events...');
         await this.events.start();
-        this.logger.info('Success! Connecting to Discord...');
+        this.logger.log('info', 'Success! Connecting to Discord...');
         await super.connect()
-        this.logger.discord('Connected to Discord!');
-        this.logger.info('Loading commands...');
+        this.logger.log('discord', 'Connected to Discord!');
+        this.logger.log('info', 'Loading commands...');
         await this.manager.start();
-        this.logger.info('All set!');
+        this.logger.log('info', 'All set!');
     }
 
     getEmbed() {

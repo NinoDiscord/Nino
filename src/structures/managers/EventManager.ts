@@ -20,8 +20,8 @@ export default class EventManager {
      */
     start() {
         readdir(this.path, (error, files) => {
-            if (error) this.client.logger.error(error.stack);
-            this.client.logger.info(`Building ${files.length} event${files.length > 1? 's': ''}!`);
+            if (error && !!error.stack) this.client.logger.log('error', error.stack);
+            this.client.logger.log('info', `Building ${files.length} event${files.length > 1? 's': ''}!`);
             files.forEach((file) => {
                 try {
                     const event = require(`${this.path}${sep}${file}`);
@@ -42,7 +42,7 @@ export default class EventManager {
             try {
                 await ev.emit(...args);
             } catch(ex) {
-                this.client.logger.error(`Unable to run the "${ev.event}" event:\n${ex}`);
+                this.client.logger.log('error', `Unable to run the "${ev.event}" event:\n${ex}`);
             }
         };
         this.client.on(ev.event, wrapper);

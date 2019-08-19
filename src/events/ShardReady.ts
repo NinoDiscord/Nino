@@ -7,6 +7,6 @@ export default class ShardReadyEvent extends Event {
     }
 
     async emit(id: number) {
-        this.client.logger.discord(`Shard #${id} is ready!`);
+        this.client.logger.log('discord', `Shard #${id} is ready!`);
     }
 }
