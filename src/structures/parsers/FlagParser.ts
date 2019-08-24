@@ -19,7 +19,7 @@ export default class FlagParser {
                 continue;
             }
             const a = flag.split('=')[0];
-            const b = flag.slice(flag.indexOf('=') + 1);
+            const b = flag.slice(flag.indexOf('=') + 1).trim();
             parsed[a] = b;
         }
         return parsed;

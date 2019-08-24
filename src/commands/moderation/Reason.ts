@@ -27,6 +27,7 @@ export default class ReasonCommand extends Command {
         const settings = await this.client.settings.get(ctx.guild.id); 
 
         if (!_case || _case === null) return ctx.send(`Case #${caseID} was not found.`);
+        _case.reason = reason
 
         await this.client.cases.update(ctx.guild.id, parseInt(caseID), {
             $set: {

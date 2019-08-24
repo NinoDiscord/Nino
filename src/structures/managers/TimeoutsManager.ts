@@ -17,6 +17,19 @@ export default class TimeoutsManager {
     }
 
     /**
+     * The setTimeout function for big time values.
+     * @param func the function to execute
+     * @param time the time to excute it after
+     */
+    bigTimeout(func: (...args: any[]) => void, time: number) {
+        if (time > 0x7FFFFFFF) {
+            setTimeout(() => this.bigTimeout(func, time - 0x7FFFFFFF), 0x7FFFFFFF)
+        } else {
+            setTimeout(func, time)
+        }
+    }
+
+    /**
      * Create a timeout
      * @param member the member
      * @param guild the guild
@@ -26,7 +39,7 @@ export default class TimeoutsManager {
     async addTimeout(member: string, guild: Guild, task: string, time: number) {
         const key = `Timeout:${task}:${guild.id}:${member}`;
         await this.client.redis.set(key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
-        setTimeout(async () => {
+        this.bigTimeout(async () => {
             if (await this.client.redis.exists(key)) {
                 await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
                 await this.client.redis.del(key);
@@ -61,7 +74,7 @@ export default class TimeoutsManager {
             if (!guild)
                 continue;
             
-            setTimeout(async () => {
+            this.bigTimeout(async () => {
                 if (await this.client.redis.exists(timedate)) {
                     await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
                     await this.client.redis.del(timedate);
