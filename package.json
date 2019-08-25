@@ -24,7 +24,7 @@
         "eris": "0.10.1",
         "ioredis": "4.10.0",
         "js-yaml": "3.13.1",
-        "mongoose": "5.6.10",
+        "mongoose": "5.6.11",
         "ms": "2.1.2",
         "pikmin": "0.1.13",
         "prom-client": "11.5.3",
