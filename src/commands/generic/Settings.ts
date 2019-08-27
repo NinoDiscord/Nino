@@ -255,9 +255,10 @@ export default class SettingsCommand extends Command {
                     }
                 }, (error) => {
                     if (error) return ctx.send('I was unable to reset the punishments')
-                    return ctx.send('Mod-log has been the punishments!')
+                    return ctx.send('Punishments have been reset!')
                 })
             }
+            break;
             case 'modlog': {
                 this.client.settings.update(ctx.guild.id, {
                     $set: {
