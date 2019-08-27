@@ -1,5 +1,4 @@
 import { Schema, Document, model } from 'mongoose';
-import { ok } from 'assert';
 
 export interface GuildModel extends Document {
     guildID: string;
@@ -15,6 +14,7 @@ export interface GuildModel extends Document {
             wordlist: string[];
         },
         raid: boolean
+        mention: boolean
     },
     punishments: {type: string, warnings: number, [options: string]: any}[]
 }
@@ -51,6 +51,10 @@ const schema = new Schema<GuildModel>({
             wordlist: []
         },
         raid: {
+            type: Boolean,
+            default: false
+        },
+        mention: {
             type: Boolean,
             default: false
         }

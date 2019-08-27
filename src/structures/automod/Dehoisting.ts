@@ -1,4 +1,4 @@
-import { Message, TextChannel, Guild, User, Member } from 'eris';
+import { Member } from 'eris';
 import NinoClient from '../Client';
 import PermissionUtils from '../../util/PermissionUtils';
 
