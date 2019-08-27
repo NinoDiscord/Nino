@@ -5,6 +5,7 @@ import { Message, Member } from "eris";
 import AutoModBadWords from "../automod/Badwords";
 import AutoModRaid from "../automod/Raid";
 import AutoModDehoist from "../automod/Dehoisting";
+import AutoModMention from "../automod/Mention";
 
 /**
  * Service that generalizes automod event handling
@@ -14,6 +15,9 @@ import AutoModDehoist from "../automod/Dehoisting";
  * * anti-spam
  * * anti-invites
  * * swearing
+ * * anti-raid
+ * * auto dehoist
+ * * auto mention
  */
 export default class AutomodService {
     private spamhandler: AutoModSpam;
@@ -21,6 +25,7 @@ export default class AutomodService {
     private badwordhandler: AutoModBadWords;
     private raidhandler: AutoModRaid;
     private dehoisthandler: AutoModDehoist;
+    private mentionhandler: AutoModMention;
 
     constructor(client: NinoClient) {
         this.spamhandler = new AutoModSpam(client);
@@ -28,6 +33,7 @@ export default class AutomodService {
         this.badwordhandler = new AutoModBadWords(client);
         this.raidhandler = new AutoModRaid(client);
         this.dehoisthandler = new AutoModDehoist(client);
+        this.mentionhandler = new AutoModMention(client);
     }
 
     /**
@@ -36,7 +42,7 @@ export default class AutomodService {
      * @param m the message
      */
     async handleMessage(m: Message): Promise<boolean> {
-        return await this.invitehandler.handle(m) || await this.badwordhandler.handle(m) || await this.spamhandler.handle(m);
+        return await this.invitehandler.handle(m) || await this.badwordhandler.handle(m) || await this.spamhandler.handle(m) || await this.mentionhandler.handle(m);
     }
 
     /**
