@@ -12,7 +12,7 @@ export default class AutoModMention {
         const channel = (m.channel as TextChannel);
         const nino = channel.guild.members.get(this.client.user.id)!;
 
-        if (!PermissionUtil.above(nino, m.member!) || m.member!.permission.has('manageMessages')) return false;
+        if (!PermissionUtil.above(nino, m.member!) || (m.channel as TextChannel).permissionsOf(m.author.id).has('manageMessages')) return false;
 
         const settings = await this.client.settings.get(channel.guild.id);
         if (!settings || !settings.automod.mention) return false;
@@ -21,7 +21,7 @@ export default class AutoModMention {
         if (m.mentions.length >= 4) {
             let punishment = await this.client.punishments.addWarning(m.member!);
             for (let punish of punishment) await this.client.punishments.punish(m.member!, punish, 'Automod');
-            await m.channel.createMessage(`${m.member!.mention}, Please don't mention spam.`);
+            await m.channel.createMessage(`${m.member!.mention}, Please don't mention above 4 people.`);
             return true;
         }
 

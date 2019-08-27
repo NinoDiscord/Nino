@@ -31,7 +31,7 @@ export default class AutoModSpam {
     async handle(m: Message): Promise<boolean> {
         const guild = (m.channel as TextChannel).guild;
         const me = guild.members.get(this.client.user.id)!;
-        if (!PermissionUtils.above(me, m.member!) || m.author.bot || m.member!.permission.has('manageMessages'))
+        if (!PermissionUtils.above(me, m.member!) || m.author.bot || (m.channel as TextChannel).permissionsOf(m.author.id).has('manageMessages'))
             return false;
 
         const settings = await this.client.settings.get(guild.id);
