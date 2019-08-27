@@ -248,6 +248,16 @@ export default class SettingsCommand extends Command {
     async reset(ctx: Context) {
         const setting = ctx.args.get(1);
         switch (setting) {
+            case 'punishments': {
+                this.client.settings.update(ctx.guild.id, {
+                    $set: {
+                        punishments: []
+                    }
+                }, (error) => {
+                    if (error) return ctx.send('I was unable to reset the punishments')
+                    return ctx.send('Mod-log has been the punishments!')
+                })
+            }
             case 'modlog': {
                 this.client.settings.update(ctx.guild.id, {
                     $set: {
@@ -352,7 +362,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             default: {
-                return ctx.send('Invalid disabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swears` | `automod.invites` | `automod.dehoist` | `automod.mention` | `mutedrole` | `modlog`)');
+                return ctx.send('Invalid disabler. (`prefix` | `automod.spam` | `automod.raid` | `automod.swears` | `automod.invites` | `automod.dehoist` | `automod.mention` | `mutedrole` | `modlog` | `punishments`)');
             }
         }
     }
