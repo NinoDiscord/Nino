@@ -1,10 +1,10 @@
 # Nino
 
-Moderation-based Discord bot created for the official [hackweek](https://discord.gg/hackweek).
+Moderation-based Discord bot initally created for the Discord hackweek, now it is still regularly maintained.
 
 Invite the public version [here](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
 
-Join the support server [here](https://discord.gg/7TtMP2n)
+Join the support server (Dondish Central) [here](https://discord.gg/pEKkg9r)
 
 # How to use the bot?
 
@@ -12,7 +12,7 @@ Check out the [wiki](https://github.com/auguwu/Nino/wiki)!
 
 # Features
 
-* Auto Moderation - Prevents raids, spam, ads and swears!
+* Auto Moderation - Prevents raids, spam, ads and many more!
 * Lockdown command - locks one, multiple or all channels for a specific role downwards
 * Moderation commands - many moderation commands to simplify your moderators' work.
 * Moderation Log and Cases - easy and organized way of seeing the actions done by you and your mods! 
