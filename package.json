@@ -37,7 +37,7 @@
         "@types/ioredis": "4.0.13",
         "@types/js-yaml": "3.12.1",
         "@types/mongoose": "5.5.17",
-        "@types/ms": "0.7.30",
+        "@types/ms": "0.7.31",
         "@types/node": "12.7.4",
         "eslint": "6.3.0",
         "eslint-config-google": "0.13.0",
