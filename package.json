@@ -42,7 +42,7 @@
         "eslint": "6.3.0",
         "eslint-config-google": "0.13.0",
         "nodemon": "1.19.2",
-        "tslint": "5.19.0",
+        "tslint": "5.20.0",
         "typescript": "3.6.3",
         "typescript-tslint-plugin": "0.5.4"
     }
