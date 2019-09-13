@@ -25,7 +25,7 @@
         "express": "4.17.1",
         "ioredis": "4.14.1",
         "js-yaml": "3.13.1",
-        "mongoose": "5.7.0",
+        "mongoose": "5.7.1",
         "ms": "2.1.2",
         "pikmin": "0.1.13",
         "prom-client": "11.5.3",
