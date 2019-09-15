@@ -8,7 +8,7 @@ export default class UserUpdateEvent extends Event {
     }
 
     getMutualGuilds(user: User): Member[] {
-        let members: Member[] = []
+        let members: Member[] = [];
         for (let [,guild] of this.client.guilds) {
             if (!!guild.members[user.id]) {
                 members.push(guild.members[user.id]);
@@ -19,7 +19,7 @@ export default class UserUpdateEvent extends Event {
 
     async emit(user: User) {
         for (let member of this.getMutualGuilds(user)) {
-            this.client.autoModService.handleMemberNameUpdate(member)
+            this.client.autoModService.handleMemberNameUpdate(member);
         }
     }
 

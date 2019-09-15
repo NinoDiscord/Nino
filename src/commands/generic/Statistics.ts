@@ -27,11 +27,12 @@ export default class StatisticsCommand extends Command {
             command: name,
             size: this.client.stats.commandUsage[name].size,
             users: this.client.stats.commandUsage[name].users.length
-        }
+        };
     }
 
     async run(ctx: Context) {
         const command = this.getMostUsedCommand();
+        const build   = this.client.database.getBuild();
         const ping    = await this.client.database.admin.ping();
 
         return ctx.send(stripIndents`
@@ -45,7 +46,7 @@ export default class StatisticsCommand extends Command {
             Messages Seen       ~> ${this.client.stats.messagesSeen.toLocaleString()}
             Commands Executed   ~> ${this.client.stats.commandsExecuted.toLocaleString()}
             Most Used Command   ~> ${command.command} (${command.size} executions)
-            Database Connection ~> ${ping}ms
+            Database Connection ~> ${ping}ms | v${build.version}
             \`\`\`
         `);
     }

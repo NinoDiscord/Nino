@@ -23,7 +23,7 @@ export default class WarningsCommand extends Command {
 
         const u = findUser(this.client, ctx.args.get(0))!;
         if (!u) {
-            return ctx.send('I can\'t find this user!')
+            return ctx.send('I can\'t find this user!');
         }
         const member = ctx.guild.members.get(u.id);
 
@@ -31,9 +31,9 @@ export default class WarningsCommand extends Command {
 
         const settings = await this.client.warnings.get(ctx.guild.id, member.id);
         if (!settings) {
-            return ctx.send(`${member.username}#${member.discriminator} has 0 warnings.`)
+            return ctx.send(`${member.username}#${member.discriminator} has 0 warnings.`);
         } else {
-            return ctx.send(`${member.username}#${member.discriminator} has ${settings!.amount} warnings.`)
+            return ctx.send(`${member.username}#${member.discriminator} has ${settings!.amount} warnings.`);
         }
     }
 }

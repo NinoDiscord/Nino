@@ -49,7 +49,7 @@ export default class AutoModSpam {
                 for (let punishment of punishments) {
                     await this.client.punishments.punish(m.member!, punishment, 'Automod');
                 }
-                await m.channel.createMessage('Stop right there! Spamming is not allowed!')
+                await m.channel.createMessage('Stop right there! Spamming is not allowed!');
                 return true;
             }
         }

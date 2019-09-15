@@ -151,7 +151,7 @@ export default class PunishmentManager {
                 if (soft) {
                     await guild.unbanMember(member.id, reason);
                 } else if (time !== undefined && time > 0) {
-                    await this.client.timeouts.addTimeout(member.id, member.guild, 'unban', time!)
+                    await this.client.timeouts.addTimeout(member.id, member.guild, 'unban', time!);
                 }
                 break;
             case "kick":
@@ -252,7 +252,7 @@ export default class PunishmentManager {
             });
             await this.client.cases.update(member.guild.id, c.id, {message: message.id}, (e) => {
                 if (!!e)
-                    this.client.logger.log('error', `Couldn't update the case: ${e}`)
+                    this.client.logger.log('error', `Couldn't update the case: ${e}`);
             });
         }
     }

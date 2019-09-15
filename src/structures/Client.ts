@@ -153,7 +153,7 @@ export default class NinoClient extends Client {
         this.logger.log('info', 'Success! Intializing events...');
         await this.events.start();
         this.logger.log('info', 'Success! Connecting to Discord...');
-        await super.connect()
+        await super.connect();
         this.logger.log('discord', 'Connected to Discord!');
         this.logger.log('info', 'Loading commands...');
         await this.manager.start();

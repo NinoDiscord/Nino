@@ -23,7 +23,7 @@ export default class AutoModBadWords {
      * @param m the message
      */
     async handle(m: Message): Promise<boolean> {
-        const channel = (m.channel as TextChannel)
+        const channel = (m.channel as TextChannel);
         const guild = channel.guild;
         const me = guild.members.get(this.client.user.id)!;
         

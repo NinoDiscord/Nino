@@ -25,14 +25,14 @@ export default class MuteCommand extends Command {
 
         const u = findUser(this.client, ctx.args.get(0))!;
         if (!u) {
-            return ctx.send('I can\'t find this user!')
+            return ctx.send('I can\'t find this user!');
         }
         const member = ctx.guild.members.get(u.id);
 
         if (!member) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
 
         if (!PermissionUtils.above(ctx.message.member!, member))
-            return ctx.send('The user is above you in the heirarchy.')
+            return ctx.send('The user is above you in the heirarchy.');
 
         let reason = (ctx.flags.get('reason') || ctx.flags.get('r'));
         if (typeof reason === 'boolean') return ctx.send('You will need to specify a reason');

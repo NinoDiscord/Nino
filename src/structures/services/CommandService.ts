@@ -95,11 +95,12 @@ export default class CommandService {
                             if (user)
                                 return `${user.username}#${user.discriminator}`;
                             else 
-                                return `<@${userID}>`
+                                return `<@${userID}>`;
                         }).join(', ')} at https://discord.gg/7TtMP2n
                     `);
                 this.client.logger.log('error', `Unable to run the "${cmd.name}" command\n${ex.stack}`);
                 this.client.report(ex);
+                ctx.embed(embed.build());
             }
         }
     }

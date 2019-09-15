@@ -23,7 +23,7 @@ export default class UnmuteCommand extends Command {
 
         const u = findUser(this.client, ctx.args.get(0))!;
         if (!u) {
-            return ctx.send('I can\'t find this user!')
+            return ctx.send('I can\'t find this user!');
         }
         const member = ctx.guild.members.get(u.id);
 
@@ -34,7 +34,7 @@ export default class UnmuteCommand extends Command {
 
         await this.client.timeouts.cancelTimeout(member.id, ctx.guild, 'unmute');
         const punishment = new Punishment(PunishmentType.Unmute, { moderator: ctx.sender });
-        await ctx.send('User successfully unmuted.')
+        await ctx.send('User successfully unmuted.');
         await this.client.punishments.punish(member!, punishment, (reason as string | undefined));
     }
 }

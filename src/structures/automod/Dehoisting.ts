@@ -23,14 +23,14 @@ export default class AutoModDehoist {
      * @param m the member
      */
     async handle(m: Member): Promise<void> {
-        const guild = m.guild
+        const guild = m.guild;
         const me = guild.members.get(this.client.user.id)!;
-        const name = m.nick || m.username
+        const name = m.nick || m.username;
         
         if (name >= '0') 
             return;
 
-        const settings = await this.client.settings.get(m.guild.id)
+        const settings = await this.client.settings.get(m.guild.id);
 
         if (!settings || !settings.automod.dehoist) 
             return;
@@ -42,13 +42,13 @@ export default class AutoModDehoist {
         while (i < name.length && name[i] < '0') {
             i++;
         }
-        const goodName = name.substring(i).trim()
+        const goodName = name.substring(i).trim();
         if (goodName == "" && m.username >= '0') {
-            return m.edit({nick: m.username}, 'Auto Dehoist')
+            return m.edit({nick: m.username}, 'Auto Dehoist');
         } else if (goodName == "") {
-            return m.edit({nick: 'hoister'})
+            return m.edit({nick: 'hoister'});
         } else {
-            return m.edit({nick: goodName}, 'Auto Dehoist')
+            return m.edit({nick: goodName}, 'Auto Dehoist');
         }
     }
 }

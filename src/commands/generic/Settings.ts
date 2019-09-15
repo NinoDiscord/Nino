@@ -36,20 +36,20 @@ export default class SettingsCommand extends Command {
             return ctx.send('Amount of warnings is required, needs to between 1 to 5');
         const punishment = ctx.args.get(2);
         if (!['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].includes(punishment))
-            return ctx.send('A punishment is required and it needs to be of the following: ' + ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].join(', '))
+            return ctx.send('A punishment is required and it needs to be of the following: ' + ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].join(', '));
         const temp = ctx.flags.get('time');
         if (!!temp && (typeof temp === 'boolean' || (typeof temp === 'string' && (!ms(temp as string) || ms(temp as string) < 1000))))
-            return ctx.send('The time flag needs to be a correct time expression: can be 0.5h or 30m or 0.5 hours or 30 minutes or the amount in milliseconds. It also needs to be more or equal to one second.')
+            return ctx.send('The time flag needs to be a correct time expression: can be 0.5h or 30m or 0.5 hours or 30 minutes or the amount in milliseconds. It also needs to be more or equal to one second.');
         const soft = !!ctx.flags.get('soft');
         const roleid = ctx.flags.get('roleid');
         if (!roleid && (punishment === 'role' || punishment === 'unrole'))
-            return ctx.send('A role id is a must when the punishment is role or unrole.')
+            return ctx.send('A role id is a must when the punishment is role or unrole.');
 
         if (!!roleid && (typeof roleid === 'boolean' || (typeof roleid === 'string' && (!/^[0-9]+$/.test(roleid) || !ctx.guild.roles.get(roleid)))))
-            return ctx.send('Incorrect role id.')
+            return ctx.send('Incorrect role id.');
         const days = ctx.flags.get('days');
         if (!!days && (typeof days === 'boolean' || (typeof days === 'string' && !/^[0-9]{1,2}$/.test(days))))
-            return ctx.send('Incorrect amount of days. It is the amount of days to delete the messages in when banning.')
+            return ctx.send('Incorrect amount of days. It is the amount of days to delete the messages in when banning.');
 
         this.client.settings.update(ctx.guild.id, {
             $push: {
@@ -65,9 +65,9 @@ export default class SettingsCommand extends Command {
         }, (error, raw) => {
             if (error) return ctx.send('I was unable to add the punishment.');
             if (raw.n) {
-                return ctx.send(`The punishment was successfully added!`)
+                return ctx.send(`The punishment was successfully added!`);
             } else {
-                return ctx.send('We limit the amount of punishments per server to 15. Please remove some of your punishments before further additions.')
+                return ctx.send('We limit the amount of punishments per server to 15. Please remove some of your punishments before further additions.');
             }
         });
         
@@ -79,12 +79,12 @@ export default class SettingsCommand extends Command {
             return ctx.send('The index of the punishment is required, see the index in `x!settings view`.');
         const settings = await ctx.client.settings.get(ctx.guild.id);
         if (!settings) {
-            return ctx.send('There are no punishments!')
+            return ctx.send('There are no punishments!');
         }
         if (Number(index) <= settings!.punishments.length)
             settings!.punishments.splice(Math.round(Number(index))-1, 1);
         settings!.save();
-        return ctx.send('Successfully removed the punishment!')
+        return ctx.send('Successfully removed the punishment!');
     }
 
     async set(ctx: Context) {
@@ -92,7 +92,7 @@ export default class SettingsCommand extends Command {
         switch (setting) {
             case 'modlog': {
                 const channelId = ctx.args.get(2);
-                if (!channelId || !/^[0-9]+$/.test(channelId)) return ctx.send('Please set a valid id!')
+                if (!channelId || !/^[0-9]+$/.test(channelId)) return ctx.send('Please set a valid id!');
                 this.client.settings.update(ctx.guild.id, {
                     $set: {
                         modlog: channelId
@@ -100,7 +100,7 @@ export default class SettingsCommand extends Command {
                 }, (error) => {
                     if (error) return ctx.send('I was unable to set the modlog channel');
                     return ctx.send(`The modlog channel has been set to <#${channelId}>`);
-                })
+                });
                 break;
             }
             case 'prefix': {
@@ -120,7 +120,7 @@ export default class SettingsCommand extends Command {
             }
             case 'mutedrole': {
                 const mutedRole = ctx.args.get(2);
-                if (!mutedRole || !/^[0-9]+$/.test(mutedRole)) return ctx.send('Please set a valid id!')
+                if (!mutedRole || !/^[0-9]+$/.test(mutedRole)) return ctx.send('Please set a valid id!');
                 this.client.settings.update(ctx.guild.id, {
                     $set: {
                         mutedRole
@@ -128,7 +128,7 @@ export default class SettingsCommand extends Command {
                 }, (error) => {
                     if (error) return ctx.send('I was unable to change the role id');
                     return ctx.send(`The role id has been set to \`${mutedRole}\``);
-                })
+                });
                 break;
             }
             case 'automod.dehoist': {
@@ -146,7 +146,7 @@ export default class SettingsCommand extends Command {
                 }, (error) => {
                     if (error) return ctx.send(`Unable to ${boole? 'enable': 'disable'} the automod dehoist feature`);
                     return ctx.send(`${boole? 'Enabled': 'Disabled'} the automod dehoist feature`);
-                })
+                });
                 break;
             }
             case 'automod.spam': {
@@ -254,9 +254,9 @@ export default class SettingsCommand extends Command {
                         punishments: []
                     }
                 }, (error) => {
-                    if (error) return ctx.send('I was unable to reset the punishments')
-                    return ctx.send('Punishments have been reset!')
-                })
+                    if (error) return ctx.send('I was unable to reset the punishments');
+                    return ctx.send('Punishments have been reset!');
+                });
             }
             break;
             case 'modlog': {
@@ -265,9 +265,9 @@ export default class SettingsCommand extends Command {
                         modlog: null
                     }
                 }, (error) => {
-                    if (error) return ctx.send('I was unable to disable the modlog')
-                    return ctx.send('Mod-log has been disabled!')
-                })
+                    if (error) return ctx.send('I was unable to disable the modlog');
+                    return ctx.send('Mod-log has been disabled!');
+                });
                 break;
             }
             case 'prefix': {

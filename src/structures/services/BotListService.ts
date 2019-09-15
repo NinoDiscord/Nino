@@ -56,7 +56,7 @@ export default class BotListService {
                 logger.info("Posted guild stats to Discord Bot List.");
             }).catch(() => {
                 logger.error("Failed to post guild stats to Discord Bot List.");
-            })
+            });
         if (config.bfdtoken)
             wumpfetch({
                 url: `https://botsfordiscord.com/api/bot/${id}`, 
@@ -72,7 +72,7 @@ export default class BotListService {
                 logger.info("Posted guild stats to Bots For Discord");
             }).catch(() => {
                 logger.error("Failed to post guild stats to Bots For Discord.");
-            })
+            });
         if (config.dboatstoken)
             wumpfetch({
                 url: `https://discord.boats/api/v2/bot/${id}`, 
@@ -88,6 +88,6 @@ export default class BotListService {
                 logger.info("Posted guild stats to Discord Boats.");
             }).catch(() => {
                 logger.error("Failed to post guild stats to Discord Boats.");
-            })
+            });
     }
 }

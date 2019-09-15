@@ -47,9 +47,9 @@ export default class AutoModRaid {
             if (Date.now() - oldtime <= 1000) {
                 do {
                     await this.client.punishments.punish(m, new Punishment(PunishmentType.Ban, {moderator: me.user}), 'Automod: Raid detected');
-                    const [time, id] = (await queue.pop()).split("U")
-                    m = guild.members[id]
-                } while (await queue.length() > 0)
+                    const [time, id] = (await queue.pop()).split("U");
+                    m = guild.members[id];
+                } while (await queue.length() > 0);
                 return true;
             }
         }

@@ -25,7 +25,7 @@ export default class ReadyEvent extends Event {
         this.client.promServer.listen(5595, () => this.client.logger.log('info', 'Metrics is now listening on port "5595"'));
         await this.client.redis.set("guilds", this.client.guilds.size);
         this.client.stats.guildCount = this.client.guilds.size;
-        this.client.prom.guildCount.set(this.client.stats.guildCount, Date.now())
+        this.client.prom.guildCount.set(this.client.stats.guildCount, Date.now());
         this.client.botlistservice.start();
         this.client.timeouts.reapplyTimeouts();
         this.web.start();

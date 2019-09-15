@@ -23,9 +23,9 @@ export default class TimeoutsManager {
      */
     bigTimeout(func: (...args: any[]) => void, time: number) {
         if (time > 0x7FFFFFFF) {
-            setTimeout(() => this.bigTimeout(func, time - 0x7FFFFFFF), 0x7FFFFFFF)
+            setTimeout(() => this.bigTimeout(func, time - 0x7FFFFFFF), 0x7FFFFFFF);
         } else {
-            setTimeout(func, time)
+            setTimeout(func, time);
         }
     }
 
@@ -45,7 +45,7 @@ export default class TimeoutsManager {
                 await this.client.redis.del(key);
             }
             
-        }, time)
+        }, time);
     }
 
     /**
@@ -56,7 +56,7 @@ export default class TimeoutsManager {
      */
     async cancelTimeout(member: string, guild: Guild, task: string) {
         const key = `Timeout:${task}:${guild.id}:${member}`;
-        return this.client.redis.del(key)
+        return this.client.redis.del(key);
     }
 
     /**
@@ -70,7 +70,7 @@ export default class TimeoutsManager {
             const amount = Number(value!.split(':')[1]);
             const member = value!.split(':')[2];
             const guild = await this.client.guilds.get(value!.split(':')[3]);
-            const task = value!.split(':')[4]
+            const task = value!.split(':')[4];
             if (!guild)
                 continue;
             
