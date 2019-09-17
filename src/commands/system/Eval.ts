@@ -39,7 +39,7 @@ export default class EvalCommand extends Command {
         const isAsync = (script.includes('return') || script.includes('await'));
 
         try {
-            if (typescript) result = this.compileTypescript(isAsync? `(async() => {${script}})()`: script);
+            if (typescript) result = eval(this.compileTypescript(isAsync? `(async() => {${script}})()`: script));
             result = eval(isAsync? `(async()=>{${script}})();`: script);
             const evaluationTime = Date.now() - startTime;
             await message.edit({
