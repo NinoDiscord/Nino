@@ -1,7 +1,7 @@
 {
     "name": "nino",
     "description": "Moderation bot for Discord's hack week entry.",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "main": "dist/bot.js",
     "scripts": {
         "build": "yarn lint && rm -fr dist && tsc",
