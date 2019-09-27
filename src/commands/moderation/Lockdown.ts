@@ -12,7 +12,7 @@ export default class LockdownCommand extends Command {
             category: 'Moderation',
             guildOnly: true,
             botpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
-            usage: '[all] <channel> <channel>... [--role] [--release]'
+            usage: '[all] <channel> <channel>... [--roles] [--release]'
         });
         this.userpermissions = this.botpermissions;
     }
@@ -47,36 +47,47 @@ export default class LockdownCommand extends Command {
         if (!ctx.args.has(0)) {
             return ctx.send('The channels argument is required.');
         }
-        const role = this.getRole(ctx.flags.get('role') as string, ctx);
+        if (ctx.flags.get('roles') === true) {
+            return ctx.send('The roles flag is not supposed to be a boolean!')
+        }
+        const roles = (ctx.flags.get('roles') as string).split(', ').map(role=>{return {perm: role[0], role: this.getRole(role.slice(1), ctx)}}).filter(({ role }) => !!role && PermissionUtils.topRole(ctx.me) && PermissionUtils.topRole(ctx.me)!.position > role.position);
 
-        if (!role || !PermissionUtils.topRole(ctx.me) || PermissionUtils.topRole(ctx.me)!.position <= role.position) {
-            return ctx.send('Role doesn\'t exist or is above me in the heirarchy.'); 
+        if (roles.length === 0) {
+            return ctx.send('All roles can not be modified by me! Please check that the roles are under this bot in the heirarchy.'); 
         }
 
-        const channels = (ctx.args.args.findIndex(x => x === 'all') !== -1) ? ctx.guild.channels.filter(c => c.type === 0).map(c => c as TextChannel) : ctx.args.args.map(x => this.getChannel(x, ctx)).filter(x => !!x);
-        const roles = ctx.guild.roles.filter(r => r!.position > role!.position && r!.position < PermissionUtils.topRole(ctx.me)!.position);
+        const channels = (ctx.args.args.findIndex(x => x === 'all') !== -1) ? ctx.guild.channels.filter(c => c.type === 0).map(c => c as TextChannel) : ctx.args.args.map(x => this.getChannel(x, ctx)).filter(x => !!x).map(tc=>tc!);
+        
+        if (channels.length === 0) {
+            return ctx.send("No valid channels were selected.");
+        }
+
+        if (!ctx.flags.get('release')) {
+            const msg = await ctx.send('Backing up former permissions...')
+            const currstate = channels.map(c => {return {channel: c, pos: c.permissionOverwrites.filter(r => !!roles.find((ro) => ro.role!.id === r.id)).map(po => {return {role: po.id, allow: po.allow, deny: po.deny}})}})
+        
+            for (let {channel, pos} of currstate) {
+                await ctx.client.redis.set(`lockdownstate:${channel.id}`, JSON.stringify(pos));
+            }
+            msg.edit('Done!')
+        }
+        
+
 
         for (let channel of channels) {
-            if (!!channel && ((ctx.me.permission.allow|channel.permissionsOf(ctx.me.id).allow) & Constants.Permissions.manageChannels) !== 0) {
+            if (((ctx.me.permission.allow|channel.permissionsOf(ctx.me.id).allow) & Constants.Permissions.manageChannels) !== 0) {
                 if (ctx.flags.get('release') as boolean) {
-                    if (!!channel.topic && channel.topic!.startsWith('[LOCKED]')) {
-                        for (let rs of roles) {
-                            await channel.deletePermission(rs!.id, 'Channel Lockdown Over');
+                    const formerperms = await ctx.client.redis.get(`lockdownstate:${channel.id}`);
+                    if (!!formerperms) {
+                        for (let po of JSON.parse(formerperms)) {
+                            await channel.editPermission(po.id, po.allow, po.deny, 'Channel Lockdown Over');
                         }
-                        await channel.edit({topic: channel.topic !== '[LOCKED]' ? channel.topic.substring(9) : ''});
-                        await channel.deletePermission(role!.id, 'Channel Lockdown Over');
                         await channel.editPermission(ctx.guild.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown Over');
-                        await ctx.send(`Channel <#${channel.id}> is now unlocked.`);
+                        await ctx.send(`Channel ${channel.mention} is now unlocked.`);
                     }
                 } else {
-                    if ((PermissionUtils.permissionsOf(role, channel) & Constants.Permissions.sendMessages) !== 0) {
-                        await channel.edit({topic: `[LOCKED]${!!channel.topic ? ' ' + channel.topic : ''}`});
-                        await channel.editPermission(ctx.me.id, Constants.Permissions.sendMessages, 0, 'member', 'Channel Lockdown');
-                        await channel.editPermission(ctx.guild.id, 0, Constants.Permissions.sendMessages, 'role', 'Channel Lockdown');
-                        await channel.editPermission(role!.id, 0, Constants.Permissions.sendMessages, 'role', 'Channel Lockdown');
-                        for (let rs of roles) {
-                            await channel.editPermission(rs!.id, Constants.Permissions.sendMessages, 0, 'role', 'Channel Lockdown');
-                        }
+                    for (let role of roles) {
+                        if (formerperms.)
                     }
                     await ctx.send(`Channel <#${channel.id}> is now locked down.`);
                 }
