@@ -8,7 +8,7 @@ export default class LockdownCommand extends Command {
     constructor(client: NinoClient) {
         super(client, {
             name: 'lockdown',
-            description: 'Locks down a channel, multiple channels or all channels for all roles below the specified role.',
+            description: 'Locks down a channel, multiple channels or all channels for all roles below the specified role. Put + or - before the role to specify whether to allow the role to write or deny the permission.',
             category: 'Moderation',
             guildOnly: true,
             botpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
@@ -99,6 +99,7 @@ export default class LockdownCommand extends Command {
                         }
                         await ctx.send(`Channel ${channel.mention} is now unlocked.`);
                     }
+                    await ctx.client.redis.del(`lockdownstate:${channel.id}`);
                 } else {
                     for (let role of roles) {
                         let allow = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id).allow : 0;
