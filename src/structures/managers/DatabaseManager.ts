@@ -42,13 +42,10 @@ export default class DatabaseManager {
         });
     }
 
-    getBuild() {
+    async getBuild(): Promise<any> {
         if (!this.admin) this.admin = this.m.connection.db.admin();
         if (!this.build) {
-            this.admin.buildInfo((error, build) => {
-                if (error) console.error(error);
-                this.build = build;
-            });
+            this.build = await this.admin.buildInfo();
         }
 
         return this.build;
