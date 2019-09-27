@@ -12,7 +12,7 @@ export default class MuteCommand extends Command {
         super(client, {
             name: 'mute',
             description: 'Mutes a member from this guild',
-            usage: '<user> [--reason] [--time]',
+            usage: '<user> <reason> [--reason] [--time]',
             aliases: ['slience'],
             category: 'Moderation',
             userpermissions: Constants.Permissions.manageRoles,
@@ -34,8 +34,8 @@ export default class MuteCommand extends Command {
         if (!PermissionUtils.above(ctx.message.member!, member))
             return ctx.send('The user is above you in the heirarchy.');
 
-        let reason = (ctx.flags.get('reason') || ctx.flags.get('r'));
-        if (typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
+        let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1) : false);
+        if (reason && typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
 
         let time = (ctx.flags.get('time') || ctx.flags.get('t'));
         if (typeof time === 'boolean') return ctx.send('You will need to specify time to be alloted');

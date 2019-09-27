@@ -95,15 +95,15 @@ export default class LockdownCommand extends Command {
                             await channel.editPermission(po.role, po.allow, po.deny, 'role', 'Channel Lockdown Over');
                         }
                         for (let role of roles.filter(r => !JSON.parse(formerperms).find(ro => r.role!.id === ro.role!))) {
-                            await channel.deletePermission(role.role.id,'Channel Lockdown Over');
+                            await channel.deletePermission(role.role!.id,'Channel Lockdown Over');
                         }
                         await ctx.send(`Channel ${channel.mention} is now unlocked.`);
                     }
                     await ctx.client.redis.del(`lockdownstate:${channel.id}`);
                 } else {
                     for (let role of roles) {
-                        let allow = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id).allow : 0;
-                        let deny = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id).deny : 0;
+                        let allow = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.allow : 0;
+                        let deny = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.deny : 0;
                         if (role.perm === "+") {
                             await channel.editPermission(role.role!.id, allow | Constants.Permissions.sendMessages, deny & ~Constants.Permissions.sendMessages, 'role', 'Channel Lockdown Started');
                         } else if (role.perm === "-") {
