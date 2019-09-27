@@ -29,7 +29,7 @@ export default class UnmuteCommand extends Command {
 
         if (!member || member === null) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
 
-        let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1) : false);
+        let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1).join(' ') : false);
         if (reason && typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
 
         await this.client.timeouts.cancelTimeout(member.id, ctx.guild, 'unmute');

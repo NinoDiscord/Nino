@@ -34,7 +34,7 @@ export default class KickCommand extends Command {
         if (!PermissionUtils.above(ctx.message.member!, member))
             return ctx.send('The user is above you in the heirarchy.');
 
-            let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1) : false);
+            let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1).join(' ') : false);
             if (reason && typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
 
         const punishment = new Punishment(PunishmentType.Kick, {

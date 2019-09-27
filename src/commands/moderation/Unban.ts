@@ -32,7 +32,7 @@ export default class UnbanCommand extends Command {
             return ctx.send('The user is not banned from this guild.');
         }
 
-        let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1) : false);
+        let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1).join(' ') : false);
         if (reason && typeof reason === 'boolean') return ctx.send('You will need to specify a reason');
 
         await this.client.timeouts.cancelTimeout(id, ctx.guild, 'unban');
