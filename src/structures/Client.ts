@@ -18,12 +18,13 @@ import { captureException } from '@sentry/node';
 import { createServer } from 'http';
 import { parse } from 'url';
 import AutoModDehoist from './automod/Dehoisting';
-import { setDefaults } from 'wumpfetch';
+import { setDefaults} from 'wumpfetch';
 
 const pkg = require('../../package');
 setDefaults({
     headers: { 'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/auguwu/Nino)` }
 });
+
 
 export interface NinoConfig {
     environment: string;
@@ -46,7 +47,7 @@ export interface NinoConfig {
     dbltoken: string;
     bfdtoken: string;
     dboatstoken: string;
-    dbgtoken: string;
+    blstoken: string;
 }
 
 export interface CommandStats {

@@ -41,18 +41,16 @@ export default class BotListService {
      * Post guild stats
      */
     postCount(guilds: Number, id: string,  config: NinoConfig, logger: any) {
-        logger.info(JSON.stringify(config));
         if (config.dbltoken)
             wumpfetch({
                 url: `https://discordbots.org/api/bots/${id}/stats`, 
                 method: "POST",
-                headers: {
-                    "Authorization": config.dbltoken,
-                    "Content-Type": "application/json"
-                },
                 data: {
                     "server_count": guilds
                 }
+            }).header({
+                "Authorization": config.dbltoken,
+                "Content-Type": "application/json"
             }).send().then(res => {
                 logger.info(`Posted guild stats to Discord Bot List: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
@@ -62,13 +60,12 @@ export default class BotListService {
             wumpfetch({
                 url: `https://botsfordiscord.com/api/bot/${id}`, 
                 method: "POST",
-                headers: {
-                    "Authorization": config.bfdtoken,
-                    "Content-Type": "application/json"
-                },
                 data: {
                     "server_count": guilds
                 }
+            }).header({
+                "Authorization": config.bfdtoken,
+                "Content-Type": "application/json"
             }).send().then(res => {
                 logger.info(`Posted guild stats to Bots For Discord: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
@@ -78,17 +75,31 @@ export default class BotListService {
             wumpfetch({
                 url: `https://discord.boats/api/bot/${id}`, 
                 method: "POST",
-                headers: {
-                    "Authorization": config.dboatstoken,
-                    "Content-Type": "application/json"
-                },
                 data: {
                     "server_count": guilds
                 }
+            }).header({
+                "Authorization": config.dboatstoken,
+                "Content-Type": "application/json"
             }).send().then(res => {
                 logger.info(`Posted guild stats to Discord Boats: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
                 logger.error("Failed to post guild stats to Discord Boats.");
+            });
+        if (config.blstoken)
+            wumpfetch({
+                url: `https://api.botlist.space/v1/bots/${id}`, 
+                method: "POST",
+                data: {
+                    "server_count": guilds
+                }
+            }).header({
+                "Authorization": config.blstoken,
+                "Content-Type": "application/json"
+            }).send().then(res => {
+                logger.info(`Posted guild stats to Botlist.space: ${res.statusCode} : ${res.body}`);
+            }).catch(() => {
+                logger.error("Failed to post guild stats to Botlist.space.");
             });
     }
 }
