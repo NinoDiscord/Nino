@@ -75,7 +75,7 @@ export default class BotListService {
             });
         if (config.dboatstoken)
             wumpfetch({
-                url: `https://discord.boats/api/v2/bot/${id}`, 
+                url: `https://discord.boats/api/bot/${id}`, 
                 method: "POST",
                 headers: {
                     "Authorization": config.dboatstoken,
