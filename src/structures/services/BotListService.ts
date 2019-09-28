@@ -52,8 +52,8 @@ export default class BotListService {
                 data: {
                     "server_count": guilds
                 }
-            }).send().then(() => {
-                logger.info("Posted guild stats to Discord Bot List.");
+            }).send().then(res => {
+                logger.info(`Posted guild stats to Discord Bot List: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
                 logger.error("Failed to post guild stats to Discord Bot List.");
             });
@@ -68,8 +68,8 @@ export default class BotListService {
                 data: {
                     "server_count": guilds
                 }
-            }).send().then(() => {
-                logger.info("Posted guild stats to Bots For Discord");
+            }).send().then(res => {
+                logger.info(`Posted guild stats to Bots For Discord: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
                 logger.error("Failed to post guild stats to Bots For Discord.");
             });
@@ -84,8 +84,8 @@ export default class BotListService {
                 data: {
                     "server_count": guilds
                 }
-            }).send().then(() => {
-                logger.info("Posted guild stats to Discord Boats.");
+            }).send().then(res => {
+                logger.info(`Posted guild stats to Discord Boats: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
                 logger.error("Failed to post guild stats to Discord Boats.");
             });
