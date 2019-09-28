@@ -41,6 +41,7 @@ export default class BotListService {
      * Post guild stats
      */
     postCount(guilds: Number, id: string,  config: NinoConfig, logger: any) {
+        logger.info(JSON.stringify(config));
         if (config.dbltoken)
             wumpfetch({
                 url: `https://discordbots.org/api/bots/${id}/stats`, 
