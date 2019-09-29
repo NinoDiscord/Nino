@@ -39,7 +39,7 @@ export default class AutoModBadWords {
                 await m.channel.createMessage(`HEY ${m.member!.mention}! Watch your language!`);
                 await m.delete();
                 for (let punishment of punishments) {
-                    await this.client.punishments.punish(m.member!, punishment, 'Automod');
+                    await this.client.punishments.punish(m.member!, punishment, 'Automod (Swearing)');
                 }
                 return true;
             }

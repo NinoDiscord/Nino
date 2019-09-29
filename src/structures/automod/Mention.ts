@@ -20,7 +20,7 @@ export default class AutoModMention {
         
         if (m.mentions.length >= 4) {
             let punishment = await this.client.punishments.addWarning(m.member!);
-            for (let punish of punishment) await this.client.punishments.punish(m.member!, punish, 'Automod');
+            for (let punish of punishment) await this.client.punishments.punish(m.member!, punish, 'Automod (Mention Spam)');
             await m.channel.createMessage(`${m.member!.mention}, Please don't mention above 4 people.`);
             return true;
         }

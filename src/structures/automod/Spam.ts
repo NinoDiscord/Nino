@@ -47,7 +47,7 @@ export default class AutoModSpam {
             if (m.timestamp - oldtime <= 3000) {
                 let punishments = await this.client.punishments.addWarning(m.member!);
                 for (let punishment of punishments) {
-                    await this.client.punishments.punish(m.member!, punishment, 'Automod');
+                    await this.client.punishments.punish(m.member!, punishment, 'Automod (Spamming)');
                 }
                 await m.channel.createMessage('Stop right there! Spamming is not allowed!');
                 return true;

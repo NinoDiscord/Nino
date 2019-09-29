@@ -46,7 +46,7 @@ export default class AutoModInvite {
             await m.delete();
             const punishments = await this.client.punishments.addWarning(m.member!);
             for (let punishment of punishments) {
-                await this.client.punishments.punish(m.member!, punishment, 'Automod');
+                await this.client.punishments.punish(m.member!, punishment, 'Automod (Advertisments)');
             }
             return true;
         }
