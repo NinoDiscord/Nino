@@ -13,8 +13,8 @@ export default class UnmuteCommand extends Command {
             usage: '<user> <reason> [--reason]',
             category: 'Moderation',
             guildOnly: true,
-            userpermissions: Constants.Permissions.banMembers,
-            botpermissions: Constants.Permissions.banMembers
+            userpermissions: Constants.Permissions.manageRoles,
+            botpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels
         });
     }
 
