@@ -9,7 +9,7 @@ export default class CommandManager {
     public client: Client;
     public service: CommandService;
     public path: string = `${process.cwd()}${sep}dist${sep}commands`;
-    public commands: Collection<Command> = new Collection({ name: 'nino:commands' });
+    public commands: Collection<Command> = new Collection('nino:commands');
 
     /**
      * Creates a new instance of the `CommandManager`
