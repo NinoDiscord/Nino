@@ -37,14 +37,13 @@ export default class TimeoutsManager {
      * @param time the amount of time before executing
      */
     async addTimeout(member: string, guild: Guild, task: string, time: number) {
-        const key = `Timeout:${task}:${guild.id}:${member}`;
+        const key = `timeout:${task}:${guild.id}:${member}`;
         await this.client.redis.set(key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
         this.bigTimeout(async () => {
             if (await this.client.redis.exists(key)) {
                 await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
                 await this.client.redis.del(key);
             }
-            
         }, time);
     }
 
@@ -55,7 +54,7 @@ export default class TimeoutsManager {
      * @param task the punishment
      */
     async cancelTimeout(member: string, guild: Guild, task: string) {
-        const key = `Timeout:${task}:${guild.id}:${member}`;
+        const key = `timeout:${task}:${guild.id}:${member}`;
         return this.client.redis.del(key);
     }
 
@@ -63,13 +62,13 @@ export default class TimeoutsManager {
      * Reapply timeouts since server went dead
      */
     async reapplyTimeouts() {
-        const timedates = await this.client.redis.keys('Timeout:*:*:*');
+        const timedates = await this.client.redis.keys('timeout:*:*:*');
         for (let timedate of timedates) {
             const value = await this.client.redis.get(timedate);
             const start = Number(value!.split(':')[0]);
             const amount = Number(value!.split(':')[1]);
             const member = value!.split(':')[2];
-            const guild = await this.client.guilds.get(value!.split(':')[3]);
+            const guild = this.client.guilds.get(value!.split(':')[3]);
             const task = value!.split(':')[4];
             if (!guild)
                 continue;

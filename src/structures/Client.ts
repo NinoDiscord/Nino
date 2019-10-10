@@ -25,7 +25,6 @@ setDefaults({
     headers: { 'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/auguwu/Nino)` }
 });
 
-
 export interface NinoConfig {
     environment: string;
     databaseUrl: string;

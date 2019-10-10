@@ -4,7 +4,7 @@ import Command from '../Command';
 
 export default class RatelimitBucket extends Collection<Collection<number>> {
     constructor() {
-        super({ name: 'ratelimit:bucket' });
+        super('ratelimits');
     }
 
     /**
@@ -12,7 +12,7 @@ export default class RatelimitBucket extends Collection<Collection<number>> {
      * @param command The command
      */
     initialize(command: Command) {
-        if (!this.has(command.name)) this.set(command.name, new Collection<number>({ name: `ratelimit:bucket:${command.name}` }));
+        if (!this.has(command.name)) this.set(command.name, new Collection<number>(`ratelimits:${command.name}`));
         return this;
     }
 
