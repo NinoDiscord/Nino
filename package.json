@@ -44,6 +44,6 @@
         "@typescript-eslint/parser": "2.3.3",
         "eslint": "6.5.1",
         "nodemon": "1.19.3",
-        "typescript": "3.6.3"
+        "typescript": "3.6.4"
     }
 }
