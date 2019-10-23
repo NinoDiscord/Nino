@@ -1,6 +1,6 @@
 import NinoClient from "../../structures/Client";
 import Command from '../../structures/Command';
-import { Constants, Channel, TextChannel, Role, Permission } from "eris";
+import { Constants, TextChannel, Role } from "eris";
 import CommandContext from "../../structures/Context";
 import PermissionUtils from "../../util/PermissionUtils";
 
@@ -12,9 +12,9 @@ export default class LockdownCommand extends Command {
             category: 'Moderation',
             guildOnly: true,
             botpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
+            userpermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
             usage: '[all] <channel> <channel>... [--roles=[+/-]<role>, [+/-]<role>, ...] [--release]'
         });
-        this.userpermissions = this.botpermissions;
     }
 
     getChannel(s: string, ctx: CommandContext): TextChannel | undefined {

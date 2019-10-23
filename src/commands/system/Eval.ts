@@ -1,4 +1,4 @@
-import { stripIndents } from 'common-tags';
+import { inspect } from 'util';
 import NinoClient from '../../structures/Client';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -42,11 +42,18 @@ export default class EvalCommand extends Command {
             if (typescript) result = eval(this.compileTypescript(isAsync? `(async() => {${script}})()`: script));
             result = eval(isAsync? `(async()=>{${script}})();`: script);
             const evaluationTime = Date.now() - startTime;
+            if ((result as any) instanceof Promise) result = await result;
+            if (typeof result !== 'string') result = inspect(result, {
+                depth: +!(inspect(result, { depth: 1 })),
+                showHidden: false
+            });
+
+            const _res = this._redact(result);
             await message.edit({
                 embed: new EmbedBuilder()
                     .setTitle('Evauluation')
                     .addField(":scroll: Script :scroll:", `\`\`\`js\n${script}\n\`\`\``, false)
-                    .addField(":white_check_mark: Result :white_check_mark:", `\`\`\`js\n${result}\n\`\`\``, false)
+                    .addField(":white_check_mark: Result :white_check_mark:", `\`\`\`js\n${_res}\n\`\`\``, false)
                     .addField(":alarm_clock: Evaluation Time :alarm_clock:", `${evaluationTime}ms`, false)
                     .setColor(0x00ff00)
                     .build()
@@ -63,15 +70,30 @@ export default class EvalCommand extends Command {
         }
     }
 
+    _redact(script: string) {
+        const cancellationToken = new RegExp([
+            this.client.token,
+            //this.client.config.bfdtoken,
+            //this.client.config.blstoken,
+            //this.client.config.dbltoken,
+            //this.client.config.dboatstoken,
+            this.client.config.databaseUrl,
+            this.client.config.discord.token,
+            this.client.config.redis.host,
+            this.client.config.sentryDSN
+        ].join('|'), 'gi');
+
+        return script.replace(cancellationToken, '--snip--');
+    }
+
     // Stolen from: https://github.com/yamdbf/core/blob/master/src/command/base/EvalTS.ts#L68-L96
     compileTypescript(script: string) {
-        let message!: string;
         const file = `${process.cwd()}${require('path').sep}data${require('path').sep}eval_${Date.now()}.ts`;
         fs.writeFileSync(file, script);
         const program: any = ts.createProgram([file], {
             target: ts.ScriptTarget.ESNext,
             module: ts.ModuleKind.CommonJS,
-            lib: ['es2015', 'es2016', 'es2017', 'es2018', 'esnext'],
+            lib: ['lib.es2015.d.ts', 'lib.es2016.d.ts', 'lib.es2017.d.ts', 'lib.es2018.d.ts', 'lib.esnext.d.ts'],
             declaration: false,
             strict: true,
             noImplicitAny: true,
@@ -82,14 +104,24 @@ export default class EvalCommand extends Command {
             emitDeclarationMetadata: true
         });
 
-        let diagnostics: (readonly any[]) = ts.getPreEmitDiagnostics(program);
-        if (diagnostics.length > 0) {
-            diagnostics = diagnostics.map((data) => {
-                const txt = ts.flattenDiagnosticMessageText(data.messageText, '\n');
-                const d = data.file!.getLineAndCharacterOfPosition(data.start!);
-                return `\n[${d.line + 1};${d.character + 1}]: ${txt} (${data.code})`;
-            }).filter(d => !d.includes('Cannot find name'));
-            if (diagnostics.length > 0) message = diagnostics.join('');
+        let diagnostics = ts.getPreEmitDiagnostics(program);
+        let message!: string;
+        if (diagnostics.length) {
+            for (const diagnostic of diagnostics) {
+                const _msg  = diagnostic.messageText;
+                const _file = diagnostic.file;
+                const line  = _file? _file.getLineAndCharacterOfPosition(diagnostic.start!): undefined;
+
+                //* Unable to get "line" and "character", reduce it to the message that the diagnostic returned
+                if (line === undefined) {
+                    message = _msg.toString();
+                    break;
+                }
+
+                const _line = line.line + 1;
+                const _char = line.character + 1;
+                message = `${_msg} (at "${_line}:${_char}")`;
+            }
         }
 
         fs.unlinkSync(file);
@@ -99,7 +131,7 @@ export default class EvalCommand extends Command {
             compilerOptions: {
                 target: ts.ScriptTarget.ESNext,
                 module: ts.ModuleKind.CommonJS,
-                lib: ['es2015', 'es2016', 'es2017', 'es2018', 'esnext'],
+                lib: ['lib.es2015.d.ts', 'lib.es2016.d.ts', 'lib.es2017.d.ts', 'lib.es2018.d.ts', 'lib.esnext.d.ts'],
                 declaration: false,
                 strict: true,
                 noImplicitAny: true,
