@@ -73,10 +73,10 @@ export default class EvalCommand extends Command {
     _redact(script: string) {
         const cancellationToken = new RegExp([
             this.client.token,
-            //this.client.config.bfdtoken,
-            //this.client.config.blstoken,
-            //this.client.config.dbltoken,
-            //this.client.config.dboatstoken,
+            this.client.config.bfdtoken,
+            this.client.config.blstoken,
+            this.client.config.dbltoken,
+            this.client.config.dboatstoken,
             this.client.config.databaseUrl,
             this.client.config.discord.token,
             this.client.config.redis.host,
