@@ -19,8 +19,8 @@
     ],
     "dependencies": {
         "@augu/immutable": "0.0.8",
-        "@sentry/integrations": "5.7.1",
-        "@sentry/node": "5.7.1",
+        "@sentry/integrations": "5.8.0",
+        "@sentry/node": "5.8.0",
         "common-tags": "1.8.0",
         "eris": "0.11.0",
         "express": "4.17.1",
