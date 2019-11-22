@@ -43,7 +43,7 @@
         "@typescript-eslint/eslint-plugin": "2.8.0",
         "@typescript-eslint/parser": "2.8.0",
         "eslint": "6.6.0",
-        "nodemon": "1.19.4",
+        "nodemon": "2.0.1",
         "typescript": "3.7.2"
     }
 }
