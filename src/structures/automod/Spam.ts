@@ -35,7 +35,7 @@ export default class AutoModSpam {
             return false;
 
         const settings = await this.client.settings.get(guild.id);
-        
+
         if (!settings || !settings.automod.spam) return false;
 
         const queue = new RedisQueue(this.client.redis, `${m.author.id}:${guild.id}`);
@@ -43,7 +43,8 @@ export default class AutoModSpam {
 
         if ((await queue.length()) >= 5) {
             const oldtime = Number.parseInt(await queue.pop());
-            
+
+            if (m.editedTimestamp > m.timestamp) return false; //remove the possibility for edits to be counted by checking if the message object has a greater edit timestamp than created timestamp
             if (m.timestamp - oldtime <= 3000) {
                 let punishments = await this.client.punishments.addWarning(m.member!);
                 for (let punishment of punishments) {
