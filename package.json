@@ -40,8 +40,8 @@
         "@types/mongoose": "5.5.32",
         "@types/ms": "0.7.31",
         "@types/node": "12.12.11",
-        "@typescript-eslint/eslint-plugin": "2.7.0",
-        "@typescript-eslint/parser": "2.7.0",
+        "@typescript-eslint/eslint-plugin": "2.8.0",
+        "@typescript-eslint/parser": "2.8.0",
         "eslint": "6.6.0",
         "nodemon": "1.19.4",
         "typescript": "3.7.2"
