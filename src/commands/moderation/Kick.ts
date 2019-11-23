@@ -12,7 +12,7 @@ export default class KickCommand extends Command {
             name: 'kick',
             description: 'Kicks a user from the guild',
             usage: '<user> <reason> [--reason]',
-            aliases: ['boot'],
+            aliases: [ 'boot' ],
             category: 'Moderation',
             guildOnly: true,
             botpermissions: Constants.Permissions.kickMembers,
@@ -21,7 +21,7 @@ export default class KickCommand extends Command {
     }
 
     async run(ctx: Context) {
-        if (!ctx.args.has(0)) return ctx.send('Sorry but you will need to specify a user.');
+        if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
 
         const u = findUser(this.client, ctx.args.get(0))!;
         if (!u) {

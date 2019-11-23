@@ -24,13 +24,9 @@ export default class UnbanCommand extends Command {
 
         const id = findId(ctx.client, ctx.args.get(0));
 
-        if (!id) {
-            return ctx.send('Please type the id or mention the user (<@id>/<@!id>)');
-        }
+        if (!id) return ctx.send('Please type the id or mention the user (<@id>/<@!id>)');
 
-        if (!(await ctx.guild.getBans()).find(v => v.user.id === id)) {
-            return ctx.send('The user is not banned from this guild.');
-        }
+        if (!(await ctx.guild.getBans()).find(v => v.user.id === id)) return ctx.send('The user is not banned from this guild.');
 
         let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1).join(' ') : false);
         if (reason && typeof reason === 'boolean') return ctx.send('You will need to specify a reason');

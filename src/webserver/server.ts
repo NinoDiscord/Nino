@@ -33,6 +33,6 @@ export default class NinoWebServer {
             res.status(200).json({ success: true, data: cmd! });
         });
 
-        this.app.listen(this.client.config.webserver, () => this.client.logger.log('info', `Now listening to ${this.client.config.webserver}~`));
+        this.app.listen(this.client.config.webserver, () => this.client.logger.log('info', `Web server listening on ${this.client.config.webserver}~`));
     }
 }

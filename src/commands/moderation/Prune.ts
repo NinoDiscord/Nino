@@ -14,13 +14,13 @@ export default class PruneCommand extends Command {
             name: 'prune',
             description: 'Prunes messages from the current channel',
             usage: '<amount> [--filter="bot" | "user" | "new"]',
-            aliases: ['purge'],
+            aliases: [ 'purge' ],
             category: 'Moderation',
             userpermissions: Constants.Permissions.manageMessages,
             botpermissions: Constants.Permissions.manageMessages
         });
 
-        this.filters = ['bot', 'user', 'new'];
+        this.filters = [ 'bot', 'user', 'new' ];
     }
 
     async run(ctx: Context) {

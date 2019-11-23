@@ -41,20 +41,20 @@ export default class BotListService {
      * Post guild stats
      */
     postCount(guilds: Number, id: string,  config: NinoConfig, logger: any) {
-        if (config.dbltoken)
+        if (config.topgg)
             wumpfetch({
-                url: `https://discordbots.org/api/bots/${id}/stats`, 
+                url: `https://top.gg/api/bots/${id}/stats`, 
                 method: "POST",
                 data: {
                     "server_count": guilds
                 }
             }).header({
-                "Authorization": config.dbltoken,
+                "Authorization": config.topggtoken,
                 "Content-Type": "application/json"
             }).send().then(res => {
-                logger.info(`Posted guild stats to Discord Bot List: ${res.statusCode} : ${res.body}`);
+                logger.info(`Posted guild stats to TOP.GG: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
-                logger.error("Failed to post guild stats to Discord Bot List.");
+                logger.error("Failed to post guild stats to TOP.GG.");
             });
         if (config.bfdtoken)
             wumpfetch({

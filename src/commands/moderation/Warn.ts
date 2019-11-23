@@ -20,20 +20,16 @@ export default class WarnCommand extends Command {
     }
 
     async run(ctx: Context) {
-        if (!ctx.args.has(0)) return ctx.send('Sorry but you will need to specify a user!');
+        if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
 
         const u = findUser(this.client, ctx.args.get(0))!;
-        if (!u) {
-            return ctx.send('I can\'t find this user!');
-        }
+        if (!u) return ctx.send('I can\'t find this user!');
         const member = ctx.guild.members.get(u.id);
 
         if (!member) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
 
         const punishments = await this.client.punishments.addWarning(member!);
-        for (let i of punishments) {
-            await this.client.punishments.punish(member!, i, 'Automod');
-        }
+        for (let i of punishments) await this.client.punishments.punish(member!, i, 'Automod');
         const warns = await this.client.warnings.get(ctx.guild.id, member.id);
         return ctx.send(`Successfully warned ${member.username}#${member.discriminator}! They now have ${warns!.amount} warnings!`);
     }

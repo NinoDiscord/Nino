@@ -21,9 +21,9 @@ Check out the [wiki](https://github.com/auguwu/Nino/wiki)!
 ## Setting up the bot
 
 1. Clone the repository using Git: ``git clone https://github.com/auguwu/nino``
-2. Install dependencies with NPM (included in Node.js): ``npm i``
+2. Install dependencies with NPM (included in Node.js): ``npm i`` (or with [Yarn](https://yarnpkg.com) ``yarn``)
 3. Create an application.yml file in your working directory (see the example for more information)
-4. Compile TypeScript (install TypeScript with ``npm i -g typescript``): ``tsc``
+4. Compile TypeScript (install TypeScript with ``npm i -g typescript`` or with Yarn ``yarn global add typescript``): ``tsc``
 5. Run the bot in the `dist` directory: ``node bot.js``
 6. 4 and 5 can be bypassed by running npm run main.
 
@@ -49,7 +49,11 @@ redis:
 * [Node.js](https://nodejs.org)
 * [Git](https://git-scm.com)
 
-## Participants
+## Maintainers
+* August#5820 (Lead) ([GitHub](https://github.com/auguwu))
+* dondish#0001 (Development Lead) ([GitHub](https://github.com/dondish))
+
+## Hackweek Participants
 
 * August#5820 (Lead) ([GitHub](https://github.com/auguwu))
 * dondish#0001 (Development Lead) ([GitHub](https://github.com/dondish))

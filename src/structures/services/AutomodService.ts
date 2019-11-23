@@ -28,10 +28,10 @@ export default class AutomodService {
     private mentionhandler: AutoModMention;
 
     constructor(client: NinoClient) {
-        this.spamhandler = new AutoModSpam(client);
-        this.invitehandler = new AutoModInvite(client);
+        this.spamhandler    = new AutoModSpam(client);
+        this.invitehandler  = new AutoModInvite(client);
         this.badwordhandler = new AutoModBadWords(client);
-        this.raidhandler = new AutoModRaid(client);
+        this.raidhandler    = new AutoModRaid(client);
         this.dehoisthandler = new AutoModDehoist(client);
         this.mentionhandler = new AutoModMention(client);
     }

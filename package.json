@@ -11,9 +11,11 @@
         "lint": "eslint src --ext .ts --fix"
     },
     "maintainers": [
-        "Kyle (dvhe)",
         "August (auguwu)",
         "dondish",
+    ],
+    "contributors": [
+        "Kyle (dvhe)",
         "Wesselgame",
         "ohlookitsderpy"
     ],

@@ -9,6 +9,7 @@ export interface DMOptions {
     content: string;
     embed?: EmbedOptions;
 }
+
 export default class CommandContext {
     public client: NinoClient;
     public message: Message;
