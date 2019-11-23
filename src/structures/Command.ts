@@ -39,19 +39,19 @@ export default class NinoCommand {
     public userpermissions: number;
 
     constructor(client: Client, info: CommandInfo) {
-        this.client      = client;
-        this.name        = info.name;
-        this.description = (typeof info.description === 'function')? info.description(client): info.description;
-        this.usage       = info.usage || '';
-        this.category    = info.category || 'Generic';
-        this.aliases     = info.aliases || [];
-        this.guildOnly   = info.guildOnly || false;
-        this.ownerOnly   = info.ownerOnly || false;
-        this.disabled    = info.disabled || false;
-        this.hidden      = info.hidden || false;
-        this.cooldown    = info.cooldown || 5;
-        this.subcommands = info.subcommands || [];
-        this.botpermissions = info.botpermissions || 0;
+        this.client          = client;
+        this.name            = info.name;
+        this.description     = (typeof info.description === 'function')? info.description(client): info.description;
+        this.usage           = info.usage || '';
+        this.category        = info.category || 'Generic';
+        this.aliases         = info.aliases || [];
+        this.guildOnly       = info.guildOnly || false;
+        this.ownerOnly       = info.ownerOnly || false;
+        this.disabled        = info.disabled || false;
+        this.hidden          = info.hidden || false;
+        this.cooldown        = info.cooldown || 5;
+        this.subcommands     = info.subcommands || [];
+        this.botpermissions  = info.botpermissions || 0;
         this.userpermissions = info.userpermissions || 0;
     }
 
