@@ -41,7 +41,7 @@ export default class BotListService {
      * Post guild stats
      */
     postCount(guilds: Number, id: string,  config: NinoConfig, logger: any) {
-        if (config.topgg)
+        if (config.botlists.topggtoken)
             wumpfetch({
                 url: `https://top.gg/api/bots/${id}/stats`, 
                 method: "POST",
@@ -56,7 +56,7 @@ export default class BotListService {
             }).catch(() => {
                 logger.error("Failed to post guild stats to TOP.GG.");
             });
-        if (config.bfdtoken)
+        if (config.botlists.bfdtoken)
             wumpfetch({
                 url: `https://botsfordiscord.com/api/bot/${id}`, 
                 method: "POST",
@@ -64,14 +64,14 @@ export default class BotListService {
                     "server_count": guilds
                 }
             }).header({
-                "Authorization": config.bfdtoken,
+                "Authorization": config.botlists.bfdtoken,
                 "Content-Type": "application/json"
             }).send().then(res => {
                 logger.info(`Posted guild stats to Bots For Discord: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
                 logger.error("Failed to post guild stats to Bots For Discord.");
             });
-        if (config.dboatstoken)
+        if (config.botlists.dboatstoken)
             wumpfetch({
                 url: `https://discord.boats/api/bot/${id}`, 
                 method: "POST",
@@ -79,14 +79,14 @@ export default class BotListService {
                     "server_count": guilds
                 }
             }).header({
-                "Authorization": config.dboatstoken,
+                "Authorization": config.botlists.dboatstoken,
                 "Content-Type": "application/json"
             }).send().then(res => {
                 logger.info(`Posted guild stats to Discord Boats: ${res.statusCode} : ${res.body}`);
             }).catch(() => {
                 logger.error("Failed to post guild stats to Discord Boats.");
             });
-        if (config.blstoken)
+        if (config.botlists.blstoken)
             wumpfetch({
                 url: `https://api.botlist.space/v1/bots/${id}`, 
                 method: "POST",
@@ -94,7 +94,7 @@ export default class BotListService {
                     "server_count": guilds
                 }
             }).header({
-                "Authorization": config.blstoken,
+                "Authorization": config.botlists.blstoken,
                 "Content-Type": "application/json"
             }).send().then(res => {
                 logger.info(`Posted guild stats to Botlist.space: ${res.statusCode} : ${res.body}`);

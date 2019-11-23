@@ -43,10 +43,12 @@ export interface NinoConfig {
     webserver: number;
     mode: string;
     sentryDSN: string;
-    dbltoken: string;
-    bfdtoken: string;
-    dboatstoken: string;
-    blstoken: string;
+    botlists: {
+        topggtoken: string;
+        bfdtoken: string;
+        dboatstoken: string;
+        blstoken: string;
+    }
 }
 
 export interface CommandStats {
