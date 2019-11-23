@@ -10,6 +10,7 @@ export default class SettingsCommand extends Command {
         super(client, {
             name: 'settings',
             description: 'View or edit the guild\'s settings.',
+            aliases: [ 'options' ],
             usage: 'set <key> <value> / reset <key> / view / add <warnings> <punishment> [--time <time> (mute/ban)] [--roleid <id> (role/unrole)] [--soft (ban)] [--days <amount> (ban: delete messages)]/ remove <punishment index>',
             userpermissions: Constants.Permissions.manageGuild,
             guildOnly: true
@@ -32,24 +33,18 @@ export default class SettingsCommand extends Command {
 
     async add(ctx: Context) {
         const warnings = ctx.args.get(1);
-        if (!warnings || !/^[0-9]$/.test(warnings) || Number(warnings) < 1 || Number(warnings) > 5)
-            return ctx.send('Amount of warnings is required, needs to between 1 to 5');
+        if (!warnings || !/^[0-9]$/.test(warnings) || Number(warnings) < 1 || Number(warnings) > 5) return ctx.send('Amount of warnings is required, needs to between 1 to 5');
         const punishment = ctx.args.get(2);
-        if (!['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].includes(punishment))
-            return ctx.send('A punishment is required and it needs to be of the following: ' + ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].join(', '));
+        if (!['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].includes(punishment)) return ctx.send('A punishment is required and it needs to be of the following: ' + ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'].join(', '));
         const temp = ctx.flags.get('time');
-        if (!!temp && (typeof temp === 'boolean' || (typeof temp === 'string' && (!ms(temp as string) || ms(temp as string) < 1000))))
-            return ctx.send('The time flag needs to be a correct time expression: can be 0.5h or 30m or 0.5 hours or 30 minutes or the amount in milliseconds. It also needs to be more or equal to one second.');
+        if (!!temp && (typeof temp === 'boolean' || (typeof temp === 'string' && (!ms(temp as string) || ms(temp as string) < 1000)))) return ctx.send('The time flag needs to be a correct time expression: can be 0.5h or 30m or 0.5 hours or 30 minutes or the amount in milliseconds. It also needs to be more or equal to one second.');
         const soft = !!ctx.flags.get('soft');
         const roleid = ctx.flags.get('roleid');
-        if (!roleid && (punishment === 'role' || punishment === 'unrole'))
-            return ctx.send('A role id is a must when the punishment is role or unrole.');
+        if (!roleid && (punishment === 'role' || punishment === 'unrole')) return ctx.send('A role id is required when the punishment is role or unrole.');
 
-        if (!!roleid && (typeof roleid === 'boolean' || (typeof roleid === 'string' && (!/^[0-9]+$/.test(roleid) || !ctx.guild.roles.get(roleid)))))
-            return ctx.send('Incorrect role id.');
+        if (!!roleid && (typeof roleid === 'boolean' || (typeof roleid === 'string' && (!/^[0-9]+$/.test(roleid) || !ctx.guild.roles.get(roleid))))) return ctx.send('Incorrect role id.');
         const days = ctx.flags.get('days');
-        if (!!days && (typeof days === 'boolean' || (typeof days === 'string' && !/^[0-9]{1,2}$/.test(days))))
-            return ctx.send('Incorrect amount of days. It is the amount of days to delete the messages in when banning.');
+        if (!!days && (typeof days === 'boolean' || (typeof days === 'string' && !/^[0-9]{1,2}$/.test(days)))) return ctx.send('Incorrect amount of days. It is the amount of days to delete the messages in when banning.');
 
         this.client.settings.update(ctx.guild.id, {
             $push: {
@@ -64,25 +59,18 @@ export default class SettingsCommand extends Command {
             }
         }, (error, raw) => {
             if (error) return ctx.send('I was unable to add the punishment.');
-            if (raw.n) {
-                return ctx.send(`The punishment was successfully added!`);
-            } else {
-                return ctx.send('We limit the amount of punishments per server to 15. Please remove some of your punishments before further additions.');
-            }
+            if (raw.n) return ctx.send(`The punishment was successfully added!`);
+            else return ctx.send('We limit the amount of punishments per server to 15. Please remove some of your punishments before further additions.');
         });
         
     }
 
     async remove(ctx: Context) {
         const index = ctx.args.get(1);
-        if (!index || !/^[0-9]+$/.test(index) || Number(index) < 1)
-            return ctx.send('The index of the punishment is required, see the index in `x!settings view`.');
+        if (!index || !/^[0-9]+$/.test(index) || Number(index) < 1) return ctx.send('The index of the punishment is required, see the index in `x!settings view`.');
         const settings = await ctx.client.settings.get(ctx.guild.id);
-        if (!settings) {
-            return ctx.send('There are no punishments!');
-        }
-        if (Number(index) <= settings!.punishments.length)
-            settings!.punishments.splice(Math.round(Number(index))-1, 1);
+        if (!settings) return ctx.send('There are no punishments!');
+        if (Number(index) <= settings!.punishments.length) settings!.punishments.splice(Math.round(Number(index))-1, 1);
         settings!.save();
         return ctx.send('Successfully removed the punishment!');
     }

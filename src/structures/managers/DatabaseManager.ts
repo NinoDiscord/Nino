@@ -44,9 +44,7 @@ export default class DatabaseManager {
 
     async getBuild(): Promise<any> {
         if (!this.admin) this.admin = this.m.connection.db.admin();
-        if (!this.build) {
-            this.build = await this.admin.buildInfo();
-        }
+        if (!this.build) this.build = await this.admin.buildInfo();
 
         return this.build;
     }

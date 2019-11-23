@@ -22,11 +22,8 @@ export default class TimeoutsManager {
      * @param time the time to excute it after
      */
     bigTimeout(func: (...args: any[]) => void, time: number) {
-        if (time > 0x7FFFFFFF) {
-            setTimeout(() => this.bigTimeout(func, time - 0x7FFFFFFF), 0x7FFFFFFF);
-        } else {
-            setTimeout(func, time);
-        }
+        if (time > 0x7FFFFFFF) setTimeout(() => this.bigTimeout(func, time - 0x7FFFFFFF), 0x7FFFFFFF);
+        else setTimeout(func, time);
     }
 
     /**
@@ -70,8 +67,7 @@ export default class TimeoutsManager {
             const member = value!.split(':')[2];
             const guild = this.client.guilds.get(value!.split(':')[3]);
             const task = value!.split(':')[4];
-            if (!guild)
-                continue;
+            if (!guild) continue;
             
             this.bigTimeout(async () => {
                 if (await this.client.redis.exists(timedate)) {

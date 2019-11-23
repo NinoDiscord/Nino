@@ -27,28 +27,19 @@ export default class AutoModDehoist {
         const me = guild.members.get(this.client.user.id)!;
         const name = m.nick || m.username;
         
-        if (name >= '0') 
-            return;
+        if (name >= '0') return;
 
         const settings = await this.client.settings.get(m.guild.id);
 
-        if (!settings || !settings.automod.dehoist) 
-            return;
+        if (!settings || !settings.automod.dehoist) return;
         
-        if (!PermissionUtils.above(me, m) || !me.permission.has('manageNicknames') || m.bot || m.permission.has('manageNicknames'))
-            return;
+        if (!PermissionUtils.above(me, m) || !me.permission.has('manageNicknames') || m.bot || m.permission.has('manageNicknames')) return;
 
         let i = 0;
-        while (i < name.length && name[i] < '0') {
-            i++;
-        }
+        while (i < name.length && name[i] < '0') i++;
         const goodName = name.substring(i).trim();
-        if (goodName == "" && m.username >= '0') {
-            return m.edit({nick: m.username}, 'Auto Dehoist');
-        } else if (goodName == "") {
-            return m.edit({nick: 'hoister'});
-        } else {
-            return m.edit({nick: goodName}, 'Auto Dehoist');
-        }
+        if (goodName === "" && m.username >= '0') return m.edit({ nick: m.username }, 'Auto Dehoist');
+        else if (goodName === "") return m.edit({ nick: 'hoister' });
+        else return m.edit({nick: goodName}, 'Auto Dehoist');
     }
 }

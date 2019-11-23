@@ -11,7 +11,7 @@ export default class StatisticsCommand extends Command {
         super(client, {
             name: 'statistics',
             description: 'Gives you the bot\'s statistics',
-            aliases: ['stats', 'info', 'bot', 'botinfo'],
+            aliases: [ 'stats', 'info', 'bot', 'botinfo' ],
             category: 'Generic',
             ownerOnly: false
         });

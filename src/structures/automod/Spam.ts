@@ -31,8 +31,7 @@ export default class AutoModSpam {
     async handle(m: Message): Promise<boolean> {
         const guild = (m.channel as TextChannel).guild;
         const me = guild.members.get(this.client.user.id)!;
-        if (!PermissionUtils.above(me, m.member!) || m.author.bot || (m.channel as TextChannel).permissionsOf(m.author.id).has('manageMessages'))
-            return false;
+        if (!PermissionUtils.above(me, m.member!) || m.author.bot || (m.channel as TextChannel).permissionsOf(m.author.id).has('manageMessages')) return false;
 
         const settings = await this.client.settings.get(guild.id);
         
@@ -46,9 +45,7 @@ export default class AutoModSpam {
             
             if (m.timestamp - oldtime <= 3000) {
                 let punishments = await this.client.punishments.addWarning(m.member!);
-                for (let punishment of punishments) {
-                    await this.client.punishments.punish(m.member!, punishment, 'Automod (Spamming)');
-                }
+                for (let punishment of punishments) await this.client.punishments.punish(m.member!, punishment, 'Automod (Spamming)');
                 await m.channel.createMessage('Stop right there! Spamming is not allowed!');
                 return true;
             }
