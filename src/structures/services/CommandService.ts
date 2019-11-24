@@ -21,8 +21,7 @@ export default class CommandService {
 
         const guild = (m.channel as TextChannel).guild;
         const me = guild.members.get(this.client.user.id);
-        if (!(m.channel as TextChannel).permissionsOf(me!.id).has('sendMessages'))
-            return;
+        if (!(m.channel as TextChannel).permissionsOf(me!.id).has('sendMessages')) return;
 
         const mention = new RegExp(`^<@!?${this.client.user.id}> `).exec(m.content);
 
@@ -98,7 +97,7 @@ export default class CommandService {
                                 return `<@${userID}>`;
                         }).join(', ')} at https://discord.gg/7TtMP2n
                     `);
-                this.client.logger.log('error', `Unable to run the "${cmd.name}" command\n${ex.stack}`);
+                this.client.logger.log('error', `Unable to run the '${cmd.name}' command\n${ex.stack}`);
                 this.client.report(ex);
                 ctx.embed(embed.build());
             }

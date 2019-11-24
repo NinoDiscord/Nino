@@ -4,7 +4,7 @@ import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import EmbedBuilder from '../../structures/EmbedBuilder';
 import ts from 'typescript';
-import fs from 'fs';
+import { writeFileSync, unlinkSync } from 'fs';
 
 class CompilerError extends Error {
     constructor(m: string) {
@@ -52,9 +52,9 @@ export default class EvalCommand extends Command {
             await message.edit({
                 embed: new EmbedBuilder()
                     .setTitle('Evauluation')
-                    .addField(":scroll: Script :scroll:", `\`\`\`js\n${script}\n\`\`\``, false)
-                    .addField(":white_check_mark: Result :white_check_mark:", `\`\`\`js\n${_res}\n\`\`\``, false)
-                    .addField(":alarm_clock: Evaluation Time :alarm_clock:", `${evaluationTime}ms`, false)
+                    .addField(':scroll: Script :scroll:', `\`\`\`js\n${script}\n\`\`\``, false)
+                    .addField(':white_check_mark: Result :white_check_mark:', `\`\`\`js\n${_res}\n\`\`\``, false)
+                    .addField(':alarm_clock: Evaluation Time :alarm_clock:', `${evaluationTime}ms`, false)
                     .setColor(0x00ff00)
                     .build()
             });
@@ -62,8 +62,8 @@ export default class EvalCommand extends Command {
             await message.edit({
                 embed: new EmbedBuilder()
                     .setTitle('Evaluation Error!')
-                    .addField(":scroll: Script :scroll:", `\`\`\`js\n${script}\n\`\`\``, false)
-                    .addField(":no_entry_sign: Error :no_entry_sign:", `\`\`\`js\n${e}\n\`\`\``, false)
+                    .addField(':scroll: Script :scroll:', `\`\`\`js\n${script}\n\`\`\``, false)
+                    .addField(':no_entry_sign: Error :no_entry_sign:', `\`\`\`js\n${e}\n\`\`\``, false)
                     .setColor(0xff0000)
                     .build()
             });
@@ -89,7 +89,7 @@ export default class EvalCommand extends Command {
     // Stolen from: https://github.com/yamdbf/core/blob/master/src/command/base/EvalTS.ts#L68-L96
     compileTypescript(script: string) {
         const file = `${process.cwd()}${require('path').sep}data${require('path').sep}eval_${Date.now()}.ts`;
-        fs.writeFileSync(file, script);
+        writeFileSync(file, script);
         const program: any = ts.createProgram([file], {
             target: ts.ScriptTarget.ESNext,
             module: ts.ModuleKind.CommonJS,
@@ -112,7 +112,7 @@ export default class EvalCommand extends Command {
                 const _file = diagnostic.file;
                 const line  = _file? _file.getLineAndCharacterOfPosition(diagnostic.start!): undefined;
 
-                //* Unable to get "line" and "character", reduce it to the message that the diagnostic returned
+                //* Unable to get 'line' and 'character', reduce it to the message that the diagnostic returned
                 if (line === undefined) {
                     message = _msg.toString();
                     break;
@@ -120,11 +120,11 @@ export default class EvalCommand extends Command {
 
                 const _line = line.line + 1;
                 const _char = line.character + 1;
-                message = `${_msg} (at "${_line}:${_char}")`;
+                message = `${_msg} (at '${_line}:${_char}')`;
             }
         }
 
-        fs.unlinkSync(file);
+        unlinkSync(file);
         if (message) throw new CompilerError(message);
 
         return ts.transpileModule(script, {

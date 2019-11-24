@@ -38,8 +38,8 @@ export default class AutoModDehoist {
         let i = 0;
         while (i < name.length && name[i] < '0') i++;
         const goodName = name.substring(i).trim();
-        if (goodName === "" && m.username >= '0') return m.edit({ nick: m.username }, 'Auto Dehoist');
-        else if (goodName === "") return m.edit({ nick: 'hoister' });
+        if (goodName === '' && m.username >= '0') return m.edit({ nick: m.username }, 'Auto Dehoist');
+        else if (goodName === '') return m.edit({ nick: 'hoister' });
         else return m.edit({nick: goodName}, 'Auto Dehoist');
     }
 }

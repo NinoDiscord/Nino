@@ -1,4 +1,4 @@
-import { Message, TextChannel, Member } from 'eris';
+import { Member } from 'eris';
 import RedisQueue from '../../util/RedisQueue';
 import NinoClient from '../Client';
 import PermissionUtils from '../../util/PermissionUtils';
@@ -40,14 +40,14 @@ export default class AutoModRaid {
         if (!settings || !settings.automod.raid) return false;
 
         const queue = new RedisQueue(this.client.redis, `raid:${guild.id}`);
-        await queue.push(Date.now().toString()+"U"+m.id);
+        await queue.push(Date.now().toString()+'U'+m.id);
 
         if ((await queue.length()) >= 3) {
             const oldtime = Number.parseInt(await queue.pop());
             if (Date.now() - oldtime <= 1000) {
                 do {
                     await this.client.punishments.punish(m, new Punishment(PunishmentType.Ban, {moderator: me.user}), 'Automod: Raid detected');
-                    const [time, id] = (await queue.pop()).split("U");
+                    const [time, id] = (await queue.pop()).split('U');
                     m = guild.members[id];
                 } while (await queue.length() > 0);
                 return true;

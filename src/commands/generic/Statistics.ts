@@ -30,7 +30,7 @@ export default class StatisticsCommand extends Command {
                 users: this.client.stats.commandUsage[name].users.length
             };  
         }
-        return {command: "None", size: 0, users: 0};
+        return {command: 'None', size: 0, users: 0};
     }
 
     async run(ctx: Context) {

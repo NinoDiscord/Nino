@@ -1,4 +1,4 @@
-import { Constants, TextChannel } from 'eris';
+import { Constants } from 'eris';
 import { stripIndents } from 'common-tags';
 import NinoClient from '../../structures/Client';
 import Command from '../../structures/Command';
@@ -13,7 +13,7 @@ export default class PruneCommand extends Command {
         super(client, {
             name: 'prune',
             description: 'Prunes messages from the current channel',
-            usage: '<amount> [--filter="bot" | "user" | "new"]',
+            usage: '<amount> [--filter='bot' | 'user' | 'new']',
             aliases: [ 'purge' ],
             category: 'Moderation',
             userpermissions: Constants.Permissions.manageMessages,

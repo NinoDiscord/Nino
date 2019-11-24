@@ -32,13 +32,13 @@ Bot credentials (+ extra information) and personal touches are obviously your re
 # Example application.yml
 
 ```yaml
-environment: "development"
-databaseUrl: "mongodb://localhost:27017/database"
-mode: "development"
-sentryDSN: "your sentry DSN"
+environment: 'development'
+databaseUrl: 'mongodb://localhost:27017/database'
+mode: 'development'
+sentryDSN: 'your sentry DSN'
 discord:
-  token: "TOKEN"
-  prefix: "x!"
+  token: 'TOKEN'
+  prefix: 'x!'
 redis:
   host: 'localhost'
   port: 6379

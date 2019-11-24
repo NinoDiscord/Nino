@@ -16,6 +16,6 @@ export default class GuildLeftEvent extends Event {
         });
         this.client.prom.guildCount.dec();
         this.client.stats.guildCount--;
-        await this.client.redis.set("guilds", this.client.guilds.size);
+        await this.client.redis.set('guilds', this.client.guilds.size);
     }
 }
