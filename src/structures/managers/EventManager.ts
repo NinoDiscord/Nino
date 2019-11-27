@@ -42,7 +42,7 @@ export default class EventManager {
             try {
                 await ev.emit(...args);
             } catch(ex) {
-                this.client.logger.log('error', `Unable to run the "${ev.event}" event:\n${ex}`);
+                this.client.logger.log('error', `Unable to run the '${ev.event}' event:\n${ex}`);
             }
         };
         this.client.on(ev.event, wrapper);

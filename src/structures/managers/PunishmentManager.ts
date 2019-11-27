@@ -1,10 +1,10 @@
-import NinoClient from "../Client";
-import { Member, TextChannel, Constants, User, Message, Guild } from "eris";
-import PermissionUtils from "../../util/PermissionUtils";
-import EmbedBuilder from "../EmbedBuilder";
+import NinoClient from '../Client';
+import { Member, TextChannel, Constants, User, Message, Guild } from 'eris';
+import PermissionUtils from '../../util/PermissionUtils';
+import EmbedBuilder from '../EmbedBuilder';
 import { stripIndents } from 'common-tags';
-import ms = require("ms");
-import { CaseModel } from "../../models/CaseSchema";
+import ms = require('ms');
+import { CaseModel } from '../../models/CaseSchema';
 
 /**
  * Punishment types
@@ -16,13 +16,13 @@ import { CaseModel } from "../../models/CaseSchema";
  * * AddRole is to add a role, it should have roleid as a parameter
  */
 export enum PunishmentType {
-    Ban = "ban", 
-    Kick = "kick", 
-    Mute = "mute",
-    AddRole = "role",
-    Unmute = "unmute",
-    Unban = "unban",
-    RemoveRole = "unrole"
+    Ban = 'ban', 
+    Kick = 'kick', 
+    Mute = 'mute',
+    AddRole = 'role',
+    Unmute = 'unmute',
+    Unban = 'unban',
+    RemoveRole = 'unrole'
 }
 
 export interface PunishmentOptions {
@@ -66,10 +66,10 @@ export default class PunishmentManager {
      * @param punishment the punishment
      */
     punishmentPerms(punishment: Punishment): number {
-        if (punishment.type === "ban" || punishment.type === "unban") return Constants.Permissions.banMembers;
-        if (punishment.type === "kick") return Constants.Permissions.kickMembers; 
-        if (punishment.type === "role" || punishment.type === "unmute" || punishment.type === "unrole") return Constants.Permissions.manageRoles;
-        if (punishment.type === "mute") return Constants.Permissions.manageRoles | Constants.Permissions.manageChannels; 
+        if (punishment.type === 'ban' || punishment.type === 'unban') return Constants.Permissions.banMembers;
+        if (punishment.type === 'kick') return Constants.Permissions.kickMembers; 
+        if (punishment.type === 'role' || punishment.type === 'unmute' || punishment.type === 'unrole') return Constants.Permissions.manageRoles;
+        if (punishment.type === 'mute') return Constants.Permissions.manageRoles | Constants.Permissions.manageChannels; 
         return 0;
     }
 
@@ -127,7 +127,7 @@ export default class PunishmentManager {
         if ((member instanceof Member && !PermissionUtils.above(me, member)) || (me.permission.allow & this.punishmentPerms(punishment)) === 0) return;
 
         switch (punishment.type) {
-            case "ban": 
+            case 'ban': 
                 const days: number = punishment.options.days ? punishment.options.days : 7;
                 const time = punishment.options.temp;
                 const soft: boolean = !!punishment.options.soft;
@@ -135,11 +135,11 @@ export default class PunishmentManager {
                 if (soft) await guild.unbanMember(member.id, reason);
                 else if (time !== undefined && time > 0) await this.client.timeouts.addTimeout(member.id, member.guild, 'unban', time!);
                 break;
-            case "kick":
+            case 'kick':
                 if (!(member instanceof Member)) return;
                 await member.kick(reason);
                 break;
-            case "mute": 
+            case 'mute': 
                 if (!(member instanceof Member)) return;
                 const temp = punishment.options.temp;
                 let muterole = settings!.mutedRole;
@@ -158,12 +158,12 @@ export default class PunishmentManager {
                 await member.addRole(muterole, reason);
                 if (!!temp) this.client.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
                 break;
-            case "role":
+            case 'role':
                 if (!(member instanceof Member)) return;
                 const role = member.guild.roles.get(punishment.options.roleid!);
                 if (!!role && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > role.position) await member.addRole(role.id, reason);
                 break;
-            case "unmute":
+            case 'unmute':
                 let mem: Member | {id: string, guild: Guild} | undefined = member;
                 if (!(member instanceof Member)) mem = guild.members.get(mem.id);
                 if (!mem) return;
@@ -173,10 +173,10 @@ export default class PunishmentManager {
                     await(mem! as Member).removeRole(muted.id, reason);
                 }
                 break;
-            case "unban":
+            case 'unban':
                 if (!guild.members.find(x => x.id === member.id)) await guild.unbanMember(member.id, reason);
                 break;
-            case "unrole":
+            case 'unrole':
                 const srole = member.guild.roles.get(punishment.options.roleid!);
                 if (member instanceof Member && !!srole && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > srole!.position) await member.removeRole(srole.id, reason);
                 break;
@@ -243,11 +243,11 @@ export default class PunishmentManager {
 
     determineType(type: string): { action: number; suffix: string; } {
         const action = {
-            "ban": 0xff0000,
-            "kick": 0xfff000,
-            "mute": 0xfff000,
-            "unban": 0xfff00,
-            "unmute": 0xfff00
+            'ban': 0xff0000,
+            'kick': 0xfff000,
+            'mute': 0xfff000,
+            'unban': 0xfff00,
+            'unmute': 0xfff00
         }[type];
         let suffix;
         if (type === 'ban' || type === 'unban') suffix = 'ned';

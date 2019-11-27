@@ -1,8 +1,8 @@
-import NinoClient from "../../structures/Client";
+import NinoClient from '../../structures/Client';
 import Command from '../../structures/Command';
-import { Constants, TextChannel, Role } from "eris";
-import CommandContext from "../../structures/Context";
-import PermissionUtils from "../../util/PermissionUtils";
+import { Constants, TextChannel, Role } from 'eris';
+import CommandContext from '../../structures/Context';
+import PermissionUtils from '../../util/PermissionUtils';
 
 export default class LockdownCommand extends Command {
     constructor(client: NinoClient) {
@@ -46,8 +46,7 @@ export default class LockdownCommand extends Command {
         if (ctx.flags.get('roles') === true) return ctx.send('The roles flag is not supposed to be a boolean!');
         const roles = (ctx.flags.get('roles') as string)
         .split(/\s*,\s+/)
-        .map(role=>
-            { 
+        .map(role => { 
                 return !ctx.flags.get('release') ? {perm: role[0], role: this.getRole(role.slice(1), ctx)} : {role: this.getRole(role, ctx)};
             }).filter(({ role }) => 
             !!role && PermissionUtils.topRole(ctx.me) && PermissionUtils.topRole(ctx.me)!.position > role.position
@@ -59,7 +58,7 @@ export default class LockdownCommand extends Command {
         ctx.guild.channels.filter(c => c.type === 0).map(c => c as TextChannel) : 
         ctx.args.args.map(x => this.getChannel(x, ctx)).filter(x => !!x).map(tc=>tc!);
         
-        if (channels.length === 0) return ctx.send("No valid channels were selected.");
+        if (channels.length === 0) return ctx.send('No valid channels were selected.');
 
         if (!ctx.flags.get('release')) {
             const msg = await ctx.send('Backing up former permissions...');
@@ -84,9 +83,9 @@ export default class LockdownCommand extends Command {
                 } else {
                     for (let role of roles) {
                         let allow = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.allow : 0;
-                        let deny = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.deny : 0;
-                        if (role.perm === "+") await channel.editPermission(role.role!.id, allow | Constants.Permissions.sendMessages, deny & ~Constants.Permissions.sendMessages, 'role', 'Channel Lockdown Started');
-                        else if (role.perm === "-") await channel.editPermission(role.role!.id, allow & ~Constants.Permissions.sendMessages, deny | Constants.Permissions.sendMessages, 'role', 'Channel Lockdown Started');
+                        let deny  = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.deny : 0;
+                        if (role.perm === '+') await channel.editPermission(role.role!.id, allow | Constants.Permissions.sendMessages, deny & ~Constants.Permissions.sendMessages, 'role', 'Channel Lockdown Started');
+                        else if (role.perm === '-') await channel.editPermission(role.role!.id, allow & ~Constants.Permissions.sendMessages, deny | Constants.Permissions.sendMessages, 'role', 'Channel Lockdown Started');
                     }
                     await ctx.send(`Channel ${channel.mention} is now locked down.`);
                 }

@@ -1,11 +1,11 @@
-import NinoClient from "../Client";
-import AutoModSpam from "../automod/Spam";
-import AutoModInvite from "../automod/Invite";
-import { Message, Member } from "eris";
-import AutoModBadWords from "../automod/Badwords";
-import AutoModRaid from "../automod/Raid";
-import AutoModDehoist from "../automod/Dehoisting";
-import AutoModMention from "../automod/Mention";
+import NinoClient from '../Client';
+import AutoModSpam from '../automod/Spam';
+import AutoModInvite from '../automod/Invite';
+import { Message, Member } from 'eris';
+import AutoModBadWords from '../automod/Badwords';
+import AutoModRaid from '../automod/Raid';
+import AutoModDehoist from '../automod/Dehoisting';
+import AutoModMention from '../automod/Mention';
 
 /**
  * Service that generalizes automod event handling

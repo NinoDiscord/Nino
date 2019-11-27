@@ -1,6 +1,6 @@
-import Event from "../structures/Event";
-import NinoClient from "../structures/Client";
-import { User, Guild, Member } from "eris";
+import Event from '../structures/Event';
+import NinoClient from '../structures/Client';
+import { User, Member } from 'eris';
 
 export default class UserUpdateEvent extends Event {
     constructor(client: NinoClient) {
@@ -18,5 +18,4 @@ export default class UserUpdateEvent extends Event {
     async emit(user: User) {
         for (let member of this.getMutualGuilds(user)) this.client.autoModService.handleMemberNameUpdate(member);
     }
-
 }
