@@ -1,5 +1,7 @@
 import Context from './Context';
 import Client from './Client';
+import { Member, User, Channel } from 'eris';
+import PermissionUtils from '../util/PermissionUtils';
 
 export interface CommandInfo {
     name: string;
@@ -21,6 +23,7 @@ export interface Subcommand {
     description: string | ((client: Client) => string);
     run: (client: Client, ctx: Context) => Promise<any>;
 }
+
 export default class NinoCommand {
     public client: Client;
     public name: string;

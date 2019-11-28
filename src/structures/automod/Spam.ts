@@ -43,7 +43,7 @@ export default class AutoModSpam {
         if ((await queue.length()) >= 5) {
             const oldtime = Number.parseInt(await queue.pop());
 
-            if (m.editedTimestamp > m.timestamp) return false; //remove the possibility for edits to be counted by checking if the message object has a greater edit timestamp than created timestamp
+            if (m.editedTimestamp && m.editedTimestamp > m.timestamp) return false; //remove the possibility for edits to be counted by checking if the message object has a greater edit timestamp than created timestamp
             if (m.timestamp - oldtime <= 3000) {
                 let punishments = await this.client.punishments.addWarning(m.member!);
                 for (let punishment of punishments) await this.client.punishments.punish(m.member!, punishment, 'Automod (Spamming)');

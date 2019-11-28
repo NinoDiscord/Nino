@@ -13,7 +13,7 @@ export default class PruneCommand extends Command {
         super(client, {
             name: 'prune',
             description: 'Prunes messages from the current channel',
-            usage: '<amount> [--filter='bot' | 'user' | 'new']',
+            usage: '<amount> [--filter=\'bot\' | \'user\' | \'new\']',
             aliases: [ 'purge' ],
             category: 'Moderation',
             userpermissions: Constants.Permissions.manageMessages,

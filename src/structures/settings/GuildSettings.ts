@@ -16,6 +16,13 @@ export default class GuildSettings implements Base<GuildModel> {
         return document;
     }
 
+    async getOrCreate(id: string) {
+        let settings = await this.get(id);
+        if (!settings || settings === null) 
+            settings = this.client.settings.create(id);
+        return settings;
+    }
+
     create(id: string) {
         const query = new this.model({
             guildID: id,

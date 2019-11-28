@@ -4,11 +4,13 @@
     "version": "0.5.2",
     "main": "dist/bot.js",
     "scripts": {
-        "build": "yarn lint && rm -fr dist && tsc",
-        "build:dev": "rm -fr dist && tsc -w",
+        "build": "yarn lint && yarn clean && tsc",
+        "build:dev": "yarn clean && tsc -w",
         "main": "yarn build && node dist/bot.js",
         "dev": "nodemon dist/bot.js",
-        "lint": "eslint src --ext .ts --fix"
+        "lint": "eslint src --ext .ts --fix",
+        "clean": "rm -fr dist",
+        "test": "jest"
     },
     "maintainers": [
         "August (auguwu)",
@@ -53,7 +55,7 @@
     },
     "jest": {
         "transform": {
-            "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+            "^.+\\.tsx?$": "ts-jest"
         },
         "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
         "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json"]
