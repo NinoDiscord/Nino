@@ -23,7 +23,7 @@ export default class PermissionUtils {
     }
 
     /**
-     * 
+     * Calculates permissions of a role in a channel.
      * @param role 
      */
     public static permissionsOf(role: Role, channel: GuildChannel) {
@@ -51,5 +51,15 @@ export default class PermissionUtils {
     public static toString(permission: number): string {
         const perm = new Permission(permission, 0).json;
         return Object.keys(perm).join(' ');
+    }
+
+    /**
+     * Returns whether the permission the user has overlap the permissions required
+     * @param user the permission the user has
+     * @param required the permissions required
+     */
+    public static overlaps(user: number, required: number): boolean {
+        return ((user & 8) != 0) // The user is an admin, automatically overwrites all permissions.
+         || ((user & required) == required);  // user & required give all of the permissions in common, it should be required.
     }
 }

@@ -57,8 +57,8 @@ export default class CommandService {
             if (cmd.guildOnly && m.channel.type === 1) return void ctx.send('Sorry, but you need to be in a guild to execute the `' + cmd.name + '` command.');
             if (cmd.ownerOnly && !this.client.owners.includes(ctx.sender.id)) return void ctx.send(`Sorry, but you need to be a developer to execute the \`${cmd.name}\` command.`);
             if (cmd.disabled) return void ctx.send(`Command \`${cmd.name}\` is disabled.`);
-            if ((me!.permission.allow & 8) === 0 && (cmd.botpermissions & me!.permission.allow) !== cmd.botpermissions) return void ctx.send(`I am missing the following permissions: ${PermissionUtils.toString(cmd.botpermissions & ~(me!.permission.allow))}`);
-            if ((m.member!.permission.allow & 8) === 0 && (cmd.userpermissions & m.member!.permission.allow) !== cmd.userpermissions) return void ctx.send(`You are missing the following permissions: ${PermissionUtils.toString(cmd.userpermissions & ~(m.member!.permission.allow))}`);
+            if (!PermissionUtils.overlaps(me!.permission.allow, cmd.userpermissions)) return void ctx.send(`I am missing the following permissions: ${PermissionUtils.toString(cmd.botpermissions & ~(me!.permission.allow))}`);
+            if (!PermissionUtils.overlaps(m.member!.permission.allow, cmd.userpermissions)) return void ctx.send(`You are missing the following permissions: ${PermissionUtils.toString(cmd.userpermissions & ~(m.member!.permission.allow))}`);
 
             this
                 .bucket
