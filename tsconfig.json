@@ -18,6 +18,7 @@
     "include": [ "src/**/*" ],
     "exclude": [ 
         "node_modules",
-        "src/**/*.test.ts"
+        "src/**/*.test.ts",
+        "src/**/__mocks__/*.ts"
      ]
 }
