@@ -1,13 +1,13 @@
 import { init } from '@sentry/node';
 import Client, { NinoConfig } from './structures/Client';
-import { readFileSync } from 'fs';
 import { safeLoad } from 'js-yaml';
+import container from './inversify.config';
+import { TYPES } from './types';
 
-const file = readFileSync('application.yml', 'utf8');
 const pkg: any = require('../package.json');
 
-const config: NinoConfig = safeLoad(file);
-const client = new Client(config);
+const config = container.get<NinoConfig>(TYPES.NinoConfig);
+const client = container.get<Client>(TYPES.Client);
 
 init({
     dsn: config.sentryDSN,

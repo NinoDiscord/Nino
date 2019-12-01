@@ -17,8 +17,9 @@ import { Counter, register, collectDefaultMetrics, Gauge } from 'prom-client';
 import { captureException } from '@sentry/node';
 import { createServer } from 'http';
 import { parse } from 'url';
-import AutoModDehoist from './automod/Dehoisting';
 import { setDefaults} from 'wumpfetch';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../types';
 
 const pkg = require('../../package');
 setDefaults({
@@ -63,6 +64,7 @@ export interface CommandStats {
     }
 }
 
+@injectable()
 export default class NinoClient extends Client {
     public manager: CommandManager;
     public events: EventManager;
@@ -98,7 +100,7 @@ export default class NinoClient extends Client {
         commandUsage: {}
     };
 
-    constructor(config: NinoConfig) {
+    constructor(@inject(TYPES.NinoConfig) config: NinoConfig) {
         super(config.discord.token, {
             maxShards: 'auto',
             disableEveryone: true,
