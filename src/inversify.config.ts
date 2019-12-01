@@ -23,9 +23,7 @@ import BotListService from './structures/services/BotListService';
 
 let config: Config;
 try {
-  const file = readFileSync('application.yml', 'utf8');
-
-  config = safeLoad(file);
+  config = safeLoad(readFileSync('application.yml', 'utf8'));
 } catch (e) {
   config = {
     environment: 'development',
@@ -54,43 +52,54 @@ container.bind<Client>(TYPES.Client).toConstantValue(
     restMode: true,
   })
 );
+
 container
   .bind<Bot>(TYPES.Bot)
   .to(Bot)
   .inSingletonScope();
+
 container.bind<Config>(TYPES.Config).toConstantValue(config);
+
 container
   .bind<CommandService>(TYPES.CommandService)
   .to(CommandService)
   .inSingletonScope();
+
 container
   .bind<CommandManager>(TYPES.CommandManager)
   .to(CommandManager)
   .inSingletonScope();
+
 container
   .bind<DatabaseManager>(TYPES.DatabaseManager)
   .to(DatabaseManager)
   .inSingletonScope();
+
 container
   .bind<EventManager>(TYPES.EventManager)
   .to(EventManager)
   .inSingletonScope();
+
 container
   .bind<PunishmentManager>(TYPES.PunishmentManager)
   .to(PunishmentManager)
   .inSingletonScope();
+
 container
   .bind<TimeoutsManager>(TYPES.TimeoutsManager)
   .to(TimeoutsManager)
   .inSingletonScope();
+
 container
   .bind<AutomodService>(TYPES.AutoModService)
   .to(AutomodService)
   .inSingletonScope();
+
 container
   .bind<GuildSettings>(TYPES.GuildSettings)
   .to(GuildSettings)
   .inSingletonScope();
+
 container
   .bind<BotListService>(TYPES.BotListService)
   .to(BotListService)
