@@ -10,6 +10,9 @@ Join the support server (Dondish Central) [here](https://discord.gg/pEKkg9r)
 
 Check out the [wiki](https://github.com/auguwu/Nino/wiki)!
 
+# Contributing
+First, check our [contributing guidelines](https://github.com/auguwu/nino/blob/master/CONTRIBUTING.md) and  [code of conduct](https://github.com/auguwu/nino/blob/master/CODE_OF_CONDUCT.md).
+
 # Features
 
 * Auto Moderation - Prevents raids, spam, ads and many more!
