@@ -14,6 +14,12 @@ import { safeLoad } from "js-yaml";
 import CommandService from "./structures/services/CommandService";
 import CommandManager from "./structures/managers/CommandManager";
 import AutomodService from "./structures/services/AutomodService";
+import DatabaseManager from "./structures/managers/DatabaseManager";
+import EventManager from "./structures/managers/EventManager";
+import PunishmentManager from "./structures/managers/PunishmentManager";
+import TimeoutsManager from "./structures/managers/TimeoutsManager";
+import GuildSettings from "./structures/settings/GuildSettings";
+import BotListService from "./structures/services/BotListService";
 
 
 let config: Config;
@@ -52,6 +58,12 @@ container.bind<Bot>(TYPES.Bot).to(Bot).inSingletonScope();
 container.bind<Config>(TYPES.Config).toConstantValue(config);
 container.bind<CommandService>(TYPES.CommandService).to(CommandService).inSingletonScope();
 container.bind<CommandManager>(TYPES.CommandManager).to(CommandManager).inSingletonScope();
+container.bind<DatabaseManager>(TYPES.DatabaseManager).to(DatabaseManager).inSingletonScope();
+container.bind<EventManager>(TYPES.EventManager).to(EventManager).inSingletonScope();
+container.bind<PunishmentManager>(TYPES.PunishmentManager).to(PunishmentManager).inSingletonScope();
+container.bind<TimeoutsManager>(TYPES.TimeoutsManager).to(TimeoutsManager).inSingletonScope();
 container.bind<AutomodService>(TYPES.AutoModService).to(AutomodService).inSingletonScope();
+container.bind<GuildSettings>(TYPES.GuildSettings).to(GuildSettings).inSingletonScope();
+container.bind<BotListService>(TYPES.BotListService).to(BotListService).inSingletonScope();
 
 export default container;

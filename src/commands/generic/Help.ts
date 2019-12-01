@@ -7,7 +7,7 @@ export default class HelpCommand extends Command {
     constructor(client: Bot) {
         super(client, {
             name: 'help',
-            description: (bot: Bot) => `Gives a list of ${bot.client.user ? bot.client.user.username: 'Nino #0989'}'s commands or shows documentation on a command`,
+            description: (bot: Bot) => `Gives a list of ${bot.client.user ? bot.client.user.username : 'Nino #0989'}'s commands or shows documentation on a command`,
             usage: '[command]',
             aliases: ['cmds', 'commands']
         });

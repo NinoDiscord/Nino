@@ -65,16 +65,16 @@ export default class EmbedBuilder {
     public url: string | undefined;
 
     constructor(data: Embed = {}) {
-        this.title       = data.title;
+        this.title = data.title;
         this.description = data.description;
-        this.author      = data.author;
-        this.thumbnail   = data.thumbnail;
-        this.image       = data.image;
-        this.footer      = data.footer;
-        this.color       = data.color;
-        this.fields      = data.fields? data.fields.map(clone): [];
-        this.timestamp   = data.timestamp;
-        this.url         = data.url;
+        this.author = data.author;
+        this.thumbnail = data.thumbnail;
+        this.image = data.image;
+        this.footer = data.footer;
+        this.color = data.color;
+        this.fields = data.fields ? data.fields.map(clone) : [];
+        this.timestamp = data.timestamp;
+        this.url = data.url;
     }
 
     setColor(color: number) {
@@ -142,21 +142,21 @@ export default class EmbedBuilder {
             description: this.description,
             type: 'rich',
             fields: this.fields,
-            author: this.author? {
+            author: this.author ? {
                 name: this.author.name,
                 url: this.author.url,
                 icon_url: this.author.icon_url,
                 proxy_icon_url: this.author.icon_url
-            }: undefined,
-            image: this.image? this.image: undefined,
-            footer: this.footer? {
+            } : undefined,
+            image: this.image ? this.image : undefined,
+            footer: this.footer ? {
                 text: this.footer.text,
                 icon_url: this.footer.icon_url,
                 proxy_icon_url: this.footer.icon_url
-            }: undefined,
+            } : undefined,
             color: this.color,
-            url: this.url? this.url: undefined,
-            timestamp: this.timestamp? this.timestamp.toISOString(): undefined
+            url: this.url ? this.url : undefined,
+            timestamp: this.timestamp ? this.timestamp.toISOString() : undefined
         };
     }
 }

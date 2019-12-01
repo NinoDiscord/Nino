@@ -8,7 +8,7 @@ export default class UptimeCommand extends Command {
         super(client, {
             name: 'uptime',
             description: 'Gives you the uptime for the bot.',
-            aliases: [ 'up' ],
+            aliases: ['up'],
             category: 'Generic',
             ownerOnly: false
         });

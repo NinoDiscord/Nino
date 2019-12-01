@@ -42,19 +42,19 @@ export default class NinoCommand {
     public userpermissions: number;
 
     constructor(client: Client, info: CommandInfo) {
-        this.bot          = client;
-        this.name            = info.name;
-        this.description     = (typeof info.description === 'function')? info.description(client): info.description;
-        this.usage           = info.usage || '';
-        this.category        = info.category || 'Generic';
-        this.aliases         = info.aliases || [];
-        this.guildOnly       = info.guildOnly || false;
-        this.ownerOnly       = info.ownerOnly || false;
-        this.disabled        = info.disabled || false;
-        this.hidden          = info.hidden || false;
-        this.cooldown        = info.cooldown || 5;
-        this.subcommands     = info.subcommands || [];
-        this.botpermissions  = info.botpermissions || 0;
+        this.bot = client;
+        this.name = info.name;
+        this.description = (typeof info.description === 'function') ? info.description(client) : info.description;
+        this.usage = info.usage || '';
+        this.category = info.category || 'Generic';
+        this.aliases = info.aliases || [];
+        this.guildOnly = info.guildOnly || false;
+        this.ownerOnly = info.ownerOnly || false;
+        this.disabled = info.disabled || false;
+        this.hidden = info.hidden || false;
+        this.cooldown = info.cooldown || 5;
+        this.subcommands = info.subcommands || [];
+        this.botpermissions = info.botpermissions || 0;
         this.userpermissions = info.userpermissions || 0;
     }
 
@@ -68,7 +68,7 @@ export default class NinoCommand {
     }
 
     format() {
-        return `${this.bot.config.discord.prefix}${this.name}${this.usage? ` ${this.usage}`: ''}`;
+        return `${this.bot.config.discord.prefix}${this.name}${this.usage ? ` ${this.usage}` : ''}`;
     }
 
     help() {
@@ -79,9 +79,9 @@ export default class NinoCommand {
             .setDescription(`**${this.description}**`)
             .addField('Syntax', this.format(), true)
             .addField('Category', this.category, true)
-            .addField('Aliases', this.aliases.length > 1? this.aliases.join(', '): 'No aliases available', true)
-            .addField('Guild Only', this.guildOnly? 'Yes': 'No', true)
-            .addField('Owner Only', this.ownerOnly? 'Yes': 'No', true)
+            .addField('Aliases', this.aliases.length > 1 ? this.aliases.join(', ') : 'No aliases available', true)
+            .addField('Guild Only', this.guildOnly ? 'Yes' : 'No', true)
+            .addField('Owner Only', this.ownerOnly ? 'Yes' : 'No', true)
             .addField('Cooldown', `${this.cooldown} seconds`, true);
 
         if (this.subcommands.length > 1) embed.addField('Subcommands', this.subcommands.map(s => `**${s.name}**: ${s.description}`).join('\n'), false);

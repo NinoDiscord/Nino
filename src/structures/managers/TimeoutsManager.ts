@@ -1,6 +1,8 @@
 import Bot from '../Bot';
 import { Punishment, PunishmentType } from './PunishmentManager';
-import { Guild, User, Member } from 'eris';
+import { Guild } from 'eris';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
 /**
  * This class makes timeouts resilent, automatic unmutes and unbans will be supported even on an event of a crash.
@@ -8,12 +10,13 @@ import { Guild, User, Member } from 'eris';
  * @remarks
  * Saves the data in redis so it can be invoked later.
  */
+@injectable()
 export default class TimeoutsManager {
 
     private bot: Bot;
 
-    constructor(client: Bot) {
-        this.bot = client;
+    constructor(@inject(TYPES.Bot) bot: Bot) {
+        this.bot = bot;
     }
 
     /**

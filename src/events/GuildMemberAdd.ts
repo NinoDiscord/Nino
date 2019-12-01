@@ -15,7 +15,7 @@ export default class GuildMemberJoined extends Event {
         const his = cases.sort(m => m.id).filter(m => m.victim === member.id);
         if (his.length > 0) {
             const latest = his[his.length - 1];
-            if (latest.type === 'mute') await this.bot.punishments.punish(member, new Punishment(PunishmentType.Mute, { moderator: guild.members.get(this.bot.client.user.id)!.user}), 'mute evading');
+            if (latest.type === 'mute') await this.bot.punishments.punish(member, new Punishment(PunishmentType.Mute, { moderator: guild.members.get(this.bot.client.user.id)!.user }), 'mute evading');
         }
     }
 }

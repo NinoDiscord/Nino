@@ -1,6 +1,9 @@
+import "reflect-metadata";
 import { Admin } from 'mongodb';
 import mongoose from 'mongoose';
-import { injectable } from 'inversify';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
+import { Config } from '../Bot';
 
 interface BuildInfo {
     version: string;
@@ -27,15 +30,15 @@ interface BuildInfo {
     }
 }
 
-
+@injectable()
 export default class DatabaseManager {
     public uri: string = 'mongodb://localhost:27017/nino';
     public admin!: Admin;
     public build!: BuildInfo;
     public m!: typeof mongoose;
 
-    constructor(uri: string = 'mongodb://localhost:27017/nino') {
-        this.uri = uri;
+    constructor(@inject(TYPES.Config) config: Config) {
+        this.uri = config.databaseUrl;
     }
 
     async connect() {

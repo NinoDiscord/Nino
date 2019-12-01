@@ -26,12 +26,12 @@ export default class BanCommand extends Command {
 
         const u = findId(ctx.args.get(0));
         if (!u) return ctx.send('Invalid format: <@mention> / <user id>');
-        let member: Member | undefined | {id: string, guild: Guild} = ctx.guild.members.get(u);
+        let member: Member | undefined | { id: string, guild: Guild } = ctx.guild.members.get(u);
 
-        if (!member || !(member instanceof Member)) member = {id: u, guild: ctx.guild};
+        if (!member || !(member instanceof Member)) member = { id: u, guild: ctx.guild };
         else {
             if (!PermissionUtils.above(ctx.message.member!, member))
-            return ctx.send('The user is above you in the heirarchy.');
+                return ctx.send('The user is above you in the heirarchy.');
         }
 
         let reason = (ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1) ? ctx.args.slice(1).join(' ') : false);
@@ -42,7 +42,7 @@ export default class BanCommand extends Command {
 
         const days = (ctx.flags.get('days') || ctx.flags.get('d'));
         if (typeof days === 'boolean' || !/[0-9]+/.test(days)) return ctx.send('You need to specify the amount days to delete messages of.');
-        
+
         const t = !!time ? ms(time) : undefined;
 
         const punishment = new Punishment(PunishmentType.Ban, {

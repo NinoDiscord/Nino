@@ -34,6 +34,6 @@ export default class UnbanCommand extends Command {
         await this.bot.timeouts.cancelTimeout(id, ctx.guild, 'unban');
         await ctx.send('User successfully unbanned.');
         const punishment = new Punishment(PunishmentType.Unban, { moderator: ctx.sender });
-        await this.bot.punishments.punish({id: id!, guild: ctx.guild}, punishment, (reason as string | undefined));
+        await this.bot.punishments.punish({ id: id!, guild: ctx.guild }, punishment, (reason as string | undefined));
     }
 }

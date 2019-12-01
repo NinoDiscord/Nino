@@ -20,7 +20,7 @@ export default class EvalCommand extends Command {
             name: 'eval',
             description: 'Evaluates JavaScript code and return a clean output',
             usage: '<script>',
-            aliases: [ 'js', 'evl' ],
+            aliases: ['js', 'evl'],
             category: 'System Adminstration',
             ownerOnly: true,
             hidden: true
@@ -39,8 +39,8 @@ export default class EvalCommand extends Command {
         const isAsync = (script.includes('return') || script.includes('await'));
 
         try {
-            if (typescript) result = eval(this.compileTypescript(isAsync? `(async() => {${script}})()`: script));
-            result = eval(isAsync? `(async()=>{${script}})();`: script);
+            if (typescript) result = eval(this.compileTypescript(isAsync ? `(async() => {${script}})()` : script));
+            result = eval(isAsync ? `(async()=>{${script}})();` : script);
             const evaluationTime = Date.now() - startTime;
             if ((result as any) instanceof Promise) result = await result;
             if (typeof result !== 'string') result = inspect(result, {
@@ -114,9 +114,9 @@ export default class EvalCommand extends Command {
         let message!: string;
         if (diagnostics.length) {
             for (const diagnostic of diagnostics) {
-                const _msg  = diagnostic.messageText;
+                const _msg = diagnostic.messageText;
                 const _file = diagnostic.file;
-                const line  = _file? _file.getLineAndCharacterOfPosition(diagnostic.start!): undefined;
+                const line = _file ? _file.getLineAndCharacterOfPosition(diagnostic.start!) : undefined;
 
                 //* Unable to get 'line' and 'character', reduce it to the message that the diagnostic returned
                 if (line === undefined) {

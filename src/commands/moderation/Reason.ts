@@ -9,7 +9,7 @@ export default class ReasonCommand extends Command {
             name: 'reason',
             description: 'Updates a case reason',
             usage: '<caseID> <reason>',
-            aliases: [ 'update-reason' ],
+            aliases: ['update-reason'],
             category: 'Moderation',
             guildOnly: true,
             userpermissions: Constants.Permissions.banMembers,
@@ -24,7 +24,7 @@ export default class ReasonCommand extends Command {
         const caseID = ctx.args.get(0);
         const reason = ctx.args.args.slice(1).join(' ');
         const _case = await this.bot.cases.get(ctx.guild.id, parseInt(caseID));
-        const settings = await this.bot.settings.get(ctx.guild.id); 
+        const settings = await this.bot.settings.get(ctx.guild.id);
 
         if (!_case || _case === null) return ctx.send(`Case #${caseID} was not found.`);
         _case.reason = reason;
@@ -33,7 +33,7 @@ export default class ReasonCommand extends Command {
             $set: {
                 reason
             }
-        }, async(error) => {
+        }, async (error) => {
             if (error) return ctx.send(`Unable to update case #${caseID}: \`${reason}\``);
             const m = await this.bot.client.getMessage(settings!.modlog, _case.message);
             await this.bot.punishments.editModlog(_case, m);

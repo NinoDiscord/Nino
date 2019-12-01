@@ -5,6 +5,9 @@ import EmbedBuilder from '../EmbedBuilder';
 import { stripIndents } from 'common-tags';
 import ms = require('ms');
 import { CaseModel } from '../../models/CaseSchema';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
+import "reflect-metadata";
 
 /**
  * Punishment types
@@ -54,11 +57,12 @@ export class Punishment {
 /**
  * This class will automate the process of warning and punishing users.
  */
+@injectable()
 export default class PunishmentManager {
     private bot: Bot;
 
-    constructor(client: Bot) {
-        this.bot = client;
+    constructor(@inject(TYPES.Bot) bot: Bot) {
+        this.bot = bot;
     }
 
     /**

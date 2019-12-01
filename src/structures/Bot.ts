@@ -17,7 +17,7 @@ import { Counter, register, collectDefaultMetrics, Gauge } from 'prom-client';
 import { captureException } from '@sentry/node';
 import { createServer } from 'http';
 import { parse } from 'url';
-import { setDefaults} from 'wumpfetch';
+import { setDefaults } from 'wumpfetch';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import { lazyInject } from '../inversify.config';
@@ -68,24 +68,24 @@ export interface CommandStats {
 
 @injectable()
 export default class Bot {
+    public config: Config;
     public client: Client;
     @lazyInject(TYPES.CommandManager) public manager!: CommandManager;
-    public events: EventManager;
-    public database: DatabaseManager;
-    public logger: instance;
-    public settings: GuildSettings;
-    public warnings: Warning;
-    public config: Config;
-    public redis: Redis;
-    public botlistservice: BotListService;
-    public punishments = new PunishmentManager(this);
+    @lazyInject(TYPES.EventManager) public events!: EventManager;
+    @lazyInject(TYPES.DatabaseManager) public database!: DatabaseManager;
+    @lazyInject(TYPES.PunishmentManager) public punishments!: PunishmentManager;
+    @lazyInject(TYPES.TimeoutsManager) public timeouts!: TimeoutsManager;
     @lazyInject(TYPES.AutoModService) public autoModService!: AutomodService;
+    @lazyInject(TYPES.BotListService) public botlistservice!: BotListService;
+    @lazyInject(TYPES.GuildSettings) public settings!: GuildSettings;
+    public logger: instance;
+    public warnings: Warning = new Warning();
+    public redis: Redis;
     public cases: CaseSettings = new CaseSettings();
-    public timeouts: TimeoutsManager;
     public prom = {
         messagesSeen: new Counter({ name: 'nino_messages_seen', help: 'Total messages that have been seen by Nino' }),
         commandsExecuted: new Counter({ name: 'nino_commands_executed', help: 'The number of times commands have been executed.' }),
-        guildCount: new Gauge({name: 'nino_guild_count', help: 'The number of guilds Nino is in.'})
+        guildCount: new Gauge({ name: 'nino_guild_count', help: 'The number of guilds Nino is in.' })
     }
     public promServer = createServer((req, res) => {
         if (parse(req.url!).pathname === '/metrics') {
@@ -103,20 +103,16 @@ export default class Bot {
         commandUsage: {}
     };
 
-    constructor(@inject(TYPES.Config) config: Config, @inject(TYPES.Client) client: Client) {
-        this.config   = config;
+    constructor(
+        @inject(TYPES.Config) config: Config,
+        @inject(TYPES.Client) client: Client
+    ) {
+        this.config = config;
         this.client = client;
-        this.redis    = new redis({
+        this.redis = new redis({
             port: config.redis['port'],
             host: config.redis['host']
         });
-        this.punishments = new PunishmentManager(this);
-        this.events = new EventManager(this);
-        this.database = new DatabaseManager(config.databaseUrl);
-        this.settings = new GuildSettings(this);
-        this.warnings = new Warning();
-        this.timeouts = new TimeoutsManager(this);
-        this.botlistservice = new BotListService(this);
         this.logger = new instance({
             name: 'main',
             format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=> `,
@@ -137,7 +133,7 @@ export default class Bot {
                     process: process,
                     format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.cyan('[DISCORD]')} <=> `
                 }),
-                new FileTransport({ file: 'data/Nino.log', format: ''})
+                new FileTransport({ file: 'data/Nino.log', format: '' })
             ]
         });
     }
@@ -147,7 +143,7 @@ export default class Bot {
         this.logger.log('info', 'Connecting to the database...');
         await this.database.connect();
         this.logger.log('info', 'Success! Connecting to Redis...');
-        this.redis.connect().catch(() => {}); // Redis likes to throw errors smh
+        this.redis.connect().catch(() => { }); // Redis likes to throw errors smh
         this.logger.log('info', 'Success! Intializing events...');
         await this.events.start();
         this.logger.log('info', 'Success! Connecting to Discord...');

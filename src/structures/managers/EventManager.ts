@@ -1,18 +1,22 @@
+import "reflect-metadata";
+import { injectable, inject } from 'inversify';
 import { readdir } from 'fs';
 import { sep } from 'path';
-import Client from '../Bot';
+import Bot from '../Bot';
 import Event from '../Event';
+import { TYPES } from "../../types";
 
+@injectable()
 export default class EventManager {
-    public bot: Client;
+    public bot: Bot;
     public path: string = `${process.cwd()}${sep}dist${sep}events`;
 
     /**
      * Creates a new instance of the event manager
-     * @param client The client instance
+     * @param bot The client instance
      */
-    constructor(client: Client) {
-        this.bot = client;
+    constructor(@inject(TYPES.Bot) bot: Bot) {
+        this.bot = bot;
     }
 
     /**

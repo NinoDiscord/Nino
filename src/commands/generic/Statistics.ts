@@ -11,7 +11,7 @@ export default class StatisticsCommand extends Command {
         super(client, {
             name: 'statistics',
             description: 'Gives you the bot\'s statistics',
-            aliases: [ 'stats', 'info', 'bot', 'botinfo' ],
+            aliases: ['stats', 'info', 'bot', 'botinfo'],
             category: 'Generic',
             ownerOnly: false
         });
@@ -20,24 +20,24 @@ export default class StatisticsCommand extends Command {
     getMostUsedCommand() {
         if (Object.keys(this.bot.stats.commandUsage).length > 0) {
             const name = Object.keys(this.bot.stats.commandUsage)
-            .map(key => ({ key, uses: this.bot.stats.commandUsage[key].size })) // map key array to {key uses} array
-            .sort((a, b) => b.uses - a.uses) // Sort by uses
+                .map(key => ({ key, uses: this.bot.stats.commandUsage[key].size })) // map key array to {key uses} array
+                .sort((a, b) => b.uses - a.uses) // Sort by uses
             [0].key;
 
             return {
                 command: name,
                 size: this.bot.stats.commandUsage[name].size,
                 users: this.bot.stats.commandUsage[name].users.length
-            };  
+            };
         }
-        return {command: 'None', size: 0, users: 0};
+        return { command: 'None', size: 0, users: 0 };
     }
 
     async run(ctx: Context) {
         const command = this.getMostUsedCommand();
-        const build   = await this.bot.database.getBuild();
-        const commit  = execSync('git rev-parse HEAD').toString().trim();
-        
+        const build = await this.bot.database.getBuild();
+        const commit = execSync('git rev-parse HEAD').toString().trim();
+
         return ctx.send(stripIndents`
             \`\`\`prolog
             Guilds              ~> ${this.bot.client.guilds.size.toLocaleString()}

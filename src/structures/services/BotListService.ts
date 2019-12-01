@@ -1,17 +1,20 @@
 import Bot, { Config } from '../Bot';
 import wumpfetch from 'wumpfetch';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
 /**
  * Service that posts guild count to botlists.
  * @remarks
  * Posts every minute to all botlists.
  */
+@injectable()
 export default class BotListService {
     private bot: Bot;
     private interval?: NodeJS.Timeout;
 
-    constructor(client: Bot) {
-        this.bot = client;
+    constructor(@inject(TYPES.Bot) bot: Bot) {
+        this.bot = bot;
     }
 
     /**

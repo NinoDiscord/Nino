@@ -23,14 +23,14 @@ export default class CommandContext {
     constructor(bot: Bot, m: Message, args: string[]) {
         Object.assign<this, Message>(this, m);
 
-        this.bot    = bot;
-        this.message   = m;
-        this.args      = new ArgumentParser(args);
-        this.flags     = new FlagParser(args);
-        this.guild     = (m.channel as TextChannel).guild;
-        this.sender    = m.author;
+        this.bot = bot;
+        this.message = m;
+        this.args = new ArgumentParser(args);
+        this.flags = new FlagParser(args);
+        this.guild = (m.channel as TextChannel).guild;
+        this.sender = m.author;
         this.collector = new MessageCollector(bot.client);
-        this.me        = this.guild.members.get(bot.client.user.id)!;
+        this.me = this.guild.members.get(bot.client.user.id)!;
     }
 
     send(content: string) {

@@ -34,7 +34,7 @@ export default class RedisQueue {
      * @remarks
      * Works in O(1) time complexity
      */
-    pop(): Promise<string>{
+    pop(): Promise<string> {
         return this.redis.lpop(this.key);
     }
 

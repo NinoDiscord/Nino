@@ -31,10 +31,10 @@ export default class PermissionUtils {
         if (permission & Constants.Permissions.administrator) return Constants.Permissions.all;
         let overwrite = channel.permissionOverwrites.get(channel.guild.id);
         if (overwrite) permission = (permission & ~overwrite.deny) | overwrite.allow;
-        let deny  = 0;
+        let deny = 0;
         let allow = 0;
         const roles = channel.guild.roles.filter(r => r.position <= role.position).map(r => r.id);
-        for(const roleID of roles) {
+        for (const roleID of roles) {
             if ((overwrite = channel.permissionOverwrites.get(roleID))) {
                 deny |= overwrite.deny;
                 allow |= overwrite.allow;
@@ -42,7 +42,7 @@ export default class PermissionUtils {
         }
         permission = (permission & ~deny) | allow;
         return permission;
-}
+    }
 
     /**
      * Shows a string representation of all of the permissions
@@ -60,6 +60,6 @@ export default class PermissionUtils {
      */
     public static overlaps(user: number, required: number): boolean {
         return ((user & 8) != 0) // The user is an admin, automatically overwrites all permissions.
-         || ((user & required) == required);  // user & required give all of the permissions in common, it should be required.
+            || ((user & required) == required);  // user & required give all of the permissions in common, it should be required.
     }
 }

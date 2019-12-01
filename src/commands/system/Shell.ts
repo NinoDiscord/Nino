@@ -10,7 +10,7 @@ export default class ShellCommand extends Command {
             name: 'shell',
             description: 'Runs a command on the bot\'s host machine.',
             usage: '<script>',
-            aliases: [ 'exec', 'sh' ],
+            aliases: ['exec', 'sh'],
             category: 'System Adminstration',
             ownerOnly: true,
             hidden: true
@@ -39,7 +39,7 @@ export default class ShellCommand extends Command {
                     .addField(':alarm_clock: Evaluation Time', `**${Date.now() - time}ms**`, false)
                     .build()
             });
-        } catch(ex) {
+        } catch (ex) {
             await message.edit({
                 embed: this
                     .bot

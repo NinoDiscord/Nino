@@ -36,14 +36,14 @@ export default class MuteCommand extends Command {
 
         let time = (ctx.flags.get('time') || ctx.flags.get('t'));
         if (typeof time === 'boolean') return ctx.send('You will need to specify time to be alloted');
-        
+
         const t = !!time ? ms(time) : undefined;
 
         const punishment = new Punishment(PunishmentType.Mute, {
             moderator: ctx.sender,
             temp: t
         });
-        
+
         await this.bot.timeouts.cancelTimeout(member.id, ctx.guild, 'unmute');
         await ctx.send('User successfully muted.');
         await this.bot.punishments.punish(member!, punishment, (reason as string | undefined));

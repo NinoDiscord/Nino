@@ -7,7 +7,7 @@ export default class ShardInfoCommand extends Command {
         super(client, {
             name: 'shardinfo',
             description: 'Gives you the bot shard info.',
-            aliases: [ 'si', 'shards' ],
+            aliases: ['si', 'shards'],
             category: 'Generic',
             ownerOnly: false
         });
@@ -16,7 +16,7 @@ export default class ShardInfoCommand extends Command {
     async run(ctx: Context) {
         let shardinfo = '';
         this.bot.client.shards.map((shard) =>
-            shardinfo += `${shard.status === 'disconnected'? '-': shard.status === 'connecting' || shard.status === 'handshaking'? '*': '+'} Shard #${shard.id} ${ctx.guild.shard.id === shard.id? '(current)': ''}: ${shard.latency}ms\n`
+            shardinfo += `${shard.status === 'disconnected' ? '-' : shard.status === 'connecting' || shard.status === 'handshaking' ? '*' : '+'} Shard #${shard.id} ${ctx.guild.shard.id === shard.id ? '(current)' : ''}: ${shard.latency}ms\n`
         );
         return ctx.embed(
             this

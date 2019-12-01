@@ -26,7 +26,7 @@ export default class PardonCommand extends Command {
         if (!u) return ctx.send('I can\'t find this user!');
         const member = ctx.guild.members.get(u.id);
         const amount = Number(ctx.args.get(1));
-        
+
 
         if (!member) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
 

@@ -1,12 +1,16 @@
 import model, { GuildModel } from '../../models/GuildSchema';
 import { SettingsBase as Base } from './SettingsBase';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
+import Bot from '../Bot';
 
+@injectable()
 export default class GuildSettings implements Base<GuildModel> {
     public client: any;
     public model = model;
 
-    constructor(client: any) {
-        this.client = client;
+    constructor(@inject(TYPES.Bot) bot: Bot) {
+        this.client = bot;
     }
 
     async get(id: string) {
