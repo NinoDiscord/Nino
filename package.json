@@ -1,14 +1,14 @@
 {
     "name": "nino",
     "description": "Moderation bot for Discord's hack week entry.",
-    "version": "0.5.2",
+    "version": "0.6.1",
     "main": "dist/index.js",
     "scripts": {
-        "build": "yarn lint && yarn clean && tsc",
-        "build:dev": "yarn clean && tsc -w",
+        "build": "yarn clean && tsc",
+        "build:watch": "yarn clean && tsc -w",
         "main": "yarn build && node dist/index.js",
         "dev": "nodemon dist/index.js",
-        "lint": "prettier --write --single-quote --trailing-comma es5 \"src/**/*.ts\"",
+        "lint": "prettier --write --single-quote --trailing-comma es5 --parser typescript \"src/**/*.ts\"",
         "clean": "rm -fr dist",
         "test": "jest"
     },
