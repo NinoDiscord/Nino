@@ -140,11 +140,10 @@ export default class Bot {
                 new FileTransport({ file: 'data/Nino.log', format: ''})
             ]
         });
-
-        collectDefaultMetrics();
     }
 
     async build() {
+        collectDefaultMetrics();
         this.logger.log('info', 'Connecting to the database...');
         await this.database.connect();
         this.logger.log('info', 'Success! Connecting to Redis...');
