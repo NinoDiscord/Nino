@@ -21,154 +21,189 @@ import { setDefaults } from 'wumpfetch';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import { lazyInject } from '../inversify.config';
-import "reflect-metadata";
+import 'reflect-metadata';
 
 const pkg = require('../../package');
 setDefaults({
-    headers: { 'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/auguwu/Nino)` }
+  headers: {
+    'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/auguwu/Nino)`,
+  },
 });
 
 export interface Config {
-    environment: string;
-    databaseUrl: string;
-    discord: {
-        prefix: string;
-        token: string;
-    };
-    redis: {
-        host: string;
-        port: number;
-    };
-    webhook: {
+  environment: string;
+  databaseUrl: string;
+  discord: {
+    prefix: string;
+    token: string;
+  };
+  redis: {
+    host: string;
+    port: number;
+  };
+  webhook:
+    | {
         id: string;
         token: string;
-    } | undefined;
-    webserver: number | undefined;
-    mode: string | undefined;
-    sentryDSN: string | undefined;
-    botlists: {
+      }
+    | undefined;
+  webserver: number | undefined;
+  mode: string | undefined;
+  sentryDSN: string | undefined;
+  botlists:
+    | {
         topggtoken: string | undefined;
         bfdtoken: string | undefined;
         dboatstoken: string | undefined;
         blstoken: string | undefined;
-    } | undefined
+      }
+    | undefined;
 }
 
 export interface CommandStats {
-    commandsExecuted: number;
-    messagesSeen: number;
-    guildCount: number;
-    commandUsage: {
-        [x: string]: {
-            size: number;
-            users: User[];
-        }
-    }
+  commandsExecuted: number;
+  messagesSeen: number;
+  guildCount: number;
+  commandUsage: {
+    [x: string]: {
+      size: number;
+      users: User[];
+    };
+  };
 }
 
 @injectable()
 export default class Bot {
-    public config: Config;
-    public client: Client;
-    @lazyInject(TYPES.CommandManager) public manager!: CommandManager;
-    @lazyInject(TYPES.EventManager) public events!: EventManager;
-    @lazyInject(TYPES.DatabaseManager) public database!: DatabaseManager;
-    @lazyInject(TYPES.PunishmentManager) public punishments!: PunishmentManager;
-    @lazyInject(TYPES.TimeoutsManager) public timeouts!: TimeoutsManager;
-    @lazyInject(TYPES.AutoModService) public autoModService!: AutomodService;
-    @lazyInject(TYPES.BotListService) public botlistservice!: BotListService;
-    @lazyInject(TYPES.GuildSettings) public settings!: GuildSettings;
-    public logger: instance;
-    public warnings: Warning = new Warning();
-    public redis: Redis;
-    public cases: CaseSettings = new CaseSettings();
-    public prom = {
-        messagesSeen: new Counter({ name: 'nino_messages_seen', help: 'Total messages that have been seen by Nino' }),
-        commandsExecuted: new Counter({ name: 'nino_commands_executed', help: 'The number of times commands have been executed.' }),
-        guildCount: new Gauge({ name: 'nino_guild_count', help: 'The number of guilds Nino is in.' })
+  public config: Config;
+  public client: Client;
+  @lazyInject(TYPES.CommandManager) public manager!: CommandManager;
+  @lazyInject(TYPES.EventManager) public events!: EventManager;
+  @lazyInject(TYPES.DatabaseManager) public database!: DatabaseManager;
+  @lazyInject(TYPES.PunishmentManager) public punishments!: PunishmentManager;
+  @lazyInject(TYPES.TimeoutsManager) public timeouts!: TimeoutsManager;
+  @lazyInject(TYPES.AutoModService) public autoModService!: AutomodService;
+  @lazyInject(TYPES.BotListService) public botlistservice!: BotListService;
+  @lazyInject(TYPES.GuildSettings) public settings!: GuildSettings;
+  public logger: instance;
+  public warnings: Warning = new Warning();
+  public redis: Redis;
+  public cases: CaseSettings = new CaseSettings();
+  public prom = {
+    messagesSeen: new Counter({
+      name: 'nino_messages_seen',
+      help: 'Total messages that have been seen by Nino',
+    }),
+    commandsExecuted: new Counter({
+      name: 'nino_commands_executed',
+      help: 'The number of times commands have been executed.',
+    }),
+    guildCount: new Gauge({
+      name: 'nino_guild_count',
+      help: 'The number of guilds Nino is in.',
+    }),
+  };
+  public promServer = createServer((req, res) => {
+    if (parse(req.url!).pathname === '/metrics') {
+      res.writeHead(200, { 'Content-Type': register.contentType });
+      res.write(register.metrics());
     }
-    public promServer = createServer((req, res) => {
-        if (parse(req.url!).pathname === '/metrics') {
-            res.writeHead(200, { 'Content-Type': register.contentType });
-            res.write(register.metrics());
-        }
 
-        res.end();
+    res.end();
+  });
+  public owners: string[] = [
+    '280158289667555328',
+    '239790360728043520',
+    '130442810456408064',
+    '145557815287611393',
+    '107130754189766656',
+  ];
+  public stats: CommandStats = {
+    commandsExecuted: 0,
+    messagesSeen: 0,
+    guildCount: 0,
+    commandUsage: {},
+  };
+
+  constructor(
+    @inject(TYPES.Config) config: Config,
+    @inject(TYPES.Client) client: Client
+  ) {
+    this.config = config;
+    this.client = client;
+    this.redis = new redis({
+      port: config.redis['port'],
+      host: config.redis['host'],
     });
-    public owners: string[] = ['280158289667555328', '239790360728043520', '130442810456408064', '145557815287611393', '107130754189766656'];
-    public stats: CommandStats = {
-        commandsExecuted: 0,
-        messagesSeen: 0,
-        guildCount: 0,
-        commandUsage: {}
-    };
+    this.logger = new instance({
+      name: 'main',
+      format: `${colors.bgBlueBright(
+        process.pid.toString()
+      )} ${colors.bgBlackBright('%h:%m:%s')} <=> `,
+      autogen: false,
+      transports: [
+        new ConsoleTransport({
+          name: 'info',
+          process: process,
+          format: `${colors.bgBlueBright(
+            process.pid.toString()
+          )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.green(
+            '[INFO]'
+          )} <=> `,
+        }),
+        new ConsoleTransport({
+          name: 'error',
+          process: process,
+          format: `${colors.bgBlueBright(
+            process.pid.toString()
+          )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.red('[ERROR]')} <=> `,
+        }),
+        new ConsoleTransport({
+          name: 'discord',
+          process: process,
+          format: `${colors.bgBlueBright(
+            process.pid.toString()
+          )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.cyan(
+            '[DISCORD]'
+          )} <=> `,
+        }),
+        new FileTransport({ file: 'data/Nino.log', format: '' }),
+      ],
+    });
+  }
 
-    constructor(
-        @inject(TYPES.Config) config: Config,
-        @inject(TYPES.Client) client: Client
-    ) {
-        this.config = config;
-        this.client = client;
-        this.redis = new redis({
-            port: config.redis['port'],
-            host: config.redis['host']
-        });
-        this.logger = new instance({
-            name: 'main',
-            format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} <=> `,
-            autogen: false,
-            transports: [
-                new ConsoleTransport({
-                    name: 'info',
-                    process: process,
-                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.green('[INFO]')} <=> `
-                }),
-                new ConsoleTransport({
-                    name: 'error',
-                    process: process,
-                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.red('[ERROR]')} <=> `
-                }),
-                new ConsoleTransport({
-                    name: 'discord',
-                    process: process,
-                    format: `${colors.bgBlueBright(process.pid.toString())} ${colors.bgBlackBright('%h:%m:%s')} ${colors.cyan('[DISCORD]')} <=> `
-                }),
-                new FileTransport({ file: 'data/Nino.log', format: '' })
-            ]
-        });
-    }
+  async build() {
+    collectDefaultMetrics();
+    this.logger.log('info', 'Connecting to the database...');
+    await this.database.connect();
+    this.logger.log('info', 'Success! Connecting to Redis...');
+    this.redis.connect().catch(() => {}); // Redis likes to throw errors smh
+    this.logger.log('info', 'Success! Intializing events...');
+    await this.events.start();
+    this.logger.log('info', 'Success! Connecting to Discord...');
+    await this.client.connect();
+    this.logger.log('discord', 'Connected to Discord!');
+    this.logger.log('info', 'Loading commands...');
+    await this.manager.start();
+    this.logger.log('info', 'All set!');
+  }
 
-    async build() {
-        collectDefaultMetrics();
-        this.logger.log('info', 'Connecting to the database...');
-        await this.database.connect();
-        this.logger.log('info', 'Success! Connecting to Redis...');
-        this.redis.connect().catch(() => { }); // Redis likes to throw errors smh
-        this.logger.log('info', 'Success! Intializing events...');
-        await this.events.start();
-        this.logger.log('info', 'Success! Connecting to Discord...');
-        await this.client.connect();
-        this.logger.log('discord', 'Connected to Discord!');
-        this.logger.log('info', 'Loading commands...');
-        await this.manager.start();
-        this.logger.log('info', 'All set!');
-    }
+  getEmbed() {
+    return new EmbedBuilder().setColor(0x6d6d99);
+  }
 
-    getEmbed() {
-        return new EmbedBuilder()
-            .setColor(0x6D6D99);
-    }
+  addCommandUsage(cmd: Command, user: User) {
+    if (!this.stats.commandUsage[cmd.name])
+      this.stats.commandUsage[cmd.name] = {
+        size: 0,
+        users: [],
+      };
+    this.stats.commandUsage[cmd.name].size =
+      this.stats.commandUsage[cmd.name].size + 1;
+    if (!this.stats.commandUsage[cmd.name].users.includes(user))
+      this.stats.commandUsage[cmd.name].users.push(user);
+  }
 
-    addCommandUsage(cmd: Command, user: User) {
-        if (!this.stats.commandUsage[cmd.name]) this.stats.commandUsage[cmd.name] = {
-            size: 0,
-            users: []
-        };
-        this.stats.commandUsage[cmd.name].size = this.stats.commandUsage[cmd.name].size + 1;
-        if (!this.stats.commandUsage[cmd.name].users.includes(user)) this.stats.commandUsage[cmd.name].users.push(user);
-    }
-
-    report(ex: Error) {
-        captureException(ex);
-    }
+  report(ex: Error) {
+    captureException(ex);
+  }
 }

@@ -10,12 +10,15 @@ const config = container.get<Config>(TYPES.Config);
 const bot = container.get<Bot>(TYPES.Bot);
 
 init({
-    dsn: config.sentryDSN,
-    release: `${pkg.version} (${config.mode})`
+  dsn: config.sentryDSN,
+  release: `${pkg.version} (${config.mode})`,
 });
 
-bot.build().then(() => {
+bot
+  .build()
+  .then(() => {
     bot.logger.log('info', 'Now connecting to Discord...');
-}).catch(ex => {
+  })
+  .catch(ex => {
     bot.logger.log('error', 'unable to build:\n' + ex.stack);
-});
+  });

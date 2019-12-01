@@ -7,147 +7,223 @@ import PermissionUtils from '../../util/PermissionUtils';
 import NinoCommand from '../Command';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../../types';
-import "reflect-metadata";
+import 'reflect-metadata';
 
 export class CommandInvocation {
-    command: NinoCommand;
-    ctx: CommandContext;
-    user: Member | User;
-    bot: Member | User;
-    channel: Channel;
+  command: NinoCommand;
+  ctx: CommandContext;
+  user: Member | User;
+  bot: Member | User;
+  channel: Channel;
 
-    constructor(command: NinoCommand, user: Member | User, bot: Member | User, channel: Channel, ctx: CommandContext) {
-        this.command = command;
-        this.user = user;
-        this.bot = bot;
-        this.channel = channel;
-        this.ctx = ctx;
-    }
+  constructor(
+    command: NinoCommand,
+    user: Member | User,
+    bot: Member | User,
+    channel: Channel,
+    ctx: CommandContext
+  ) {
+    this.command = command;
+    this.user = user;
+    this.bot = bot;
+    this.channel = channel;
+    this.ctx = ctx;
+  }
 
-    /**
-     * Returns an error string if cannot invoke, otherwise it will return undefined.
-     */
-    canInvoke(): string | undefined {
-        if (this.command.guildOnly && this.channel.type === 1) return 'Sorry, but you need to be in a guild to execute the `' + this.command.name + '` command.';
-        if (this.command.ownerOnly && !this.command.bot.owners.includes(this.user.id)) return `Sorry, but you need to be a developer to execute the \`${this.command.name}\` command.`;
-        if (this.command.disabled) return `Command \`${this.command.name}\` is disabled.`;
-        if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.userpermissions)) return `I am missing the following permissions: ${PermissionUtils.toString(this.command.botpermissions & ~(this.bot.permission.allow))}`;
-        if (this.user instanceof Member && !PermissionUtils.overlaps(this.user.permission.allow, this.command.userpermissions)) return `You are missing the following permissions: ${PermissionUtils.toString(this.command.userpermissions & ~(this.user.permission.allow))}`;
-        return undefined;
-    }
+  /**
+   * Returns an error string if cannot invoke, otherwise it will return undefined.
+   */
+  canInvoke(): string | undefined {
+    if (this.command.guildOnly && this.channel.type === 1)
+      return (
+        'Sorry, but you need to be in a guild to execute the `' +
+        this.command.name +
+        '` command.'
+      );
+    if (
+      this.command.ownerOnly &&
+      !this.command.bot.owners.includes(this.user.id)
+    )
+      return `Sorry, but you need to be a developer to execute the \`${this.command.name}\` command.`;
+    if (this.command.disabled)
+      return `Command \`${this.command.name}\` is disabled.`;
+    if (
+      this.bot instanceof Member &&
+      !PermissionUtils.overlaps(
+        this.bot.permission.allow,
+        this.command.userpermissions
+      )
+    )
+      return `I am missing the following permissions: ${PermissionUtils.toString(
+        this.command.botpermissions & ~this.bot.permission.allow
+      )}`;
+    if (
+      this.user instanceof Member &&
+      !PermissionUtils.overlaps(
+        this.user.permission.allow,
+        this.command.userpermissions
+      )
+    )
+      return `You are missing the following permissions: ${PermissionUtils.toString(
+        this.command.userpermissions & ~this.user.permission.allow
+      )}`;
+    return undefined;
+  }
 
-    /**
-     * Executes the command with the invocation context
-     */
-    async execute(): Promise<any> {
-        return this.command.run(this.ctx);
-    }
+  /**
+   * Executes the command with the invocation context
+   */
+  async execute(): Promise<any> {
+    return this.command.run(this.ctx);
+  }
 }
 
 @injectable()
 export default class CommandService {
-    public bot: Bot;
-    public bucket: RatelimitBucket = new RatelimitBucket();
+  public bot: Bot;
+  public bucket: RatelimitBucket = new RatelimitBucket();
 
-    constructor(@inject(TYPES.Bot) bot: Bot) {
-        this.bot = bot;
+  constructor(@inject(TYPES.Bot) bot: Bot) {
+    this.bot = bot;
+  }
+
+  /**
+   * Parses the message content and returns a command invocation.
+   * @param args the message arguments
+   * @param m the message object
+   */
+  getCommandInvocation(
+    args: string[],
+    m: Message
+  ): CommandInvocation | undefined {
+    if (args.length == 0) {
+      return undefined;
     }
+    const name = args.shift()!;
+    const command = this.bot.manager.commands.filter(
+      c => c.name === name || c.aliases!.includes(name)
+    );
+    const ctx = new CommandContext(this.bot, m, args);
 
-    /**
-     * Parses the message content and returns a command invocation.
-     * @param args the message arguments
-     * @param m the message object
-     */
-    getCommandInvocation(args: string[], m: Message): CommandInvocation | undefined {
-        if (args.length == 0) {
-            return undefined;
-        }
-        const name = args.shift()!;
-        const command = this.bot.manager.commands.filter((c) =>
-            c.name === name || c.aliases!.includes(name)
-        );
-        const ctx = new CommandContext(this.bot, m, args);
-
-        if (command.length > 0) {
-            const cmd = command[0];
-            const helpFlag = ctx.flags.get('help') || ctx.flags.get('h');
-            if (helpFlag && typeof helpFlag === 'boolean') {
-                ctx.flags.flags = '';
-                ctx.args.args = [cmd.name];
-                return new CommandInvocation(this.bot.manager.commands.get('help')!, m.member || m.author, m.member ?  m.member!.guild.members[ctx.bot.client.user.id] : ctx.bot.client.user, m.channel, ctx); // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
-            }
-            return new CommandInvocation(cmd, m.member || m.author, m.member ?  m.member!.guild.members[ctx.bot.client.user.id] : ctx.bot.client.user, m.channel, ctx);
-        }
-        return undefined;
+    if (command.length > 0) {
+      const cmd = command[0];
+      const helpFlag = ctx.flags.get('help') || ctx.flags.get('h');
+      if (helpFlag && typeof helpFlag === 'boolean') {
+        ctx.flags.flags = '';
+        ctx.args.args = [cmd.name];
+        return new CommandInvocation(
+          this.bot.manager.commands.get('help')!,
+          m.member || m.author,
+          m.member
+            ? m.member!.guild.members[ctx.bot.client.user.id]
+            : ctx.bot.client.user,
+          m.channel,
+          ctx
+        ); // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
+      }
+      return new CommandInvocation(
+        cmd,
+        m.member || m.author,
+        m.member
+          ? m.member!.guild.members[ctx.bot.client.user.id]
+          : ctx.bot.client.user,
+        m.channel,
+        ctx
+      );
     }
+    return undefined;
+  }
 
-    async handle(m: Message) {
-        this.bot.prom.messagesSeen.inc();
-        this.bot.stats.messagesSeen++;
-        
-        if (m.author.bot) return;
+  async handle(m: Message) {
+    this.bot.prom.messagesSeen.inc();
+    this.bot.stats.messagesSeen++;
 
-        const guild = (m.channel as TextChannel).guild;
-        const me = guild.members.get(this.bot.client.user.id);
-        if (!(m.channel as TextChannel).permissionsOf(me!.id).has('sendMessages')) return;
+    if (m.author.bot) return;
 
-        const mention = new RegExp(`^<@!?${this.bot.client.user.id}> `).exec(m.content);
+    const guild = (m.channel as TextChannel).guild;
+    const me = guild.members.get(this.bot.client.user.id);
+    if (!(m.channel as TextChannel).permissionsOf(me!.id).has('sendMessages'))
+      return;
 
-        let settings = await this.bot.settings.getOrCreate((m.channel as TextChannel).guild.id);
+    const mention = new RegExp(`^<@!?${this.bot.client.user.id}> `).exec(
+      m.content
+    );
 
-        const prefixes = [settings!.prefix, this.bot.config.discord.prefix, `${mention}`];
+    let settings = await this.bot.settings.getOrCreate(
+      (m.channel as TextChannel).guild.id
+    );
 
+    const prefixes = [
+      settings!.prefix,
+      this.bot.config.discord.prefix,
+      `${mention}`,
+    ];
 
-        let prefix: string | null = null;
+    let prefix: string | null = null;
 
-        // Prefix checks
-        for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;
+    // Prefix checks
+    for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;
 
-        if (!prefix) return;
+    if (!prefix) return;
 
-        const args = m.content.slice(prefix.length).trim().split(/ +/g);
-        const invocation: CommandInvocation | undefined = this.getCommandInvocation(args, m);
+    const args = m.content
+      .slice(prefix.length)
+      .trim()
+      .split(/ +/g);
+    const invocation: CommandInvocation | undefined = this.getCommandInvocation(
+      args,
+      m
+    );
 
-        if (invocation) {
-            const invoketry = invocation.canInvoke();
-            if (invoketry) return void invocation.ctx.send(invoketry);
+    if (invocation) {
+      const invoketry = invocation.canInvoke();
+      if (invoketry) return void invocation.ctx.send(invoketry);
 
-            this
-                .bucket
-                .initialize(invocation.command)
-                .check(invocation.command, (invocation.user instanceof Member) ? invocation.user.user : invocation.user, (left) => {
-                    const embed = this.bot.getEmbed();
-                    embed.setDescription(stripIndents`
+      this.bucket
+        .initialize(invocation.command)
+        .check(
+          invocation.command,
+          invocation.user instanceof Member
+            ? invocation.user.user
+            : invocation.user,
+          left => {
+            const embed = this.bot.getEmbed();
+            embed.setDescription(stripIndents`
                         **${invocation.user.username}**: The command \`${invocation.command.name}\` is currently on cooldown!
                         Please wait \`${left}\`!
                     `);
-                    invocation.ctx.embed(embed.build());
-                });
+            invocation.ctx.embed(embed.build());
+          }
+        );
 
-            try {
-                await invocation.execute();
-                this.bot.stats.commandsExecuted = (this.bot.stats.commandsExecuted || 0) + 1;
-                this.bot.prom.commandsExecuted.inc(); 
-                this.bot.addCommandUsage(invocation.command, invocation.ctx.sender);
-            } catch(ex) {
-                const embed = this.bot.getEmbed();
-                embed
-                    .setTitle(`Command ${invocation.command.name} has failed!`)
-                    .setDescription(stripIndents`
+      try {
+        await invocation.execute();
+        this.bot.stats.commandsExecuted =
+          (this.bot.stats.commandsExecuted || 0) + 1;
+        this.bot.prom.commandsExecuted.inc();
+        this.bot.addCommandUsage(invocation.command, invocation.ctx.sender);
+      } catch (ex) {
+        const embed = this.bot.getEmbed();
+        embed.setTitle(`Command ${invocation.command.name} has failed!`)
+          .setDescription(stripIndents`
                         The error has been automatically logged in our systems.
                         If the issue persists contact us!
-                        Available Contacts: ${this.bot.owners.map(userID => {
+                        Available Contacts: ${this.bot.owners
+                          .map(userID => {
                             const user = this.bot.client.users.get(userID)!;
                             if (user)
-                                return `${user.username}#${user.discriminator}`;
-                            else 
-                                return `<@${userID}>`;
-                        }).join(', ')} at https://discord.gg/7TtMP2n
+                              return `${user.username}#${user.discriminator}`;
+                            else return `<@${userID}>`;
+                          })
+                          .join(', ')} at https://discord.gg/7TtMP2n
                     `);
-                this.bot.logger.log('error', `Unable to run the '${invocation.command.name}' command\n${ex.stack}`);
-                this.bot.report(ex);
-                return invocation.ctx.embed(embed.build());
-            }
-        }
+        this.bot.logger.log(
+          'error',
+          `Unable to run the '${invocation.command.name}' command\n${ex.stack}`
+        );
+        this.bot.report(ex);
+        return invocation.ctx.embed(embed.build());
+      }
     }
+  }
 }
