@@ -35,7 +35,7 @@ export default class HelpCommand extends Command {
                 .getEmbed()
                 .setTitle(`${this.client.user.username}#${this.client.user.discriminator} | Commands List`)
                 .setDescription(stripIndents`
-                    More information is available on the [wiki](https://github.com/auguwu/Nino/wiki)!
+                    More information is available on the [website](https://nino.augu.dev)!
                     There are currently **${this.client.manager.commands.size}** commands available
                 `).setFooter(`Use ${settings!.prefix}help [command] to get documentation regarding a command`);
 

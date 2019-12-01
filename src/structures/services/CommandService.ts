@@ -49,6 +49,11 @@ export default class CommandService {
         this.client = client;
     }
 
+    /**
+     * Parses the message content and returns a command invocation.
+     * @param args the message arguments
+     * @param m the message object
+     */
     getCommandInvocation(args: string[], m: Message): CommandInvocation | undefined {
         if (args.length == 0) {
             return undefined;

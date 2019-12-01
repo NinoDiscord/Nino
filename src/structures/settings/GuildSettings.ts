@@ -1,6 +1,5 @@
 import model, { GuildModel } from '../../models/GuildSchema';
 import { SettingsBase as Base } from './SettingsBase';
-import Warning from './Warning';
 
 export default class GuildSettings implements Base<GuildModel> {
     public client: any;
@@ -16,14 +15,14 @@ export default class GuildSettings implements Base<GuildModel> {
         return document;
     }
 
-    async getOrCreate(id: string) {
+    async getOrCreate(id: string): Promise<GuildModel> {
         let settings = await this.get(id);
         if (!settings || settings === null) 
             settings = this.client.settings.create(id);
-        return settings;
+        return settings!;
     }
 
-    create(id: string) {
+    create(id: string): GuildModel {
         const query = new this.model({
             guildID: id,
             prefix: this.client.config.discord.prefix
