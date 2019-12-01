@@ -13,7 +13,7 @@ import PermissionUtils from '../../util/PermissionUtils';
  */
 export default class AutoModInvite {
     public client: NinoClient;
-    private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me)\/\w+/;
+    private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|invite.gg||discord.link)\/\w+/;
 
     constructor(client: NinoClient) {
         this.client = client;
@@ -45,7 +45,7 @@ export default class AutoModInvite {
             await m.channel.createMessage(`HEY ${m.member!.mention}! NO ADS ALLOWED!`);
             await m.delete();
             const punishments = await this.client.punishments.addWarning(m.member!);
-            for (let punishment of punishments) await this.client.punishments.punish(m.member!, punishment, 'Automod (Advertisments)');
+            for (let punishment of punishments) await this.client.punishments.punish(m.member!, punishment, 'Automod (Advertisements)');
             return true;
         }
         return false;

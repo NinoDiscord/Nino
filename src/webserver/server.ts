@@ -27,7 +27,7 @@ export default class NinoWebServer {
         this.app.get('/', (_, res) => res.status(200).send(this.responses[Math.floor(Math.random() * this.responses.length)]));
         this.app.get('/commands', (_, res) => res.status(200).json({ success: true, data: this.getCommands() }));
         this.app.get('/commands/:cmd', (req, res) => {
-            const q = req.query['cmd'];
+            const q   = req.query['cmd'];
             const cmd = this.client.manager.commands.get(q);
             if (cmd === undefined) res.status(500).json({ success: false, message: 'Command was not found.' });
             res.status(200).json({ success: true, data: cmd! });

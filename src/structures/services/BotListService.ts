@@ -22,7 +22,6 @@ export default class BotListService {
         this.interval = setInterval(async () => {
             const guilds = await this.client.redis.get('guilds');
             if (guilds) this.postCount(Number(guilds), this.client.user.id, this.client.config, this.client.logger);
-
         }, 60000);
     }
 
@@ -30,9 +29,7 @@ export default class BotListService {
      * Stop posting guild stats
      */
     stop() {
-        if (this.interval) {
-            this.interval.unref();
-        }
+        if (this.interval) this.interval.unref();
     }
 
     /**
