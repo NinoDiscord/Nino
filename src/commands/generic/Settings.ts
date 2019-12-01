@@ -1,12 +1,12 @@
 import { stripIndents } from 'common-tags';
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import Context from '../../structures/Context';
 import Command from '../../structures/Command';
 import { Constants } from 'eris';
 import ms = require('ms');
 
 export default class SettingsCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'settings',
             description: 'View or edit the guild\'s settings.',
@@ -46,7 +46,7 @@ export default class SettingsCommand extends Command {
         const days = ctx.flags.get('days');
         if (!!days && (typeof days === 'boolean' || (typeof days === 'string' && !/^[0-9]{1,2}$/.test(days)))) return ctx.send('Incorrect amount of days. It is the amount of days to delete the messages in when banning.');
 
-        this.client.settings.update(ctx.guild.id, {
+        this.bot.settings.update(ctx.guild.id, {
             $push: {
                 punishments: {
                     warnings: Number(warnings),
@@ -68,7 +68,7 @@ export default class SettingsCommand extends Command {
     async remove(ctx: Context) {
         const index = ctx.args.get(1);
         if (!index || !/^[0-9]+$/.test(index) || Number(index) < 1) return ctx.send('The index of the punishment is required, see the index in `x!settings view`.');
-        const settings = await ctx.client.settings.get(ctx.guild.id);
+        const settings = await ctx.bot.settings.get(ctx.guild.id);
         if (!settings) return ctx.send('There are no punishments!');
         if (Number(index) <= settings!.punishments.length) settings!.punishments.splice(Math.round(Number(index))-1, 1);
         settings!.save();
@@ -81,7 +81,7 @@ export default class SettingsCommand extends Command {
             case 'modlog': {
                 const channelId = ctx.args.get(2);
                 if (!channelId || !/^[0-9]+$/.test(channelId)) return ctx.send('Please set a valid id!');
-                this.client.settings.update(ctx.guild.id, {
+                this.bot.settings.update(ctx.guild.id, {
                     $set: {
                         modlog: channelId
                     }
@@ -96,7 +96,7 @@ export default class SettingsCommand extends Command {
                 if (!prefix) return ctx.send('Hey! You\'ll need to set a prefix.');
                 if (prefix.length > 20) return ctx.send(':warning: The prefix cannot reach the threshold. (`20`)');
                 if (prefix.includes('@everyone') || prefix.includes('@here')) return ctx.send(':x: Hey! Why are you pinging everyone?! We don\'t allow at everyone pings as prefixes.');
-                this.client.settings.update(ctx.guild.id, {
+                this.bot.settings.update(ctx.guild.id, {
                     $set: {
                         prefix
                     }
@@ -109,7 +109,7 @@ export default class SettingsCommand extends Command {
             case 'mutedrole': {
                 const mutedRole = ctx.args.get(2);
                 if (!mutedRole || !/^[0-9]+$/.test(mutedRole)) return ctx.send('Please set a valid id!');
-                this.client.settings.update(ctx.guild.id, {
+                this.bot.settings.update(ctx.guild.id, {
                     $set: {
                         mutedRole
                     }
@@ -127,7 +127,7 @@ export default class SettingsCommand extends Command {
                 if (bool === 'true') boole = true;
                 else if (bool === 'false') boole = false;
                 else return ctx.send('Invalid boolean');
-                this.client.settings.update(ctx.guild.id, {
+                this.bot.settings.update(ctx.guild.id, {
                     $set: {
                         'automod.dehoist': boole
                     }
@@ -146,7 +146,7 @@ export default class SettingsCommand extends Command {
                 else if (bool === 'false') boole = false;
                 else return ctx.send('Invalid boolean');
 
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.spam': boole
                     }
@@ -163,7 +163,7 @@ export default class SettingsCommand extends Command {
                 if (bool === 'true') boole = true;
                 else if (bool === 'false') boole = false;
                 else return ctx.send('Invalid boolean');
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.mention': boole
                     }
@@ -181,7 +181,7 @@ export default class SettingsCommand extends Command {
                 else if (bool === 'false') boole = false;
                 else return ctx.send('Invalid boolean');
 
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.raid': boole
                     }
@@ -197,7 +197,7 @@ export default class SettingsCommand extends Command {
                 if (!wordlist || wordlist.length === 0) 
                     enabled = false;
 
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.badwords.enabled': enabled,
                         'automod.badwords.wordlist': wordlist
@@ -218,7 +218,7 @@ export default class SettingsCommand extends Command {
                 else if (bool === 'false') boole = false;
                 else return ctx.send('Invalid boolean');
 
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.invites': boole
                     }
@@ -237,7 +237,7 @@ export default class SettingsCommand extends Command {
         const setting = ctx.args.get(1);
         switch (setting) {
             case 'punishments': {
-                this.client.settings.update(ctx.guild.id, {
+                this.bot.settings.update(ctx.guild.id, {
                     $set: {
                         punishments: []
                     }
@@ -248,7 +248,7 @@ export default class SettingsCommand extends Command {
             }
             break;
             case 'modlog': {
-                this.client.settings.update(ctx.guild.id, {
+                this.bot.settings.update(ctx.guild.id, {
                     $set: {
                         modlog: null
                     }
@@ -259,7 +259,7 @@ export default class SettingsCommand extends Command {
                 break;
             }
             case 'prefix': {
-                this.client.settings.update(ctx.guild.id, {
+                this.bot.settings.update(ctx.guild.id, {
                     $set: {
                         prefix: 'x!'
                     }
@@ -271,7 +271,7 @@ export default class SettingsCommand extends Command {
             }
 
             case 'mutedrole': {
-                this.client.settings.update(ctx.guild.id, {
+                this.bot.settings.update(ctx.guild.id, {
                     $set: {
                         mutedRole: null
                     }
@@ -282,7 +282,7 @@ export default class SettingsCommand extends Command {
                 break;
             }
             case 'automod.dehoist': {
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.dehoist': false
                     }
@@ -292,7 +292,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             case 'automod.mention': {
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.mention': false
                     }
@@ -302,7 +302,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             case 'automod.spam': {
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.spam': false
                     }
@@ -320,7 +320,7 @@ export default class SettingsCommand extends Command {
                 else if (bool === 'false') boole = false;
                 else return ctx.send('Invalid boolean');
 
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.raid': boole
                     }
@@ -330,7 +330,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             case 'automod.swears': {
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.badwords.enabled': false,
                         'automod.badwords.wordlist': null
@@ -341,7 +341,7 @@ export default class SettingsCommand extends Command {
                 });
             } break;
             case 'automod.invites': {
-                this.client.settings.update(ctx.guild.id, { 
+                this.bot.settings.update(ctx.guild.id, { 
                     $set: {
                         'automod.invites': false
                     }
@@ -357,9 +357,9 @@ export default class SettingsCommand extends Command {
     }
 
     async view(ctx: Context) {
-        const settings = await this.client.settings.get(ctx.guild.id);
+        const settings = await this.bot.settings.get(ctx.guild.id);
         const embed = this
-            .client
+            .bot
             .getEmbed()
             .setTitle(`Configuration for ${ctx.guild.name}`)
             .setDescription(stripIndents`
@@ -377,7 +377,7 @@ export default class SettingsCommand extends Command {
                 ${settings!.punishments.map((p, i) => `${i+1}. warnings: ${p.warnings}, punishment: ${p.type}, special:${!!p.temp ? ` Time: ${ms(p.temp)}` : ''}${!!p.soft ? ` Soft` : ''}${!!p.roleid ? ` Role: ${!!ctx.guild.roles.get(p.roleid) ? ctx.guild.roles.get(p.roleid)!.name: ''}` : ''}`).join('\n')}
                 \`\`\`
             `)
-            .setFooter('You\'re viewing the configuration because you didn\'t specify a subcommand', this.client.users.get(ctx.guild.ownerID)!.avatarURL);
+            .setFooter('You\'re viewing the configuration because you didn\'t specify a subcommand', this.bot.client.users.get(ctx.guild.ownerID)!.avatarURL);
 
         return ctx.embed(embed.build());
     }

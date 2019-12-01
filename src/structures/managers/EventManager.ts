@@ -1,10 +1,10 @@
 import { readdir } from 'fs';
 import { sep } from 'path';
-import Client from '../Client';
+import Client from '../Bot';
 import Event from '../Event';
 
 export default class EventManager {
-    public client: Client;
+    public bot: Client;
     public path: string = `${process.cwd()}${sep}dist${sep}events`;
 
     /**
@@ -12,7 +12,7 @@ export default class EventManager {
      * @param client The client instance
      */
     constructor(client: Client) {
-        this.client = client;
+        this.bot = client;
     }
 
     /**
@@ -20,12 +20,12 @@ export default class EventManager {
      */
     start() {
         readdir(this.path, (error, files) => {
-            if (error && !!error.stack) this.client.logger.log('error', error.stack);
-            this.client.logger.log('info', `Building ${files.length} event${files.length > 1? 's': ''}!`);
+            if (error && !!error.stack) this.bot.logger.log('error', error.stack);
+            this.bot.logger.log('info', `Building ${files.length} event${files.length > 1? 's': ''}!`);
             files.forEach((file) => {
                 try {
                     const event = require(`${this.path}${sep}${file}`);
-                    const ev: Event = new event.default(this.client);
+                    const ev: Event = new event.default(this.bot);
                     this.emit(ev);
                 } catch (ignored) {}
                 
@@ -42,9 +42,9 @@ export default class EventManager {
             try {
                 await ev.emit(...args);
             } catch(ex) {
-                this.client.logger.log('error', `Unable to run the '${ev.event}' event:\n${ex}`);
+                this.bot.logger.log('error', `Unable to run the '${ev.event}' event:\n${ex}`);
             }
         };
-        this.client.on(ev.event, wrapper);
+        this.bot.client.on(ev.event, wrapper);
     }
 }

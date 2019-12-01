@@ -1,12 +1,12 @@
 import { Guild, Role, TextChannel, CategoryChannel, VoiceChannel } from 'eris';
-import Client from './Client';
+import Bot from './Bot';
 
 export type AnyRESTChannel = TextChannel | CategoryChannel | VoiceChannel;
 export default class RESTClient {
-    public client: Client;
+    public bot: Bot;
 
-    constructor(client: Client) {
-        this.client = client;
+    constructor(client: Bot) {
+        this.bot = client;
     }
 
     getRole(info: { query: string; guild: Guild; }) {
@@ -38,7 +38,7 @@ export default class RESTClient {
                     if (!guild.channels.has(query)) reject();
                     resolve(guild.channels.get(query));
                 } else {
-                    const channel = query in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[query])!.channels.get(query);
+                    const channel = query in this.bot.client.channelGuildMap && this.bot.client.guilds.get(this.bot.client.channelGuildMap[query])!.channels.get(query);
                     if (channel) return resolve(channel);
                 }
             } else if (/^<#(\d+)>$/.test(query)) {
@@ -47,7 +47,7 @@ export default class RESTClient {
                     if (!guild.channels.has(match![1])) reject();
                     resolve(guild.channels.get(match![1]));
                 } else {
-                    const channel = match![1] in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[match![1]])!.channels.get(query);
+                    const channel = match![1] in this.bot.client.channelGuildMap && this.bot.client.guilds.get(this.bot.client.channelGuildMap[match![1]])!.channels.get(query);
                     if (channel) return resolve(channel);
                 }
             } else if (guild) {

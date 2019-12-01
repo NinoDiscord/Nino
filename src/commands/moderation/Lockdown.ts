@@ -1,11 +1,11 @@
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import { Constants, TextChannel, Role } from 'eris';
 import CommandContext from '../../structures/Context';
 import PermissionUtils from '../../util/PermissionUtils';
 
 export default class LockdownCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'lockdown',
             description: 'Locks down a channel, multiple channels or all channels for all roles below the specified role. Put + or - before the role to specify whether to allow the role to write or deny the permission.',
@@ -64,7 +64,7 @@ export default class LockdownCommand extends Command {
             const msg = await ctx.send('Backing up former permissions...');
             const currstate = channels.map(c => {return {channel: c, pos: c.permissionOverwrites.filter(r => !!roles.find((ro) => ro.role!.id === r.id)).map(po => {return {role: po.id, allow: po.allow, deny: po.deny};})};});
         
-            for (let {channel, pos} of currstate) await ctx.client.redis.set(`lockdownstate:${channel.id}`, JSON.stringify(pos));
+            for (let {channel, pos} of currstate) await ctx.bot.redis.set(`lockdownstate:${channel.id}`, JSON.stringify(pos));
             msg.edit('Done!');
         }
         
@@ -73,13 +73,13 @@ export default class LockdownCommand extends Command {
         for (let channel of channels) {
             if (((ctx.me.permission.allow|channel.permissionsOf(ctx.me.id).allow) & Constants.Permissions.manageChannels) !== 0) {
                 if (ctx.flags.get('release') as boolean) {
-                    const formerperms = await ctx.client.redis.get(`lockdownstate:${channel.id}`);
+                    const formerperms = await ctx.bot.redis.get(`lockdownstate:${channel.id}`);
                     if (!!formerperms) {
                         for (let po of JSON.parse(formerperms)) await channel.editPermission(po.role, po.allow, po.deny, 'role', 'Channel Lockdown Over');
                         for (let role of roles.filter(r => !JSON.parse(formerperms).find(ro => r.role!.id === ro.role!))) await channel.deletePermission(role.role!.id, 'Channel Lockdown Over');
                         await ctx.send(`Channel ${channel.mention} is now unlocked.`);
                     }
-                    await ctx.client.redis.del(`lockdownstate:${channel.id}`);
+                    await ctx.bot.redis.del(`lockdownstate:${channel.id}`);
                 } else {
                     for (let role of roles) {
                         let allow = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.allow : 0;

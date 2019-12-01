@@ -1,5 +1,5 @@
 import Context from './Context';
-import Client from './Client';
+import Client from './Bot';
 import { Member, User, Channel } from 'eris';
 import PermissionUtils from '../util/PermissionUtils';
 
@@ -25,7 +25,7 @@ export interface Subcommand {
 }
 
 export default class NinoCommand {
-    public client: Client;
+    public bot: Client;
     public name: string;
     public description: string;
     public usage: string;
@@ -42,7 +42,7 @@ export default class NinoCommand {
     public userpermissions: number;
 
     constructor(client: Client, info: CommandInfo) {
-        this.client          = client;
+        this.bot          = client;
         this.name            = info.name;
         this.description     = (typeof info.description === 'function')? info.description(client): info.description;
         this.usage           = info.usage || '';
@@ -68,12 +68,12 @@ export default class NinoCommand {
     }
 
     format() {
-        return `${this.client.config.discord.prefix}${this.name}${this.usage? ` ${this.usage}`: ''}`;
+        return `${this.bot.config.discord.prefix}${this.name}${this.usage? ` ${this.usage}`: ''}`;
     }
 
     help() {
         const embed = this
-            .client
+            .bot
             .getEmbed()
             .setTitle(`Command ${this.name}`)
             .setDescription(`**${this.description}**`)

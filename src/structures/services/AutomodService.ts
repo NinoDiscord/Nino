@@ -1,4 +1,4 @@
-import NinoClient from '../Client';
+import Bot from '../Bot';
 import AutoModSpam from '../automod/Spam';
 import AutoModInvite from '../automod/Invite';
 import { Message, Member } from 'eris';
@@ -6,6 +6,9 @@ import AutoModBadWords from '../automod/Badwords';
 import AutoModRaid from '../automod/Raid';
 import AutoModDehoist from '../automod/Dehoisting';
 import AutoModMention from '../automod/Mention';
+import { inject, injectable } from 'inversify';
+import { TYPES } from '../../types';
+import "reflect-metadata";
 
 /**
  * Service that generalizes automod event handling
@@ -19,6 +22,7 @@ import AutoModMention from '../automod/Mention';
  * * auto dehoist
  * * auto mention
  */
+@injectable()
 export default class AutomodService {
     private spamhandler: AutoModSpam;
     private invitehandler: AutoModInvite;
@@ -27,13 +31,13 @@ export default class AutomodService {
     private dehoisthandler: AutoModDehoist;
     private mentionhandler: AutoModMention;
 
-    constructor(client: NinoClient) {
-        this.spamhandler    = new AutoModSpam(client);
-        this.invitehandler  = new AutoModInvite(client);
-        this.badwordhandler = new AutoModBadWords(client);
-        this.raidhandler    = new AutoModRaid(client);
-        this.dehoisthandler = new AutoModDehoist(client);
-        this.mentionhandler = new AutoModMention(client);
+    constructor(@inject(TYPES.Bot) bot: Bot) {
+        this.spamhandler    = new AutoModSpam(bot);
+        this.invitehandler  = new AutoModInvite(bot);
+        this.badwordhandler = new AutoModBadWords(bot);
+        this.raidhandler    = new AutoModRaid(bot);
+        this.dehoisthandler = new AutoModDehoist(bot);
+        this.mentionhandler = new AutoModMention(bot);
     }
 
     /**

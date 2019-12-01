@@ -1,13 +1,13 @@
 import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
 import { Constants } from 'eris';
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import PermissionUtils from '../../util/PermissionUtils';
 
 export default class KickCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'kick',
             description: 'Kicks a user from the guild',
@@ -23,7 +23,7 @@ export default class KickCommand extends Command {
     async run(ctx: Context) {
         if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
 
-        const u = findUser(this.client, ctx.args.get(0))!;
+        const u = findUser(this.bot, ctx.args.get(0))!;
         if (!u) {
             return ctx.send('I can\'t find this user!');
         }
@@ -42,6 +42,6 @@ export default class KickCommand extends Command {
         });
 
         await ctx.send('User successfully kicked.');
-        await this.client.punishments.punish(member!, punishment, (reason as string | undefined));
+        await this.bot.punishments.punish(member!, punishment, (reason as string | undefined));
     }
 }

@@ -1,6 +1,6 @@
 import { Message, TextChannel } from 'eris';
 import RedisQueue from '../../util/RedisQueue';
-import NinoClient from '../Client';
+import Bot from '../Bot';
 import PermissionUtils from '../../util/PermissionUtils';
 
 /**
@@ -13,10 +13,10 @@ import PermissionUtils from '../../util/PermissionUtils';
  * It auto evacuates message timestamps so no old messages will be kept. 
  */
 export default class AutoModSpam {
-    public client: NinoClient;
+    public bot: Bot;
 
-    constructor(client: NinoClient) {
-        this.client = client;
+    constructor(client: Bot) {
+        this.bot = client;
     }
 
     /**
@@ -30,14 +30,14 @@ export default class AutoModSpam {
      */
     async handle(m: Message): Promise<boolean> {
         const guild = (m.channel as TextChannel).guild;
-        const me = guild.members.get(this.client.user.id)!;
+        const me = guild.members.get(this.bot.client.user.id)!;
         if (!PermissionUtils.above(me, m.member!) || m.author.bot || (m.channel as TextChannel).permissionsOf(m.author.id).has('manageMessages')) return false;
 
-        const settings = await this.client.settings.get(guild.id);
+        const settings = await this.bot.settings.get(guild.id);
 
         if (!settings || !settings.automod.spam) return false;
 
-        const queue = new RedisQueue(this.client.redis, `${m.author.id}:${guild.id}`);
+        const queue = new RedisQueue(this.bot.redis, `${m.author.id}:${guild.id}`);
         await queue.push(m.timestamp.toString());
 
         if ((await queue.length()) >= 5) {
@@ -45,8 +45,8 @@ export default class AutoModSpam {
 
             if (m.editedTimestamp && m.editedTimestamp > m.timestamp) return false; //remove the possibility for edits to be counted by checking if the message object has a greater edit timestamp than created timestamp
             if (m.timestamp - oldtime <= 3000) {
-                let punishments = await this.client.punishments.addWarning(m.member!);
-                for (let punishment of punishments) await this.client.punishments.punish(m.member!, punishment, 'Automod (Spamming)');
+                let punishments = await this.bot.punishments.addWarning(m.member!);
+                for (let punishment of punishments) await this.bot.punishments.punish(m.member!, punishment, 'Automod (Spamming)');
                 await m.channel.createMessage('Stop right there! Spamming is not allowed!');
                 return true;
             }

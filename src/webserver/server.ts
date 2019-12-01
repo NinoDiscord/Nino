@@ -1,6 +1,6 @@
 import Command from '../structures/Command';
 import express from 'express';
-import Client from '../structures/Client';
+import Client from '../structures/Bot';
 
 export default class NinoWebServer {
     public app: express.Application = express();

@@ -1,5 +1,5 @@
 import { Member } from 'eris';
-import NinoClient from '../Client';
+import Bot from '../Bot';
 import PermissionUtils from '../../util/PermissionUtils';
 
 /**
@@ -10,10 +10,10 @@ import PermissionUtils from '../../util/PermissionUtils';
  * A user whose first letter of the username/nickname comes before 0 in the ascii table is defined as a hoister.
  */
 export default class AutoModDehoist {
-    public client: NinoClient;
+    public bot: Bot;
 
-    constructor(client: NinoClient) {
-        this.client = client;
+    constructor(client: Bot) {
+        this.bot = client;
     }
 
     /**
@@ -24,12 +24,12 @@ export default class AutoModDehoist {
      */
     async handle(m: Member): Promise<void> {
         const guild = m.guild;
-        const me = guild.members.get(this.client.user.id)!;
+        const me = guild.members.get(this.bot.client.user.id)!;
         const name = m.nick || m.username;
         
         if (name >= '0') return;
 
-        const settings = await this.client.settings.get(m.guild.id);
+        const settings = await this.bot.settings.get(m.guild.id);
 
         if (!settings || !settings.automod.dehoist) return;
         

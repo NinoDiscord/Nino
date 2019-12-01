@@ -1,4 +1,4 @@
-import NinoClient, { NinoConfig } from '../Client';
+import Bot, { Config } from '../Bot';
 import wumpfetch from 'wumpfetch';
 
 /**
@@ -7,21 +7,21 @@ import wumpfetch from 'wumpfetch';
  * Posts every minute to all botlists.
  */
 export default class BotListService {
-    private client: NinoClient;
+    private bot: Bot;
     private interval?: NodeJS.Timeout;
 
-    constructor(client: NinoClient) {
-        this.client = client;
+    constructor(client: Bot) {
+        this.bot = client;
     }
 
     /**
      * Start posting guild stats
      */
     start() {
-        this.postCount(this.client.guilds.size, this.client.user.id, this.client.config, this.client.logger);
+        this.postCount(this.bot.client.guilds.size, this.bot.client.user.id, this.bot.config, this.bot.logger);
         this.interval = setInterval(async () => {
-            const guilds = await this.client.redis.get('guilds');
-            if (guilds) this.postCount(Number(guilds), this.client.user.id, this.client.config, this.client.logger);
+            const guilds = await this.bot.redis.get('guilds');
+            if (guilds) this.postCount(Number(guilds), this.bot.client.user.id, this.bot.config, this.bot.logger);
 
         }, 60000);
     }
@@ -38,8 +38,8 @@ export default class BotListService {
     /**
      * Post guild stats
      */
-    postCount(guilds: Number, id: string,  config: NinoConfig, logger: any) {
-        if (config.botlists.topggtoken) {
+    postCount(guilds: Number, id: string,  config: Config, logger: any) {
+        if (config.botlists && config.botlists.topggtoken) {
             wumpfetch({
                 url: `https://top.gg/api/bots/${id}/stats`, 
                 method: 'POST',
@@ -55,7 +55,7 @@ export default class BotListService {
                 logger.error('Failed to post guild stats to TOP.GG.');
             });
         }
-        if (config.botlists.bfdtoken) {
+        if (config.botlists && config.botlists.bfdtoken) {
             wumpfetch({
                 url: `https://botsfordiscord.com/api/bot/${id}`, 
                 method: 'POST',
@@ -71,7 +71,7 @@ export default class BotListService {
                 logger.error('Failed to post guild stats to Bots For Discord.');
             });
         }
-        if (config.botlists.dboatstoken) {
+        if (config.botlists && config.botlists.dboatstoken) {
             wumpfetch({
                 url: `https://discord.boats/api/bot/${id}`, 
                 method: 'POST',
@@ -87,7 +87,7 @@ export default class BotListService {
                 logger.error('Failed to post guild stats to Discord Boats.');
             });
         }
-        if (config.botlists.blstoken) {
+        if (config.botlists && config.botlists.blstoken) {
             wumpfetch({
                 url: `https://api.botlist.space/v1/bots/${id}`, 
                 method: 'POST',

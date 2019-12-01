@@ -1,11 +1,11 @@
 import { stripIndents } from 'common-tags';
 import { execSync } from 'child_process';
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 
 export default class ShellCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'shell',
             description: 'Runs a command on the bot\'s host machine.',
@@ -20,7 +20,7 @@ export default class ShellCommand extends Command {
     async run(ctx: Context) {
         const message = await ctx.embed(
             this
-                .client
+                .bot
                 .getEmbed()
                 .setTitle(':computer: Executing...')
                 .build()
@@ -32,7 +32,7 @@ export default class ShellCommand extends Command {
             result = execSync(script).toString().trim();
             await message.edit({
                 embed: this
-                    .client
+                    .bot
                     .getEmbed()
                     .addField(':scroll: Script', `\`\`\`\n${script}\`\`\``, false)
                     .addField(':white_check_mark: Result', `\`\`\`\n${result}\`\`\``, false)
@@ -42,7 +42,7 @@ export default class ShellCommand extends Command {
         } catch(ex) {
             await message.edit({
                 embed: this
-                    .client
+                    .bot
                     .getEmbed()
                     .addField(':scroll: Script', `\`\`\`\n${script}\`\`\``, false)
                     .addField(':white_check_mark: Result', `\`\`\`\n${ex}\`\`\``, false)

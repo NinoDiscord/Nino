@@ -1,6 +1,6 @@
 import { Constants } from 'eris';
 import { stripIndents } from 'common-tags';
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 
@@ -9,7 +9,7 @@ const weeks = (Date.now() - (1000 * 60 * 60 * 24 * 14));
 export default class PruneCommand extends Command {
     public filters: string[];
 
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'prune',
             description: 'Prunes messages from the current channel',

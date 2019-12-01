@@ -1,4 +1,4 @@
-import Client from '../structures/Client';
+import Client from '../structures/Bot';
 import Event from '../structures/Event';
 
 export default class ShardDisconnectedEvent extends Event {
@@ -7,6 +7,6 @@ export default class ShardDisconnectedEvent extends Event {
     }
 
     async emit(id: number, error: any) {
-        this.client.logger.log('discord', `Shard #${id} has disconnected!\n${error}`);
+        this.bot.logger.log('discord', `Shard #${id} has disconnected!\n${error}`);
     }
 }

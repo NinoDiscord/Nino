@@ -20,13 +20,15 @@ import { parse } from 'url';
 import { setDefaults} from 'wumpfetch';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
+import { lazyInject } from '../inversify.config';
+import "reflect-metadata";
 
 const pkg = require('../../package');
 setDefaults({
     headers: { 'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/auguwu/Nino)` }
 });
 
-export interface NinoConfig {
+export interface Config {
     environment: string;
     databaseUrl: string;
     discord: {
@@ -40,16 +42,16 @@ export interface NinoConfig {
     webhook: {
         id: string;
         token: string;
-    };
-    webserver: number;
-    mode: string;
-    sentryDSN: string;
+    } | undefined;
+    webserver: number | undefined;
+    mode: string | undefined;
+    sentryDSN: string | undefined;
     botlists: {
-        topggtoken: string;
-        bfdtoken: string;
-        dboatstoken: string;
-        blstoken: string;
-    }
+        topggtoken: string | undefined;
+        bfdtoken: string | undefined;
+        dboatstoken: string | undefined;
+        blstoken: string | undefined;
+    } | undefined
 }
 
 export interface CommandStats {
@@ -65,18 +67,19 @@ export interface CommandStats {
 }
 
 @injectable()
-export default class NinoClient extends Client {
-    public manager: CommandManager;
+export default class Bot {
+    public client: Client;
+    @lazyInject(TYPES.CommandManager) public manager!: CommandManager;
     public events: EventManager;
     public database: DatabaseManager;
     public logger: instance;
     public settings: GuildSettings;
     public warnings: Warning;
-    public config: NinoConfig;
+    public config: Config;
     public redis: Redis;
     public botlistservice: BotListService;
     public punishments = new PunishmentManager(this);
-    public autoModService: AutomodService;
+    @lazyInject(TYPES.AutoModService) public autoModService!: AutomodService;
     public cases: CaseSettings = new CaseSettings();
     public timeouts: TimeoutsManager;
     public prom = {
@@ -100,22 +103,14 @@ export default class NinoClient extends Client {
         commandUsage: {}
     };
 
-    constructor(@inject(TYPES.NinoConfig) config: NinoConfig) {
-        super(config.discord.token, {
-            maxShards: 'auto',
-            disableEveryone: true,
-            getAllUsers: true,
-            restMode: true
-        });
-
+    constructor(@inject(TYPES.Config) config: Config, @inject(TYPES.Client) client: Client) {
         this.config   = config;
+        this.client = client;
         this.redis    = new redis({
             port: config.redis['port'],
             host: config.redis['host']
         });
         this.punishments = new PunishmentManager(this);
-        this.autoModService = new AutomodService(this);
-        this.manager  = new CommandManager(this);
         this.events = new EventManager(this);
         this.database = new DatabaseManager(config.databaseUrl);
         this.settings = new GuildSettings(this);
@@ -157,7 +152,7 @@ export default class NinoClient extends Client {
         this.logger.log('info', 'Success! Intializing events...');
         await this.events.start();
         this.logger.log('info', 'Success! Connecting to Discord...');
-        await super.connect();
+        await this.client.connect();
         this.logger.log('discord', 'Connected to Discord!');
         this.logger.log('info', 'Loading commands...');
         await this.manager.start();

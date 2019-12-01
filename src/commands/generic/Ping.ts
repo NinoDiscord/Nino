@@ -1,9 +1,9 @@
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 
 export default class PingCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'ping',
             description: 'Gives you the bot\'s ping.',

@@ -1,4 +1,4 @@
-import Client from './Client';
+import Client from './Bot';
 
 export type Emittable = 'ready' | 'disconnect' | 'callCreate' | 'callRing' | 'callDelete' |
     'callUpdate' | 'channelCreate' | 'channelDelete' | 'channelPinUpdate' | 'channelRecipientAdd' |
@@ -12,11 +12,11 @@ export type Emittable = 'ready' | 'disconnect' | 'callCreate' | 'callRing' | 'ca
     'voiceChannelJoin' | 'voiceChannelLeave' | 'voiceChannelSwitch' | 'voiceStateUpdate' | 'warn' | 'debug' |
     'shardDisconnect' | 'error' | 'shardPreReady' | 'connect' | 'shardReady' | 'shardResume' | 'messageDelete';
 export default class NinoEvent {
-    public client: Client;
+    public bot: Client;
     public event: Emittable;
 
     constructor(client: Client, event: Emittable) {
-        this.client = client;
+        this.bot = client;
         this.event  = event;
     }
 

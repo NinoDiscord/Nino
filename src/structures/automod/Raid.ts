@@ -1,6 +1,6 @@
 import { Member } from 'eris';
 import RedisQueue from '../../util/RedisQueue';
-import NinoClient from '../Client';
+import Bot from '../Bot';
 import PermissionUtils from '../../util/PermissionUtils';
 import { Punishment, PunishmentType } from '../managers/PunishmentManager';
 
@@ -14,10 +14,10 @@ import { Punishment, PunishmentType } from '../managers/PunishmentManager';
  * It auto evacuates ban timestamps so no old messages will be kept. 
  */
 export default class AutoModRaid {
-    public client: NinoClient;
+    public bot: Bot;
 
-    constructor(client: NinoClient) {
-        this.client = client;
+    constructor(client: Bot) {
+        this.bot = client;
     }
 
     /**
@@ -31,22 +31,22 @@ export default class AutoModRaid {
      */
     async handle(m: Member): Promise<boolean> {
         const guild = m.guild;
-        const me = guild.members.get(this.client.user.id)!;
+        const me = guild.members.get(this.bot.client.user.id)!;
         if (!PermissionUtils.above(me, m) || m.bot || (Date.now() - m.createdAt) > 7 * 86400000) // if the account is more than 7 days old we can assume it's not a part of a raid
             return false;
 
-        const settings = await this.client.settings.get(guild.id);
+        const settings = await this.bot.settings.get(guild.id);
         
         if (!settings || !settings.automod.raid) return false;
 
-        const queue = new RedisQueue(this.client.redis, `raid:${guild.id}`);
+        const queue = new RedisQueue(this.bot.redis, `raid:${guild.id}`);
         await queue.push(Date.now().toString()+'U'+m.id);
 
         if ((await queue.length()) >= 3) {
             const oldtime = Number.parseInt(await queue.pop());
             if (Date.now() - oldtime <= 1000) {
                 do {
-                    await this.client.punishments.punish(m, new Punishment(PunishmentType.Ban, {moderator: me.user}), 'Automod: Raid detected');
+                    await this.bot.punishments.punish(m, new Punishment(PunishmentType.Ban, {moderator: me.user}), 'Automod: Raid detected');
                     const [time, id] = (await queue.pop()).split('U');
                     m = guild.members[id];
                 } while (await queue.length() > 0);

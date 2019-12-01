@@ -1,5 +1,6 @@
 import { Admin } from 'mongodb';
 import mongoose from 'mongoose';
+import { injectable } from 'inversify';
 
 interface BuildInfo {
     version: string;
@@ -25,6 +26,8 @@ interface BuildInfo {
         target_os: string;
     }
 }
+
+
 export default class DatabaseManager {
     public uri: string = 'mongodb://localhost:27017/nino';
     public admin!: Admin;

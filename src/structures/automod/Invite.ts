@@ -1,5 +1,5 @@
 import { Message, TextChannel } from 'eris';
-import NinoClient from '../Client';
+import Bot from '../Bot';
 import PermissionUtils from '../../util/PermissionUtils';
 
 /**
@@ -12,11 +12,11 @@ import PermissionUtils from '../../util/PermissionUtils';
  * * discord.me
  */
 export default class AutoModInvite {
-    public client: NinoClient;
+    public bot: Bot;
     private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me)\/\w+/;
 
-    constructor(client: NinoClient) {
-        this.client = client;
+    constructor(client: Bot) {
+        this.bot = client;
     }
 
     /**
@@ -32,20 +32,20 @@ export default class AutoModInvite {
     async handle(m: Message): Promise<boolean> {
         const channel = (m.channel as TextChannel);
         const guild = channel.guild;
-        const me = guild.members.get(this.client.user.id)!;
+        const me = guild.members.get(this.bot.client.user.id)!;
         
         if (!PermissionUtils.above(me, m.member!) || !channel.permissionsOf(me.id).has('manageMessages') || m.author.bot || channel.permissionsOf(m.author.id).has('manageMessages')) // TODO: add permission checks. I will need to figure out those!
             return false;
 
         if (m.content.match(this.regex)) {
-            const settings = await this.client.settings.get(guild.id);
+            const settings = await this.bot.settings.get(guild.id);
         
             if (!settings || !settings.automod.invites) return false;
             
             await m.channel.createMessage(`HEY ${m.member!.mention}! NO ADS ALLOWED!`);
             await m.delete();
-            const punishments = await this.client.punishments.addWarning(m.member!);
-            for (let punishment of punishments) await this.client.punishments.punish(m.member!, punishment, 'Automod (Advertisments)');
+            const punishments = await this.bot.punishments.addWarning(m.member!);
+            for (let punishment of punishments) await this.bot.punishments.punish(m.member!, punishment, 'Automod (Advertisments)');
             return true;
         }
         return false;

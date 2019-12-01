@@ -1,5 +1,5 @@
 import { Collection } from '@augu/immutable';
-import { Message } from 'eris';
+import { Message, Client } from 'eris';
 
 export interface Collector {
     filter: (m: Message) => boolean;
@@ -9,7 +9,7 @@ export interface Collector {
 export default class MessageCollector {
     public collectors: Collection<Collector> = new Collection('collectors');
 
-    constructor(client: any) {
+    constructor(client: Client) {
         client.on('messageCreate', this.verify.bind(this));
     }
 

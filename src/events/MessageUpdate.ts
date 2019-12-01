@@ -1,5 +1,5 @@
 import { Message } from 'eris';
-import Client from '../structures/Client';
+import Client from '../structures/Bot';
 import Event from '../structures/Event';
 
 export default class MessageUpdatedEvent extends Event {
@@ -8,6 +8,6 @@ export default class MessageUpdatedEvent extends Event {
     }
 
     async emit(m: Message) {
-        this.client.autoModService.handleMessage(m);
+        this.bot.autoModService.handleMessage(m);
     }
 }

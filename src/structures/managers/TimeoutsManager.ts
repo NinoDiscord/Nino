@@ -1,4 +1,4 @@
-import NinoClient from '../Client';
+import Bot from '../Bot';
 import { Punishment, PunishmentType } from './PunishmentManager';
 import { Guild, User, Member } from 'eris';
 
@@ -10,10 +10,10 @@ import { Guild, User, Member } from 'eris';
  */
 export default class TimeoutsManager {
 
-    private client: NinoClient;
+    private bot: Bot;
 
-    constructor(client: NinoClient) {
-        this.client = client;
+    constructor(client: Bot) {
+        this.bot = client;
     }
 
     /**
@@ -35,11 +35,11 @@ export default class TimeoutsManager {
      */
     async addTimeout(member: string, guild: Guild, task: string, time: number) {
         const key = `timeout:${task}:${guild.id}:${member}`;
-        await this.client.redis.set(key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
+        await this.bot.redis.set(key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
         this.bigTimeout(async () => {
-            if (await this.client.redis.exists(key)) {
-                await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
-                await this.client.redis.del(key);
+            if (await this.bot.redis.exists(key)) {
+                await this.bot.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.bot.client.user}), 'time\'s up');
+                await this.bot.redis.del(key);
             }
         }, time);
     }
@@ -52,27 +52,27 @@ export default class TimeoutsManager {
      */
     async cancelTimeout(member: string, guild: Guild, task: string) {
         const key = `timeout:${task}:${guild.id}:${member}`;
-        return this.client.redis.del(key);
+        return this.bot.redis.del(key);
     }
 
     /**
      * Reapply timeouts since server went dead
      */
     async reapplyTimeouts() {
-        const timedates = await this.client.redis.keys('timeout:*:*:*');
+        const timedates = await this.bot.redis.keys('timeout:*:*:*');
         for (let timedate of timedates) {
-            const value = await this.client.redis.get(timedate);
+            const value = await this.bot.redis.get(timedate);
             const start = Number(value!.split(':')[0]);
             const amount = Number(value!.split(':')[1]);
             const member = value!.split(':')[2];
-            const guild = this.client.guilds.get(value!.split(':')[3]);
+            const guild = this.bot.client.guilds.get(value!.split(':')[3]);
             const task = value!.split(':')[4];
             if (!guild) continue;
             
             this.bigTimeout(async () => {
-                if (await this.client.redis.exists(timedate)) {
-                    await this.client.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.client.user}), 'time\'s up');
-                    await this.client.redis.del(timedate);
+                if (await this.bot.redis.exists(timedate)) {
+                    await this.bot.punishments.punish({id: member, guild}, new Punishment(task as PunishmentType, {moderator: this.bot.client.user}), 'time\'s up');
+                    await this.bot.redis.del(timedate);
                 }
             }, start - Date.now() + amount);
 

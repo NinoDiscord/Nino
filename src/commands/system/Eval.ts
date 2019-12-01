@@ -1,5 +1,5 @@
 import { inspect } from 'util';
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import EmbedBuilder from '../../structures/EmbedBuilder';
@@ -15,7 +15,7 @@ class CompilerError extends Error {
 }
 
 export default class EvalCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'eval',
             description: 'Evaluates JavaScript code and return a clean output',
@@ -71,17 +71,23 @@ export default class EvalCommand extends Command {
     }
 
     _redact(script: string) {
-        const cancellationToken = new RegExp([
-            this.client.token,
-            this.client.config.botlists.bfdtoken,
-            this.client.config.botlists.blstoken,
-            this.client.config.botlists.topggtoken,
-            this.client.config.botlists.dboatstoken,
-            this.client.config.databaseUrl,
-            this.client.config.discord.token,
-            this.client.config.redis.host,
-            this.client.config.sentryDSN
-        ].join('|'), 'gi');
+        let tokens = [
+            this.bot.client.token,
+            this.bot.config.databaseUrl,
+            this.bot.config.discord.token,
+            this.bot.config.redis.host,
+            this.bot.config.sentryDSN
+        ];
+        if (this.bot.config.botlists) {
+            tokens.push(...[
+                this.bot.config.botlists.bfdtoken,
+                this.bot.config.botlists.blstoken,
+                this.bot.config.botlists.topggtoken,
+                this.bot.config.botlists.dboatstoken
+            ]);
+        }
+        tokens = tokens.filter(x => !!x);
+        const cancellationToken = new RegExp(tokens.join('|'), 'gi');
 
         return script.replace(cancellationToken, '--snip--');
     }

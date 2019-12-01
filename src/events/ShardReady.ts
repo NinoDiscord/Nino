@@ -1,4 +1,4 @@
-import Client from '../structures/Client';
+import Client from '../structures/Bot';
 import Event from '../structures/Event';
 
 export default class ShardReadyEvent extends Event {
@@ -7,6 +7,6 @@ export default class ShardReadyEvent extends Event {
     }
 
     async emit(id: number) {
-        this.client.logger.log('discord', `Shard #${id} is ready!`);
+        this.bot.logger.log('discord', `Shard #${id} is ready!`);
     }
 }

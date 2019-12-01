@@ -2,12 +2,12 @@
     "name": "nino",
     "description": "Moderation bot for Discord's hack week entry.",
     "version": "0.5.2",
-    "main": "dist/bot.js",
+    "main": "dist/index.js",
     "scripts": {
         "build": "yarn lint && yarn clean && tsc",
         "build:dev": "yarn clean && tsc -w",
-        "main": "yarn build && node dist/bot.js",
-        "dev": "nodemon dist/bot.js",
+        "main": "yarn build && node dist/index.js",
+        "dev": "nodemon dist/index.js",
         "lint": "eslint src --ext .ts --fix",
         "clean": "rm -fr dist",
         "test": "jest"
@@ -29,12 +29,14 @@
         "eris": "0.11.1",
         "express": "4.17.1",
         "inversify": "^5.0.1",
+        "inversify-inject-decorators": "^3.1.0",
         "ioredis": "4.14.1",
         "js-yaml": "3.13.1",
         "mongoose": "5.7.13",
         "ms": "2.1.2",
         "pikmin": "0.1.13",
         "prom-client": "11.5.3",
+        "reflect-metadata": "^0.1.13",
         "wumpfetch": "0.3.1"
     },
     "devDependencies": {

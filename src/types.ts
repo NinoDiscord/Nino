@@ -1,5 +1,8 @@
 export const TYPES = {
-    NinoClient: Symbol.for('NinoClient'),
-    NinoConfig: Symbol.for('NinoConfig'),
-    Client: Symbol.for('Client')
+    Bot: Symbol.for('Bot'),
+    Config: Symbol.for('Config'),
+    Client: Symbol.for('Client'),
+    CommandManager: Symbol.for('CommandManager'),
+    CommandService: Symbol.for('CommandService'),
+    AutoModService: Symbol.for('AutoModService')
 };

@@ -1,10 +1,10 @@
 import { Constants } from 'eris';
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 
 export default class ReasonCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'reason',
             description: 'Updates a case reason',
@@ -23,20 +23,20 @@ export default class ReasonCommand extends Command {
 
         const caseID = ctx.args.get(0);
         const reason = ctx.args.args.slice(1).join(' ');
-        const _case = await this.client.cases.get(ctx.guild.id, parseInt(caseID));
-        const settings = await this.client.settings.get(ctx.guild.id); 
+        const _case = await this.bot.cases.get(ctx.guild.id, parseInt(caseID));
+        const settings = await this.bot.settings.get(ctx.guild.id); 
 
         if (!_case || _case === null) return ctx.send(`Case #${caseID} was not found.`);
         _case.reason = reason;
 
-        await this.client.cases.update(ctx.guild.id, parseInt(caseID), {
+        await this.bot.cases.update(ctx.guild.id, parseInt(caseID), {
             $set: {
                 reason
             }
         }, async(error) => {
             if (error) return ctx.send(`Unable to update case #${caseID}: \`${reason}\``);
-            const m = await this.client.getMessage(settings!.modlog, _case.message);
-            await this.client.punishments.editModlog(_case, m);
+            const m = await this.bot.client.getMessage(settings!.modlog, _case.message);
+            await this.bot.punishments.editModlog(_case, m);
         });
     }
 }

@@ -1,4 +1,4 @@
-import NinoClient from '../Client';
+import Bot from '../Bot';
 import { Member, TextChannel, Constants, User, Message, Guild } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
 import EmbedBuilder from '../EmbedBuilder';
@@ -55,10 +55,10 @@ export class Punishment {
  * This class will automate the process of warning and punishing users.
  */
 export default class PunishmentManager {
-    private client: NinoClient;
+    private bot: Bot;
 
-    constructor(client: NinoClient) {
-        this.client = client;
+    constructor(client: Bot) {
+        this.bot = client;
     }
 
     /**
@@ -79,13 +79,13 @@ export default class PunishmentManager {
      * @param member the member to warn
      */
     async addWarning(member: Member): Promise<Punishment[]> {
-        const me = member.guild.members.get(this.client.user.id)!;
-        const settings = await this.client.settings.get(member.guild.id);
+        const me = member.guild.members.get(this.bot.client.user.id)!;
+        const settings = await this.bot.settings.get(member.guild.id);
         if (!settings) return [];
 
-        let warnings = await this.client.warnings.get(member.guild.id, member.id);
-        if (!warnings) this.client.warnings.create(member.guild.id, member.id);
-        else await this.client.warnings.update(member.guild.id, member.id, {'amount': Math.min(warnings.amount + 1, 5)});
+        let warnings = await this.bot.warnings.get(member.guild.id, member.id);
+        if (!warnings) this.bot.warnings.create(member.guild.id, member.id);
+        else await this.bot.warnings.update(member.guild.id, member.id, {'amount': Math.min(warnings.amount + 1, 5)});
         const warns = Math.min(!!warnings ? warnings!.amount + 1 : 1, 5);
 
         let res: Punishment[] = [];
@@ -104,8 +104,8 @@ export default class PunishmentManager {
      * @param amount the amount of warnings to remove
      */
     async pardon(member: Member, amount: number) {
-        let warnings = await this.client.warnings.get(member.guild.id, member.id);
-        if (!!warnings && amount > 0) await this.client.warnings.update(member.guild.id, member.id, {'amount': Math.max(0, warnings.amount - amount)});
+        let warnings = await this.bot.warnings.get(member.guild.id, member.id);
+        if (!!warnings && amount > 0) await this.bot.warnings.update(member.guild.id, member.id, {'amount': Math.max(0, warnings.amount - amount)});
     }
 
     /**
@@ -119,10 +119,10 @@ export default class PunishmentManager {
      * @param reason the reason
      */
     async punish(member: Member | {id: string, guild: Guild}, punishment: Punishment, reason?: string) {
-        const me = member.guild.members.get(this.client.user.id)!;
+        const me = member.guild.members.get(this.bot.client.user.id)!;
         const guild = member.guild;
 
-        const settings = await this.client.settings.get(guild.id);
+        const settings = await this.bot.settings.get(guild.id);
 
         if ((member instanceof Member && !PermissionUtils.above(me, member)) || (me.permission.allow & this.punishmentPerms(punishment)) === 0) return;
 
@@ -133,7 +133,7 @@ export default class PunishmentManager {
                 const soft: boolean = !!punishment.options.soft;
                 await guild.banMember(member.id, days, reason);
                 if (soft) await guild.unbanMember(member.id, reason);
-                else if (time !== undefined && time > 0) await this.client.timeouts.addTimeout(member.id, member.guild, 'unban', time!);
+                else if (time !== undefined && time > 0) await this.bot.timeouts.addTimeout(member.id, member.guild, 'unban', time!);
                 break;
             case 'kick':
                 if (!(member instanceof Member)) return;
@@ -156,7 +156,7 @@ export default class PunishmentManager {
                     settings!.save();
                 }
                 await member.addRole(muterole, reason);
-                if (!!temp) this.client.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
+                if (!!temp) this.bot.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
                 break;
             case 'role':
                 if (!(member instanceof Member)) return;
@@ -184,7 +184,7 @@ export default class PunishmentManager {
         if (punishment.type !== 'role' && punishment.type !== 'unrole') {
             if (member instanceof Member) this.postToModLog(member, punishment, reason);
             else {
-                const user = await this.client.getRESTUser(member.id);
+                const user = await this.bot.client.getRESTUser(member.id);
                 this.postToModLog({username: user.username, discriminator: user.discriminator, guild: member.guild, id: member.id}, punishment, reason);
             }
         }
@@ -201,12 +201,12 @@ export default class PunishmentManager {
      * @param reason the reason
      */
     async postToModLog(member: Member | {guild: Guild, id: string, username: string, discriminator: string}, punishment: Punishment, reason?: string) {
-        const settings = await this.client.settings.get(member.guild.id);
+        const settings = await this.bot.settings.get(member.guild.id);
         if (!settings || !settings!.modlog) return;
         const modlog = member.guild.channels.get(settings!.modlog) as TextChannel;
-        if (!!modlog && modlog!.permissionsOf(this.client.user.id).has('sendMessages') && modlog!.permissionsOf(this.client.user.id).has('embedLinks')) {
+        if (!!modlog && modlog!.permissionsOf(this.bot.client.user.id).has('sendMessages') && modlog!.permissionsOf(this.bot.client.user.id).has('embedLinks')) {
             const action = this.determineType(punishment.type);
-            const c = await this.client.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
+            const c = await this.bot.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
             const message = await modlog.createMessage({
                 embed: new EmbedBuilder()
                     .setTitle( `Case #${c.id} **|** ${member.username} has been ${punishment.type + action.suffix}!`)
@@ -218,16 +218,16 @@ export default class PunishmentManager {
                     .setColor(action.action)
                     .build()
             });
-            await this.client.cases.update(member.guild.id, c.id, {message: message.id}, (e) => {
-                if (!!e) this.client.logger.log('error', `Couldn't update the case: ${e}`);
+            await this.bot.cases.update(member.guild.id, c.id, {message: message.id}, (e) => {
+                if (!!e) this.bot.logger.log('error', `Couldn't update the case: ${e}`);
             });
         }
     }
 
     async editModlog(_case: CaseModel, m: Message) {
         const action = this.determineType(_case.type);
-        const member = await this.client.getRESTUser(_case.victim)!;
-        const moderator =  await this.client.getRESTUser(_case.moderator)!;
+        const member = await this.bot.client.getRESTUser(_case.victim)!;
+        const moderator =  await this.bot.client.getRESTUser(_case.moderator)!;
         await m.edit({
             embed: new EmbedBuilder()
                 .setTitle( `Case #${_case.id} **|** ${member.username} has been ${_case.type + action.suffix}!`)

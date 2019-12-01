@@ -1,6 +1,6 @@
 import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
 import { Constants, Member, Guild } from 'eris';
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import findUser, { findId } from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -8,7 +8,7 @@ import ms = require('ms');
 import PermissionUtils from '../../util/PermissionUtils';
 
 export default class BanCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'ban',
             description: 'Ban a member in the current guild',
@@ -24,7 +24,7 @@ export default class BanCommand extends Command {
     async run(ctx: Context) {
         if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
 
-        const u = findId(this.client, ctx.args.get(0));
+        const u = findId(ctx.args.get(0));
         if (!u) return ctx.send('Invalid format: <@mention> / <user id>');
         let member: Member | undefined | {id: string, guild: Guild} = ctx.guild.members.get(u);
 
@@ -53,6 +53,6 @@ export default class BanCommand extends Command {
         });
 
         await ctx.send('User successfully banned.');
-        await this.client.punishments.punish(member!, punishment, reason as string | undefined);
+        await this.bot.punishments.punish(member!, punishment, reason as string | undefined);
     }
 }

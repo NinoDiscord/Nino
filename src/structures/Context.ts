@@ -2,7 +2,7 @@ import { Message, Guild, TextChannel, User, EmbedOptions, Member } from 'eris';
 import MessageCollector from './MessageCollector';
 import ArgumentParser from './parsers/ArgumentParser';
 import FlagParser from './parsers/FlagParser';
-import NinoClient from './Client';
+import Bot from './Bot';
 
 export interface DMOptions {
     user: User;
@@ -11,7 +11,7 @@ export interface DMOptions {
 }
 
 export default class CommandContext {
-    public client: NinoClient;
+    public bot: Bot;
     public message: Message;
     public args: ArgumentParser;
     public flags: FlagParser;
@@ -20,17 +20,17 @@ export default class CommandContext {
     public sender: User;
     public me: Member;
 
-    constructor(client: NinoClient, m: Message, args: string[]) {
+    constructor(bot: Bot, m: Message, args: string[]) {
         Object.assign<this, Message>(this, m);
 
-        this.client    = client;
+        this.bot    = bot;
         this.message   = m;
         this.args      = new ArgumentParser(args);
         this.flags     = new FlagParser(args);
         this.guild     = (m.channel as TextChannel).guild;
         this.sender    = m.author;
-        this.collector = new MessageCollector(client);
-        this.me        = this.guild.members.get(client.user.id)!;
+        this.collector = new MessageCollector(bot.client);
+        this.me        = this.guild.members.get(bot.client.user.id)!;
     }
 
     send(content: string) {

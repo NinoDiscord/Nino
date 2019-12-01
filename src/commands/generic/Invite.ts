@@ -1,9 +1,9 @@
-import NinoClient from '../../structures/Client';
+import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 
 export default class InviteCommand extends Command {
-    constructor(client: NinoClient) {
+    constructor(client: Bot) {
         super(client, {
             name: 'invite',
             description: 'Gives you the invite for the bot.',
@@ -14,6 +14,6 @@ export default class InviteCommand extends Command {
     }
 
     async run(ctx: Context) {
-        return ctx.send(`:link: Here you go: <https://discordapp.com/oauth2/authorize?client_id=${this.client.user.id}&scope=bot>`);
+        return ctx.send(`:link: Here you go: <https://discordapp.com/oauth2/authorize?client_id=${this.bot.client.user.id}&scope=bot>`);
     }
 }
