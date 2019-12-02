@@ -20,5 +20,5 @@ bot
     bot.logger.log('info', 'Now connecting to Discord...');
   })
   .catch(ex => {
-    bot.logger.log('error', 'unable to build:\n' + ex.stack);
+    bot.logger.log('error', 'Unable to build:\n' + ex.stack);
   });

@@ -10,10 +10,12 @@ import PermissionUtils from '../../util/PermissionUtils';
  * * discord.gg
  * * discord.io
  * * discord.me
+ * * discord.link
+ * * invite.gg
  */
 export default class AutoModInvite {
   public bot: Bot;
-  private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me)\/\w+/;
+  private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg)\/\w+/;
 
   constructor(client: Bot) {
     this.bot = client;
@@ -57,7 +59,7 @@ export default class AutoModInvite {
         await this.bot.punishments.punish(
           m.member!,
           punishment,
-          'Automod (Advertisments)'
+          'Automod (Advertisements)'
         );
       return true;
     }
