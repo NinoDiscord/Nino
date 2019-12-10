@@ -1,4 +1,5 @@
 {
-    "automerge": true,
-    "baseBranches": ["edge"]
+  "extends": ["config:base"],
+  "automerge": true,
+  "baseBranches": ["edge"]
 }
