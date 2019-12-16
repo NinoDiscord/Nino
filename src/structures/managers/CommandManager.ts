@@ -13,7 +13,7 @@ export default class CommandManager {
   public bot: Bot;
   public service: CommandService;
   public path: string = `${process.cwd()}${sep}dist${sep}commands`;
-  public commands: Collection<Command> = new Collection('nino:commands');
+  public commands: Collection<Command> = new Collection();
 
   /**
    * Creates a new instance of the `CommandManager`
