@@ -7,7 +7,7 @@ export interface Collector {
 }
 
 export default class MessageCollector {
-  public collectors: Collection<Collector> = new Collection('collectors');
+  public collectors: Collection<Collector> = new Collection();
 
   constructor(client: Client) {
     client.on('messageCreate', this.verify.bind(this));
