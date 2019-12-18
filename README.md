@@ -58,6 +58,12 @@ redis:
   port: 6379
 ```
 
+## Cloning
+
+> If you wish to use Nino outside of the official bot, please add proper crediting in the `README.md` file if it's Open Source (if the cloned bot is open source). If you don't comply of what we ask, we'll ask you to remove the bot's source code.
+>
+> **Do not add your cloned bot to ANY bot lists, please!**
+
 # Credits
 
 ## Maintainers
