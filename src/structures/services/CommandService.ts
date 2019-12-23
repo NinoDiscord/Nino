@@ -114,7 +114,8 @@ export default class CommandService {
       if (helpFlag && typeof helpFlag === 'boolean') {
         ctx.flags.flags = '';
         ctx.args.args = [cmd.name];
-        return new CommandInvocation(this.bot.manager.commands.get('help')!,
+        return new CommandInvocation(
+          this.bot.manager.commands.get('help')!,
           m.member || m.author,
           m.member
             ? m.member!.guild.members[ctx.bot.client.user.id]

@@ -44,7 +44,10 @@ export default class CommandManager {
           try {
             const command = require(`${this.path}${sep}${category}${sep}${file}`);
             const cmd: Command = new command.default(this.bot);
-            if ((this.bot.config.disabledcmds || []).includes(cmd.name) || (this.bot.config.disabledcats || []).includes(cmd.category)) {
+            if (
+              (this.bot.config.disabledcmds || []).includes(cmd.name) ||
+              (this.bot.config.disabledcats || []).includes(cmd.category)
+            ) {
               cmd.disabled = true;
             }
 

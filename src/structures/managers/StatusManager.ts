@@ -5,7 +5,7 @@ import Bot from '../Bot';
 
 /**
  * This class assists in updating the status of the bot in real time.
- * 
+ *
  * @remarks
  * The pattern style:
  * %prefix% is replaced by the default prefix.
