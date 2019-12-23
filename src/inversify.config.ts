@@ -28,10 +28,12 @@ try {
 } catch (e) {
   config = {
     status: undefined,
+    statustype: undefined,
     environment: 'development',
     databaseUrl: 'mongodb://localhost:27017/nino',
     disabledcmds: undefined,
     disabledcats: undefined,
+    owners: undefined,
     discord: {
       token: '',
       prefix: 'x!',

@@ -33,10 +33,12 @@ setDefaults({
 
 export interface Config {
   status: string | undefined;
+  statustype: number | undefined;
   environment: string;
   databaseUrl: string;
   disabledcmds: string[] | undefined;
   disabledcats: string[] | undefined;
+  owners: string[] | undefined;
   discord: {
     prefix: string;
     token: string;
@@ -116,13 +118,7 @@ export default class Bot {
 
     res.end();
   });
-  public owners: string[] = [
-    '280158289667555328',
-    '239790360728043520',
-    '130442810456408064',
-    '145557815287611393',
-    '107130754189766656',
-  ];
+  public owners: string[];
   public stats: CommandStats = {
     commandsExecuted: 0,
     messagesSeen: 0,
@@ -136,6 +132,7 @@ export default class Bot {
   ) {
     this.config = config;
     this.client = client;
+    this.owners = this.config.owners || [];
     this.redis = new redis({
       port: config.redis.port,
       host: config.redis.host,
