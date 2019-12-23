@@ -9,6 +9,7 @@ import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import ms = require('ms');
 import PermissionUtils from '../../util/PermissionUtils';
+import { Exception } from '@sentry/node';
 
 export default class BanCommand extends Command {
   constructor(client: Bot) {
@@ -49,11 +50,11 @@ export default class BanCommand extends Command {
       return ctx.send('You need to specify a reason.');
 
     let time = ctx.flags.get('time') || ctx.flags.get('t');
-    if (typeof time === 'boolean')
+    if (time && typeof time === 'boolean')
       return ctx.send('You need to specify time to be allotted.');
 
     const days = ctx.flags.get('days') || ctx.flags.get('d');
-    if (typeof days === 'boolean' || !/[0-9]+/.test(days))
+    if (days && (typeof days === 'boolean' || !/[0-9]+/.test(days)))
       return ctx.send(
         'You need to specify the amount days to delete messages of.'
       );
@@ -67,11 +68,15 @@ export default class BanCommand extends Command {
       days: Number(days),
     });
 
-    await ctx.send('User successfully banned.');
-    await this.bot.punishments.punish(
-      member!,
-      punishment,
-      reason as string | undefined
-    );
+    try {
+      await this.bot.punishments.punish(
+        member!,
+        punishment,
+        reason as string | undefined
+      );
+      await ctx.send('User successfully banned.');
+    } catch (e) {
+      ctx.send('Cannot ban user, ' + e.message);
+    }
   }
 }

@@ -15,19 +15,22 @@ export class CommandInvocation {
   user: Member | User;
   bot: Member | User;
   channel: Channel;
+  onetime: boolean;
 
   constructor(
     command: NinoCommand,
     user: Member | User,
     bot: Member | User,
     channel: Channel,
-    ctx: CommandContext
+    ctx: CommandContext,
+    onetime: boolean = false
   ) {
     this.command = command;
     this.user = user;
     this.bot = bot;
     this.channel = channel;
     this.ctx = ctx;
+    this.onetime = onetime;
   }
 
   /**
@@ -45,7 +48,7 @@ export class CommandInvocation {
       !this.command.bot.owners.includes(this.user.id)
     )
       return `Sorry, but you need to be a developer to execute the \`${this.command.name}\` command.`;
-    if (this.command.disabled)
+    if (this.command.disabled && !this.onetime)
       return `Command \`${this.command.name}\` is disabled.`;
     if (
       this.bot instanceof Member &&
@@ -111,14 +114,14 @@ export default class CommandService {
       if (helpFlag && typeof helpFlag === 'boolean') {
         ctx.flags.flags = '';
         ctx.args.args = [cmd.name];
-        return new CommandInvocation(
-          this.bot.manager.commands.get('help')!,
+        return new CommandInvocation(this.bot.manager.commands.get('help')!,
           m.member || m.author,
           m.member
             ? m.member!.guild.members[ctx.bot.client.user.id]
             : ctx.bot.client.user,
           m.channel,
-          ctx
+          ctx,
+          true
         ); // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
       }
       return new CommandInvocation(

@@ -15,19 +15,9 @@ export default class ReadyEvent extends Event {
       'discord',
       `Logged in as ${this.bot.client.user.username}#${this.bot.client.user.discriminator} (${this.bot.client.user.id})`
     );
-    this.bot.client.editStatus('online', {
-      name: `${
-        this.bot.config['discord'].prefix
-      }help | ${this.bot.client.guilds.size.toLocaleString()} Guilds`,
-      type: 0,
-    });
+    this.bot.status.updateStatus();
     setInterval(() => {
-      this.bot.client.editStatus('online', {
-        name: `${
-          this.bot.config['discord'].prefix
-        }help | ${this.bot.client.guilds.size.toLocaleString()} Guilds`,
-        type: 0,
-      });
+      this.bot.status.updateStatus();
     }, 600000);
     this.bot.promServer.listen(5595, () =>
       this.bot.logger.log('info', "Metrics is now listening on port '5595'")

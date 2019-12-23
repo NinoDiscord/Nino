@@ -8,8 +8,7 @@ export default class RatelimitBucket extends Collection<Collection<number>> {
    * @param command The command
    */
   initialize(command: Command) {
-    if (!this.has(command.name))
-      this.set(command.name, new Collection());
+    if (!this.has(command.name)) this.set(command.name, new Collection());
     return this;
   }
 

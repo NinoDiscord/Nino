@@ -47,11 +47,15 @@ export default class UnmuteCommand extends Command {
     const punishment = new Punishment(PunishmentType.Unmute, {
       moderator: ctx.sender,
     });
-    await ctx.send('User successfully unmuted.');
-    await this.bot.punishments.punish(
-      member!,
-      punishment,
-      reason as string | undefined
-    );
+    try {
+      await this.bot.punishments.punish(
+        member!,
+        punishment,
+        reason as string | undefined
+      );
+      await ctx.send('User successfully unmuted.');
+    } catch (e) {
+      ctx.send('Cannot unmute user, ' + e.message);
+    }
   }
 }

@@ -22,6 +22,7 @@ import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import { lazyInject } from '../inversify.config';
 import 'reflect-metadata';
+import StatusManager from './managers/StatusManager';
 
 const pkg = require('../../package');
 setDefaults({
@@ -31,8 +32,11 @@ setDefaults({
 });
 
 export interface Config {
+  status: string | undefined;
   environment: string;
   databaseUrl: string;
+  disabledcmds: string[] | undefined;
+  disabledcats: string[] | undefined;
   discord: {
     prefix: string;
     token: string;
@@ -40,6 +44,7 @@ export interface Config {
   redis: {
     host: string;
     port: number;
+    database: number | undefined;
   };
   webhook:
     | {
@@ -84,6 +89,7 @@ export default class Bot {
   @lazyInject(TYPES.AutoModService) public autoModService!: AutomodService;
   @lazyInject(TYPES.BotListService) public botlistservice!: BotListService;
   @lazyInject(TYPES.GuildSettings) public settings!: GuildSettings;
+  @lazyInject(TYPES.StatusManager) public status!: StatusManager;
   public logger: instance;
   public warnings: Warning = new Warning();
   public redis: Redis;
@@ -131,8 +137,9 @@ export default class Bot {
     this.config = config;
     this.client = client;
     this.redis = new redis({
-      port: config.redis['port'],
-      host: config.redis['host'],
+      port: config.redis.port,
+      host: config.redis.host,
+      db: config.redis.database,
     });
     this.logger = new instance({
       name: 'main',

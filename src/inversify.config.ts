@@ -20,14 +20,18 @@ import PunishmentManager from './structures/managers/PunishmentManager';
 import TimeoutsManager from './structures/managers/TimeoutsManager';
 import GuildSettings from './structures/settings/GuildSettings';
 import BotListService from './structures/services/BotListService';
+import StatusManager from './structures/managers/StatusManager';
 
 let config: Config;
 try {
   config = safeLoad(readFileSync('application.yml', 'utf8'));
 } catch (e) {
   config = {
+    status: undefined,
     environment: 'development',
     databaseUrl: 'mongodb://localhost:27017/nino',
+    disabledcmds: undefined,
+    disabledcats: undefined,
     discord: {
       token: '',
       prefix: 'x!',
@@ -35,6 +39,7 @@ try {
     redis: {
       host: 'localhost',
       port: 6379,
+      database: undefined,
     },
     webhook: undefined,
     webserver: undefined,
@@ -103,6 +108,11 @@ container
 container
   .bind<BotListService>(TYPES.BotListService)
   .to(BotListService)
+  .inSingletonScope();
+
+container
+  .bind<StatusManager>(TYPES.StatusManager)
+  .to(StatusManager)
   .inSingletonScope();
 
 export default container;

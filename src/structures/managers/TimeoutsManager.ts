@@ -83,14 +83,17 @@ export default class TimeoutsManager {
 
       this.bigTimeout(async () => {
         if (await this.bot.redis.exists(timedate)) {
-          await this.bot.punishments.punish(
-            { id: member, guild },
-            new Punishment(task as PunishmentType, {
-              moderator: this.bot.client.user,
-            }),
-            "time's up"
-          );
-          await this.bot.redis.del(timedate);
+          try {
+            await this.bot.punishments.punish(
+              { id: member, guild },
+              new Punishment(task as PunishmentType, {
+                moderator: this.bot.client.user,
+              }),
+              "time's up"
+            );
+          } finally {
+            await this.bot.redis.del(timedate);
+          }
         }
       }, start - Date.now() + amount);
     }

@@ -38,7 +38,11 @@ export default class WarnCommand extends Command {
 
     const punishments = await this.bot.punishments.addWarning(member!);
     for (let i of punishments)
-      await this.bot.punishments.punish(member!, i, 'Automod');
+      try {
+        await this.bot.punishments.punish(member!, i, 'Automod');
+      } catch (e) {
+        return ctx.send(`Unable to punish, ${e.message}`);
+      }
     const warns = await this.bot.warnings.get(ctx.guild.id, member.id);
     return ctx.send(
       `Successfully warned ${member.username}#${

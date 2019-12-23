@@ -254,10 +254,10 @@ export default class PunishmentManager {
     }
     if (punishment.type !== 'role' && punishment.type !== 'unrole') {
       if (member instanceof Member)
-        this.postToModLog(member, punishment, reason);
+        return this.postToModLog(member, punishment, reason);
       else {
         const user = await this.bot.client.getRESTUser(member.id);
-        this.postToModLog(
+        return this.postToModLog(
           {
             username: user.username,
             discriminator: user.discriminator,
@@ -304,43 +304,51 @@ export default class PunishmentManager {
         member.id,
         reason
       );
-      const message = await modlog.createMessage({
-        embed: new EmbedBuilder()
-          .setTitle(
-            `Case #${c.id} **|** ${member.username} has been ${punishment.type +
-              action.suffix}!`
-          )
-          .setDescription(
-            stripIndents`
-                        **User**: ${member.username}#${
-              member.discriminator
-            } (ID: ${member.id})
-                        **Moderator**: ${
-                          punishment.options.moderator.username
-                        }#${punishment.options.moderator.discriminator} (ID: ${
-              punishment.options.moderator.id
-            })
-                        **Reason**: ${reason || 'Unknown'}${
-              !!punishment.options.soft ? '\n**Type**: Soft Ban' : ''
-            }${
-              !punishment.options.soft && !!punishment.options.temp
-                ? `\n**Time**: ${ms(punishment.options.temp, { long: true })}`
-                : ''
-            }
-                    `
-          )
-          .setColor(action.action)
-          .build(),
-      });
-      await this.bot.cases.update(
-        member.guild.id,
-        c.id,
-        { message: message.id },
-        e => {
-          if (!!e)
-            this.bot.logger.log('error', `Couldn't update the case: ${e}`);
-        }
-      );
+      try {
+        const message = await modlog.createMessage({
+          embed: new EmbedBuilder()
+            .setTitle(
+              `Case #${c.id} **|** ${
+                member.username
+              } has been ${punishment.type + action.suffix}!`
+            )
+            .setDescription(
+              stripIndents`
+                          **User**: ${member.username}#${
+                member.discriminator
+              } (ID: ${member.id})
+                          **Moderator**: ${
+                            punishment.options.moderator.username
+                          }#${
+                punishment.options.moderator.discriminator
+              } (ID: ${punishment.options.moderator.id})
+                          **Reason**: ${reason || 'Unknown'}${
+                !!punishment.options.soft ? '\n**Type**: Soft Ban' : ''
+              }${
+                !punishment.options.soft && !!punishment.options.temp
+                  ? `\n**Time**: ${ms(punishment.options.temp, { long: true })}`
+                  : ''
+              }
+                      `
+            )
+            .setColor(action.action)
+            .build(),
+        });
+        await this.bot.cases.update(
+          member.guild.id,
+          c.id,
+          { message: message.id },
+          e => {
+            if (!!e)
+              this.bot.logger.log('error', `Couldn't update the case: ${e}`);
+          }
+        );
+      } catch (e) {
+        console.error(e);
+        throw { message: 'Cannot write to the mod-log!' };
+      }
+    } else {
+      throw { message: 'Cannot write to the mod-log!' };
     }
   }
 

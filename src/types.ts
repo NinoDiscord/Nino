@@ -11,4 +11,5 @@ export const TYPES = {
   TimeoutsManager: Symbol.for('TimeoutsManager'),
   GuildSettings: Symbol.for('GuildSettings'),
   BotListService: Symbol.for('BotListService'),
+  StatusManager: Symbol.for('StatusManager'),
 };

@@ -59,11 +59,15 @@ export default class MuteCommand extends Command {
     });
 
     await this.bot.timeouts.cancelTimeout(member.id, ctx.guild, 'unmute');
-    await ctx.send('User successfully muted.');
-    await this.bot.punishments.punish(
-      member!,
-      punishment,
-      reason as string | undefined
-    );
+    try {
+      await this.bot.punishments.punish(
+        member!,
+        punishment,
+        reason as string | undefined
+      );
+      await ctx.send('User successfully muted.');
+    } catch (e) {
+      ctx.send('Cannot mute user, ' + e.message);
+    }
   }
 }
