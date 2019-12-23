@@ -97,7 +97,8 @@ export default class PunishmentManager {
     if (!settings) return [];
 
     let warnings = await this.bot.warnings.get(member.guild.id, member.id);
-    if (!warnings) warnings = this.bot.warnings.create(member.guild.id, member.id);
+    if (!warnings)
+      warnings = this.bot.warnings.create(member.guild.id, member.id);
     else
       await this.bot.warnings.update(member.guild.id, member.id, {
         amount: Math.min(warnings.amount + 1, 5),
