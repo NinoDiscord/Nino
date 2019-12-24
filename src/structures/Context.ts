@@ -6,6 +6,7 @@ import {
   EmbedOptions,
   Member,
   Client,
+  Channel,
 } from 'eris';
 import MessageCollector from './MessageCollector';
 import ArgumentParser from './parsers/ArgumentParser';
@@ -56,20 +57,34 @@ export default class CommandContext {
     return this.bot.client;
   }
 
-  get guild(): Guild {
+  get guild(): Guild | undefined {
+    if (!(this.message.channel instanceof TextChannel)) {
+      return undefined;
+    }
     return (this.message.channel as TextChannel).guild;
+  }
+
+  get channel(): Channel {
+    return this.message.channel;
   }
 
   get sender(): User {
     return this.message.author;
   }
 
+  get member(): Member | undefined {
+    if (this.guild) {
+      return this.guild.members.get(this.sender.id);
+    }
+  }
+
   get me(): Member {
-    return this.guild.members.get(this.bot.client.user.id)!;
+    return this.guild!.members.get(this.bot.client.user.id)!;
   }
 
   get settings(): Promise<GuildModel> {
-    return this.bot.settings.getOrCreate(this.guild.id);
+    if (this.guild) return this.bot.settings.getOrCreate(this.guild.id);
+    return Promise.reject('not in a guild');
   }
 
   get redis(): IORedis.Redis {

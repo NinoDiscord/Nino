@@ -12,25 +12,31 @@ import 'reflect-metadata';
 export class CommandInvocation {
   command: NinoCommand;
   ctx: CommandContext;
-  user: Member | User;
-  bot: Member | User;
-  channel: Channel;
   onetime: boolean;
 
   constructor(
     command: NinoCommand,
-    user: Member | User,
-    bot: Member | User,
-    channel: Channel,
     ctx: CommandContext,
     onetime: boolean = false
   ) {
     this.command = command;
-    this.user = user;
-    this.bot = bot;
-    this.channel = channel;
     this.ctx = ctx;
     this.onetime = onetime;
+  }
+
+  get user(): Member | User {
+    return this.ctx.member || this.ctx.sender;
+  }
+
+  get bot(): Member | User {
+    if (this.ctx.guild) {
+      return this.ctx.me;
+    }
+    return this.ctx.client.user;
+  }
+
+  get channel(): Channel {
+    return this.ctx.channel;
   }
 
   /**
@@ -116,24 +122,11 @@ export default class CommandService {
         ctx.args.args = [cmd.name];
         return new CommandInvocation(
           this.bot.manager.commands.get('help')!,
-          m.member || m.author,
-          m.member
-            ? m.member!.guild.members[ctx.bot.client.user.id]
-            : ctx.bot.client.user,
-          m.channel,
           ctx,
           true
         ); // If the --help or --h flag is ran, it'll send the embed and won't run the parent/children commands
       }
-      return new CommandInvocation(
-        cmd,
-        m.member || m.author,
-        m.member
-          ? m.member!.guild.members[ctx.bot.client.user.id]
-          : ctx.bot.client.user,
-        m.channel,
-        ctx
-      );
+      return new CommandInvocation(cmd, ctx);
     }
     return undefined;
   }
