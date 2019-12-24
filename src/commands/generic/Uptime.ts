@@ -15,6 +15,6 @@ export default class UptimeCommand extends Command {
   }
 
   async run(ctx: Context) {
-    return ctx.send(humanize(Date.now() - this.bot.client.startTime));
+    return ctx.send(humanize(Date.now() - ctx.client.startTime));
   }
 }

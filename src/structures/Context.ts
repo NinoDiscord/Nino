@@ -1,8 +1,18 @@
-import { Message, Guild, TextChannel, User, EmbedOptions, Member } from 'eris';
+import {
+  Message,
+  Guild,
+  TextChannel,
+  User,
+  EmbedOptions,
+  Member,
+  Client,
+} from 'eris';
 import MessageCollector from './MessageCollector';
 import ArgumentParser from './parsers/ArgumentParser';
 import FlagParser from './parsers/FlagParser';
 import Bot from './Bot';
+import { GuildModel } from '../models/GuildSchema';
+import IORedis = require('ioredis');
 
 export interface DMOptions {
   user: User;
@@ -16,9 +26,6 @@ export default class CommandContext {
   public args: ArgumentParser;
   public flags: FlagParser;
   public collector: MessageCollector;
-  public guild: Guild;
-  public sender: User;
-  public me: Member;
 
   constructor(bot: Bot, m: Message, args: string[]) {
     Object.assign<this, Message>(this, m);
@@ -27,10 +34,7 @@ export default class CommandContext {
     this.message = m;
     this.args = new ArgumentParser(args);
     this.flags = new FlagParser(args);
-    this.guild = (m.channel as TextChannel).guild;
-    this.sender = m.author;
     this.collector = new MessageCollector(bot.client);
-    this.me = this.guild.members.get(bot.client.user.id)!;
   }
 
   send(content: string) {
@@ -46,6 +50,30 @@ export default class CommandContext {
   code(lang: string, content: string) {
     const cb = '```';
     return this.send(`${cb}${lang}\n${content}${cb}`);
+  }
+
+  get client(): Client {
+    return this.bot.client;
+  }
+
+  get guild(): Guild {
+    return (this.message.channel as TextChannel).guild;
+  }
+
+  get sender(): User {
+    return this.message.author;
+  }
+
+  get me(): Member {
+    return this.guild.members.get(this.bot.client.user.id)!;
+  }
+
+  get settings(): Promise<GuildModel> {
+    return this.bot.settings.getOrCreate(this.guild.id);
+  }
+
+  get redis(): IORedis.Redis {
+    return this.bot.redis;
   }
 
   async dm(options: DMOptions) {

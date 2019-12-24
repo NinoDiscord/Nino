@@ -125,7 +125,7 @@ export default class SettingsCommand extends Command {
       return ctx.send(
         'The index of the punishment is required, see the index in `x!settings view`.'
       );
-    const settings = await ctx.bot.settings.get(ctx.guild.id);
+    const settings = await ctx.settings;
     if (!settings) return ctx.send('There are no punishments!');
     if (Number(index) <= settings!.punishments.length)
       settings!.punishments.splice(Math.round(Number(index)) - 1, 1);
@@ -596,7 +596,7 @@ export default class SettingsCommand extends Command {
   }
 
   async view(ctx: Context) {
-    const settings = await this.bot.settings.get(ctx.guild.id);
+    const settings = await ctx.settings;
     const embed = this.bot
       .getEmbed()
       .setTitle(`Configuration for ${ctx.guild.name}`)

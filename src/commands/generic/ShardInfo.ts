@@ -15,7 +15,7 @@ export default class ShardInfoCommand extends Command {
 
   async run(ctx: Context) {
     let shardinfo = '';
-    this.bot.client.shards.map(
+    ctx.client.shards.map(
       shard =>
         (shardinfo += `${
           shard.status === 'disconnected'
@@ -31,7 +31,7 @@ export default class ShardInfoCommand extends Command {
       this.bot
         .getEmbed()
         .setTitle(
-          `${this.bot.client.user.username}#${this.bot.client.user.discriminator} | Shard Information`
+          `${ctx.client.user.username}#${ctx.client.user.discriminator} | Shard Information`
         )
         .setDescription(`\`\`\`diff\n${shardinfo}\`\`\``)
         .build()

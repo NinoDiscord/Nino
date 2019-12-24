@@ -41,16 +41,16 @@ export default class StatisticsCommand extends Command {
 
     return ctx.send(stripIndents`
             \`\`\`prolog
-            Guilds              ~> ${this.bot.client.guilds.size.toLocaleString()}
-            Users               ~> ${this.bot.client.users.size.toLocaleString()}
+            Guilds              ~> ${ctx.client.guilds.size.toLocaleString()}
+            Users               ~> ${ctx.client.users.size.toLocaleString()}
             Channels            ~> ${Object.keys(
-              this.bot.client.channelGuildMap
+              ctx.client.channelGuildMap
             ).length.toLocaleString()}
             Shards [C/T]        ~> [${ctx.guild.shard.id}/${
-      this.bot.client.shards.size
+      ctx.client.shards.size
     }]
             Uptime              ~> ${humanize(
-              Date.now() - this.bot.client.startTime
+              Date.now() - ctx.client.startTime
             )}
             Commands            ~> ${this.bot.manager.commands.size}
             Messages Seen       ~> ${this.bot.stats.messagesSeen.toLocaleString()}

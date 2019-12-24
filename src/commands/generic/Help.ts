@@ -17,7 +17,7 @@ export default class HelpCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const settings = await this.bot.settings.get(ctx.guild.id);
+    const settings = await ctx.settings;
     const categories: {
       [x: string]: string[];
     } = {};
@@ -34,7 +34,7 @@ export default class HelpCommand extends Command {
       const embed = this.bot
         .getEmbed()
         .setTitle(
-          `${this.bot.client.user.username}#${this.bot.client.user.discriminator} | Commands List`
+          `${ctx.client.user.username}#${ctx.client.user.discriminator} | Commands List`
         )
         .setDescription(
           stripIndents`
@@ -49,10 +49,11 @@ export default class HelpCommand extends Command {
         );
 
       for (const cat in categories)
-        embed.addField(
-          cat.toUpperCase(),
-          categories[cat].map(s => `\`${s}\``).join(', ')
-        );
+        if (cat.length > 0)
+          embed.addField(
+            cat.toUpperCase(),
+            categories[cat].map(s => `\`${s}\``).join(', ')
+          );
 
       return ctx.embed(embed.build());
     } else {
