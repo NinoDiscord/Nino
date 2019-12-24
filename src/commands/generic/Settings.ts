@@ -81,7 +81,7 @@ export default class SettingsCommand extends Command {
       !!roleid &&
       (typeof roleid === 'boolean' ||
         (typeof roleid === 'string' &&
-          (!/^[0-9]+$/.test(roleid) || !ctx.guild.roles.get(roleid))))
+          (!/^[0-9]+$/.test(roleid) || !ctx.guild!.roles.get(roleid))))
     )
       return ctx.send('Incorrect role id.');
     const days = ctx.flags.get('days');
@@ -95,7 +95,7 @@ export default class SettingsCommand extends Command {
       );
 
     this.bot.settings.update(
-      ctx.guild.id,
+      ctx.guild!.id,
       {
         $push: {
           punishments: {
@@ -141,7 +141,7 @@ export default class SettingsCommand extends Command {
         if (!channelId || !/^[0-9]+$/.test(channelId))
           return ctx.send('Please set a valid id!');
         this.bot.settings.update(
-          ctx.guild.id,
+          ctx.guild!.id,
           {
             $set: {
               modlog: channelId,
@@ -169,7 +169,7 @@ export default class SettingsCommand extends Command {
             ":x: Hey! Why are you pinging everyone?! We don't allow at everyone pings as prefixes."
           );
         this.bot.settings.update(
-          ctx.guild.id,
+          ctx.guild!.id,
           {
             $set: {
               prefix,
@@ -192,7 +192,7 @@ export default class SettingsCommand extends Command {
         if (!mutedRole || !/^[0-9]+$/.test(mutedRole))
           return ctx.send('Please set a valid id!');
         this.bot.settings.update(
-          ctx.guild.id,
+          ctx.guild!.id,
           {
             $set: {
               mutedRole,
@@ -214,7 +214,7 @@ export default class SettingsCommand extends Command {
         else if (bool === 'false') boole = false;
         else return ctx.send('Invalid boolean');
         this.bot.settings.update(
-          ctx.guild.id,
+          ctx.guild!.id,
           {
             $set: {
               'automod.dehoist': boole,
@@ -245,7 +245,7 @@ export default class SettingsCommand extends Command {
           else return ctx.send('Invalid boolean');
 
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.spam': boole,
@@ -275,7 +275,7 @@ export default class SettingsCommand extends Command {
           else if (bool === 'false') boole = false;
           else return ctx.send('Invalid boolean');
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.mention': boole,
@@ -308,7 +308,7 @@ export default class SettingsCommand extends Command {
           else return ctx.send('Invalid boolean');
 
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.raid': boole,
@@ -336,7 +336,7 @@ export default class SettingsCommand extends Command {
           if (!wordlist || wordlist.length === 0) enabled = false;
 
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.badwords.enabled': enabled,
@@ -372,7 +372,7 @@ export default class SettingsCommand extends Command {
           else return ctx.send('Invalid boolean');
 
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.invites': boole,
@@ -406,7 +406,7 @@ export default class SettingsCommand extends Command {
       case 'punishments':
         {
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 punishments: [],
@@ -422,7 +422,7 @@ export default class SettingsCommand extends Command {
         break;
       case 'modlog': {
         this.bot.settings.update(
-          ctx.guild.id,
+          ctx.guild!.id,
           {
             $set: {
               modlog: null,
@@ -437,7 +437,7 @@ export default class SettingsCommand extends Command {
       }
       case 'prefix': {
         this.bot.settings.update(
-          ctx.guild.id,
+          ctx.guild!.id,
           {
             $set: {
               prefix: 'x!',
@@ -456,7 +456,7 @@ export default class SettingsCommand extends Command {
 
       case 'mutedrole': {
         this.bot.settings.update(
-          ctx.guild.id,
+          ctx.guild!.id,
           {
             $set: {
               mutedRole: null,
@@ -473,7 +473,7 @@ export default class SettingsCommand extends Command {
       case 'automod.dehoist':
         {
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.dehoist': false,
@@ -492,7 +492,7 @@ export default class SettingsCommand extends Command {
       case 'automod.mention':
         {
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.mention': false,
@@ -511,7 +511,7 @@ export default class SettingsCommand extends Command {
       case 'automod.spam':
         {
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.spam': false,
@@ -536,7 +536,7 @@ export default class SettingsCommand extends Command {
           else return ctx.send('Invalid boolean');
 
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.raid': boole,
@@ -553,7 +553,7 @@ export default class SettingsCommand extends Command {
       case 'automod.swears':
         {
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.badwords.enabled': false,
@@ -573,7 +573,7 @@ export default class SettingsCommand extends Command {
       case 'automod.invites':
         {
           this.bot.settings.update(
-            ctx.guild.id,
+            ctx.guild!.id,
             {
               $set: {
                 'automod.invites': false,
@@ -599,20 +599,20 @@ export default class SettingsCommand extends Command {
     const settings = await ctx.settings;
     const embed = this.bot
       .getEmbed()
-      .setTitle(`Configuration for ${ctx.guild.name}`)
+      .setTitle(`Configuration for ${ctx.guild!.name}`)
       .setDescription(
         stripIndents`
                 \`\`\`ini
                 [prefix]: ${settings!.prefix}
                 [mutedrole]: ${
                   settings!.mutedRole
-                    ? ctx.guild.roles.get(settings!.mutedRole)!.name
+                    ? ctx.guild!.roles.get(settings!.mutedRole)!.name
                     : 'None'
                 }
                 [modlog]: ${
                   settings!.modlog === null
                     ? 'No channel was set.'
-                    : ctx.guild.channels.get(settings!.modlog)!.name
+                    : ctx.guild!.channels.get(settings!.modlog)!.name
                 }
                 [automod.dehoist]: ${settings!.automod.dehoist ? 'Yes' : 'No'}
                 [automod.mention]: ${settings!.automod.mention ? 'Yes' : 'No'}
@@ -635,8 +635,8 @@ export default class SettingsCommand extends Command {
                       }${
                         !!p.roleid
                           ? ` Role: ${
-                              !!ctx.guild.roles.get(p.roleid)
-                                ? ctx.guild.roles.get(p.roleid)!.name
+                              !!ctx.guild!.roles.get(p.roleid)
+                                ? ctx.guild!.roles.get(p.roleid)!.name
                                 : ''
                             }`
                           : ''
@@ -648,7 +648,7 @@ export default class SettingsCommand extends Command {
       )
       .setFooter(
         "You're viewing the configuration because you didn't specify a subcommand",
-        this.bot.client.users.get(ctx.guild.ownerID)!.avatarURL
+        this.bot.client.users.get(ctx.guild!.ownerID)!.avatarURL
       );
 
     return ctx.embed(embed.build());

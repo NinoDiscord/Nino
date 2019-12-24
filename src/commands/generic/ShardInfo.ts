@@ -24,7 +24,7 @@ export default class ShardInfoCommand extends Command {
             ? '*'
             : '+'
         } Shard #${shard.id} ${
-          ctx.guild.shard.id === shard.id ? '(current)' : ''
+          ctx.guild!.shard.id === shard.id ? '(current)' : ''
         }: ${shard.latency}ms\n`)
     );
     return ctx.embed(

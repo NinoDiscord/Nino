@@ -33,10 +33,10 @@ export default class BanCommand extends Command {
     let member:
       | Member
       | undefined
-      | { id: string; guild: Guild } = ctx.guild.members.get(u);
+      | { id: string; guild: Guild } = ctx.guild!.members.get(u);
 
     if (!member || !(member instanceof Member))
-      member = { id: u, guild: ctx.guild };
+      member = { id: u, guild: ctx.guild! };
     else {
       if (!PermissionUtils.above(ctx.message.member!, member))
         return ctx.send('The user is above you in the heirarchy.');

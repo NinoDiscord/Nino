@@ -46,7 +46,7 @@ export default class StatisticsCommand extends Command {
             Channels            ~> ${Object.keys(
               ctx.client.channelGuildMap
             ).length.toLocaleString()}
-            Shards [C/T]        ~> [${ctx.guild.shard.id}/${
+            Shards [C/T]        ~> [${ctx.guild!.shard.id}/${
       ctx.client.shards.size
     }]
             Uptime              ~> ${humanize(
