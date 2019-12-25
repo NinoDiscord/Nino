@@ -102,20 +102,15 @@ export default class CommandService {
    * @param m the message object
    */
   getCommandInvocation(
-    args: string[],
-    m: Message
+    ctx: CommandContext
   ): CommandInvocation | undefined {
-    if (args.length == 0) {
+    if (ctx.args.args.length == 0) {
       return undefined;
     }
-    const name = args.shift()!;
-    const command = this.bot.manager.commands.filter(
-      c => c.name === name || c.aliases!.includes(name)
-    );
-    const ctx = new CommandContext(this.bot, m, args);
+    const name = ctx.args.args.shift()!;
+    const cmd = ctx.bot.manager.getCommand(name);
 
-    if (command.length > 0) {
-      const cmd = command[0];
+    if (cmd) {
       const helpFlag = ctx.flags.get('help') || ctx.flags.get('h');
       if (helpFlag && typeof helpFlag === 'boolean') {
         ctx.flags.flags = '';
@@ -167,9 +162,10 @@ export default class CommandService {
       .slice(prefix.length)
       .trim()
       .split(/ +/g);
+    
+    const ctx = new CommandContext(this.bot, m, args);
     const invocation: CommandInvocation | undefined = this.getCommandInvocation(
-      args,
-      m
+      ctx
     );
 
     if (invocation) {
