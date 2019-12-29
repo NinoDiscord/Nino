@@ -19,7 +19,7 @@ export default class EventManager {
   constructor(
     @inject(TYPES.Bot) bot: Bot,
     @multiInject(TYPES.Event) events: Event[]
-    ) {
+  ) {
     this.bot = bot;
     this.events = events;
   }

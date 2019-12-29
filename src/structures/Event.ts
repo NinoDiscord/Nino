@@ -61,8 +61,8 @@ export type Emittable =
   | 'shardReady'
   | 'shardResume'
   | 'messageDelete';
-  @injectable()
-  export default class NinoEvent {
+@injectable()
+export default class NinoEvent {
   public bot: Client;
   public event: Emittable;
 

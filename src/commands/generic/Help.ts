@@ -7,7 +7,7 @@ import { TYPES } from '../../types';
 
 @injectable()
 export default class HelpCommand extends Command {
-  constructor(@inject(TYPES.Bot)  client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'help',
       description: (bot: Bot) =>

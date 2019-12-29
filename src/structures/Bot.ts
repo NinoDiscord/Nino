@@ -95,9 +95,7 @@ export default class Bot {
         process: process,
         format: `${colors.bgBlueBright(
           process.pid.toString()
-        )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.green(
-          '[INFO]'
-        )} <=> `,
+        )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.green('[INFO]')} <=> `,
       }),
       new ConsoleTransport({
         name: 'error',
@@ -159,7 +157,6 @@ export default class Bot {
       messagesSeen: new Counter({
         name: 'nino_messages_seen',
         help: 'Total messages that have been seen by Nino',
-        
       }),
       commandsExecuted: new Counter({
         name: 'nino_commands_executed',
@@ -175,7 +172,7 @@ export default class Bot {
         res.writeHead(200, { 'Content-Type': register.contentType });
         res.write(register.metrics());
       }
-  
+
       res.end();
     });
   }

@@ -14,8 +14,6 @@ init({
   release: `${pkg.version} (${config.mode})`,
 });
 
-bot
-  .build()
-  .catch(ex => {
-    bot.logger.log('error', 'Unable to build:\n' + ex.stack);
-  });
+bot.build().catch(ex => {
+  bot.logger.log('error', 'Unable to build:\n' + ex.stack);
+});

@@ -34,7 +34,7 @@ export default class CommandManager {
       }
     }
   }
-  
+
   /**
    * Returns the command matching the name given
    * @param name the name or alias of the command

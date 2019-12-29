@@ -151,42 +151,135 @@ container
   .inSingletonScope();
 
 // Generic Commands
-container.bind<NinoCommand>(TYPES.Command).to(HelpCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(InviteCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(PingCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(SettingsCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(ShardInfoCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(StatisticsCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(UptimeCommand).inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(HelpCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(InviteCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(PingCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(SettingsCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(ShardInfoCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(StatisticsCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(UptimeCommand)
+  .inSingletonScope();
 
 // Moderation Commands
-container.bind<NinoCommand>(TYPES.Command).to(BanCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(KickCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(LockdownCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(MuteCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(PardonCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(PruneCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(ReasonCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(UnbanCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(UnmuteCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(WarnCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(WarningsCommand).inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(BanCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(KickCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(LockdownCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(MuteCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(PardonCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(PruneCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(ReasonCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(UnbanCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(UnmuteCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(WarnCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(WarningsCommand)
+  .inSingletonScope();
 
 // Other Commands
-container.bind<NinoCommand>(TYPES.Command).to(EvalCommand).inSingletonScope();
-container.bind<NinoCommand>(TYPES.Command).to(ShellCommand).inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(EvalCommand)
+  .inSingletonScope();
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(ShellCommand)
+  .inSingletonScope();
 
 // Events
-container.bind<NinoEvent>(TYPES.Event).to(GuildJoinedEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(GuildLeftEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(GuildMemberJoinedEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(GuildMemberUpdateEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(MessageReceivedEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(MessageUpdatedEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(ReadyEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(ShardDisconnectedEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(ShardReadyEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(ShardResumedEvent).inSingletonScope();
-container.bind<NinoEvent>(TYPES.Event).to(UserUpdateEvent).inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(GuildJoinedEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(GuildLeftEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(GuildMemberJoinedEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(GuildMemberUpdateEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(MessageReceivedEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(MessageUpdatedEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(ReadyEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(ShardDisconnectedEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(ShardReadyEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(ShardResumedEvent)
+  .inSingletonScope();
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(UserUpdateEvent)
+  .inSingletonScope();
 
 export default container;

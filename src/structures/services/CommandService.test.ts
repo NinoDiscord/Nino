@@ -35,15 +35,10 @@ describe('CommandService', () => {
     jest.clearAllMocks();
   });
 
-
   it('it should create a command invocation', () => {
     const message = { content: '!help hi' } as Message;
     const args = ['help', 'hi'];
-    const context = new CommandContext(
-        bot,
-        message,
-        args
-      );
+    const context = new CommandContext(bot, message, args);
     expect(context).toBeDefined();
     expect(context.args).toBeDefined();
     expect(context.args.args).toEqual(expect.arrayContaining(args));
@@ -55,11 +50,7 @@ describe('CommandService', () => {
   it('it should not create a command invocation', () => {
     const message = { content: '' } as Message;
     const args = [];
-    const context = new CommandContext(
-        bot,
-        message,
-        args
-      );
+    const context = new CommandContext(bot, message, args);
     expect(context).toBeDefined();
     expect(context.args).toBeDefined();
     expect(context.args.args).toEqual(expect.arrayContaining(args));
@@ -70,53 +61,47 @@ describe('CommandService', () => {
   it('it should be able to invoke the command', () => {
     const message = { content: '!help hi' } as Message;
     const args = ['help', 'hi'];
-    const context = new CommandContext(
-        bot,
-        message,
-        args
-      );
+    const context = new CommandContext(bot, message, args);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
     expect(invocation!.canInvoke()).toBeUndefined();
   });
 
-  it('it should not be able to invoke the command because it\'s disabled', () => {
+  it("it should not be able to invoke the command because it's disabled", () => {
     bot.manager.getCommand('help')!.disabled = true;
     const message = { content: '!help hi' } as Message;
     const args = ['help', 'hi'];
-    const context = new CommandContext(
-        bot,
-        message,
-        args
-      );
+    const context = new CommandContext(bot, message, args);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
     expect(invocation!.canInvoke()).toEqual('Command `help` is disabled.');
   });
 
   it('it should not be able to invoke the command because the command is guild only', () => {
-    const message = { content: '!settings', channel: {type: 0} as TextableChannel } as Message;
+    const message = {
+      content: '!settings',
+      channel: { type: 0 } as TextableChannel,
+    } as Message;
     const args = ['settings'];
-    const context = new CommandContext(
-        bot,
-        message,
-        args
-      );
+    const context = new CommandContext(bot, message, args);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
-    expect(invocation!.canInvoke()).toEqual('Sorry, but you need to be in a guild to execute the `settings` command.');
+    expect(invocation!.canInvoke()).toEqual(
+      'Sorry, but you need to be in a guild to execute the `settings` command.'
+    );
   });
 
   it('it should not be able to invoke the command because the command is owner only', () => {
-    const message = { content: '!eval', author: {id: '1'} as User } as Message;
+    const message = {
+      content: '!eval',
+      author: { id: '1' } as User,
+    } as Message;
     const args = ['eval'];
-    const context = new CommandContext(
-        bot,
-        message,
-        args
-      );
+    const context = new CommandContext(bot, message, args);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
-    expect(invocation!.canInvoke()).toEqual('Sorry, but you need to be a developer to execute the `eval` command.');
+    expect(invocation!.canInvoke()).toEqual(
+      'Sorry, but you need to be a developer to execute the `eval` command.'
+    );
   });
 });
