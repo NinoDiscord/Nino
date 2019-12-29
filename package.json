@@ -10,7 +10,7 @@
         "dev": "nodemon dist/index.js",
         "lint": "prettier --write --single-quote --trailing-comma es5 --parser typescript \"src/**/*.ts\"",
         "clean": "rm -fr dist",
-        "test": "jest"
+        "test": "jest --detectOpenHandles"
     },
     "maintainers": [
         "August (auguwu)",
