@@ -2,6 +2,7 @@ export const TYPES = {
   Bot: Symbol.for('Bot'),
   Config: Symbol.for('Config'),
   Client: Symbol.for('Client'),
+  Command: Symbol.for('Command'),
   CommandManager: Symbol.for('CommandManager'),
   CommandService: Symbol.for('CommandService'),
   AutoModService: Symbol.for('AutoModService'),

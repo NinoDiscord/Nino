@@ -2,9 +2,12 @@ import { Constants } from 'eris';
 import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class ReasonCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'reason',
       description: 'Updates a case reason',
@@ -23,15 +26,15 @@ export default class ReasonCommand extends Command {
 
     const caseID = ctx.args.get(0);
     const reason = ctx.args.args.slice(1).join(' ');
-    const _case = await this.bot.cases.get(ctx.guild.id, parseInt(caseID));
-    const settings = await this.bot.settings.get(ctx.guild.id);
+    const _case = await this.bot.cases.get(ctx.guild!.id, parseInt(caseID));
+    const settings = await this.bot.settings.get(ctx.guild!.id);
 
     if (!_case || _case === null)
       return ctx.send(`Case #${caseID} was not found.`);
     _case.reason = reason;
 
     await this.bot.cases.update(
-      ctx.guild.id,
+      ctx.guild!.id,
       parseInt(caseID),
       {
         $set: {

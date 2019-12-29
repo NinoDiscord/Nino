@@ -92,32 +92,12 @@ export default class Bot {
   @lazyInject(TYPES.BotListService) public botlistservice!: BotListService;
   @lazyInject(TYPES.GuildSettings) public settings!: GuildSettings;
   @lazyInject(TYPES.StatusManager) public status!: StatusManager;
-  public logger: instance;
+  public logger!: instance;
   public warnings: Warning = new Warning();
   public redis: Redis;
   public cases: CaseSettings = new CaseSettings();
-  public prom = {
-    messagesSeen: new Counter({
-      name: 'nino_messages_seen',
-      help: 'Total messages that have been seen by Nino',
-    }),
-    commandsExecuted: new Counter({
-      name: 'nino_commands_executed',
-      help: 'The number of times commands have been executed.',
-    }),
-    guildCount: new Gauge({
-      name: 'nino_guild_count',
-      help: 'The number of guilds Nino is in.',
-    }),
-  };
-  public promServer = createServer((req, res) => {
-    if (parse(req.url!).pathname === '/metrics') {
-      res.writeHead(200, { 'Content-Type': register.contentType });
-      res.write(register.metrics());
-    }
-
-    res.end();
-  });
+  public prom;
+  public promServer;
   public owners: string[];
   public stats: CommandStats = {
     commandsExecuted: 0,
@@ -138,6 +118,35 @@ export default class Bot {
       host: config.redis.host,
       db: config.redis.database,
     });
+  }
+
+  startPrometheus() {
+    this.prom = {
+      messagesSeen: new Counter({
+        name: 'nino_messages_seen',
+        help: 'Total messages that have been seen by Nino',
+        
+      }),
+      commandsExecuted: new Counter({
+        name: 'nino_commands_executed',
+        help: 'The number of times commands have been executed.',
+      }),
+      guildCount: new Gauge({
+        name: 'nino_guild_count',
+        help: 'The number of guilds Nino is in.',
+      }),
+    };
+    this.promServer = createServer((req, res) => {
+      if (parse(req.url!).pathname === '/metrics') {
+        res.writeHead(200, { 'Content-Type': register.contentType });
+        res.write(register.metrics());
+      }
+  
+      res.end();
+    });
+  }
+
+  async build() {
     this.logger = new instance({
       name: 'main',
       format: `${colors.bgBlueBright(
@@ -173,9 +182,8 @@ export default class Bot {
         new FileTransport({ file: 'data/Nino.log', format: '' }),
       ],
     });
-  }
-
-  async build() {
+    this.logger.log('info', 'Starting Prometheus...');
+    this.startPrometheus();
     collectDefaultMetrics();
     this.logger.log('info', 'Connecting to the database...');
     await this.database.connect();
@@ -186,8 +194,6 @@ export default class Bot {
     this.logger.log('info', 'Success! Connecting to Discord...');
     await this.client.connect();
     this.logger.log('discord', 'Connected to Discord!');
-    this.logger.log('info', 'Loading commands...');
-    await this.manager.start();
     this.logger.log('info', 'All set!');
   }
 

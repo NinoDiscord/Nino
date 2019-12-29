@@ -3,13 +3,16 @@ import { stripIndents } from 'common-tags';
 import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
 const weeks = Date.now() - 1000 * 60 * 60 * 24 * 14;
 
+@injectable()
 export default class PruneCommand extends Command {
   public filters: string[];
 
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'prune',
       description: 'Prunes messages from the current channel',

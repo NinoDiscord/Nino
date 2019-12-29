@@ -7,9 +7,12 @@ import Bot from '../../structures/Bot';
 import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class UnmuteCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'unmute',
       description: 'Unmutes a user from a guild',
@@ -29,7 +32,7 @@ export default class UnmuteCommand extends Command {
     const u = findUser(this.bot, ctx.args.get(0))!;
     if (!u) return ctx.send("I can't find this user!");
 
-    const member = ctx.guild.members.get(u.id);
+    const member = ctx.guild!.members.get(u.id);
 
     if (!member || member === null)
       return ctx.send(
@@ -43,7 +46,7 @@ export default class UnmuteCommand extends Command {
     if (reason && typeof reason === 'boolean')
       return ctx.send('You will need to specify a reason');
 
-    await this.bot.timeouts.cancelTimeout(member.id, ctx.guild, 'unmute');
+    await this.bot.timeouts.cancelTimeout(member.id, ctx.guild!, 'unmute');
     const punishment = new Punishment(PunishmentType.Unmute, {
       moderator: ctx.sender,
     });

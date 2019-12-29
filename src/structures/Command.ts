@@ -2,6 +2,7 @@ import Context from './Context';
 import Client from './Bot';
 import { Member, User, Channel } from 'eris';
 import PermissionUtils from '../util/PermissionUtils';
+import { injectable, unmanaged } from 'inversify';
 
 export interface CommandInfo {
   name: string;
@@ -24,6 +25,7 @@ export interface Subcommand {
   run: (client: Client, ctx: Context) => Promise<any>;
 }
 
+@injectable()
 export default class NinoCommand {
   public bot: Client;
   public name: string;
@@ -37,11 +39,10 @@ export default class NinoCommand {
   public hidden: boolean;
   public cooldown: number;
   public subcommands: Subcommand[];
-  public parent: string | null = null;
   public botpermissions: number;
   public userpermissions: number;
 
-  constructor(client: Client, info: CommandInfo) {
+  constructor(client: Client, @unmanaged() info: CommandInfo) {
     this.bot = client;
     this.name = info.name;
     this.description =
@@ -65,11 +66,6 @@ export default class NinoCommand {
     return ctx.send(
       `The command \`${this.name}\` is disabled due to no functionality.`
     );
-  }
-
-  setParent(category: string, filename: string) {
-    this.parent = `${category}:${filename}`;
-    return this;
   }
 
   format() {

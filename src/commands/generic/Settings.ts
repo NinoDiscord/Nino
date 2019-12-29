@@ -4,9 +4,12 @@ import Context from '../../structures/Context';
 import Command from '../../structures/Command';
 import { Constants } from 'eris';
 import ms = require('ms');
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class SettingsCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'settings',
       description: "View or edit the guild's settings.",

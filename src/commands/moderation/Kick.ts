@@ -8,9 +8,12 @@ import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import PermissionUtils from '../../util/PermissionUtils';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class KickCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'kick',
       description: 'Kicks a user from the guild',
@@ -30,7 +33,7 @@ export default class KickCommand extends Command {
     if (!u) {
       return ctx.send("I can't find this user!");
     }
-    const member = ctx.guild.members.get(u.id);
+    const member = ctx.guild!.members.get(u.id);
 
     if (!member)
       return ctx.send(

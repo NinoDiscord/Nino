@@ -5,9 +5,12 @@ import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import { execSync } from 'child_process';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class StatisticsCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'statistics',
       description: "Gives you the bot's statistics",

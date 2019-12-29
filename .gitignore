@@ -3,6 +3,9 @@ node_modules/
 dist/
 data/
 
+# Jest
+coverage/
+
 # Files
 application.yml
 *.lock

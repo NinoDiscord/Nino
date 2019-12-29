@@ -1,9 +1,12 @@
 import Bot from '../../structures/Bot';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class InviteCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'invite',
       description: 'Gives you the invite for the bot.',

@@ -10,9 +10,12 @@ import Context from '../../structures/Context';
 import ms = require('ms');
 import PermissionUtils from '../../util/PermissionUtils';
 import { Exception } from '@sentry/node';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class BanCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'ban',
       description: 'Ban a member in the current guild',

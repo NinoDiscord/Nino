@@ -2,9 +2,12 @@ import { stripIndents } from 'common-tags';
 import Bot from '../../structures/Bot';
 import Context from '../../structures/Context';
 import Command from '../../structures/Command';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class HelpCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot)  client: Bot) {
     super(client, {
       name: 'help',
       description: (bot: Bot) =>

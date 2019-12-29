@@ -7,9 +7,12 @@ import Bot from '../../structures/Bot';
 import { findId } from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class UnbanCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'unban',
       description: 'Unbans a user from a guild',
@@ -31,7 +34,7 @@ export default class UnbanCommand extends Command {
     if (!id)
       return ctx.send('Please type the id or mention the user (<@id>/<@!id>)');
 
-    if (!(await ctx.guild.getBans()).find(v => v.user.id === id))
+    if (!(await ctx.guild!.getBans()).find(v => v.user.id === id))
       return ctx.send('The user is not banned from this guild.');
 
     let reason =
@@ -41,14 +44,14 @@ export default class UnbanCommand extends Command {
     if (reason && typeof reason === 'boolean')
       return ctx.send('You will need to specify a reason');
 
-    await this.bot.timeouts.cancelTimeout(id, ctx.guild, 'unban');
+    await this.bot.timeouts.cancelTimeout(id, ctx.guild!, 'unban');
 
     const punishment = new Punishment(PunishmentType.Unban, {
       moderator: ctx.sender,
     });
     try {
       await this.bot.punishments.punish(
-        { id, guild: ctx.guild },
+        { id, guild: ctx.guild! },
         punishment,
         reason as string | undefined
       );

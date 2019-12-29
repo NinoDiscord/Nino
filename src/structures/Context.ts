@@ -6,7 +6,7 @@ import {
   EmbedOptions,
   Member,
   Client,
-  Channel,
+  TextableChannel,
 } from 'eris';
 import MessageCollector from './MessageCollector';
 import ArgumentParser from './parsers/ArgumentParser';
@@ -29,8 +29,6 @@ export default class CommandContext {
   public collector: MessageCollector;
 
   constructor(bot: Bot, m: Message, args: string[]) {
-    Object.assign<this, Message>(this, m);
-
     this.bot = bot;
     this.message = m;
     this.args = new ArgumentParser(args);
@@ -64,7 +62,7 @@ export default class CommandContext {
     return (this.message.channel as TextChannel).guild;
   }
 
-  get channel(): Channel {
+  get channel(): TextableChannel {
     return this.message.channel;
   }
 

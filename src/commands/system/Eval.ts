@@ -5,6 +5,8 @@ import Context from '../../structures/Context';
 import EmbedBuilder from '../../structures/EmbedBuilder';
 import ts from 'typescript';
 import { writeFileSync, unlinkSync } from 'fs';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
 class CompilerError extends Error {
   constructor(m: string) {
@@ -14,8 +16,9 @@ class CompilerError extends Error {
   }
 }
 
+@injectable()
 export default class EvalCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'eval',
       description: 'Evaluates JavaScript code and return a clean output',

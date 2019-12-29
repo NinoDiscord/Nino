@@ -3,9 +3,12 @@ import Command from '../../structures/Command';
 import { Constants, TextChannel, Role } from 'eris';
 import CommandContext from '../../structures/Context';
 import PermissionUtils from '../../util/PermissionUtils';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class LockdownCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'lockdown',
       description:
@@ -27,16 +30,16 @@ export default class LockdownCommand extends Command {
   getChannel(s: string, ctx: CommandContext): TextChannel | undefined {
     if (/^[0-9]+$/.test(s)) {
       // this is an id
-      const channel = ctx.guild.channels.get(s);
+      const channel = ctx.guild!.channels.get(s);
       if (!channel || channel.type === 0) return;
       return channel as TextChannel;
     } else if (/^<#[0-9]+>$/.test(s)) {
       // this is a channel mention
-      const channel = ctx.guild.channels.get(s.substring(2, s.length - 1));
+      const channel = ctx.guild!.channels.get(s.substring(2, s.length - 1));
       if (!channel || channel.type !== 0) return;
       return channel as TextChannel;
     }
-    return ctx.guild.channels.find(
+    return ctx.guild!.channels.find(
       x => x.type === 0 && x.name.toLowerCase() === s
     ) as TextChannel;
   }
@@ -44,12 +47,12 @@ export default class LockdownCommand extends Command {
   getRole(s: string, ctx: CommandContext): Role | undefined {
     if (/^[0-9]+$/.test(s)) {
       // this is an id
-      return ctx.guild.roles.get(s);
+      return ctx.guild!.roles.get(s);
     } else if (/^<@&[0-9]+>$/.test(s)) {
       // this is a channel mention
-      return ctx.guild.roles.get(s.substring(3, s.length - 1));
+      return ctx.guild!.roles.get(s.substring(3, s.length - 1));
     }
-    return ctx.guild.roles.find(x => x.name.toLowerCase() === s);
+    return ctx.guild!.roles.find(x => x.name.toLowerCase() === s);
   }
 
   async run(ctx: CommandContext) {
@@ -82,8 +85,8 @@ export default class LockdownCommand extends Command {
 
     const channels =
       ctx.args.args.findIndex(x => x === 'all') !== -1
-        ? ctx.guild.channels
-            .filter(c => c.type === 0)
+        ? ctx
+            .guild!.channels.filter(c => c.type === 0)
             .map(c => c as TextChannel)
         : ctx.args.args
             .map(x => this.getChannel(x, ctx))

@@ -9,9 +9,12 @@ import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import ms = require('ms');
 import PermissionUtils from '../../util/PermissionUtils';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class MuteCommand extends Command {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'mute',
       description: 'Mutes a member from this guild',
@@ -30,7 +33,7 @@ export default class MuteCommand extends Command {
 
     const u = findUser(this.bot, ctx.args.get(0))!;
     if (!u) return ctx.send("I can't find this user!");
-    const member = ctx.guild.members.get(u.id);
+    const member = ctx.guild!.members.get(u.id);
 
     if (!member)
       return ctx.send(
@@ -58,7 +61,7 @@ export default class MuteCommand extends Command {
       temp: t,
     });
 
-    await this.bot.timeouts.cancelTimeout(member.id, ctx.guild, 'unmute');
+    await this.bot.timeouts.cancelTimeout(member.id, ctx.guild!, 'unmute');
     try {
       await this.bot.punishments.punish(
         member!,

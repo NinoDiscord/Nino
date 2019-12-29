@@ -21,6 +21,27 @@ import TimeoutsManager from './structures/managers/TimeoutsManager';
 import GuildSettings from './structures/settings/GuildSettings';
 import BotListService from './structures/services/BotListService';
 import StatusManager from './structures/managers/StatusManager';
+import NinoCommand from './structures/Command';
+import HelpCommand from './commands/generic/Help';
+import InviteCommand from './commands/generic/Invite';
+import PingCommand from './commands/generic/Ping';
+import SettingsCommand from './commands/generic/Settings';
+import ShardInfoCommand from './commands/generic/ShardInfo';
+import StatisticsCommand from './commands/generic/Statistics';
+import UptimeCommand from './commands/generic/Uptime';
+import BanCommand from './commands/moderation/Ban';
+import KickCommand from './commands/moderation/Kick';
+import LockdownCommand from './commands/moderation/Lockdown';
+import MuteCommand from './commands/moderation/Mute';
+import PardonCommand from './commands/moderation/Pardon';
+import PruneCommand from './commands/moderation/Prune';
+import ReasonCommand from './commands/moderation/Reason';
+import UnbanCommand from './commands/moderation/Unban';
+import UnmuteCommand from './commands/moderation/Unmute';
+import WarnCommand from './commands/moderation/Warn';
+import WarningsCommand from './commands/moderation/Warnings';
+import EvalCommand from './commands/system/Eval';
+import ShellCommand from './commands/system/Shell';
 
 let config: Config;
 try {
@@ -116,5 +137,31 @@ container
   .bind<StatusManager>(TYPES.StatusManager)
   .to(StatusManager)
   .inSingletonScope();
+
+// Generic Commands
+container.bind<NinoCommand>(TYPES.Command).to(HelpCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(InviteCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(PingCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(SettingsCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(ShardInfoCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(StatisticsCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(UptimeCommand).inSingletonScope();
+
+// Moderation Commands
+container.bind<NinoCommand>(TYPES.Command).to(BanCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(KickCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(LockdownCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(MuteCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(PardonCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(PruneCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(ReasonCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(UnbanCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(UnmuteCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(WarnCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(WarningsCommand).inSingletonScope();
+
+// Other Commands
+container.bind<NinoCommand>(TYPES.Command).to(EvalCommand).inSingletonScope();
+container.bind<NinoCommand>(TYPES.Command).to(ShellCommand).inSingletonScope();
 
 export default container;
