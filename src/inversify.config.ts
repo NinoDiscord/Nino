@@ -42,6 +42,18 @@ import WarnCommand from './commands/moderation/Warn';
 import WarningsCommand from './commands/moderation/Warnings';
 import EvalCommand from './commands/system/Eval';
 import ShellCommand from './commands/system/Shell';
+import NinoEvent from './structures/Event';
+import GuildJoinedEvent from './events/GuildCreate';
+import GuildLeftEvent from './events/GuildDelete';
+import GuildMemberJoinedEvent from './events/GuildMemberAdd';
+import GuildMemberUpdateEvent from './events/GuildMemberUpdate';
+import MessageReceivedEvent from './events/Message';
+import MessageUpdatedEvent from './events/MessageUpdate';
+import ReadyEvent from './events/Ready';
+import ShardDisconnectedEvent from './events/ShardDisconnected';
+import ShardReadyEvent from './events/ShardReady';
+import ShardResumedEvent from './events/ShardResume';
+import UserUpdateEvent from './events/UserUpdate';
 
 let config: Config;
 try {
@@ -163,5 +175,18 @@ container.bind<NinoCommand>(TYPES.Command).to(WarningsCommand).inSingletonScope(
 // Other Commands
 container.bind<NinoCommand>(TYPES.Command).to(EvalCommand).inSingletonScope();
 container.bind<NinoCommand>(TYPES.Command).to(ShellCommand).inSingletonScope();
+
+// Events
+container.bind<NinoEvent>(TYPES.Event).to(GuildJoinedEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(GuildLeftEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(GuildMemberJoinedEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(GuildMemberUpdateEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(MessageReceivedEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(MessageUpdatedEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(ReadyEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(ShardDisconnectedEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(ShardReadyEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(ShardResumedEvent).inSingletonScope();
+container.bind<NinoEvent>(TYPES.Event).to(UserUpdateEvent).inSingletonScope();
 
 export default container;

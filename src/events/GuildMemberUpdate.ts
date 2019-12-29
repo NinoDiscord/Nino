@@ -5,9 +5,12 @@ import {
   Punishment,
   PunishmentType,
 } from '../structures/managers/PunishmentManager';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types';
 
-export default class GuildMemberUpdate extends Event {
-  constructor(client: Client) {
+@injectable()
+export default class GuildMemberUpdateEvent extends Event {
+  constructor(@inject(TYPES.Bot) client: Client) {
     super(client, 'guildMemberUpdate');
   }
 

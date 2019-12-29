@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { injectable, inject } from 'inversify';
+import { injectable, inject, multiInject } from 'inversify';
 import { readdir } from 'fs';
 import { sep } from 'path';
 import Bot from '../Bot';
@@ -9,34 +9,28 @@ import { TYPES } from '../../types';
 @injectable()
 export default class EventManager {
   public bot: Bot;
-  public path: string = `${process.cwd()}${sep}dist${sep}events`;
+  public events: Event[];
 
   /**
    * Creates a new instance of the event manager
    * @param bot The client instance
+   * @param events The events to listen to
    */
-  constructor(@inject(TYPES.Bot) bot: Bot) {
+  constructor(
+    @inject(TYPES.Bot) bot: Bot,
+    @multiInject(TYPES.Event) events: Event[]
+    ) {
     this.bot = bot;
+    this.events = events;
   }
 
   /**
-   * Starts the event manager's process
+   * Registers the events needed to function
    */
-  start() {
-    readdir(this.path, (error, files) => {
-      if (error && !!error.stack) this.bot.logger.log('error', error.stack);
-      this.bot.logger.log(
-        'info',
-        `Building ${files.length} event${files.length > 1 ? 's' : ''}!`
-      );
-      files.forEach(file => {
-        try {
-          const event = require(`${this.path}${sep}${file}`);
-          const ev: Event = new event.default(this.bot);
-          this.emit(ev);
-        } catch (ignored) {}
-      });
-    });
+  build() {
+    for (let event of this.events) {
+      this.emit(event);
+    }
   }
 
   /**

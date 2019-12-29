@@ -1,9 +1,12 @@
 import Event from '../structures/Event';
 import Bot from '../structures/Bot';
 import { User, Member } from 'eris';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types';
 
+@injectable()
 export default class UserUpdateEvent extends Event {
-  constructor(client: Bot) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, 'userUpdate');
   }
 

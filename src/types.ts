@@ -3,6 +3,7 @@ export const TYPES = {
   Config: Symbol.for('Config'),
   Client: Symbol.for('Client'),
   Command: Symbol.for('Command'),
+  Event: Symbol.for('Event'),
   CommandManager: Symbol.for('CommandManager'),
   CommandService: Symbol.for('CommandService'),
   AutoModService: Symbol.for('AutoModService'),

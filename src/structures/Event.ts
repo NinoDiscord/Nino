@@ -1,4 +1,5 @@
 import Client from './Bot';
+import { injectable, unmanaged } from 'inversify';
 
 export type Emittable =
   | 'ready'
@@ -60,11 +61,12 @@ export type Emittable =
   | 'shardReady'
   | 'shardResume'
   | 'messageDelete';
-export default class NinoEvent {
+  @injectable()
+  export default class NinoEvent {
   public bot: Client;
   public event: Emittable;
 
-  constructor(client: Client, event: Emittable) {
+  constructor(client: Client, @unmanaged() event: Emittable) {
     this.bot = client;
     this.event = event;
   }

@@ -83,16 +83,41 @@ export interface CommandStats {
 export default class Bot {
   public config: Config;
   public client: Client;
-  @lazyInject(TYPES.CommandManager) public manager!: CommandManager;
-  @lazyInject(TYPES.EventManager) public events!: EventManager;
-  @lazyInject(TYPES.DatabaseManager) public database!: DatabaseManager;
-  @lazyInject(TYPES.PunishmentManager) public punishments!: PunishmentManager;
-  @lazyInject(TYPES.TimeoutsManager) public timeouts!: TimeoutsManager;
-  @lazyInject(TYPES.AutoModService) public autoModService!: AutomodService;
-  @lazyInject(TYPES.BotListService) public botlistservice!: BotListService;
-  @lazyInject(TYPES.GuildSettings) public settings!: GuildSettings;
-  @lazyInject(TYPES.StatusManager) public status!: StatusManager;
-  public logger!: instance;
+  public logger: instance = new instance({
+    name: 'main',
+    format: `${colors.bgBlueBright(
+      process.pid.toString()
+    )} ${colors.bgBlackBright('%h:%m:%s')} <=> `,
+    autogen: false,
+    transports: [
+      new ConsoleTransport({
+        name: 'info',
+        process: process,
+        format: `${colors.bgBlueBright(
+          process.pid.toString()
+        )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.green(
+          '[INFO]'
+        )} <=> `,
+      }),
+      new ConsoleTransport({
+        name: 'error',
+        process: process,
+        format: `${colors.bgBlueBright(
+          process.pid.toString()
+        )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.red('[ERROR]')} <=> `,
+      }),
+      new ConsoleTransport({
+        name: 'discord',
+        process: process,
+        format: `${colors.bgBlueBright(
+          process.pid.toString()
+        )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.cyan(
+          '[DISCORD]'
+        )} <=> `,
+      }),
+      new FileTransport({ file: 'data/Nino.log', format: '' }),
+    ],
+  });
   public warnings: Warning = new Warning();
   public redis: Redis;
   public cases: CaseSettings = new CaseSettings();
@@ -105,6 +130,15 @@ export default class Bot {
     guildCount: 0,
     commandUsage: {},
   };
+  @lazyInject(TYPES.CommandManager) public manager!: CommandManager;
+  @lazyInject(TYPES.EventManager) public events!: EventManager;
+  @lazyInject(TYPES.DatabaseManager) public database!: DatabaseManager;
+  @lazyInject(TYPES.PunishmentManager) public punishments!: PunishmentManager;
+  @lazyInject(TYPES.TimeoutsManager) public timeouts!: TimeoutsManager;
+  @lazyInject(TYPES.AutoModService) public autoModService!: AutomodService;
+  @lazyInject(TYPES.BotListService) public botlistservice!: BotListService;
+  @lazyInject(TYPES.GuildSettings) public settings!: GuildSettings;
+  @lazyInject(TYPES.StatusManager) public status!: StatusManager;
 
   constructor(
     @inject(TYPES.Config) config: Config,
@@ -147,50 +181,15 @@ export default class Bot {
   }
 
   async build() {
-    this.logger = new instance({
-      name: 'main',
-      format: `${colors.bgBlueBright(
-        process.pid.toString()
-      )} ${colors.bgBlackBright('%h:%m:%s')} <=> `,
-      autogen: false,
-      transports: [
-        new ConsoleTransport({
-          name: 'info',
-          process: process,
-          format: `${colors.bgBlueBright(
-            process.pid.toString()
-          )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.green(
-            '[INFO]'
-          )} <=> `,
-        }),
-        new ConsoleTransport({
-          name: 'error',
-          process: process,
-          format: `${colors.bgBlueBright(
-            process.pid.toString()
-          )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.red('[ERROR]')} <=> `,
-        }),
-        new ConsoleTransport({
-          name: 'discord',
-          process: process,
-          format: `${colors.bgBlueBright(
-            process.pid.toString()
-          )} ${colors.bgBlackBright('%h:%m:%s')} ${colors.cyan(
-            '[DISCORD]'
-          )} <=> `,
-        }),
-        new FileTransport({ file: 'data/Nino.log', format: '' }),
-      ],
-    });
     this.logger.log('info', 'Starting Prometheus...');
     this.startPrometheus();
     collectDefaultMetrics();
-    this.logger.log('info', 'Connecting to the database...');
+    this.logger.log('info', 'Success! Connecting to the database...');
     await this.database.connect();
     this.logger.log('info', 'Success! Connecting to Redis...');
     this.redis.connect().catch(() => {}); // Redis likes to throw errors smh
     this.logger.log('info', 'Success! Intializing events...');
-    await this.events.start();
+    this.events.build();
     this.logger.log('info', 'Success! Connecting to Discord...');
     await this.client.connect();
     this.logger.log('discord', 'Connected to Discord!');

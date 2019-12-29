@@ -1,11 +1,14 @@
 import Webserver from '../webserver/server';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types';
 
+@injectable()
 export default class ReadyEvent extends Event {
   public web: Webserver;
 
-  constructor(client: Client) {
+  constructor(@inject(TYPES.Bot) client: Client) {
     super(client, 'ready');
     this.web = new Webserver(client);
   }

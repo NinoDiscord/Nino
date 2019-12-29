@@ -16,9 +16,6 @@ init({
 
 bot
   .build()
-  .then(() => {
-    bot.logger.log('info', 'Now connecting to Discord...');
-  })
   .catch(ex => {
     bot.logger.log('error', 'Unable to build:\n' + ex.stack);
   });
