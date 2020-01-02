@@ -45,7 +45,7 @@
         "@types/ioredis": "4.0.20",
         "@types/jest": "24.0.25",
         "@types/js-yaml": "3.12.1",
-        "@types/mongoose": "5.5.35",
+        "@types/mongoose": "5.5.37",
         "@types/ms": "0.7.31",
         "@types/node": "12.12.21",
         "@typescript-eslint/eslint-plugin": "2.13.0",
