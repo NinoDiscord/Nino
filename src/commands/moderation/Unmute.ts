@@ -45,11 +45,7 @@ export default class UnmuteCommand extends Command {
       moderator: ctx.sender,
     });
     try {
-      await this.bot.punishments.punish(
-        member!,
-        punishment,
-        reason
-      );
+      await this.bot.punishments.punish(member!, punishment, reason);
       await ctx.send('User successfully unmuted.');
     } catch (e) {
       ctx.send('Cannot unmute user, ' + e.message);

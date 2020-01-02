@@ -45,7 +45,9 @@ export default class BanCommand extends Command {
         return ctx.send('The user is above you in the heirarchy.');
     }
 
-    const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
+    const baseReason = ctx.args.has(1)
+      ? ctx.args.slice(1).join(' ')
+      : undefined;
     let time!: string;
     let reason!: string;
 
@@ -71,11 +73,7 @@ export default class BanCommand extends Command {
     });
 
     try {
-      await this.bot.punishments.punish(
-        member!,
-        punishment,
-        reason
-      );
+      await this.bot.punishments.punish(member!, punishment, reason);
       await ctx.send('User successfully banned.');
     } catch (e) {
       ctx.send('Cannot ban user, ' + e.message);

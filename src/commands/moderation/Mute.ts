@@ -43,10 +43,12 @@ export default class MuteCommand extends Command {
     if (!PermissionUtils.above(ctx.message.member!, member))
       return ctx.send('The user is above you in the heirarchy.');
 
-    const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
+    const baseReason = ctx.args.has(1)
+      ? ctx.args.slice(1).join(' ')
+      : undefined;
     let time!: string;
-     let reason!: string;
-  
+    let reason!: string;
+
     if (baseReason) {
       const sliced = baseReason.split(' | ');
       reason = sliced[0];
@@ -61,11 +63,7 @@ export default class MuteCommand extends Command {
 
     await this.bot.timeouts.cancelTimeout(member.id, ctx.guild!, 'unmute');
     try {
-      await this.bot.punishments.punish(
-        member!,
-        punishment,
-        reason
-      );
+      await this.bot.punishments.punish(member!, punishment, reason);
       await ctx.send('User successfully muted.');
     } catch (e) {
       ctx.send('Cannot mute user, ' + e.message);

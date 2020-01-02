@@ -48,7 +48,7 @@ export default class DatabaseManager {
     this.m = await mongoose.connect(this.uri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      autoIndex: false
+      autoIndex: false,
     });
     this.m.connection.on('error', error => {
       if (error) console.error(error);

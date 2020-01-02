@@ -49,11 +49,7 @@ export default class KickCommand extends Command {
     });
 
     try {
-      await this.bot.punishments.punish(
-        member!,
-        punishment,
-        reason
-      );
+      await this.bot.punishments.punish(member!, punishment, reason);
       await ctx.send('User successfully kicked.');
     } catch (e) {
       ctx.send('Cannot kick user, ' + e.message);
