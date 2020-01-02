@@ -17,3 +17,8 @@ init({
 bot.build().catch(ex => {
   bot.logger.log('error', 'Unable to build:\n' + ex.stack);
 });
+
+process.on('exit', () => {
+  bot.database.m.connection.close();
+  process.kill(process.pid);
+});
