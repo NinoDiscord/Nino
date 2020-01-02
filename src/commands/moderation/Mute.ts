@@ -43,19 +43,17 @@ export default class MuteCommand extends Command {
     if (!PermissionUtils.above(ctx.message.member!, member))
       return ctx.send('The user is above you in the heirarchy.');
 
-    let reason =
-      ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1)
-        ? ctx.args.slice(1).join(' ')
-        : false;
-    if (reason && typeof reason === 'boolean')
-      return ctx.send('You will need to specify a reason');
-
-    let time = ctx.flags.get('time') || ctx.flags.get('t');
-    if (typeof time === 'boolean')
-      return ctx.send('You will need to specify time to be alloted');
+    const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
+    let time!: string;
+     let reason!: string;
+  
+    if (baseReason) {
+      const sliced = baseReason.split(' | ');
+      reason = sliced[0];
+      time = sliced[1];
+    }
 
     const t = !!time ? ms(time) : undefined;
-
     const punishment = new Punishment(PunishmentType.Mute, {
       moderator: ctx.sender,
       temp: t,
@@ -66,7 +64,7 @@ export default class MuteCommand extends Command {
       await this.bot.punishments.punish(
         member!,
         punishment,
-        reason as string | undefined
+        reason
       );
       await ctx.send('User successfully muted.');
     } catch (e) {

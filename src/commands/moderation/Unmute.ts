@@ -39,13 +39,7 @@ export default class UnmuteCommand extends Command {
         `User \`${u.username}#${u.discriminator}\` is not in this guild?`
       );
 
-    let reason =
-      ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1)
-        ? ctx.args.slice(1).join(' ')
-        : false;
-    if (reason && typeof reason === 'boolean')
-      return ctx.send('You will need to specify a reason');
-
+    const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     await this.bot.timeouts.cancelTimeout(member.id, ctx.guild!, 'unmute');
     const punishment = new Punishment(PunishmentType.Unmute, {
       moderator: ctx.sender,
@@ -54,7 +48,7 @@ export default class UnmuteCommand extends Command {
       await this.bot.punishments.punish(
         member!,
         punishment,
-        reason as string | undefined
+        reason
       );
       await ctx.send('User successfully unmuted.');
     } catch (e) {

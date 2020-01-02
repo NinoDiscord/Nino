@@ -37,13 +37,7 @@ export default class UnbanCommand extends Command {
     if (!(await ctx.guild!.getBans()).find(v => v.user.id === id))
       return ctx.send('The user is not banned from this guild.');
 
-    let reason =
-      ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1)
-        ? ctx.args.slice(1).join(' ')
-        : false;
-    if (reason && typeof reason === 'boolean')
-      return ctx.send('You will need to specify a reason');
-
+    const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     await this.bot.timeouts.cancelTimeout(id, ctx.guild!, 'unban');
 
     const punishment = new Punishment(PunishmentType.Unban, {
@@ -53,7 +47,7 @@ export default class UnbanCommand extends Command {
       await this.bot.punishments.punish(
         { id, guild: ctx.guild! },
         punishment,
-        reason as string | undefined
+        reason
       );
       await ctx.send('User successfully unbanned.');
     } catch (e) {

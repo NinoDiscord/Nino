@@ -33,6 +33,7 @@ export default class ReasonCommand extends Command {
       return ctx.send(`Case #${caseID} was not found.`);
     _case.reason = reason;
 
+    ctx.send(`:ok_hand: Updated case **#${caseID}** for \`${reason}\``);
     await this.bot.cases.update(
       ctx.guild!.id,
       parseInt(caseID),

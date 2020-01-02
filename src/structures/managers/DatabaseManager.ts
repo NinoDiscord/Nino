@@ -4,6 +4,9 @@ import mongoose from 'mongoose';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
 import { Config } from '../Bot';
+import Pikmin from 'pikmin';
+
+const logger = Pikmin.loggers.get('main')!;
 
 interface BuildInfo {
   version: string;
@@ -42,10 +45,17 @@ export default class DatabaseManager {
   }
 
   async connect() {
-    this.m = await mongoose.connect(this.uri, { useNewUrlParser: true });
+    this.m = await mongoose.connect(this.uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      autoIndex: false
+    });
     this.m.connection.on('error', error => {
       if (error) console.error(error);
     });
+    this.m.connection.once('open', () =>
+      logger.log('info', `Opened a connection to MongoDB with URI: ${this.uri}`)
+    );
   }
 
   async getBuild(): Promise<any> {

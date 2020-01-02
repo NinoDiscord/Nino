@@ -190,12 +190,12 @@ export default class PunishmentManager {
           if (!muterole) {
             muterole = await guild.createRole(
               {
-                name: 'muted',
+                name: 'Muted',
                 permissions: 0,
                 mentionable: false,
                 hoist: false,
               },
-              'Creating muted role'
+              '[Automated] Created Muted role'
             );
             await muterole.editPosition(
               PermissionUtils.topRole(me)!.position - 1
@@ -207,7 +207,7 @@ export default class PunishmentManager {
                   0,
                   Constants.Permissions.sendMessages,
                   'role',
-                  'Overridding permissions for muted role'
+                  '[Automated] Overriding permissions for new Muted role'
                 );
             }
           }

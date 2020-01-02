@@ -19,7 +19,7 @@ export default class BanCommand extends Command {
     super(client, {
       name: 'ban',
       description: 'Ban a member in the current guild',
-      usage: '<user> <reason> [--reason] [--soft] [--days] [--time]',
+      usage: '<user> <reason> [--soft] [--days]',
       aliases: ['banne', 'bean'],
       category: 'Moderation',
       guildOnly: true,
@@ -45,16 +45,15 @@ export default class BanCommand extends Command {
         return ctx.send('The user is above you in the heirarchy.');
     }
 
-    let reason =
-      ctx.flags.get('reason') || ctx.flags.get('r') || ctx.args.has(1)
-        ? ctx.args.slice(1).join(' ')
-        : false;
-    if (reason && typeof reason === 'boolean')
-      return ctx.send('You need to specify a reason.');
+    const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
+    let time!: string;
+    let reason!: string;
 
-    let time = ctx.flags.get('time') || ctx.flags.get('t');
-    if (time && typeof time === 'boolean')
-      return ctx.send('You need to specify time to be allotted.');
+    if (baseReason) {
+      const sliced = baseReason.split(' | ');
+      reason = sliced[0];
+      time = sliced[1];
+    }
 
     const days = ctx.flags.get('days') || ctx.flags.get('d');
     if (days && (typeof days === 'boolean' || !/[0-9]+/.test(days)))
@@ -75,7 +74,7 @@ export default class BanCommand extends Command {
       await this.bot.punishments.punish(
         member!,
         punishment,
-        reason as string | undefined
+        reason
       );
       await ctx.send('User successfully banned.');
     } catch (e) {
