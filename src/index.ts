@@ -20,5 +20,6 @@ bot.build().catch(ex => {
 
 process.on('exit', () => {
   bot.database.m.connection.close();
+  bot.client.disconnect({ reconnect: false });
   process.kill(process.pid);
 });
