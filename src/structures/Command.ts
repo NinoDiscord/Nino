@@ -3,6 +3,7 @@ import Client from './Bot';
 import { Member, User, Channel } from 'eris';
 import PermissionUtils from '../util/PermissionUtils';
 import { injectable, unmanaged } from 'inversify';
+import 'reflect-metadata';
 
 export interface CommandInfo {
   name: string;

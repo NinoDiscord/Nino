@@ -1,5 +1,6 @@
 import Client from './Bot';
 import { injectable, unmanaged } from 'inversify';
+import 'reflect-metadata';
 
 export type Emittable =
   | 'ready'

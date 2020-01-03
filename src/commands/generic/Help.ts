@@ -20,7 +20,7 @@ export default class HelpCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const settings = await ctx.settings;
+    const settings = await ctx.getSettings();
     const categories: {
       [x: string]: string[];
     } = {};

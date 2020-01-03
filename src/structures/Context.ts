@@ -80,7 +80,7 @@ export default class CommandContext {
     return this.guild!.members.get(this.bot.client.user.id)!;
   }
 
-  get settings(): Promise<GuildModel> {
+  getSettings(): Promise<GuildModel> {
     if (this.guild) return this.bot.settings.getOrCreate(this.guild.id);
     return Promise.reject('not in a guild');
   }
