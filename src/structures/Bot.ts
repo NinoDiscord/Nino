@@ -13,16 +13,15 @@ import AutomodService from './services/AutomodService';
 import PunishmentManager from './managers/PunishmentManager';
 import TimeoutsManager from './managers/TimeoutsManager';
 import BotListService from './services/BotListService';
-import { Counter, register, collectDefaultMetrics, Gauge } from 'prom-client';
+import { collectDefaultMetrics } from 'prom-client';
 import { captureException } from '@sentry/node';
-import { createServer } from 'http';
-import { parse } from 'url';
 import { setDefaults } from 'wumpfetch';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import { lazyInject } from '../inversify.config';
 import 'reflect-metadata';
 import StatusManager from './managers/StatusManager';
+import PrometheusManager from './managers/PrometheusManager';
 
 const pkg = require('../../package');
 setDefaults({
@@ -119,8 +118,6 @@ export default class Bot {
   public warnings: Warning = new Warning();
   public redis: Redis;
   public cases: CaseSettings = new CaseSettings();
-  public prom;
-  public promServer;
   public owners: string[];
   public stats: CommandStats = {
     commandsExecuted: 0,
@@ -137,6 +134,7 @@ export default class Bot {
   @lazyInject(TYPES.BotListService) public botlistservice!: BotListService;
   @lazyInject(TYPES.GuildSettings) public settings!: GuildSettings;
   @lazyInject(TYPES.StatusManager) public status!: StatusManager;
+  @lazyInject(TYPES.PrometheusManager) public prometheus!: PrometheusManager;
 
   constructor(
     @inject(TYPES.Config) config: Config,
@@ -152,40 +150,13 @@ export default class Bot {
     });
   }
 
-  startPrometheus() {
-    this.prom = {
-      messagesSeen: new Counter({
-        name: 'nino_messages_seen',
-        help: 'Total messages that have been seen by Nino',
-      }),
-      commandsExecuted: new Counter({
-        name: 'nino_commands_executed',
-        help: 'The number of times commands have been executed.',
-      }),
-      guildCount: new Gauge({
-        name: 'nino_guild_count',
-        help: 'The number of guilds Nino is in.',
-      }),
-    };
-    this.promServer = createServer((req, res) => {
-      if (parse(req.url!).pathname === '/metrics') {
-        res.writeHead(200, { 'Content-Type': register.contentType });
-        res.write(register.metrics());
-      }
-
-      res.end();
-    });
-  }
-
   async build() {
-    this.logger.log('info', 'Starting Prometheus...');
-    this.startPrometheus();
     collectDefaultMetrics();
     this.logger.log('info', 'Success! Connecting to the database...');
     await this.database.connect();
     this.logger.log('info', 'Success! Connecting to Redis...');
     // eslint-disable-next-line
-    this.redis.connect()['catch'](() => {}); // Redis likes to throw errors smh
+    this.redis.connect().catch(() => {}); // Redis likes to throw errors smh
     this.logger.log('info', 'Success! Intializing events...');
     this.events.build();
     this.logger.log('info', 'Success! Connecting to Discord...');

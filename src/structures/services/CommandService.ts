@@ -125,7 +125,7 @@ export default class CommandService {
   }
 
   async handle(m: Message) {
-    this.bot.prom.messagesSeen.inc();
+    this.bot.prometheus.messagesSeen.inc();
     this.bot.stats.messagesSeen++;
 
     if (m.author.bot) return;
@@ -191,7 +191,7 @@ export default class CommandService {
         await invocation.execute();
         this.bot.stats.commandsExecuted =
           (this.bot.stats.commandsExecuted || 0) + 1;
-        this.bot.prom.commandsExecuted.inc();
+        this.bot.prometheus.commandsExecuted.inc();
         this.bot.addCommandUsage(invocation.command, invocation.ctx.sender);
       }
       catch (ex) {

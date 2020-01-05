@@ -18,10 +18,4 @@ describe('PermissionUtils', () => {
   it('a regular user should not overlap a channel with different permissions', () => {
     expect(PermissionUtils.overlaps(4, 16)).toBe(false);
   });
-
-  describe('PermissionUtils#topRole', () => {
-    beforeEach(() =>
-      jest
-    );
-  });
 });
