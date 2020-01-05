@@ -1,13 +1,15 @@
-import {
-  Punishment,
-  PunishmentType,
-} from '../structures/managers/PunishmentManager';
+import { Punishment, PunishmentType, } from '../structures/managers/PunishmentManager';
+import { inject, injectable } from 'inversify';
 import { Guild, User } from 'eris';
+import { TYPES } from '../types';
 import Event from '../structures/Event';
 import Bot from '../structures/Bot';
 
+@injectable()
 export default class GuildBanRemoveEvent extends Event {
-  constructor(bot: Bot) {
+  constructor(
+    @inject(TYPES.Bot) bot: Bot
+  ) {
     super(bot, 'guildBanRemove');
   }
 

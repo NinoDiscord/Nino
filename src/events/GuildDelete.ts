@@ -14,7 +14,7 @@ export default class GuildLeftEvent extends Event {
     this.bot.settings.remove(guild.id);
     this.bot.logger.log('discord', `Left ${guild.name} (${guild.id})`); // eslint-disable-line
     this.bot.status.updateStatus();
-    this.bot.prom.guildCount.dec();
+    this.bot.prometheus.guildCount.dec();
     this.bot.stats.guildCount--;
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
   }
