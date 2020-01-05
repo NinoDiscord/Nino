@@ -67,7 +67,7 @@ describe('CommandService', () => {
     expect(invocation!.canInvoke()).toBeUndefined();
   });
 
-  it("it should not be able to invoke the command because it's disabled", () => {
+  it('it should not be able to invoke the command because it\'s disabled', () => {
     bot.manager.getCommand('help')!.disabled = true;
     const message = { content: '!help hi' } as Message;
     const args = ['help', 'hi'];

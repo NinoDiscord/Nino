@@ -50,7 +50,8 @@ export default class UnbanCommand extends Command {
         reason
       );
       await ctx.send('User successfully unbanned.');
-    } catch (e) {
+    }
+    catch (e) {
       ctx.send('Cannot unban user, ' + e.message);
     }
   }

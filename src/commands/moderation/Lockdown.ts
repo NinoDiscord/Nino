@@ -33,7 +33,8 @@ export default class LockdownCommand extends Command {
       const channel = ctx.guild!.channels.get(s);
       if (!channel || channel.type === 0) return;
       return channel as TextChannel;
-    } else if (/^<#[0-9]+>$/.test(s)) {
+    }
+    else if (/^<#[0-9]+>$/.test(s)) {
       // this is a channel mention
       const channel = ctx.guild!.channels.get(s.substring(2, s.length - 1));
       if (!channel || channel.type !== 0) return;
@@ -48,7 +49,8 @@ export default class LockdownCommand extends Command {
     if (/^[0-9]+$/.test(s)) {
       // this is an id
       return ctx.guild!.roles.get(s);
-    } else if (/^<@&[0-9]+>$/.test(s)) {
+    }
+    else if (/^<@&[0-9]+>$/.test(s)) {
       // this is a channel mention
       return ctx.guild!.roles.get(s.substring(3, s.length - 1));
     }
@@ -80,18 +82,18 @@ export default class LockdownCommand extends Command {
 
     if (roles.length === 0)
       return ctx.send(
-        "All of the roles you've listed can not be modified by me! Please check that the roles are under this bot in the heirarchy."
+        'All of the roles you\'ve listed can not be modified by me! Please check that the roles are under this bot in the heirarchy.'
       );
 
     const channels =
       ctx.args.args.findIndex(x => x === 'all') !== -1
         ? ctx
-            .guild!.channels.filter(c => c.type === 0)
-            .map(c => c as TextChannel)
+          .guild!.channels.filter(c => c.type === 0)
+          .map(c => c as TextChannel)
         : ctx.args.args
-            .map(x => this.getChannel(x, ctx))
-            .filter(x => !!x)
-            .map(tc => tc!);
+          .map(x => this.getChannel(x, ctx))
+          .filter(x => !!x)
+          .map(tc => tc!);
 
     if (channels.length === 0)
       return ctx.send('No valid channels were selected.');
@@ -146,7 +148,8 @@ export default class LockdownCommand extends Command {
             await ctx.send(`Channel ${channel.mention} is now unlocked.`);
           }
           await ctx.bot.redis.del(`lockdownstate:${channel.id}`);
-        } else {
+        }
+        else {
           for (let role of roles) {
             let allow = channel.permissionOverwrites.has(role.role!.id)
               ? channel.permissionOverwrites.get(role.role!.id)!.allow

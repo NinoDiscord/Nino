@@ -41,7 +41,8 @@ export default class EventManager {
     const wrapper = async (...args) => {
       try {
         await ev.emit(...args);
-      } catch (ex) {
+      }
+      catch (ex) {
         this.bot.logger.log(
           'error',
           `Unable to run the '${ev.event}' event:\n${ex}`

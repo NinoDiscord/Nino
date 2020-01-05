@@ -24,8 +24,8 @@ export default class ShardInfoCommand extends Command {
           shard.status === 'disconnected'
             ? '-'
             : shard.status === 'connecting' || shard.status === 'handshaking'
-            ? '*'
-            : '+'
+              ? '*'
+              : '+'
         } Shard #${shard.id} ${
           ctx.guild!.shard.id === shard.id ? '(current)' : ''
         }: ${shard.latency}ms\n`)

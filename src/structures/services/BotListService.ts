@@ -51,7 +51,7 @@ export default class BotListService {
   /**
    * Post guild stats
    */
-  postCount(guilds: Number, id: string, config: Config, logger: any) {
+  postCount(guilds: number, id: string, config: Config, logger: any) {
     if (config.botlists && config.botlists.topggtoken) {
       wumpfetch({
         url: `https://top.gg/api/bots/${id}/stats`,
@@ -70,7 +70,7 @@ export default class BotListService {
             `Posted guild stats to TOP.GG: ${res.statusCode} : ${res.body}`
           );
         })
-        .catch(() => {
+        ['catch'](() => {
           logger.error('Failed to post guild stats to TOP.GG.');
         });
     }
@@ -92,7 +92,7 @@ export default class BotListService {
             `Posted guild stats to Bots For Discord: ${res.statusCode} : ${res.body}`
           );
         })
-        .catch(() => {
+        ['catch'](() => {
           logger.error('Failed to post guild stats to Bots For Discord.');
         });
     }
@@ -114,7 +114,7 @@ export default class BotListService {
             `Posted guild stats to Discord Boats: ${res.statusCode} : ${res.body}`
           );
         })
-        .catch(() => {
+        ['catch'](() => {
           logger.error('Failed to post guild stats to Discord Boats.');
         });
     }
@@ -136,7 +136,7 @@ export default class BotListService {
             `Posted guild stats to Botlist.space: ${res.statusCode} : ${res.body}`
           );
         })
-        .catch(() => {
+        ['catch'](() => {
           logger.error('Failed to post guild stats to Botlist.space.');
         });
     }

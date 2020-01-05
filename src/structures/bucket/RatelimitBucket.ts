@@ -26,7 +26,8 @@ export default class RatelimitBucket extends Collection<Collection<number>> {
     if (!ratelimits.has(user.id)) {
       ratelimits.set(user.id, now);
       setTimeout(() => ratelimits.delete(user.id), throttle);
-    } else {
+    }
+    else {
       const time = ratelimits.get(user.id)!;
       if (now < time) {
         const left = (time - now) / 1000;

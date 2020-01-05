@@ -30,7 +30,7 @@ export default class UnmuteCommand extends Command {
     if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
 
     const u = findUser(this.bot, ctx.args.get(0))!;
-    if (!u) return ctx.send("I can't find this user!");
+    if (!u) return ctx.send('I can\'t find this user!');
 
     const member = ctx.guild!.members.get(u.id);
 
@@ -47,7 +47,8 @@ export default class UnmuteCommand extends Command {
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
       await ctx.send('User successfully unmuted.');
-    } catch (e) {
+    }
+    catch (e) {
       ctx.send('Cannot unmute user, ' + e.message);
     }
   }

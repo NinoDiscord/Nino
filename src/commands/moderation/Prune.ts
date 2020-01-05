@@ -16,7 +16,7 @@ export default class PruneCommand extends Command {
     super(client, {
       name: 'prune',
       description: 'Prunes messages from the current channel',
-      usage: "<amount> [--filter='bot' | 'user' | 'new']",
+      usage: '<amount> [--filter=\'bot\' | \'user\' | \'new\']',
       aliases: ['purge'],
       category: 'Moderation',
       userpermissions: Constants.Permissions.manageMessages,
@@ -59,13 +59,15 @@ export default class PruneCommand extends Command {
     try {
       toDelete.map(async m => await ctx.message.channel.deleteMessage(m.id));
       return ctx.send(`I've deleted \`${toDelete.length}\` messages!`);
-    } catch (ex) {
+    }
+    catch (ex) {
       if (ex.message.includes(' is more then 2 weeks old.')) {
         const m = toDelete.filter(m => m.timestamp < weeks);
         return ctx.send(
           `There were ${m.length} messages that I c-cant delete because Discord puts messages at bulk after 2 weeks has past.`
         );
-      } else {
+      }
+      else {
         return ctx.code(
           'js',
           stripIndents`

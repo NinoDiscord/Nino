@@ -49,7 +49,7 @@ export default class TimeoutsManager {
           new Punishment(task as PunishmentType, {
             moderator: this.bot.client.user,
           }),
-          "time's up"
+          'time\'s up'
         );
         await this.bot.redis.del(key);
       }
@@ -89,9 +89,10 @@ export default class TimeoutsManager {
               new Punishment(task as PunishmentType, {
                 moderator: this.bot.client.user,
               }),
-              "time's up"
+              'time\'s up'
             );
-          } finally {
+          }
+          finally {
             await this.bot.redis.del(timedate);
           }
         }

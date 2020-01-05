@@ -32,7 +32,7 @@ export default class PardonCommand extends Command {
       return ctx.send('Requires an amount of warnings to remove.');
 
     const u = findUser(this.bot, ctx.args.get(0))!;
-    if (!u) return ctx.send("I can't find this user!");
+    if (!u) return ctx.send('I can\'t find this user!');
     const member = ctx.guild!.members.get(u.id);
     const amount = Number(ctx.args.get(1));
 

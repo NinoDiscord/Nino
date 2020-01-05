@@ -23,7 +23,7 @@ export default class ReadyEvent extends Event {
       this.bot.status.updateStatus();
     }, 600000);
     this.bot.promServer.listen(5595, () =>
-      this.bot.logger.log('info', "Metrics is now listening on port '5595'")
+      this.bot.logger.log('info', 'Metrics is now listening on port \'5595\'')
     );
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
     this.bot.stats.guildCount = this.bot.client.guilds.size;

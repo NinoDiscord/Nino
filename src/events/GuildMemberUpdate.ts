@@ -17,7 +17,7 @@ export default class GuildMemberUpdateEvent extends Event {
   async emit(
     guild: Guild,
     member: Member,
-    old: { roles: String[]; nick: String }
+    old: { roles: string[]; nick: string }
   ) {
     if (member.nick != old.nick)
       this.bot.autoModService.handleMemberNameUpdate(member);

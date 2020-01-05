@@ -184,7 +184,8 @@ export default class Bot {
     this.logger.log('info', 'Success! Connecting to the database...');
     await this.database.connect();
     this.logger.log('info', 'Success! Connecting to Redis...');
-    this.redis.connect().catch(() => {}); // Redis likes to throw errors smh
+    // eslint-disable-next-line
+    this.redis.connect()['catch'](() => {}); // Redis likes to throw errors smh
     this.logger.log('info', 'Success! Intializing events...');
     this.events.build();
     this.logger.log('info', 'Success! Connecting to Discord...');

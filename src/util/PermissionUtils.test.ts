@@ -1,4 +1,6 @@
 import PermissionUtils from './PermissionUtils';
+import { Member } from 'eris';
+import mock from 'jest-mock-extended';
 
 describe('PermissionUtils', () => {
   it('the admin should overlap an all permission denying channel', () => {
@@ -15,5 +17,11 @@ describe('PermissionUtils', () => {
   });
   it('a regular user should not overlap a channel with different permissions', () => {
     expect(PermissionUtils.overlaps(4, 16)).toBe(false);
+  });
+
+  describe('PermissionUtils#topRole', () => {
+    beforeEach(() =>
+      jest
+    );
   });
 });

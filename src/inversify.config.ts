@@ -58,7 +58,8 @@ import UserUpdateEvent from './events/UserUpdate';
 let config: Config;
 try {
   config = safeLoad(readFileSync('application.yml', 'utf8'));
-} catch (e) {
+}
+catch (e) {
   config = {
     status: undefined,
     statustype: undefined,

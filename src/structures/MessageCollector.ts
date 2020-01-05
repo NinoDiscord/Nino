@@ -26,7 +26,7 @@ export default class MessageCollector {
   ) {
     return new Promise<Message>(accept => {
       const collector = this.collectors.get(`${info.channelID}:${info.userID}`);
-      if (collector) this.collectors.delete(`${info.channelID}:${info.userID}`);
+      if (collector) this.collectors['delete'](`${info.channelID}:${info.userID}`);
 
       this.collectors.set(`${info.channelID}:${info.userID}`, {
         filter,

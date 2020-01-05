@@ -43,7 +43,7 @@ export default class EvalCommand extends Command {
 
     const typescript = ctx.flags.get('ts');
     if (typeof typescript === 'string')
-      return ctx.send("Um, I'm sorry but it's just `--ts`");
+      return ctx.send('Um, I\'m sorry but it\'s just `--ts`');
 
     const isAsync = script.includes('return') || script.includes('await');
 
@@ -85,7 +85,8 @@ export default class EvalCommand extends Command {
           .setColor(0x00ff00)
           .build(),
       });
-    } catch (e) {
+    }
+    catch (e) {
       await message.edit({
         embed: new EmbedBuilder()
           .setTitle('Evaluation Error!')

@@ -11,7 +11,8 @@ export default class ArgumentParser {
     for (let i = 0; i < raw.length; i++) {
       if (!raw[i].startsWith('--')) {
         this.args.push(raw[i]);
-      } else {
+      }
+      else {
         break;
       }
     }

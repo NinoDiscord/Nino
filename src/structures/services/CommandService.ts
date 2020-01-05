@@ -43,7 +43,7 @@ export class CommandInvocation {
    * Returns an error string if cannot invoke, otherwise it will return undefined.
    */
   canInvoke(): string | undefined {
-    if (this.command.guildOnly && this.channel.type !== 1)
+    if (this.command.guildOnly && [1, 3, 4].includes(this.channel.type))
       return (
         'Sorry, but you need to be in a guild to execute the `' +
         this.command.name +
@@ -193,20 +193,21 @@ export default class CommandService {
           (this.bot.stats.commandsExecuted || 0) + 1;
         this.bot.prom.commandsExecuted.inc();
         this.bot.addCommandUsage(invocation.command, invocation.ctx.sender);
-      } catch (ex) {
+      }
+      catch (ex) {
         const embed = this.bot.getEmbed();
         embed.setTitle(`Command ${invocation.command.name} has failed!`)
           .setDescription(stripIndents`
                         The error has been automatically logged in our systems.
                         If the issue persists contact us!
                         Available Contacts: ${this.bot.owners
-                          .map(userID => {
-                            const user = this.bot.client.users.get(userID)!;
-                            if (user)
-                              return `${user.username}#${user.discriminator}`;
-                            else return `<@${userID}>`;
-                          })
-                          .join(', ')} at https://discord.gg/7TtMP2n
+    .map(userID => {
+      const user = this.bot.client.users.get(userID)!;
+      if (user)
+        return `${user.username}#${user.discriminator}`;
+      else return `<@${userID}>`;
+    })
+    .join(', ')} at https://discord.gg/7TtMP2n
                     `);
         this.bot.logger.log(
           'error',

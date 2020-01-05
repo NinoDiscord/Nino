@@ -13,7 +13,7 @@ export default class StatisticsCommand extends Command {
   constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'statistics',
-      description: "Gives you the bot's statistics",
+      description: 'Gives you the bot\'s statistics',
       aliases: ['stats', 'info', 'bot', 'botinfo'],
       category: 'Generic',
       ownerOnly: false,
@@ -47,20 +47,20 @@ export default class StatisticsCommand extends Command {
             Guilds              ~> ${ctx.client.guilds.size.toLocaleString()}
             Users               ~> ${ctx.client.users.size.toLocaleString()}
             Channels            ~> ${Object.keys(
-              ctx.client.channelGuildMap
-            ).length.toLocaleString()}
+    ctx.client.channelGuildMap
+  ).length.toLocaleString()}
             Shards [C/T]        ~> [${ctx.guild!.shard.id}/${
-      ctx.client.shards.size
-    }]
+  ctx.client.shards.size
+}]
             Uptime              ~> ${humanize(
-              Date.now() - ctx.client.startTime
-            )}
+    Date.now() - ctx.client.startTime
+  )}
             Commands            ~> ${this.bot.manager.commands.size}
             Messages Seen       ~> ${this.bot.stats.messagesSeen.toLocaleString()}
             Commands Executed   ~> ${this.bot.stats.commandsExecuted.toLocaleString()}
             Most Used Command   ~> ${command.command} (${
-      command.size
-    } executions)
+  command.size
+} executions)
             Database Connection ~> v${build.version}
             GitHub Commit       ~> ${commit.slice(0, 7)}
             \`\`\`

@@ -14,30 +14,30 @@ export interface Embed {
   url?: string;
 }
 
-export type EmbedAuthor = {
+export interface EmbedAuthor {
   name: string;
   url?: string;
   icon_url?: string;
-};
+}
 
-export type EmbedThumbnail = {
+export interface EmbedThumbnail {
   url?: string;
-};
+}
 
-export type EmbedImage = {
+export interface EmbedImage {
   url?: string;
-};
+}
 
-export type EmbedField = {
+export interface EmbedField {
   name?: string;
   value?: string;
   inline?: boolean;
-};
+}
 
-export type EmbedFooter = {
+export interface EmbedFooter {
   text: string;
   icon_url?: string;
-};
+}
 
 export type StringResolvable = string | string[];
 
@@ -109,9 +109,9 @@ export default class EmbedBuilder {
 
   addField(name: string, value: string, inline: boolean = false) {
     if (!name)
-      throw new Error("You d-didn't set a name to the field you baka!!");
+      throw new Error('You d-didn\'t set a name to the field you baka!!');
     if (!value)
-      throw new Error("You d-didn't set a value to the field you baka!!");
+      throw new Error('You d-didn\'t set a value to the field you baka!!');
     if (this.fields!.length > 25)
       throw new Error('Unable to add anymore fields. (FIELD_LIMIT_THRESHOLD)');
 
@@ -147,19 +147,19 @@ export default class EmbedBuilder {
       fields: this.fields,
       author: this.author
         ? {
-            name: this.author.name,
-            url: this.author.url,
-            icon_url: this.author.icon_url,
-            proxy_icon_url: this.author.icon_url,
-          }
+          name: this.author.name,
+          url: this.author.url,
+          icon_url: this.author.icon_url,
+          proxy_icon_url: this.author.icon_url,
+        }
         : undefined,
       image: this.image ? this.image : undefined,
       footer: this.footer
         ? {
-            text: this.footer.text,
-            icon_url: this.footer.icon_url,
-            proxy_icon_url: this.footer.icon_url,
-          }
+          text: this.footer.text,
+          icon_url: this.footer.icon_url,
+          proxy_icon_url: this.footer.icon_url,
+        }
         : undefined,
       color: this.color,
       url: this.url ? this.url : undefined,

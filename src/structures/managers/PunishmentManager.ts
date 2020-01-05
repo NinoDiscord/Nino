@@ -316,20 +316,20 @@ export default class PunishmentManager {
             .setDescription(
               stripIndents`
                           **User**: ${member.username}#${
-                member.discriminator
-              } (ID: ${member.id})
+  member.discriminator
+} (ID: ${member.id})
                           **Moderator**: ${
-                            punishment.options.moderator.username
-                          }#${
-                punishment.options.moderator.discriminator
-              } (ID: ${punishment.options.moderator.id})
+  punishment.options.moderator.username
+}#${
+  punishment.options.moderator.discriminator
+} (ID: ${punishment.options.moderator.id})
                           **Reason**: ${reason || 'Unknown'}${
-                !!punishment.options.soft ? '\n**Type**: Soft Ban' : ''
-              }${
-                !punishment.options.soft && !!punishment.options.temp
-                  ? `\n**Time**: ${ms(punishment.options.temp, { long: true })}`
-                  : ''
-              }
+  !!punishment.options.soft ? '\n**Type**: Soft Ban' : ''
+}${
+  !punishment.options.soft && !!punishment.options.temp
+    ? `\n**Time**: ${ms(punishment.options.temp, { long: true })}`
+    : ''
+}
                       `
             )
             .setColor(action.action)
@@ -344,11 +344,13 @@ export default class PunishmentManager {
               this.bot.logger.log('error', `Couldn't update the case: ${e}`);
           }
         );
-      } catch (e) {
+      }
+      catch (e) {
         console.error(e);
         throw { message: 'Cannot write to the mod-log!' };
       }
-    } else {
+    }
+    else {
       throw { message: 'Cannot write to the mod-log!' };
     }
   }

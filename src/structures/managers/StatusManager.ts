@@ -27,7 +27,7 @@ export default class StatusManager {
   updateStatus(): void {
     return this.bot.client.editStatus('online', {
       name: this.pattern
-        .replace('%prefix%', this.bot.config['discord'].prefix)
+        .replace('%prefix%', this.bot.config.discord.prefix)
         .replace('%guilds%', this.bot.client.guilds.size.toLocaleString()),
       type: this.bot.config.statustype || 0,
     });

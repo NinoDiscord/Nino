@@ -4,12 +4,12 @@
     "version": "0.7.0",
     "main": "dist/index.js",
     "scripts": {
-        "build": "yarn clean && tsc",
-        "build:watch": "yarn clean && tsc -w",
+        "build": "yarn lint && yarn clean && tsc",
+        "build:watch": "yarn lint && yarn clean && tsc -w",
         "main": "yarn build && node dist/index.js",
         "dev": "nodemon dist/index.js",
-        "lint": "prettier --write --single-quote --trailing-comma es5 --parser typescript \"src/**/*.ts\"",
-        "clean": "rm -fr dist",
+        "lint": "eslint src --ext .ts --fix",
+        "clean": "rm -fr dist && rm -fr dist",
         "test": "jest --detectOpenHandles"
     },
     "maintainers": [
@@ -54,7 +54,6 @@
         "jest": "24.9.0",
         "jest-mock-extended": "1.0.6",
         "nodemon": "2.0.2",
-        "prettier": "1.19.1",
         "ts-jest": "24.2.0",
         "typescript": "3.7.4"
     },

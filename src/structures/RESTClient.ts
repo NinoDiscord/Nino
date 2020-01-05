@@ -16,11 +16,13 @@ export default class RESTClient {
       if (/^\d+$/.test(query)) {
         const role = guild.roles.get(query);
         if (role) return resolve(role);
-      } else if (/<@&(\d+)>$/.test(query)) {
+      }
+      else if (/<@&(\d+)>$/.test(query)) {
         const match = query.match(/^<@&(\d+)>$/);
         const role = guild.roles.get(match![1]);
         if (role) return resolve(role);
-      } else {
+      }
+      else {
         const roles = guild.roles.filter(role =>
           role.name.toLowerCase().includes(query.toLowerCase())
         );
@@ -39,7 +41,8 @@ export default class RESTClient {
         if (guild) {
           if (!guild.channels.has(query)) reject();
           resolve(guild.channels.get(query));
-        } else {
+        }
+        else {
           const channel =
             query in this.bot.client.channelGuildMap &&
             this.bot.client.guilds
@@ -47,12 +50,14 @@ export default class RESTClient {
               .channels.get(query);
           if (channel) return resolve(channel);
         }
-      } else if (/^<#(\d+)>$/.test(query)) {
+      }
+      else if (/^<#(\d+)>$/.test(query)) {
         const match = query.match(/^<#(\d+)>$/);
         if (guild) {
           if (!guild.channels.has(match![1])) reject();
           resolve(guild.channels.get(match![1]));
-        } else {
+        }
+        else {
           const channel =
             match![1] in this.bot.client.channelGuildMap &&
             this.bot.client.guilds
@@ -60,7 +65,8 @@ export default class RESTClient {
               .channels.get(query);
           if (channel) return resolve(channel);
         }
-      } else if (guild) {
+      }
+      else if (guild) {
         const channel = guild.channels.filter(channel =>
           channel.name.toLowerCase().includes(query.toLowerCase())
         );

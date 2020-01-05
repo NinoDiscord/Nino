@@ -31,7 +31,7 @@ export default class KickCommand extends Command {
 
     const u = findUser(this.bot, ctx.args.get(0))!;
     if (!u) {
-      return ctx.send("I can't find this user!");
+      return ctx.send('I can\'t find this user!');
     }
     const member = ctx.guild!.members.get(u.id);
 
@@ -51,7 +51,8 @@ export default class KickCommand extends Command {
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
       await ctx.send('User successfully kicked.');
-    } catch (e) {
+    }
+    catch (e) {
       ctx.send('Cannot kick user, ' + e.message);
     }
   }

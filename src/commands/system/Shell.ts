@@ -11,7 +11,7 @@ export default class ShellCommand extends Command {
   constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'shell',
-      description: "Runs a command on the bot's host machine.",
+      description: 'Runs a command on the bot\'s host machine.',
       usage: '<script>',
       aliases: ['exec', 'sh'],
       category: 'System Adminstration',
@@ -50,7 +50,8 @@ export default class ShellCommand extends Command {
           )
           .build(),
       });
-    } catch (ex) {
+    }
+    catch (ex) {
       await message.edit({
         embed: this.bot
           .getEmbed()

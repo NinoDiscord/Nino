@@ -9,7 +9,7 @@ export default class PingCommand extends Command {
   constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'ping',
-      description: "Gives you the bot's ping.",
+      description: 'Gives you the bot\'s ping.',
       aliases: ['pong', 'pang'],
       category: 'Generic',
       ownerOnly: false,
@@ -21,7 +21,7 @@ export default class PingCommand extends Command {
     const message = await ctx.send(
       ':pong: Pong, I guess? Why do you want it...?'
     );
-    await message.delete();
+    await message['delete']();
     return ctx.send(`:ping_pong: Pong! \`${Date.now() - startedAt}ms\``);
   }
 }

@@ -12,7 +12,7 @@ export default class SettingsCommand extends Command {
   constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'settings',
-      description: "View or edit the guild's settings.",
+      description: 'View or edit the guild\'s settings.',
       aliases: ['options'],
       usage:
         'set <key> <value> / reset <key> / view / add <warnings> <punishment> [--time <time> (mute/ban)] [--roleid <id> (role/unrole)] [--soft (ban)] [--days <amount> (ban: delete messages)]/ remove <punishment index>',
@@ -113,7 +113,7 @@ export default class SettingsCommand extends Command {
       },
       (error, raw) => {
         if (error) return ctx.send('I was unable to add the punishment.');
-        if (raw.n) return ctx.send(`The punishment was successfully added!`);
+        if (raw.n) return ctx.send('The punishment was successfully added!');
         else
           return ctx.send(
             'We limit the amount of punishments per server to 15. Please remove some of your punishments before further additions.'
@@ -162,14 +162,14 @@ export default class SettingsCommand extends Command {
       }
       case 'prefix': {
         const prefix = ctx.args.get(2);
-        if (!prefix) return ctx.send("Hey! You'll need to set a prefix.");
+        if (!prefix) return ctx.send('Hey! You\'ll need to set a prefix.');
         if (prefix.length > 20)
           return ctx.send(
             ':warning: The prefix cannot reach the threshold. (`20`)'
           );
         if (prefix.includes('@everyone') || prefix.includes('@here'))
           return ctx.send(
-            ":x: Hey! Why are you pinging everyone?! We don't allow at everyone pings as prefixes."
+            ':x: Hey! Why are you pinging everyone?! We don\'t allow at everyone pings as prefixes.'
           );
         this.bot.settings.update(
           ctx.guild!.id,
@@ -349,17 +349,17 @@ export default class SettingsCommand extends Command {
             error => {
               if (error)
                 return ctx.send(
-                  `Unable to modify the automod swearing feature`
+                  'Unable to modify the automod swearing feature'
                 );
               return ctx.send(stripIndents`Successfully changed the automod badwords settings: ${
                 enabled ? 'Enabled' : 'Disabled'
               }
                     Words: ${wordlist ? wordlist.join(' ') : 'No Wordlist'}
                     ${
-                      !enabled
-                        ? `If you didn't mean to disable the feature do: \`x!settings set automod.swears <bad word> <bad word>\` to enable the feature and set up a wordlist.`
-                        : ''
-                    }`);
+  !enabled
+    ? 'If you didn\'t mean to disable the feature do: `x!settings set automod.swears <bad word> <bad word>` to enable the feature and set up a wordlist.'
+    : ''
+}`);
             }
           );
         }
@@ -450,7 +450,7 @@ export default class SettingsCommand extends Command {
             if (error)
               return ctx.send('I was unable to set the prefix to `x!`...');
             return ctx.send(
-              `The prefix has been set to \`x!\` Run \`x!ping\` to test it!`
+              'The prefix has been set to `x!` Run `x!ping` to test it!'
             );
           }
         );
@@ -468,7 +468,7 @@ export default class SettingsCommand extends Command {
           error => {
             if (error)
               return ctx.send('I was unable to reset the muted role id.');
-            return ctx.send(`The muted role id was reset successfully!`);
+            return ctx.send('The muted role id was reset successfully!');
           }
         );
         break;
@@ -485,9 +485,9 @@ export default class SettingsCommand extends Command {
             error => {
               if (error)
                 return ctx.send(
-                  `Unable to disable the automod dehoist feature`
+                  'Unable to disable the automod dehoist feature'
                 );
-              return ctx.send(`Disabled the automod dehoist feature`);
+              return ctx.send('Disabled the automod dehoist feature');
             }
           );
         }
@@ -504,9 +504,9 @@ export default class SettingsCommand extends Command {
             error => {
               if (error)
                 return ctx.send(
-                  `Unable to disable the automod mention spam feature`
+                  'Unable to disable the automod mention spam feature'
                 );
-              return ctx.send(`Disabled the automod mention spam feature`);
+              return ctx.send('Disabled the automod mention spam feature');
             }
           );
         }
@@ -522,8 +522,8 @@ export default class SettingsCommand extends Command {
             },
             error => {
               if (error)
-                return ctx.send(`Unable to disable the automod spam feature`);
-              return ctx.send(`Disabled the automod spam feature`);
+                return ctx.send('Unable to disable the automod spam feature');
+              return ctx.send('Disabled the automod spam feature');
             }
           );
         }
@@ -547,8 +547,8 @@ export default class SettingsCommand extends Command {
             },
             error => {
               if (error)
-                return ctx.send(`Unable to disable the automod raid feature`);
-              return ctx.send(`Disabled the automod raid feature`);
+                return ctx.send('Unable to disable the automod raid feature');
+              return ctx.send('Disabled the automod raid feature');
             }
           );
         }
@@ -566,9 +566,9 @@ export default class SettingsCommand extends Command {
             error => {
               if (error)
                 return ctx.send(
-                  `Unable to disable the automod swearing feature`
+                  'Unable to disable the automod swearing feature'
                 );
-              return ctx.send(`Disabled the automod swearing feature`);
+              return ctx.send('Disabled the automod swearing feature');
             }
           );
         }
@@ -584,8 +584,8 @@ export default class SettingsCommand extends Command {
             },
             error => {
               if (error)
-                return ctx.send(`Unable to disable the automod invite feature`);
-              return ctx.send(`Disabled the automod invite feature`);
+                return ctx.send('Unable to disable the automod invite feature');
+              return ctx.send('Disabled the automod invite feature');
             }
           );
         }
@@ -611,12 +611,12 @@ export default class SettingsCommand extends Command {
                   settings!.mutedRole
                     ? ctx.guild!.roles.get(settings!.mutedRole)!.name
                     : 'None'
-                }
+}
                 [modlog]: ${
                   settings!.modlog === null
                     ? 'No channel was set.'
                     : ctx.guild!.channels.get(settings!.modlog)!.name
-                }
+}
                 [automod.dehoist]: ${settings!.automod.dehoist ? 'Yes' : 'No'}
                 [automod.mention]: ${settings!.automod.mention ? 'Yes' : 'No'}
                 [automod.spam]: ${settings!.automod.spam ? 'Yes' : 'No'}
@@ -625,32 +625,32 @@ export default class SettingsCommand extends Command {
                   settings!.automod.badwords.wordlist.length > 0
                     ? settings!.automod.badwords.wordlist.join(', ')
                     : 'Disabled'
-                }
+}
                 [automod.raid]: ${settings!.automod.raid ? 'Yes' : 'No'}
                 [punishments]:
                 ${settings!.punishments
-                  .map(
-                    (p, i) =>
-                      `${i + 1}. warnings: ${p.warnings}, punishment: ${
-                        p.type
-                      }, special:${!!p.temp ? ` Time: ${ms(p.temp)}` : ''}${
-                        !!p.soft ? ` Soft` : ''
-                      }${
-                        !!p.roleid
-                          ? ` Role: ${
-                              !!ctx.guild!.roles.get(p.roleid)
-                                ? ctx.guild!.roles.get(p.roleid)!.name
-                                : ''
-                            }`
-                          : ''
-                      }`
-                  )
-                  .join('\n')}
+  .map(
+    (p, i) =>
+      `${i + 1}. warnings: ${p.warnings}, punishment: ${
+        p.type
+      }, special:${!!p.temp ? ` Time: ${ms(p.temp)}` : ''}${
+        !!p.soft ? ' Soft' : ''
+      }${
+        !!p.roleid
+          ? ` Role: ${
+            !!ctx.guild!.roles.get(p.roleid)
+              ? ctx.guild!.roles.get(p.roleid)!.name
+              : ''
+          }`
+          : ''
+      }`
+  )
+  .join('\n')}
                 \`\`\`
             `
       )
       .setFooter(
-        "You're viewing the configuration because you didn't specify a subcommand",
+        'You\'re viewing the configuration because you didn\'t specify a subcommand',
         this.bot.client.users.get(ctx.guild!.ownerID)!.avatarURL
       );
 
