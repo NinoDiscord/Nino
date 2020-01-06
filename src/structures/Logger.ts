@@ -31,9 +31,6 @@ export default class Logger {
   }
 
   initialize() {
-    const tmpDir = `${process.cwd()}${sep}tmp`;
-    
-    if (!existsSync(tmpDir)) mkdirSync(tmpDir);
     if (!existsSync(this.logPath)) mkdirSync(this.logPath);
   }
 

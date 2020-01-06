@@ -1,21 +1,18 @@
-import HelpCommand from './Help';
 import { mockDeep, mock } from 'jest-mock-extended';
-import CommandContext from '../../structures/Context';
-import container from '../../inversify.config';
-import Bot from '../../structures/Bot';
-import { TYPES } from '../../types';
-import GuildSettings from '../../structures/settings/GuildSettings';
 import { TextChannel } from 'eris';
 import { GuildModel } from '../../models/GuildSchema';
+import CommandContext from '../../structures/Context';
 import EmbedBuilder from '../../structures/EmbedBuilder';
-
+import container from '../../inversify.config';
+import { TYPES } from '../../types';
+import Bot from '../../structures/Bot';
 
 describe('Help Command', () => {
   const ctx = mockDeep<CommandContext>();
   const bot = container.get<Bot>(TYPES.Bot);
   const help = bot.manager.getCommand('help')!;
 
-  beforeEach(()=>{
+  beforeEach(() => {
     jest.clearAllMocks();
   });
 

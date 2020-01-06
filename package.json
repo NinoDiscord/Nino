@@ -35,7 +35,6 @@
         "ms": "2.1.2",
         "prom-client": "11.5.3",
         "reflect-metadata": "0.1.13",
-        "table": "5.4.6",
         "wumpfetch": "0.3.1"
     },
     "devDependencies": {
@@ -47,7 +46,6 @@
         "@types/mongoose": "5.5.37",
         "@types/ms": "0.7.31",
         "@types/node": "12.12.21",
-        "@types/table": "4.0.5",
         "@typescript-eslint/eslint-plugin": "2.14.0",
         "@typescript-eslint/parser": "2.14.0",
         "eslint": "6.8.0",

@@ -2,7 +2,6 @@ import { inject, injectable } from 'inversify';
 import { Collection } from '@augu/immutable';
 import NinoCommand from '../Command';
 import { TYPES } from '../../types';
-import { User } from 'eris';
 import Bot from '../Bot';
 
 interface CommandUsage {
