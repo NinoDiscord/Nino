@@ -20,8 +20,8 @@ export default class UnbanCommand extends Command {
       aliases: ['unbanne'],
       category: 'Moderation',
       guildOnly: true,
-      userpermissions: Constants.Permissions.banMembers,
-      botpermissions: Constants.Permissions.banMembers,
+      userPermissions: Constants.Permissions.banMembers,
+      botPermissions: Constants.Permissions.banMembers,
     });
   }
 

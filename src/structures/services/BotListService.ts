@@ -57,10 +57,10 @@ export default class BotListService {
         })
         .send()
         .then(res => {
-          this.bot.logger.log('info', `Posted guild stats to top.gg: ${res.statusCode}: ${res.body}`);
+          this.bot.logger.info(`Posted guild stats to top.gg: ${res.statusCode}: ${res.body}`);
         })
         .catch(() => {
-          this.bot.logger.log('error', 'Failed to post guild stats to top.gg');
+          this.bot.logger.error('Failed to post guild stats to top.gg');
         });
     }
     if (this.bot.config.botlists && this.bot.config.botlists.bfdtoken) {
@@ -77,10 +77,10 @@ export default class BotListService {
         })
         .send()
         .then(res => {
-          this.bot.logger.log('info', `Posted guild stats to Bots For Discord: ${res.statusCode}: ${res.body}`);
+          this.bot.logger.info(`Posted guild stats to Bots For Discord: ${res.statusCode}: ${res.body}`);
         })
         .catch(() => {
-          this.bot.logger.log('error', 'Failed to post guild stats to Bots For Discord.');
+          this.bot.logger.error('Failed to post guild stats to Bots For Discord.');
         });
     }
     if (this.bot.config.botlists && this.bot.config.botlists.dboatstoken) {
@@ -97,10 +97,10 @@ export default class BotListService {
         })
         .send()
         .then(res => {
-          this.bot.logger.log('info', `Posted guild stats to Discord Boats: ${res.statusCode}: ${res.body}`);
+          this.bot.logger.info(`Posted guild stats to Discord Boats: ${res.statusCode}: ${res.body}`);
         })
         .catch(() => {
-          this.bot.logger.log('error', 'Failed to post guild stats to Discord Boats.');
+          this.bot.logger.error('Failed to post guild stats to Discord Boats.');
         });
     }
     if (this.bot.config.botlists && this.bot.config.botlists.blstoken) {
@@ -117,10 +117,10 @@ export default class BotListService {
         })
         .send()
         .then(res => {
-          this.bot.logger.log('info', `Posted guild stats to botlist.space: ${res.statusCode}: ${res.body}`);
+          this.bot.logger.info(`Posted guild stats to botlist.space: ${res.statusCode}: ${res.body}`);
         })
         .catch(() => {
-          this.bot.logger.log('error', 'Failed to post guild stats to botlist.space.');
+          this.bot.logger.error('Failed to post guild stats to botlist.space.');
         });
     }
   }

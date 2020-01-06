@@ -29,7 +29,7 @@ export default class StatusManager {
       name: this.pattern
         .replace('%prefix%', this.bot.config.discord.prefix)
         .replace('%guilds%', this.bot.client.guilds.size.toLocaleString()),
-      type: this.bot.config.statustype || 0,
+      type: this.bot.config.statusType || 0,
     });
   }
 }

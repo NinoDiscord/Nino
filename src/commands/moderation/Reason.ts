@@ -15,8 +15,8 @@ export default class ReasonCommand extends Command {
       aliases: ['update-reason'],
       category: 'Moderation',
       guildOnly: true,
-      userpermissions: Constants.Permissions.banMembers,
-      botpermissions: Constants.Permissions.manageMessages,
+      userPermissions: Constants.Permissions.banMembers,
+      botPermissions: Constants.Permissions.manageMessages,
     });
   }
 

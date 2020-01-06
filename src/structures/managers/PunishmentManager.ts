@@ -281,16 +281,16 @@ export default class PunishmentManager {
 
         await this.bot.cases.update(member.guild.id, c.id, {
           message: message.id
-        }, error => error ? this.bot.logger.log('error', `Unable to update case:\n${error}`) : null);
+        }, error => error ? this.bot.logger.error(`Unable to update case:\n${error}`) : null);
         return undefined;
       }
       catch(ex) {
-        this.bot.logger.log('error', `Unable to post to modlog:\n${ex}`);
+        this.bot.logger.error(`Unable to post to modlog:\n${ex}`);
         return `Sorry ${punishment.options.moderator.username}, I was unable to publish case #${c.id} to the mod log`;
       }
     } 
     else {
-      this.bot.logger.log('error', 'Nino doesn\'t have permissions to publish to the mod log');
+      this.bot.logger.error('Nino doesn\'t have permissions to publish to the mod log');
       return `Sorry ${punishment.options.moderator.username}, I was unable to post to the mod log due to me not having any permissions (\`Send Messages\`, \`Embed Links\`)`;
     }
   }

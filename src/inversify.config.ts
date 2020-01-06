@@ -66,11 +66,11 @@ try {
 catch (e) {
   config = {
     status: undefined,
-    statustype: undefined,
+    statusType: undefined,
     environment: 'development',
     databaseUrl: 'mongodb://localhost:27017/nino',
-    disabledcmds: undefined,
-    disabledcats: undefined,
+    disabledCommands: undefined,
+    disabledCategories: undefined,
     owners: undefined,
     discord: {
       token: '',
@@ -81,9 +81,6 @@ catch (e) {
       port: 6379,
       database: undefined,
     },
-    webhook: undefined,
-    webserver: undefined,
-    mode: undefined,
     sentryDSN: undefined,
     botlists: undefined,
   };

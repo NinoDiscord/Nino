@@ -13,12 +13,12 @@ if (!config.sentryDSN) {
 else {
   init({
     dsn: config.sentryDSN,
-    release: `${pkg.version} (${config.mode})`,
+    release: `${pkg.version}`,
   });
 }
 
 bot.build().catch(ex => {
-  bot.logger.log('error', 'Unable to build:\n' + ex.stack);
+  bot.logger.error('Unable to build:\n' + ex.stack);
 });
 
 process.on('exit', () => {
