@@ -17,9 +17,8 @@ else {
   });
 }
 
-bot.build().catch(ex => {
-  bot.logger.error('Unable to build:\n' + ex.stack);
-});
+bot.build()
+  .then(() => bot.logger.info('All set!'));
 
 process.on('exit', () => {
   bot.database.m.connection.close();

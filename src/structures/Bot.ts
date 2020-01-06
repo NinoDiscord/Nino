@@ -127,10 +127,13 @@ export default class Bot {
     // eslint-disable-next-line
     await this.redis.connect().catch(() => {});
 
-    this.logger.info('Success! Connecting to Discord...');
-    await this.client.connect();
+    this.logger.info('Success! Initializing events...');
+    this.events.run();
 
-    this.logger.info('Connected to Discord!');
+    this.logger.info('Success! Connecting to Discord...');
+    await this.client.connect()
+      .then(() => this.logger.info('Connecting to Discord...'))
+      .catch(ex => this.logger.error(ex));
   }
 
   getEmbed() {

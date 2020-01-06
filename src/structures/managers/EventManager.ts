@@ -22,8 +22,10 @@ export default class EventManager {
   ) {
     this.bot = bot;
     this.events = events;
+  }
 
-    for (let event of this.events) this.emit(event);
+  run() {
+    for (const event of this.events) this.emit(event);
   }
 
   /**
@@ -40,6 +42,7 @@ export default class EventManager {
       }
     };
 
+    this.bot.logger.info(`Built event "${ev.event}"`);
     this.bot.client.on(ev.event, wrapper);
   }
 }

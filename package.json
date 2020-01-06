@@ -9,7 +9,7 @@
         "main": "yarn build && node dist/index.js",
         "dev": "nodemon dist/index.js",
         "lint": "eslint src --ext .ts --fix",
-        "clean": "rm -fr dist && rm -fr dist",
+        "clean": "rm -fr dist",
         "test": "jest --forceExit"
     },
     "maintainers": [
