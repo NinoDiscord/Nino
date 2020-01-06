@@ -36,12 +36,12 @@ export class CommandInvocation {
    * Returns an error string if cannot invoke, otherwise it will return undefined.
    */
   canInvoke() {
-    if (this.command.guildOnly && this.channel.type === 1) {
-      return `Sorry, you will need to be in a guild to execute the \`${this.command.name}\` command.`;
+    if (this.command.guildOnly && this.channel.type !== 1) {
+      return `Sorry, but you need to be in a guild to execute the \`${this.command.name}\` command.`;
     }
 
     if (this.command.ownerOnly && !this.command.bot.owners.includes(this.user.id)) {
-      return `Sorry, you will be a developer to execute the \`${this.command.name}\` command.`;
+      return `Sorry, but you need to be a developer to execute the \`${this.command.name}\` command.`;
     }
 
     if (this.command.disabled && !this.onetime) {
@@ -91,6 +91,7 @@ export default class CommandService {
         const help = this.bot.manager.commands.get('help')!;
         return new CommandInvocation(help, ctx, true); 
       }
+      return new CommandInvocation(command, ctx, false);
     }
 
     return undefined;

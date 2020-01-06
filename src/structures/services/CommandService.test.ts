@@ -7,11 +7,11 @@ import CommandContext from '../Context';
 describe('CommandService', () => {
   container.rebind<Config>(TYPES.Config).toConstantValue({
     status: undefined,
-    statustype: undefined,
+    statusType: undefined,
     environment: 'development',
     databaseUrl: 'mongodb://localhost:27017/nino',
-    disabledcmds: [],
-    disabledcats: undefined,
+    disabledCommands: [],
+    disabledCategories: undefined,
     owners: undefined,
     discord: {
       token: '',
@@ -22,9 +22,6 @@ describe('CommandService', () => {
       port: 6379,
       database: undefined,
     },
-    webhook: undefined,
-    webserver: undefined,
-    mode: undefined,
     sentryDSN: undefined,
     botlists: undefined,
   });
@@ -74,7 +71,7 @@ describe('CommandService', () => {
     const context = new CommandContext(bot, message, args);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
-    expect(invocation!.canInvoke()).toEqual('Command `help` is disabled.');
+    expect(invocation!.canInvoke()).toEqual('Currently, command `help` is globally disabled');
   });
 
   it('it should not be able to invoke the command because the command is guild only', () => {

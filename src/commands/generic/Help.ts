@@ -34,11 +34,11 @@ export default class HelpCommand extends Command {
     const categories = this.getAllCategories();
 
     if (!ctx.args.has(0)) {
-      const embed = this.bot.getEmbed()
-        .setTitle(`${this.bot.client.user.username}#${this.bot.client.user.discriminator} | COmmands List`)
+      const embed = ctx.bot.getEmbed()
+        .setTitle(`${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator} | Commands List`)
         .setDescription(stripIndents`
-          More information is avaliable on the [website](https://nino.augu.dev)!
-          There are currently **${this.bot.manager.commands.size}** commands avaliable!
+          More information is available on the [website](https://nino.augu.dev)!
+          There are currently **${ctx.bot.manager.commands.size}** commands available!
         `)
         .setFooter(`Use "${settings!.prefix}help <command name>" to get documentation on a specific command`);
 
@@ -50,7 +50,7 @@ export default class HelpCommand extends Command {
     }
     else {
       const arg = ctx.args.get(0);
-      const command = this.bot.manager.commands.filter(s => s.name === arg)[0];
+      const command = ctx.bot.manager.commands.filter(s => s.name === arg)[0];
 
       if (!command) return ctx.send(`Sorry, I was not able to find the command \`${arg}\``);
       else {

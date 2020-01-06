@@ -9,6 +9,8 @@ interface CommandUsage {
   command: string;
   size: number;
 }
+
+@injectable()
 export default class CommandStatisticsManager {
   public commandsExecuted: number;
   public commandUsages: Collection<number>;

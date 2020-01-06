@@ -70,7 +70,7 @@ export default class Bot {
   @lazyInject(TYPES.DatabaseManager)
   public database!: DatabaseManager;
 
-  @lazyInject(TYPES.CommandStatisticsManager)
+  @lazyInject(TYPES.CommandManager)
   public manager!: CommandManager;
 
   @lazyInject(TYPES.PrometheusManager)
