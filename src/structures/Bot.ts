@@ -40,6 +40,7 @@ export interface Config {
   sentryDSN: string | undefined;
   status: string | undefined;
   owners: string[] | undefined;
+  prometheus: number;
   discord: {
     prefix: string;
     token: string;

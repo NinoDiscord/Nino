@@ -69,6 +69,7 @@ catch (e) {
     statusType: undefined,
     environment: 'development',
     databaseUrl: 'mongodb://localhost:27017/nino',
+    prometheus: 5595,
     disabledCommands: undefined,
     disabledCategories: undefined,
     owners: undefined,

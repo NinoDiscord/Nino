@@ -13,6 +13,7 @@ describe('CommandService', () => {
     disabledCommands: [],
     disabledCategories: undefined,
     owners: undefined,
+    prometheus: 5595,
     discord: {
       token: '',
       prefix: 'x!',
