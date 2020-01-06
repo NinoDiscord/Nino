@@ -1,3 +1,5 @@
+import { User } from 'eris';
+
 export function humanize(ms: number) {
   const weeks = Math.floor(ms / 1000 / 60 / 60 / 24 / 7);
   ms -= weeks * 1000 * 60 * 60 * 24 * 7;
@@ -14,11 +16,16 @@ export function humanize(ms: number) {
   const sec = Math.floor(ms / 1000);
 
   let humanized = '';
-  if (weeks > 0) humanized += `${weeks} weeks, `;
-  if (days > 0) humanized += `${days} days, `;
-  if (hours > 0) humanized += `${hours} hours, `;
-  if (mins > 0) humanized += `${mins} minutes, `;
-  if (sec > 0) humanized += `${sec} seconds`;
+  if (weeks > 0) humanized += `${weeks}w`;
+  if (days > 0) humanized += `${days}d`;
+  if (hours > 0) humanized += `${hours}h`;
+  if (mins > 0) humanized += `${mins}m`;
+  if (sec > 0) humanized += `${sec}s`;
 
   return humanized;
+}
+
+// TODO: Add more content
+export function replaceMessage(text: string, user: User) {
+  return text.replace(/%author%/, `${user.username}#${user.discriminator}`);
 }

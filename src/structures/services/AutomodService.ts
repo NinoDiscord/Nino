@@ -1,13 +1,13 @@
-import Bot from '../Bot';
-import AutoModSpam from '../automod/Spam';
-import AutoModInvite from '../automod/Invite';
-import { Message, Member } from 'eris';
-import AutoModBadWords from '../automod/Badwords';
-import AutoModRaid from '../automod/Raid';
-import AutoModDehoist from '../automod/Dehoisting';
-import AutoModMention from '../automod/Mention';
 import { inject, injectable } from 'inversify';
+import { Message, Member } from 'eris';
+import AutomodSwearing from '../automod/Badwords';
+import AutomodDehoist from '../automod/Dehoisting';
+import AutomodMention from '../automod/Mention';
+import AutomodInvite from '../automod/Invite';
+import AutomodSpam from '../automod/Spam';
+import AutomodRaid from '../automod/Raid';
 import { TYPES } from '../../types';
+import Bot from '../Bot';
 import 'reflect-metadata';
 
 /**
@@ -24,20 +24,22 @@ import 'reflect-metadata';
  */
 @injectable()
 export default class AutomodService {
-  private spamhandler: AutoModSpam;
-  private invitehandler: AutoModInvite;
-  private badwordhandler: AutoModBadWords;
-  private raidhandler: AutoModRaid;
-  private dehoisthandler: AutoModDehoist;
-  private mentionhandler: AutoModMention;
+  private swearing: AutomodSwearing;
+  private mentions: AutomodMention;
+  private invites: AutomodInvite;
+  private dehoist: AutomodDehoist;
+  private spam: AutomodSpam;
+  private raid: AutomodRaid;
 
-  constructor(@inject(TYPES.Bot) bot: Bot) {
-    this.spamhandler = new AutoModSpam(bot);
-    this.invitehandler = new AutoModInvite(bot);
-    this.badwordhandler = new AutoModBadWords(bot);
-    this.raidhandler = new AutoModRaid(bot);
-    this.dehoisthandler = new AutoModDehoist(bot);
-    this.mentionhandler = new AutoModMention(bot);
+  constructor(
+    @inject(TYPES.Bot) bot: Bot
+  ) {
+    this.swearing = new AutomodSwearing(bot);
+    this.mentions = new AutomodMention(bot);
+    this.dehoist  = new AutomodDehoist(bot);
+    this.invites  = new AutomodInvite(bot);
+    this.spam     = new AutomodSpam(bot);
+    this.raid     = new AutomodRaid(bot);
   }
 
   /**
@@ -47,10 +49,10 @@ export default class AutomodService {
    */
   async handleMessage(m: Message): Promise<boolean> {
     return (
-      (await this.invitehandler.handle(m)) ||
-      (await this.badwordhandler.handle(m)) ||
-      (await this.spamhandler.handle(m)) ||
-      (await this.mentionhandler.handle(m))
+      await this.invites.handle(m) ||
+      await this.swearing.handle(m) ||
+      await this.spam.handle(m) ||
+      await this.mentions.handle(m)
     );
   }
 
@@ -60,13 +62,13 @@ export default class AutomodService {
    */
   async handleMemberJoin(m: Member): Promise<boolean> {
     return (
-      (await this.raidhandler.handle(m)) ||
-      (await this.dehoisthandler.handle(m)) ||
+      await this.raid.handle(m) ||
+      await this.dehoist.handle(m) ||
       false
     );
   }
 
   async handleMemberNameUpdate(m: Member): Promise<void> {
-    return this.dehoisthandler.handle(m);
+    return this.dehoist.handle(m);
   }
 }

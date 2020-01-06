@@ -1,30 +1,28 @@
-import Client from '../structures/Bot';
-import Event from '../structures/Event';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../types';
+import Client from '../structures/Bot';
+import Event from '../structures/Event';
 
 @injectable()
 export default class ReadyEvent extends Event {
-  constructor(@inject(TYPES.Bot) client: Client) {
+  constructor(
+    @inject(TYPES.Bot) client: Client
+  ) {
     super(client, 'ready');
   }
 
   async emit() {
-    this.bot.logger.log(
-      'discord',
-      `Logged in as ${this.bot.client.user.username}#${this.bot.client.user.discriminator} (${this.bot.client.user.id})`
-    );
+    const name = `${this.bot.client.user.username}#${this.bot.client.user.discriminator} (${this.bot.client.user.id})`;
+
+    this.bot.logger.info(`Logged in as ${name}`);
     this.bot.status.updateStatus();
-    setInterval(() => 
-      this.bot.status.updateStatus(),
-    600000);
-    this.bot.prometheus.server.listen(5595, () =>
-      this.bot.logger.log('info', 'Metrics is now listening on port \'5595\'')
-    );
+    setInterval(() => this.bot.status.updateStatus(), 600000);
+
+    this.bot.prometheus.server.listen(5595, () => this.bot.logger.info('Metrics server is now listening on port "5595"'));
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
-    this.bot.stats.guildCount = this.bot.client.guilds.size;
-    this.bot.prometheus.guildCount.set(this.bot.stats.guildCount, Date.now());
-    this.bot.botlistservice.start();
+
+    this.bot.statistics.guildCount = this.bot.client.guilds.size;
+    this.bot.prometheus.guildCount.set(this.bot.statistics.guildCount, Date.now());
     this.bot.timeouts.reapplyTimeouts();
   }
 }

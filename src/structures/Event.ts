@@ -1,5 +1,5 @@
-import Client from './Bot';
 import { injectable, unmanaged } from 'inversify';
+import Client from './Bot';
 import 'reflect-metadata';
 
 export type Emittable =
@@ -62,19 +62,21 @@ export type Emittable =
   | 'shardReady'
   | 'shardResume'
   | 'messageDelete';
+
 @injectable()
 export default class NinoEvent {
   public bot: Client;
   public event: Emittable;
 
-  constructor(client: Client, @unmanaged() event: Emittable) {
+  constructor(
+    client: Client, 
+    @unmanaged() event: Emittable
+  ) {
     this.bot = client;
     this.event = event;
   }
 
   async emit(...args: any[]) {
-    throw new SyntaxError(
-      `Unable to run event '${this.event}' without the 'emit' function.`
-    );
+    throw new SyntaxError(`Unable to run event '${this.event}' without the 'emit' function.`);
   }
 }

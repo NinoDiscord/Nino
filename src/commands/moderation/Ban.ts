@@ -1,21 +1,19 @@
-import {
-  Punishment,
-  PunishmentType,
-} from '../../structures/managers/PunishmentManager';
+import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
 import { Constants, Member, Guild } from 'eris';
-import Bot from '../../structures/Bot';
-import findUser, { findId } from '../../util/UserUtil';
+import { injectable, inject } from 'inversify';
+import PermissionUtils from '../../util/PermissionUtils';
+import { findId } from '../../util/UserUtil'; 
+import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import Bot from '../../structures/Bot';
 import ms = require('ms');
-import PermissionUtils from '../../util/PermissionUtils';
-import { Exception } from '@sentry/node';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../../types';
 
 @injectable()
 export default class BanCommand extends Command {
-  constructor(@inject(TYPES.Bot) client: Bot) {
+  constructor(
+    @inject(TYPES.Bot) client: Bot
+  ) {
     super(client, {
       name: 'ban',
       description: 'Ban a member in the current guild',
@@ -23,33 +21,27 @@ export default class BanCommand extends Command {
       aliases: ['banne', 'bean'],
       category: 'Moderation',
       guildOnly: true,
-      userpermissions: Constants.Permissions.banMembers,
-      botpermissions: Constants.Permissions.banMembers,
+      userPermissions: Constants.Permissions.banMembers,
+      botPermissions: Constants.Permissions.banMembers,
     });
   }
 
   async run(ctx: Context) {
-    if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
+    if (!ctx.args.has(0)) return ctx.send('No user has been specified');
 
-    const u = findId(ctx.args.get(0));
-    if (!u) return ctx.send('Invalid format: <@mention> / <user id>');
-    let member:
-      | Member
-      | undefined
-      | { id: string; guild: Guild } = ctx.guild!.members.get(u);
+    const userID = ctx.args.get(0);
+    const user = findId(userID);
+    if (!user) return ctx.send('Unable to find that user. All users must be `<@mention>` or with a user ID');
 
-    if (!member || !(member instanceof Member))
-      member = { id: u, guild: ctx.guild! };
+    let member: Member | { id: string; guild: Guild } | undefined = ctx.guild!.members.get(user);
+    if (!member || !(member instanceof Member)) member = { id: userID, guild: ctx.guild! };
     else {
-      if (!PermissionUtils.above(ctx.message.member!, member))
-        return ctx.send('The user is above you in the heirarchy.');
+      if (!PermissionUtils.above(ctx.member!, member)) return ctx.send('User is above or the same of your heirarchy');
     }
 
-    const baseReason = ctx.args.has(1)
-      ? ctx.args.slice(1).join(' ')
-      : undefined;
-    let time!: string;
+    const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     let reason!: string;
+    let time!: string;
 
     if (baseReason) {
       const sliced = baseReason.split(' | ');
@@ -58,26 +50,25 @@ export default class BanCommand extends Command {
     }
 
     const days = ctx.flags.get('days') || ctx.flags.get('d');
-    if (days && (typeof days === 'boolean' || !/[0-9]+/.test(days)))
-      return ctx.send(
-        'You need to specify the amount days to delete messages of.'
-      );
+    if (days && (typeof days === 'boolean' || !(/[0-9]+/).test(days))) return ctx.send('You must need to specify an amount days to delete messages. (example: `--days=7`)');
 
-    const t = !!time ? ms(time) : undefined;
+    const t = time ? ms(time) : undefined;
+    const soft = ctx.flags.get('soft');
+    if (soft && typeof soft === 'string') return ctx.send('You don\'t need to append anything (example: `--soft`)');
 
     const punishment = new Punishment(PunishmentType.Ban, {
       moderator: ctx.sender,
-      soft: ctx.flags.get('soft') as boolean,
+      soft: soft as boolean,
       temp: t,
-      days: Number(days),
+      days: Number(days)
     });
 
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
-      await ctx.send('User successfully banned.');
+      return ctx.send('User was successfully banned');
     }
-    catch (e) {
-      ctx.send('Cannot ban user, ' + e.message);
+    catch(e) {
+      ctx.send(`Unable to ban user: \`${e.message}\``);
     }
   }
 }

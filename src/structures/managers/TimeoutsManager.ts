@@ -24,8 +24,7 @@ export default class TimeoutsManager {
    * @param time the time to excute it after
    */
   bigTimeout(func: (...args: any[]) => void, time: number) {
-    if (time > 0x7fffffff)
-      setTimeout(() => this.bigTimeout(func, time - 0x7fffffff), 0x7fffffff);
+    if (time > 0x7fffffff) setTimeout(() => this.bigTimeout(func, time - 0x7fffffff), 0x7fffffff);
     else setTimeout(func, time);
   }
 
@@ -36,22 +35,17 @@ export default class TimeoutsManager {
    * @param task the punishment
    * @param time the amount of time before executing
    */
-  async addTimeout(member: string, guild: Guild, task: string, time: number) {
+  async addTimeout(member: string, guild: Guild, task: 'unban' | 'unmute', time: number) {
     const key = `timeout:${task}:${guild.id}:${member}`;
-    await this.bot.redis.set(
-      key,
-      `${Date.now()}:${time}:${member}:${guild.id}:${task}`
-    );
+    await this.bot.redis.set(key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
     this.bigTimeout(async () => {
-      if (await this.bot.redis.exists(key)) {
-        await this.bot.punishments.punish(
-          { id: member, guild },
-          new Punishment(task as PunishmentType, {
-            moderator: this.bot.client.user,
-          }),
-          'time\'s up'
-        );
-        await this.bot.redis.del(key);
+      const exists = await this.bot.redis.exists(key);
+      if (exists) {
+        const punishment = new Punishment(task as PunishmentType, {
+          moderator: this.bot.client.user
+        });
+
+        await this.bot.punishments.punish({ id: member, guild }, punishment, '[Automod] Time\'s up!');
       }
     }, time);
   }
@@ -89,7 +83,7 @@ export default class TimeoutsManager {
               new Punishment(task as PunishmentType, {
                 moderator: this.bot.client.user,
               }),
-              'time\'s up'
+              '[Automod] Time\'s up!'
             );
           }
           finally {

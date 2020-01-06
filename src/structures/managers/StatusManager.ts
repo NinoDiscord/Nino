@@ -21,10 +21,10 @@ export default class StatusManager {
     this.pattern = bot.config.status || '%prefix%help | %guilds% Guilds';
   }
 
-  /*
-        Updates the status of the bot.
-    */
-  updateStatus(): void {
+  /**
+   * Updates the status of the bot
+   */
+  updateStatus() {
     return this.bot.client.editStatus('online', {
       name: this.pattern
         .replace('%prefix%', this.bot.config.discord.prefix)

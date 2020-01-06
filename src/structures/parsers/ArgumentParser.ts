@@ -8,13 +8,9 @@ export default class ArgumentParser {
   constructor(raw: string[]) {
     this.args = [];
 
-    for (let i = 0; i < raw.length; i++) {
-      if (!raw[i].startsWith('--')) {
-        this.args.push(raw[i]);
-      }
-      else {
-        break;
-      }
+    for (let arg of raw) {
+      if (!arg.startsWith('--')) this.args.push(arg);
+      else break;
     }
   }
 

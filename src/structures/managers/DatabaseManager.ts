@@ -1,12 +1,10 @@
-import 'reflect-metadata';
+import { injectable, inject } from 'inversify';
+import { Config } from '../Bot';
+import { TYPES } from '../../types';
 import { Admin } from 'mongodb';
 import mongoose from 'mongoose';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../../types';
-import { Config } from '../Bot';
-import Pikmin from 'pikmin';
-
-const logger = Pikmin.loggers.get('main')!;
+import Logger from '../Logger';
+import 'reflect-metadata';
 
 interface BuildInfo {
   version: string;
@@ -35,12 +33,15 @@ interface BuildInfo {
 
 @injectable()
 export default class DatabaseManager {
-  public uri: string = 'mongodb://localhost:27017/nino';
   public admin!: Admin;
   public build!: BuildInfo;
+  public logger: Logger = new Logger();
+  public uri: string;
   public m!: typeof mongoose;
 
-  constructor(@inject(TYPES.Config) config: Config) {
+  constructor(
+    @inject(TYPES.Config) config: Config
+  ) {
     this.uri = config.databaseUrl;
   }
 
@@ -50,18 +51,16 @@ export default class DatabaseManager {
       useUnifiedTopology: true,
       autoIndex: false,
     });
-    this.m.connection.on('error', error => {
-      if (error) console.error(error);
-    });
+
+    this.m.connection.on('error', error => error ? this.logger.error(error) : null);
     this.m.connection.once('open', () =>
-      logger.log('info', `Opened a connection to MongoDB with URI: ${this.uri}`)
+      this.logger.database(`Opened a connection to MongoDB with URI: ${this.uri}`)
     );
   }
 
-  async getBuild(): Promise<any> {
+  async getBuild() {
     if (!this.admin) this.admin = this.m.connection.db.admin();
     if (!this.build) this.build = await this.admin.buildInfo();
-
     return this.build;
   }
 }

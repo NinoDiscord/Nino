@@ -1,8 +1,8 @@
+import { Punishment, PunishmentType } from '../managers/PunishmentManager';
+import PermissionUtils from '../../util/PermissionUtils';
 import { Member } from 'eris';
 import RedisQueue from '../../util/RedisQueue';
 import Bot from '../Bot';
-import PermissionUtils from '../../util/PermissionUtils';
-import { Punishment, PunishmentType } from '../managers/PunishmentManager';
 
 /**
  * An event handler to check for ongoing spam.
@@ -36,32 +36,33 @@ export default class AutoModRaid {
       !PermissionUtils.above(me, m) ||
       m.bot ||
       Date.now() - m.createdAt > 7 * 86400000
-    )
-      // if the account is more than 7 days old we can assume it's not a part of a raid
-      return false;
+    ) return false;
 
     const settings = await this.bot.settings.get(guild.id);
-
     if (!settings || !settings.automod.raid) return false;
 
     const queue = new RedisQueue(this.bot.redis, `raid:${guild.id}`);
-    await queue.push(Date.now().toString() + 'U' + m.id);
+    await queue.push(`${Date.now()}U${m.id}`);
 
-    if ((await queue.length()) >= 3) {
-      const oldtime = Number.parseInt(await queue.pop());
-      if (Date.now() - oldtime <= 1000) {
+    const length = await queue.length();
+    if (length >= 3) {
+      const oldTime = Number.parseInt(await queue.pop());
+      if (Date.now() - oldTime <= 1000) {
         do {
           await this.bot.punishments.punish(
             m,
             new Punishment(PunishmentType.Ban, { moderator: me.user }),
-            'Automod: Raid detected'
+            '[Automod] Raid detected'
           );
-          const [time, id] = (await queue.pop()).split('U');
+
+          const [, id] = (await queue.pop()).split('U');
           m = guild.members[id];
-        } while ((await queue.length()) > 0);
+        } while((await queue.length()) > 0);
+
         return true;
       }
     }
+
     return false;
   }
 }

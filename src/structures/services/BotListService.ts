@@ -13,7 +13,9 @@ export default class BotListService {
   private bot: Bot;
   private interval?: NodeJS.Timeout;
 
-  constructor(@inject(TYPES.Bot) bot: Bot) {
+  constructor(
+    @inject(TYPES.Bot) bot: Bot
+  ) {
     this.bot = bot;
   }
 
@@ -21,21 +23,10 @@ export default class BotListService {
    * Start posting guild stats
    */
   start() {
-    this.postCount(
-      this.bot.client.guilds.size,
-      this.bot.client.user.id,
-      this.bot.config,
-      this.bot.logger
-    );
-    this.interval = setInterval(async () => {
+    this.postCount(this.bot.client.guilds.size);
+    this.interval = setInterval(async() => {
       const guilds = await this.bot.redis.get('guilds');
-      if (guilds)
-        this.postCount(
-          Number(guilds),
-          this.bot.client.user.id,
-          this.bot.config,
-          this.bot.logger
-        );
+      if (guilds) this.postCount(Number(guilds));
     }, 60000);
   }
 
@@ -51,93 +42,85 @@ export default class BotListService {
   /**
    * Post guild stats
    */
-  postCount(guilds: number, id: string, config: Config, logger: any) {
-    if (config.botlists && config.botlists.topggtoken) {
+  postCount(guilds: number) {
+    if (this.bot.config.botlists && this.bot.config.botlists.topggtoken) {
       wumpfetch({
-        url: `https://top.gg/api/bots/${id}/stats`,
+        url: `https://top.gg/api/bots/${this.bot.client.user.id}/stats`,
         method: 'POST',
         data: {
           server_count: guilds,
         },
       })
         .header({
-          Authorization: config.botlists.topggtoken,
+          Authorization: this.bot.config.botlists.topggtoken,
           'Content-Type': 'application/json',
         })
         .send()
         .then(res => {
-          logger.info(
-            `Posted guild stats to TOP.GG: ${res.statusCode} : ${res.body}`
-          );
+          this.bot.logger.log('info', `Posted guild stats to top.gg: ${res.statusCode}: ${res.body}`);
         })
-        ['catch'](() => {
-          logger.error('Failed to post guild stats to TOP.GG.');
+        .catch(() => {
+          this.bot.logger.log('error', 'Failed to post guild stats to top.gg');
         });
     }
-    if (config.botlists && config.botlists.bfdtoken) {
+    if (this.bot.config.botlists && this.bot.config.botlists.bfdtoken) {
       wumpfetch({
-        url: `https://botsfordiscord.com/api/bot/${id}`,
+        url: `https://botsfordiscord.com/api/bot/${this.bot.client.user.id}`,
         method: 'POST',
         data: {
           server_count: guilds,
         },
       })
         .header({
-          Authorization: config.botlists.bfdtoken,
+          Authorization: this.bot.config.botlists.bfdtoken,
           'Content-Type': 'application/json',
         })
         .send()
         .then(res => {
-          logger.info(
-            `Posted guild stats to Bots For Discord: ${res.statusCode} : ${res.body}`
-          );
+          this.bot.logger.log('info', `Posted guild stats to Bots For Discord: ${res.statusCode}: ${res.body}`);
         })
-        ['catch'](() => {
-          logger.error('Failed to post guild stats to Bots For Discord.');
+        .catch(() => {
+          this.bot.logger.log('error', 'Failed to post guild stats to Bots For Discord.');
         });
     }
-    if (config.botlists && config.botlists.dboatstoken) {
+    if (this.bot.config.botlists && this.bot.config.botlists.dboatstoken) {
       wumpfetch({
-        url: `https://discord.boats/api/bot/${id}`,
+        url: `https://discord.boats/api/bot/${this.bot.client.user.id}`,
         method: 'POST',
         data: {
           server_count: guilds,
         },
       })
         .header({
-          Authorization: config.botlists.dboatstoken,
+          Authorization: this.bot.config.botlists.dboatstoken,
           'Content-Type': 'application/json',
         })
         .send()
         .then(res => {
-          logger.info(
-            `Posted guild stats to Discord Boats: ${res.statusCode} : ${res.body}`
-          );
+          this.bot.logger.log('info', `Posted guild stats to Discord Boats: ${res.statusCode}: ${res.body}`);
         })
-        ['catch'](() => {
-          logger.error('Failed to post guild stats to Discord Boats.');
+        .catch(() => {
+          this.bot.logger.log('error', 'Failed to post guild stats to Discord Boats.');
         });
     }
-    if (config.botlists && config.botlists.blstoken) {
+    if (this.bot.config.botlists && this.bot.config.botlists.blstoken) {
       wumpfetch({
-        url: `https://api.botlist.space/v1/bots/${id}`,
+        url: `https://api.botlist.space/v1/bots/${this.bot.client.user.id}`,
         method: 'POST',
         data: {
           server_count: guilds,
         },
       })
         .header({
-          Authorization: config.botlists.blstoken,
+          Authorization: this.bot.config.botlists.blstoken,
           'Content-Type': 'application/json',
         })
         .send()
         .then(res => {
-          logger.info(
-            `Posted guild stats to Botlist.space: ${res.statusCode} : ${res.body}`
-          );
+          this.bot.logger.log('info', `Posted guild stats to botlist.space: ${res.statusCode}: ${res.body}`);
         })
-        ['catch'](() => {
-          logger.error('Failed to post guild stats to Botlist.space.');
+        .catch(() => {
+          this.bot.logger.log('error', 'Failed to post guild stats to botlist.space.');
         });
     }
   }

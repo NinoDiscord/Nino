@@ -1,16 +1,21 @@
-import { VERSION as __version__ } from 'eris';
+import { VERSION as version } from 'eris';
+import { injectable, inject } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { humanize } from '../../util';
-import Bot from '../../structures/Bot';
+import { execSync } from 'child_process';
+import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
-import { execSync } from 'child_process';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../../types';
+import Bot from '../../structures/Bot';
+import ts from 'typescript';
+
+const pkg = require('../../../package.json');
 
 @injectable()
 export default class StatisticsCommand extends Command {
-  constructor(@inject(TYPES.Bot) client: Bot) {
+  constructor(
+    @inject(TYPES.Bot) client: Bot
+  ) {
     super(client, {
       name: 'statistics',
       description: 'Gives you the bot\'s statistics',
@@ -20,50 +25,34 @@ export default class StatisticsCommand extends Command {
     });
   }
 
-  getMostUsedCommand() {
-    if (Object.keys(this.bot.stats.commandUsage).length > 0) {
-      const name = Object.keys(this.bot.stats.commandUsage)
-        .map(key => ({ key, uses: this.bot.stats.commandUsage[key].size })) // map key array to {key uses} array
-        .sort((a, b) => b.uses - a.uses)[0].key; // Sort by uses
-
-      return {
-        command: name,
-        size: this.bot.stats.commandUsage[name].size,
-        users: this.bot.stats.commandUsage[name].users.length,
-      };
-    }
-    return { command: 'None', size: 0, users: 0 };
-  }
-
   async run(ctx: Context) {
-    const command = this.getMostUsedCommand();
+    const { command, size: uses } = this.bot.statistics.getCommandUsages();
     const build = await this.bot.database.getBuild();
-    const commit = execSync('git rev-parse HEAD')
-      .toString()
-      .trim();
+    const commit = execSync('git rev-parse HEAD').toString().trim();
 
-    return ctx.send(stripIndents`
-            \`\`\`prolog
-            Guilds              ~> ${ctx.client.guilds.size.toLocaleString()}
-            Users               ~> ${ctx.client.users.size.toLocaleString()}
-            Channels            ~> ${Object.keys(
-    ctx.client.channelGuildMap
-  ).length.toLocaleString()}
-            Shards [C/T]        ~> [${ctx.guild!.shard.id}/${
-  ctx.client.shards.size
-}]
-            Uptime              ~> ${humanize(
-    Date.now() - ctx.client.startTime
-  )}
-            Commands            ~> ${this.bot.manager.commands.size}
-            Messages Seen       ~> ${this.bot.stats.messagesSeen.toLocaleString()}
-            Commands Executed   ~> ${this.bot.stats.commandsExecuted.toLocaleString()}
-            Most Used Command   ~> ${command.command} (${
-  command.size
-} executions)
-            Database Connection ~> v${build.version}
-            GitHub Commit       ~> ${commit.slice(0, 7)}
-            \`\`\`
-        `);
+    const users = this.bot.client.guilds.reduce((a, b) => a + b.memberCount, 0);
+    const channels = Object.keys(this.bot.client.channelGuildMap).length;
+    const embed = this.bot.getEmbed()
+      .setTitle(`${this.bot.client.user.username}#${this.bot.client.user.discriminator} | Realtime Statistics`)
+      .setDescription(stripIndents`
+        \`\`\`prolog
+        Guilds             ~> ${this.bot.client.guilds.size.toLocaleString()}
+        Users              ~> ${users.toLocaleString()}
+        Channels           ~> ${channels.toLocaleString()}
+        Shards             ~> [${ctx.guild!.shard.id}/${this.bot.client.shards.size}]
+        Uptime             ~> ${humanize(Date.now() - this.bot.client.startTime)}
+        Total Commands     ~> ${this.bot.manager.commands.size}
+        Messages Seen      ~> ${this.bot.statistics.messagesSeen.toLocaleString()}
+        Commands Executed  ~> ${this.bot.statistics.commandsExecuted.toLocaleString()}
+        Most Used Command  ~> ${command} (${uses} executions)
+        MongoDB Version    ~> v${build.version}
+        TypeScript Version ~> v${ts.version}
+        Node.js Version    ~> v${process.version}
+        Eris Version       ~> ${version}
+        Nino Version       ~> ${pkg.version} (${commit.slice(0, 7)})
+      `)
+      .build();
+
+    return ctx.embed(embed);
   }
 }

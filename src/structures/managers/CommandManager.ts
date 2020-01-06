@@ -1,10 +1,9 @@
+import { inject, injectable, multiInject } from 'inversify';
 import { Collection } from '@augu/immutable';
 import CommandService from '../services/CommandService';
-import Command from '../Command';
-import { sep } from 'path';
-import Bot from '../Bot';
-import { inject, injectable, multiInject } from 'inversify';
 import { TYPES } from '../../types';
+import Command from '../Command';
+import Bot from '../Bot';
 import 'reflect-metadata';
 
 @injectable()
@@ -19,16 +18,16 @@ export default class CommandManager {
    */
   constructor(
     @inject(TYPES.Bot) bot: Bot,
-    @inject(TYPES.CommandService) commandservice: CommandService,
+    @inject(TYPES.CommandService) service: CommandService,
     @multiInject(TYPES.Command) commands: Command[]
   ) {
     this.bot = bot;
-    this.service = commandservice;
+    this.service = service;
     for (let command of commands) {
       this.commands.set(command.name, command);
       if (
-        (this.bot.config.disabledcmds || []).includes(command.name) ||
-        (this.bot.config.disabledcats || []).includes(command.category)
+        (this.bot.config.disabledCommands || []).includes(command.name) ||
+        (this.bot.config.disabledCategories || []).includes(command.category)
       ) {
         command.disabled = true;
       }

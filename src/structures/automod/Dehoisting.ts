@@ -1,6 +1,6 @@
+import PermissionUtils from '../../util/PermissionUtils';
 import { Member } from 'eris';
 import Bot from '../Bot';
-import PermissionUtils from '../../util/PermissionUtils';
 
 /**
  * An event handler to handle hoisting members
@@ -27,26 +27,22 @@ export default class AutoModDehoist {
     const me = guild.members.get(this.bot.client.user.id)!;
     const name = m.nick || m.username;
 
-    if (name >= '0') return;
-
     const settings = await this.bot.settings.get(m.guild.id);
-
     if (!settings || !settings.automod.dehoist) return;
 
     if (
-      !PermissionUtils.above(me, m) ||
-      !me.permission.has('manageNicknames') ||
-      m.bot ||
+      !PermissionUtils.above(me, m) || 
+      !me.permission.has('manageNicknames') || 
+      m.bot || 
       m.permission.has('manageNicknames')
-    )
-      return;
+    ) return;
 
-    let i = 0;
-    while (i < name.length && name[i] < '0') i++;
-    const goodName = name.substring(i).trim();
-    if (goodName === '' && m.username >= '0')
-      return m.edit({ nick: m.username }, 'Auto Dehoist');
-    else if (goodName === '') return m.edit({ nick: 'hoister' });
-    else return m.edit({ nick: goodName }, 'Auto Dehoist');
+    let index = 0;
+    while (index < name.length && name[index] < '0') index++;
+
+    const good = name.substring(index).trim();
+    if (good === '' && m.username >= '0') return m.edit({ nick: m.username }, '[Automod] Dehoisted to normal username');
+    else if (good === '') return m.edit({ nick: 'hoister' }, '[Automod] Dehoisted to "hoister"');
+    else return m.edit({ nick: good }, `[Automod] Dehoisted to "${good}"`);
   }
 }

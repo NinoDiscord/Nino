@@ -1,12 +1,9 @@
+import { Punishment, PunishmentType } from '../structures/managers/PunishmentManager';
+import { injectable, inject } from 'inversify';
 import { Guild, Member } from 'eris';
+import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
-import {
-  Punishment,
-  PunishmentType,
-} from '../structures/managers/PunishmentManager';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../types';
 
 @injectable()
 export default class GuildMemberJoinedEvent extends Event {
@@ -15,19 +12,19 @@ export default class GuildMemberJoinedEvent extends Event {
   }
 
   async emit(guild: Guild, member: Member) {
-    this.bot.autoModService.handleMemberJoin(member);
+    this.bot.automod.handleMemberJoin(member);
+
     const cases = await this.bot.cases.getAll(guild.id);
-    const his = cases.sort(m => m.id).filter(m => m.victim === member.id);
-    if (his.length > 0) {
-      const latest = his[his.length - 1];
-      if (latest.type === 'mute')
-        await this.bot.punishments.punish(
-          member,
-          new Punishment(PunishmentType.Mute, {
-            moderator: guild.members.get(this.bot.client.user.id)!.user,
-          }),
-          'mute evading'
-        );
+    const all = cases.sort(m => m.id).filter(m => m.victim === member.id);
+    if (all.length > 0) {
+      const latest = all[all.length - 1];
+      if (latest.type === 'mute') {
+        const punishment = new Punishment(PunishmentType.Mute, {
+          moderator: this.bot.client.user
+        });
+
+        await this.bot.punishments.punish(member, punishment, '[Automod] Mute Evading');
+      }
     }
   }
 }

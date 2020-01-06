@@ -16,7 +16,29 @@ export interface GuildModel extends Document {
     raid: boolean;
     mention: boolean;
   };
-  punishments: { type: string; warnings: number; [options: string]: any }[];
+  responses: {
+    badwords: {
+      enabled: boolean;
+      message: string;
+    }
+    invite: {
+      enabled: boolean;
+      message: string
+    }
+    mention: {
+      enabled: boolean;
+      message: string;
+    }
+    spam: {
+      enabled: boolean;
+      message: string;
+    }
+  };
+  punishments: { 
+    type: string; 
+    warnings: number; 
+    [options: string]: any 
+  }[];
 }
 
 const schema = new Schema<GuildModel>({
@@ -62,6 +84,9 @@ const schema = new Schema<GuildModel>({
   punishments: {
     type: Array,
   },
+  responses: {
+    type: Object
+  }
 });
 
 const _model = model<GuildModel>('guilds', schema, 'guilds');

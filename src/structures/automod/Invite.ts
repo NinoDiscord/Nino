@@ -1,6 +1,7 @@
 import { Message, TextChannel } from 'eris';
-import Bot from '../Bot';
+import { replaceMessage } from '../../util';
 import PermissionUtils from '../../util/PermissionUtils';
+import Bot from '../Bot';
 
 /**
  * An event handler to check for invite links posted.
@@ -41,28 +42,28 @@ export default class AutoModInvite {
       !channel.permissionsOf(me.id).has('manageMessages') ||
       m.author.bot ||
       channel.permissionsOf(m.author.id).has('manageMessages')
-    )
-      // TODO: add permission checks. I will need to figure out those!
-      return false;
+    ) return false;
 
     if (m.content.match(this.regex)) {
       const settings = await this.bot.settings.get(guild.id);
-
       if (!settings || !settings.automod.invites) return false;
 
-      await m.channel.createMessage(
-        `HEY ${m.member!.mention}! NO ADS ALLOWED!`
-      );
+      const response = !settings.responses.invite.enabled ?
+        replaceMessage('Please don\'t advertise, %author%', m.author) :
+        replaceMessage(settings.responses.invite.message, m.author);
+      await m.channel.createMessage(response);
       await m.delete();
+
       const punishments = await this.bot.punishments.addWarning(m.member!);
-      for (let punishment of punishments)
-        await this.bot.punishments.punish(
-          m.member!,
-          punishment,
-          'Automod (Advertisements)'
-        );
+      for (let punishment of punishments) await this.bot.punishments.punish(
+        m.member!,
+        punishment,
+        'Automod (Advertising)'
+      );
+
       return true;
     }
+
     return false;
   }
 }

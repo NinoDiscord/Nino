@@ -1,19 +1,7 @@
-import {
-  Message,
-  Guild,
-  TextChannel,
-  User,
-  EmbedOptions,
-  Member,
-  Client,
-  TextableChannel,
-} from 'eris';
-import MessageCollector from './MessageCollector';
+import { Message, TextChannel, User, EmbedOptions } from 'eris';
 import ArgumentParser from './parsers/ArgumentParser';
 import FlagParser from './parsers/FlagParser';
 import Bot from './Bot';
-import { GuildModel } from '../models/GuildSchema';
-import IORedis = require('ioredis');
 
 export interface DMOptions {
   user: User;
@@ -26,14 +14,12 @@ export default class CommandContext {
   public message: Message;
   public args: ArgumentParser;
   public flags: FlagParser;
-  public collector: MessageCollector;
 
   constructor(bot: Bot, m: Message, args: string[]) {
     this.bot = bot;
     this.message = m;
     this.args = new ArgumentParser(args);
     this.flags = new FlagParser(args);
-    this.collector = new MessageCollector(bot.client);
   }
 
   send(content: string) {
@@ -51,41 +37,37 @@ export default class CommandContext {
     return this.send(`${cb}${lang}\n${content}${cb}`);
   }
 
-  get client(): Client {
+  get client() {
     return this.bot.client;
   }
 
-  get guild(): Guild | undefined {
-    if (!(this.message.channel instanceof TextChannel)) {
-      return undefined;
-    }
-    return (this.message.channel as TextChannel).guild;
+  get guild() {
+    return (this.message.channel instanceof TextChannel) ? 
+      (this.message.channel as TextChannel).guild : 
+      undefined;
   }
 
-  get channel(): TextableChannel {
+  get channel() {
     return this.message.channel;
   }
 
-  get sender(): User {
+  get sender() {
     return this.message.author;
   }
 
-  get member(): Member | undefined {
-    if (this.guild) {
-      return this.guild.members.get(this.sender.id);
-    }
+  get member() {
+    return this.guild ? this.guild.members.get(this.sender.id) : undefined;
   }
 
-  get me(): Member {
+  get me() {
     return this.guild!.members.get(this.bot.client.user.id)!;
   }
 
-  getSettings(): Promise<GuildModel> {
-    if (this.guild) return this.bot.settings.getOrCreate(this.guild.id);
-    return Promise.reject('not in a guild');
+  getSettings() {
+    return this.guild ? this.bot.settings.getOrCreate(this.guild.id) : null;
   }
 
-  get redis(): IORedis.Redis {
+  get redis() {
     return this.bot.redis;
   }
 

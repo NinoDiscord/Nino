@@ -19,8 +19,8 @@ export default class PruneCommand extends Command {
       usage: '<amount> [--filter=\'bot\' | \'user\' | \'new\']',
       aliases: ['purge'],
       category: 'Moderation',
-      userpermissions: Constants.Permissions.manageMessages,
-      botpermissions: Constants.Permissions.manageMessages,
+      userPermissions: Constants.Permissions.manageMessages,
+      botPermissions: Constants.Permissions.manageMessages,
     });
 
     this.filters = ['bot', 'user', 'new'];

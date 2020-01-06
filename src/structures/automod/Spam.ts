@@ -1,7 +1,8 @@
 import { Message, TextChannel } from 'eris';
+import { replaceMessage } from '../../util';
+import PermissionUtils from '../../util/PermissionUtils';
 import RedisQueue from '../../util/RedisQueue';
 import Bot from '../Bot';
-import PermissionUtils from '../../util/PermissionUtils';
 
 /**
  * An event handler to check for ongoing spam.
@@ -37,34 +38,35 @@ export default class AutoModSpam {
       (m.channel as TextChannel)
         .permissionsOf(m.author.id)
         .has('manageMessages')
-    )
-      return false;
+    ) return false;
 
     const settings = await this.bot.settings.get(guild.id);
-
     if (!settings || !settings.automod.spam) return false;
 
     const queue = new RedisQueue(this.bot.redis, `${m.author.id}:${guild.id}`);
     await queue.push(m.timestamp.toString());
 
-    if ((await queue.length()) >= 5) {
-      const oldtime = Number.parseInt(await queue.pop());
-
-      if (m.editedTimestamp && m.editedTimestamp > m.timestamp) return false; //remove the possibility for edits to be counted by checking if the message object has a greater edit timestamp than created timestamp
-      if (m.timestamp - oldtime <= 3000) {
+    const length = await queue.length();
+    if (length >= 5) {
+      const oldTime = Number.parseInt(await queue.pop());
+      if (m.editedTimestamp && m.editedTimestamp > m.timestamp) return false;
+      if (m.timestamp - oldTime <= 3000) {
         let punishments = await this.bot.punishments.addWarning(m.member!);
-        for (let punishment of punishments)
-          await this.bot.punishments.punish(
-            m.member!,
-            punishment,
-            'Automod (Spamming)'
-          );
-        await m.channel.createMessage(
-          'Stop right there! Spamming is not allowed!'
+        for (let punishment of punishments) await this.bot.punishments.punish(
+          m.member!,
+          punishment,
+          `[Automod] Spamming in <#${m.channel.id}>`
         );
+
+        const response = !settings.responses.spam.enabled ?
+          replaceMessage('Spamming is not allowed, %author%', m.author) :
+          replaceMessage(settings.responses.spam.message, m.author);
+
+        await m.channel.createMessage(response);
         return true;
       }
     }
+
     return false;
   }
 }

@@ -1,8 +1,6 @@
+import { injectable, unmanaged } from 'inversify';
 import Context from './Context';
 import Client from './Bot';
-import { Member, User, Channel } from 'eris';
-import PermissionUtils from '../util/PermissionUtils';
-import { injectable, unmanaged } from 'inversify';
 import 'reflect-metadata';
 
 export interface CommandInfo {
@@ -16,14 +14,8 @@ export interface CommandInfo {
   disabled?: boolean;
   hidden?: boolean;
   cooldown?: number;
-  subcommands?: Subcommand[];
-  botpermissions?: number;
-  userpermissions?: number;
-}
-export interface Subcommand {
-  name: string;
-  description: string | ((client: Client) => string);
-  run: (client: Client, ctx: Context) => Promise<any>;
+  botPermissions?: number;
+  userPermissions?: number;
 }
 
 @injectable()
@@ -39,11 +31,13 @@ export default class NinoCommand {
   public disabled: boolean;
   public hidden: boolean;
   public cooldown: number;
-  public subcommands: Subcommand[];
-  public botpermissions: number;
-  public userpermissions: number;
+  public botPermissions: number;
+  public userPermissions: number;
 
-  constructor(client: Client, @unmanaged() info: CommandInfo) {
+  constructor(
+    client: Client, 
+    @unmanaged() info: CommandInfo
+  ) {
     this.bot = client;
     this.name = info.name;
     this.description =
@@ -58,9 +52,8 @@ export default class NinoCommand {
     this.disabled = info.disabled || false;
     this.hidden = info.hidden || false;
     this.cooldown = info.cooldown || 5;
-    this.subcommands = info.subcommands || [];
-    this.botpermissions = info.botpermissions || 0;
-    this.userpermissions = info.userpermissions || 0;
+    this.botPermissions = info.botPermissions || 0;
+    this.userPermissions = info.userPermissions || 0;
   }
 
   async run(ctx: Context): Promise<any> {
@@ -92,13 +85,6 @@ export default class NinoCommand {
       .addField('Guild Only', this.guildOnly ? 'Yes' : 'No', true)
       .addField('Owner Only', this.ownerOnly ? 'Yes' : 'No', true)
       .addField('Cooldown', `${this.cooldown} seconds`, true);
-
-    if (this.subcommands.length > 1)
-      embed.addField(
-        'Subcommands',
-        this.subcommands.map(s => `**${s.name}**: ${s.description}`).join('\n'),
-        false
-      );
 
     return embed.build();
   }

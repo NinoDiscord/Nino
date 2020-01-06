@@ -22,15 +22,8 @@ export default class EventManager {
   ) {
     this.bot = bot;
     this.events = events;
-  }
 
-  /**
-   * Registers the events needed to function
-   */
-  build() {
-    for (let event of this.events) {
-      this.emit(event);
-    }
+    for (let event of this.events) this.emit(event);
   }
 
   /**
@@ -43,12 +36,10 @@ export default class EventManager {
         await ev.emit(...args);
       }
       catch (ex) {
-        this.bot.logger.log(
-          'error',
-          `Unable to run the '${ev.event}' event:\n${ex}`
-        );
+        this.bot.logger.error(`Unable to run event ${ev.event}:`, ex);
       }
     };
+
     this.bot.client.on(ev.event, wrapper);
   }
 }

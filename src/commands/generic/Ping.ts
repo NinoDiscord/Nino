@@ -6,7 +6,9 @@ import { TYPES } from '../../types';
 
 @injectable()
 export default class PingCommand extends Command {
-  constructor(@inject(TYPES.Bot) client: Bot) {
+  constructor(
+    @inject(TYPES.Bot) client: Bot
+  ) {
     super(client, {
       name: 'ping',
       description: 'Gives you the bot\'s ping.',
@@ -18,10 +20,8 @@ export default class PingCommand extends Command {
 
   async run(ctx: Context) {
     const startedAt = Date.now();
-    const message = await ctx.send(
-      ':pong: Pong, I guess? Why do you want it...?'
-    );
-    await message['delete']();
+    const message = await ctx.send(':ping_pong: S-seems weird why you w-want it!');
+    await message.delete();
     return ctx.send(`:ping_pong: Pong! \`${Date.now() - startedAt}ms\``);
   }
 }
