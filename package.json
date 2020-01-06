@@ -10,7 +10,7 @@
         "dev": "nodemon dist/index.js",
         "lint": "eslint src --ext .ts --fix",
         "clean": "rm -fr dist && rm -fr dist",
-        "test": "jest --detectOpenHandles"
+        "test": "jest --forceExit"
     },
     "maintainers": [
         "August (auguwu)",
