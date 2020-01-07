@@ -126,14 +126,14 @@ describe('Settings Command - Set', () => {
       return {} as Query<any>;
     });
     await cmd.set(ctx);
+    expect(ctx.send).toHaveBeenCalled();
+    expect(ctx.send.mock.calls[0][0]).toBe('Updated the mod log channel to **<#3>**');
     expect(ctx.bot.settings.update).toHaveBeenCalled();
     expect(ctx.bot.settings.update.mock.calls[0][1]).toMatchObject({
       $set: {
         modlog: '3'
       }
     });
-    expect(ctx.send).toHaveBeenCalled();
-    expect(ctx.send.mock.calls[0][0]).toBe('Updated the mod log channel to **<#3>**');
   });
 
 });
