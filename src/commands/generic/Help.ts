@@ -50,7 +50,7 @@ export default class HelpCommand extends Command {
     }
     else {
       const arg = ctx.args.get(0);
-      const command = ctx.bot.manager.commands.filter(s => s.name === arg)[0];
+      const command = ctx.bot.manager.getCommand(arg);
 
       if (!command) return ctx.send(`Sorry, I was not able to find the command \`${arg}\``);
       else {

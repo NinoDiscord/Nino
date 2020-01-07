@@ -32,4 +32,30 @@ describe('Help Command', () => {
     expect(call[0].footer).toBeDefined();
     expect(call[0].footer!.text).toBe('Use \"x!help <command name>\" to get documentation on a specific command');
   });
+
+  it('it should return the help of the command', async () => {
+    ctx.message.channel = mock<TextChannel>(); // makes it guild related.
+    ctx.args.has.mockReturnValueOnce(true);
+    ctx.args.get.mockReturnValueOnce('ping');
+    const ping = bot.manager.getCommand('ping')!;
+    ctx.bot.manager.getCommand.mockReturnValueOnce(ping);
+    await help.run(ctx);
+    expect(ctx.embed.mock.calls.length).toBe(1);
+    const call = ctx.embed.mock.calls[0][0];
+    expect(call).toBeDefined();
+    expect(call).toMatchObject(ping.help());
+  });
+
+  it('it should not find the command', async () => {
+    ctx.message.channel = mock<TextChannel>(); // makes it guild related.
+    ctx.args.has.mockReturnValueOnce(true);
+    ctx.args.get.mockReturnValueOnce('pong');
+    ctx.bot.manager.getCommand.mockReturnValueOnce(undefined);
+    await help.run(ctx);
+    expect(ctx.send.mock.calls.length).toBe(1);
+    const call = ctx.send.mock.calls[0][0];
+    expect(call).toBeDefined();
+    expect(call).toBe("Sorry, I was not able to find the command `pong`");
+  });
+
 });

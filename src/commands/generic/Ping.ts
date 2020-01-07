@@ -11,7 +11,7 @@ export default class PingCommand extends Command {
   ) {
     super(client, {
       name: 'ping',
-      description: 'Gives you the bot\'s ping.',
+      description: 'Shows you the bot\'s ping.',
       aliases: ['pong', 'pang'],
       category: 'Generic',
       ownerOnly: false,
