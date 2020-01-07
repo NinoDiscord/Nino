@@ -105,10 +105,10 @@ export default class SettingsCommand extends Command {
         const channelID = ctx.args.get(2);
         if (!channelID || !/^[0-9]+$/.test(channelID)) return ctx.send('Invalid channel ID');
 
-        const channel = await this.bot.client.getRESTChannel(channelID);
-        if ([1, 2, 3, 4].includes(channel.type)) return void ctx.send('The mod log channel cannot be a DM, voice, category, or group channel');
+        const channel = await ctx.bot.client.getRESTChannel(channelID);
+        if (channel.type !== 0) return void ctx.send('The mod log channel cannot be a DM, voice, category, or group channel');
 
-        this.bot.settings.update(ctx.guild!.id, {
+        ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             modlog: channel.id
           }
@@ -120,7 +120,7 @@ export default class SettingsCommand extends Command {
         if (prefix.length > 20) return ctx.send(`The prefix cannot be longer then 20 characters (went ${prefix.length - 20} over!)`);
         if (['@everyone', '@here'].includes(prefix)) return ctx.send('The prefix cannot ping other members');
 
-        this.bot.settings.update(ctx.guild!.id, {
+        ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             prefix
           }

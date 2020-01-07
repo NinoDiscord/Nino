@@ -19,8 +19,8 @@ describe('Ping command', () => {
     ctx.send.mockResolvedValueOnce(msg);
     Date.now = jest.fn(() => 1578393270160);
     await cmd.run(ctx);
-    expect(ctx.send.mock.calls.length).toBe(2);
-    expect(msg.delete.mock.calls).toHaveLength(1);
+    expect(ctx.send).toHaveBeenCalledTimes(2);
+    expect(msg.delete).toHaveBeenCalled();
     const firstcall = ctx.send.mock.calls[0];
     expect(firstcall[0]).toBe(':ping_pong: S-seems weird why you w-want it!');
     const secondcall = ctx.send.mock.calls[1];
