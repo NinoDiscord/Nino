@@ -120,12 +120,16 @@ describe('Settings Command - Set', () => {
     ctx.args.get
       .mockReturnValueOnce('modlog')
       .mockReturnValueOnce('3');
+    let res;
+    const p = new Promise((resolve) => res=resolve);
     ctx.bot.client.getRESTChannel.mockResolvedValueOnce({ id: '3', type: 0, mention: '<#3>' } as TextChannel);
     ctx.bot.settings.update.mockImplementationOnce((id: string, doc: {[x: string]: any}, cb: (error: any, raw: any)=>void)=>{
       cb(null, null);
+      res();
       return {} as Query<any>;
     });
     await cmd.set(ctx);
+    await p;
     expect(ctx.send).toHaveBeenCalled();
     expect(ctx.send.mock.calls[0][0]).toBe('Updated the mod log channel to **<#3>**');
     expect(ctx.bot.settings.update).toHaveBeenCalled();
