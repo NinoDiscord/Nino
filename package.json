@@ -52,7 +52,7 @@
         "jest": "24.9.0",
         "jest-mock-extended": "1.0.7",
         "nodemon": "2.0.2",
-        "ts-jest": "24.2.0",
+        "ts-jest": "24.3.0",
         "typescript": "3.7.4"
     },
     "jest": {
