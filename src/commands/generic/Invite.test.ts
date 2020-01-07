@@ -15,7 +15,6 @@ describe('Invite command', () => {
   );
 
   it('it should return a message to invite the bot', async() => {
-    ctx.message.channel = mock<TextChannel>();
     ctx.me.id = '420691111';
     await cmd.run(ctx);
     expect(ctx.send.mock.calls.length).toBe(1);

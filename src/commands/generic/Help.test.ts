@@ -55,7 +55,7 @@ describe('Help Command', () => {
     expect(ctx.send.mock.calls.length).toBe(1);
     const call = ctx.send.mock.calls[0][0];
     expect(call).toBeDefined();
-    expect(call).toBe("Sorry, I was not able to find the command `pong`");
+    expect(call).toBe('Sorry, I was not able to find the command `pong`');
   });
 
 });
