@@ -50,6 +50,7 @@ export default class StatisticsCommand extends Command {
         Node.js Version    ~> v${process.version}
         Eris Version       ~> ${version}
         Nino Version       ~> ${pkg.version} (${commit.slice(0, 7)})
+        \`\`\`
       `)
       .build();
 
