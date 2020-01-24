@@ -78,7 +78,7 @@ describe('CommandService', () => {
   it('it should not be able to invoke the command because the command is guild only', () => {
     const message = {
       content: '!settings',
-      channel: { type: 0 } as TextableChannel,
+      channel: { type: 1 } as TextableChannel,
     } as Message;
     const args = ['settings'];
     const context = new CommandContext(bot, message, args);

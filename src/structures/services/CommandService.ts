@@ -36,7 +36,7 @@ export class CommandInvocation {
    * Returns an error string if cannot invoke, otherwise it will return undefined.
    */
   canInvoke() {
-    if (this.command.guildOnly && this.channel.type !== 1) {
+    if (this.command.guildOnly && [1, 3].includes(this.channel.type)) {
       return `Sorry, but you need to be in a guild to execute the \`${this.command.name}\` command.`;
     }
 
@@ -140,7 +140,7 @@ export default class CommandService {
       const message = invoked.canInvoke();
       if (message) {
         const embed = this.bot.getEmbed()
-          .setTitle('An error occured!')
+          .setTitle(`Unable to run ${invoked.command.name}!`)
           .setDescription(message);
 
         return void ctx.embed(embed.build());

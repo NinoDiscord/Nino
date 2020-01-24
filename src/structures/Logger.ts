@@ -54,7 +54,7 @@ export default class Logger {
       } break;
 
       case LogLevel.DATABASE: {
-        lvlText = leeks.rgbBg(88, 150, 54, this.colors.black(`[MONGODB/${process.pid}]`));
+        lvlText = leeks.rgbBg([88, 150, 54], this.colors.black(`[MONGODB/${process.pid}]`));
       } break;
     }
 

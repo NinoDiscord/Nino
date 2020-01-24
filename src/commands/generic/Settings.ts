@@ -1,7 +1,7 @@
+import { Constants, TextChannel } from 'eris';
 import { injectable, inject } from 'inversify';
 import { replaceMessage } from '../../util';
 import { stripIndents } from 'common-tags';
-import { Constants } from 'eris';
 import { TYPES } from '../../types';
 import Context from '../../structures/Context';
 import Command from '../../structures/Command';
@@ -77,7 +77,7 @@ export default class SettingsCommand extends Command {
     }, (error, packet) => {
       if (error) return ctx.send('I was unable to add the punishment');
       if (packet.n) return ctx.send('Punishment was added to the database successfully!');
-      else return ctx.send('Sorry, we limited the amount of punishments per server to 15. MaybPlease remove some punishments before adding more');
+      else return ctx.send('Sorry, we limited the amount of punishments per server to 15. Please remove some punishments before adding more');
     });
   }
 
@@ -106,13 +106,16 @@ export default class SettingsCommand extends Command {
         if (!channelID || !/^[0-9]+$/.test(channelID)) return ctx.send('Invalid channel ID');
 
         const channel = await ctx.bot.client.getRESTChannel(channelID);
-        if (channel.type !== 0) return void ctx.send('The mod log channel cannot be a DM, voice, category, or group channel');
+        if (!(channel instanceof TextChannel)) return ctx.send('The mod log channel cannot be a DM, voice, category, or group channel');
 
+        let error!: any;
         ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             modlog: channel.id
           }
-        }, (error) => error ? ctx.send('Unable to update the mod log channel') : ctx.send(`Updated the mod log channel to **${channel.mention}**`));
+        }, (error) => error = error);
+
+        error ? ctx.send('Unable to update the mod log channel') : ctx.send(`Updated the mod log channel to **${channel.mention}**`);
       } break;
       case 'prefix': {
         const prefix = ctx.args.slice(2).join(' ');
@@ -139,6 +142,7 @@ export default class SettingsCommand extends Command {
           }
         }, (error) => error ? ctx.send(`Unable to set the muted role to "${role.name}"`) : ctx.send(`Muted role has been set to "${role.name}"`));
       } break;
+      case 'automod.badwords':
       case 'automod.swears': {
         const list = ctx.args.get(2);
         if (!list) return ctx.send('No list of bad words were provided (you can multiple with `, ` after! Example: `x!settings set automod.swears bitch, fuck`');
@@ -154,7 +158,7 @@ export default class SettingsCommand extends Command {
           `Successfully added ${swears.length} new words to the list`;
 
         return ctx.send(message);
-      } break;
+      }
       default: return ctx.send(`${setting === undefined ? 'No setting was provided' : 'Invalid setting'} (${subcommands.join(' | ')})`);
     }
   }
@@ -337,7 +341,7 @@ export default class SettingsCommand extends Command {
         [automod.invites]: ${settings!.automod.invites ? 'Enabled' : 'Disabled'}
         [automod.raid]: ${settings!.automod.raid ? 'Enabled' : 'Disabled'}
         [automod.spam]: ${settings!.automod.spam ? 'Enabled' : 'Disabled'}
-        [automod.swears]: ${settings!.automod.badwords.wordlist.length ? settings!.automod.badwords.wordlist.join(', ') : 'Disabled'}
+        [automod.swears]: ${settings!.automod.badwords.wordlist.length ? settings!.automod.badwords.wordlist.join(', ') : settings!.automod.badwords.enabled ? 'Enabled (without any words)' : 'Disabled'}
         [punishments]: 
         ${settings!.punishments.map((p, i) => `${i + 1}: ${p.type} with ${p.warnings} warnings${p.temp ? `, with time ${ms(p.temp)}` : p.soft ? ', soft' : p.roleid ? `, with role ${ctx.guild!.roles.get(p.roleid)}` : ''}`).join('\n')}
         \`\`\`

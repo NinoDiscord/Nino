@@ -53,9 +53,12 @@ export default class DatabaseManager {
     });
 
     this.m.connection.on('error', error => error ? this.logger.error(error) : null);
-    this.m.connection.once('open', () =>
-      this.logger.database(`Opened a connection to MongoDB with URI: ${this.uri}`)
-    );
+    this.logger.database(`Opened a connection to MongoDB with URI: ${this.uri}`);
+  }
+
+  dispose() {
+    this.m.connection.close();
+    this.logger.warn('Database connection was disposed');
   }
 
   async getBuild() {

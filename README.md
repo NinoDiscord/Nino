@@ -1,10 +1,8 @@
-# Nino [![Build Status](https://travis-ci.org/auguwu/Nino.svg?branch=master)](https://travis-ci.org/auguwu/Nino) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
+# Nino [![Build Status](https://travis-ci.org/auguwu/Nino.svg?branch=master)](https://travis-ci.org/auguwu/Nino)
 
-Moderation-based Discord bot initally created for the Discord hackweek, now it is still regularly maintained.
-
-Invite the public version [here](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
-
-Join the support server (Dondish Central) [here](https://discord.gg/pEKkg9r)
+> :hammer: **| Moderation-based Discord bot initally created for the Discord hackweek, now it is still regularly maintained.**
+>
+> [Website](https://nino.augu.dev) **|** [Support Server](https://discord.gg/pEKkg9r) **|** [Invite](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
 
 # How to use the bot?
 
@@ -32,7 +30,7 @@ First, check our [contributing guidelines](https://github.com/auguwu/nino/blob/m
 
 ## Setting up the bot
 
-1. Clone the repository using Git: ``git clone https://github.com/auguwu/nino`` (If you don't have Git, just go to "Clone or download" and click "Download ZIP" then extract)
+1. Clone the repository using Git: ``git clone https://github.com/nowoel/Nino`` (If you don't have Git, just go to "Clone or download" and click "Download ZIP" then extract)
 2. Install dependencies with NPM (included in Node.js): ``npm i`` (or with [Yarn](https://yarnpkg.com) ``yarn``)
 3. Create an application.yml file in your working directory and fill it in (see the example for more information)
 4. Compile TypeScript (install TypeScript with ``npm i -g typescript`` or with Yarn ``yarn global add typescript``): ``tsc``
@@ -64,12 +62,12 @@ If you wish to use the source code publically here, please add proper crediting 
 # Credits
 
 ## Maintainers
-* August#5820 (Lead) ([GitHub](https://github.com/auguwu))
+* Noel#5820 (Lead) ([GitHub](https://github.com/nowoel))
 * dondish#0001 (Development Lead) ([GitHub](https://github.com/dondish))
 
 ## Hackweek Participants
 
-* August#5820 (Owner) ([GitHub](https://github.com/auguwu))
+* Noel#5820 (Owner) ([GitHub](https://github.com/nowoel))
 * dondish#0001 ([GitHub](https://github.com/dondish))
 * Kyle#9810 ([GitHub](https://github.com/dvhe))
 * Wesselgame#0498 ([GitHub](https://github.com/PassTheWessel))
