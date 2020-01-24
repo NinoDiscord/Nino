@@ -1,5 +1,8 @@
-name: Lint the repository and test with Jest
-on: [push]
+name: Lint the repository, test with Jest, and update the Discord bot (Edge)
+on:
+  push:
+    branches:
+      - edge
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,3 +23,15 @@ jobs:
         run: npm run lint
       - name: Runs all tests with Jest
         run: npm run test
+      - name: SSH to VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          port: 22
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd ~/nino-edge
+            git pull
+            yarn build
+            pm2 restart "Nino Edge"
