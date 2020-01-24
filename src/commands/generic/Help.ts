@@ -43,7 +43,7 @@ export default class HelpCommand extends Command {
         .setFooter(`Use "${settings!.prefix}help <command name>" to get documentation on a specific command`);
 
       for (const category in categories) {
-        if (category.length > 0) embed.addField(`${category} [${categories[category].length}]`, categories[category].map(s => `\`${s.name}\``).join(', '));
+        embed.addField(`${category} [${categories[category].length}]`, categories[category].map(s => `\`${s.name}\``).join(', '));
       }
 
       return ctx.embed(embed.build());

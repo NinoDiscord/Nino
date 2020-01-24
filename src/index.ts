@@ -20,8 +20,8 @@ else {
 bot.build()
   .then(() => bot.logger.info('All set!'));
 
-process.on('exit', () => {
-  bot.database.m.connection.close();
-  bot.client.disconnect({ reconnect: false });
-  process.kill(process.pid);
+process.on('SIGINT', () => {
+  bot.dispose();
+  bot.logger.warn('Process was exited!');
+  process.exit();
 });

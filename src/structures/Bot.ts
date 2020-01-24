@@ -137,6 +137,13 @@ export default class Bot {
       .catch(ex => this.logger.error(ex));
   }
 
+  dispose() {
+    this.database.dispose();
+    this.redis.disconnect();
+    this.client.disconnect({ reconnect: false });
+    this.logger.warn('Bot connection was disposed');
+  }
+
   getEmbed() {
     return new EmbedBuilder()
       .setColor(0x6D6D99);
