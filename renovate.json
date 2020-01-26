@@ -1,5 +1,6 @@
 {
   "extends": ["config:base"],
   "automerge": true,
-  "baseBranches": ["edge"]
+  "baseBranches": ["edge"],
+  "ignoreDeps": ["@types/ioredis", "eris"]
 }
