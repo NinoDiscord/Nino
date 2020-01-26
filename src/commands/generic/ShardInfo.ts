@@ -24,7 +24,7 @@ export default class ShardInfoCommand extends Command {
       const current = ctx.guild!.shard.id === shard.id ? '(current)' : '';
       const guilds = ctx.bot.client.guilds.filter(g => g.shard.id === shard.id);
       const members = guilds.reduce((a, b) => a + b.memberCount, 0);
-      info += `| ${this.determineStatus(shard.status)} | Shard #${shard.id} ${current} | G: ${guilds.length} | U: ${members} | L: ${shard.latency}ms |`;
+      info += `${this.determineStatus(shard.status)} | Shard #${shard.id} ${current} | G: ${guilds.length} | U: ${members} | L: ${shard.latency}ms |`;
     });
 
     const embed = ctx.bot.getEmbed()

@@ -103,9 +103,12 @@ export default class SettingsCommand extends Command {
     switch (setting) {
       case 'modlog': {
         const channelID = ctx.args.get(2);
-        if (!channelID || !/^[0-9]+$/.test(channelID)) return ctx.send('Invalid channel ID');
+        if (!channelID) return ctx.send('No channel ID was specified');
 
-        const channel = await ctx.bot.client.getRESTChannel(channelID);
+        const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
+        if (id === null) return ctx.send(`Invalid channel ID: \`${channelID}\``);
+
+        const channel = await this.bot.client.getRESTChannel(id);
         if (!(channel instanceof TextChannel)) return ctx.send('The mod log channel cannot be a DM, voice, category, or group channel');
 
         let error!: any;

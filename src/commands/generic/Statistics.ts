@@ -29,27 +29,30 @@ export default class StatisticsCommand extends Command {
     const { command, size: uses } = this.bot.statistics.getCommandUsages();
     const build = await this.bot.database.getBuild();
     const commit = execSync('git rev-parse HEAD').toString().trim();
-
     const users = this.bot.client.guilds.reduce((a, b) => a + b.memberCount, 0);
     const channels = Object.keys(this.bot.client.channelGuildMap).length;
+    const shardPing = this.bot.client.shards.reduce((a, b) => a + b.latency, 0);
+    const connection = await this.bot.database.admin.ping();
+
     const embed = this.bot.getEmbed()
       .setTitle(`${this.bot.client.user.username}#${this.bot.client.user.discriminator} | Realtime Statistics`)
       .setDescription(stripIndents`
         \`\`\`prolog
-        Guilds             ~> ${this.bot.client.guilds.size.toLocaleString()}
-        Users              ~> ${users.toLocaleString()}
-        Channels           ~> ${channels.toLocaleString()}
-        Shards             ~> [${ctx.guild!.shard.id}/${this.bot.client.shards.size}]
-        Uptime             ~> ${humanize(Date.now() - this.bot.client.startTime)}
-        Total Commands     ~> ${this.bot.manager.commands.size}
-        Messages Seen      ~> ${this.bot.statistics.messagesSeen.toLocaleString()}
-        Commands Executed  ~> ${this.bot.statistics.commandsExecuted.toLocaleString()}
-        Most Used Command  ~> ${command} (${uses} executions)
-        MongoDB Version    ~> v${build.version}
-        TypeScript Version ~> v${ts.version}
-        Node.js Version    ~> v${process.version}
-        Eris Version       ~> ${version}
-        Nino Version       ~> ${pkg.version} (${commit.slice(0, 7)})
+        Guilds              ~> ${this.bot.client.guilds.size.toLocaleString()}
+        Users               ~> ${users.toLocaleString()}
+        Channels            ~> ${channels.toLocaleString()}
+        Shards              ~> ${ctx.guild!.shard.id}/${this.bot.client.shards.size} (${shardPing}ms avg.)
+        Uptime              ~> ${humanize(Date.now() - this.bot.client.startTime)}
+        Total Commands      ~> ${this.bot.manager.commands.size}
+        Messages Seen       ~> ${this.bot.statistics.messagesSeen.toLocaleString()}
+        Commands Executed   ~> ${this.bot.statistics.commandsExecuted.toLocaleString()}
+        Most Used Command   ~> ${command} (${uses} executions)
+        MongoDB Version     ~> v${build.version}
+        TypeScript Version  ~> v${ts.version}
+        Node.js Version     ~> ${process.version}
+        Eris Version        ~> ${version}
+        Nino Version        ~> ${pkg.version} (${commit.slice(0, 7)})
+        Database Connection ~> ${connection.ok === 1 ? 'Online' : 'Offline'}
         \`\`\`
       `)
       .build();
