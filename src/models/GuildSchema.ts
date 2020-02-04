@@ -42,6 +42,7 @@ export interface GuildModel extends Document {
   logging: {
     enabled: boolean;
     channelID: string;
+    ignore: string[];
     events: {
       messageDelete: boolean;
     };
@@ -102,6 +103,10 @@ const schema = new Schema<GuildModel>({
     channelID: {
       type: String,
       default: null
+    },
+    ignore: {
+      type: Array,
+      default: []
     },
     events: {
       messageDelete: {

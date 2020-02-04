@@ -149,7 +149,7 @@ export default class SettingsCommand extends Command {
       case 'automod.badwords':
       case 'automod.swears': {
         const list = ctx.args.get(2);
-        if (!list) return ctx.send('No list of bad words were provided (you can multiple with `, ` after! Example: `x!settings set automod.swears bitch, fuck`');
+        if (!list) return ctx.send('No list of bad words were provided (you can multiple with ` ` after! Example: `x!settings set automod.swears bitch, fuck`');
 
         const settings = await ctx.getSettings();
         const swears = ctx.args.slice(2);
@@ -160,6 +160,27 @@ export default class SettingsCommand extends Command {
         const message = !settings!.automod.badwords.enabled ?
           `We've added ${swears.length} to the list! Since you didn't have the swearing automod feature enabled, I have enabled it for you!` :
           `Successfully added ${swears.length} new words to the list`;
+
+        return ctx.send(message);
+      }
+      case 'logging.ignore': {
+        const list = ctx.args.get(2);
+        if (!list) return ctx.send('No list of channels were provided');
+
+        const settings = await ctx.getSettings();
+        const channels = ctx.args.slice(2);
+        const errors = channels.filter(channelID =>
+          channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null
+        );
+
+        if (errors.some(e => e === null)) return ctx.send(`Invalid channels: ${errors.filter(e => e === null).map(s => `\`${s}\``).join(' | ')}`);
+        if (!settings!.logging.enabled) settings!.logging.enabled = true;
+        settings!.logging.ignore.push(...errors);
+        await settings!.save();
+
+        const message = !settings!.logging.enabled ?
+          `Added ${errors.length} channels to the ignore list, since you didn't enable the feature, I have enabled it for you.` :
+          `Added ${errors.length} channels to the ignore list.`;
 
         return ctx.send(message);
       }
