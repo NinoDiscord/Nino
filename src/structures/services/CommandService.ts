@@ -48,7 +48,7 @@ export class CommandInvocation {
       return `Currently, command \`${this.command.name}\` is globally disabled`;
     }
 
-    if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.userPermissions)) {
+    if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.botPermissions)) {
       const bytecode = this.command.userPermissions & ~this.bot.permission.allow;
       return `I am missing the following permissions: ${PermissionUtils.toString(bytecode)}`;
     }
