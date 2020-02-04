@@ -22,7 +22,7 @@ export default class GuildJoinedEvent extends Event {
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
 
     const channel = await this.bot.client.getRESTChannel('529593466729267200');
-    if (channel.type === 0) {
+    if (channel && channel.type === 0) {
       const chan = (channel as TextChannel);
       const embed = this.bot.getEmbed()
         .setAuthor(`| Joined ${guild.name} (${guild.id})`, undefined, this.bot.client.user.dynamicAvatarURL('png', 1024))

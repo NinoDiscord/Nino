@@ -1,4 +1,4 @@
-import { Client as DiscordClient } from 'eris';
+import { Client as DiscordClient, Guild, AnyChannel, Role } from 'eris';
 import { collectDefaultMetrics } from 'prom-client';
 import CommandStatisticsManager from './managers/CommandStatisticsManager';
 import { inject, injectable } from 'inversify';
