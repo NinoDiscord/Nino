@@ -53,6 +53,7 @@ import GuildMemberJoinedEvent from './events/GuildMemberAdd';
 import GuildMemberUpdateEvent from './events/GuildMemberUpdate';
 import MessageReceivedEvent from './events/Message';
 import MessageUpdatedEvent from './events/MessageUpdate';
+import MessageDeletedEvent from './events/MessageDelete';
 import ReadyEvent from './events/Ready';
 import ShardDisconnectedEvent from './events/ShardDisconnected';
 import ShardReadyEvent from './events/ShardReady';
@@ -300,6 +301,11 @@ container
 container
   .bind<NinoEvent>(TYPES.Event)
   .to(MessageReceivedEvent)
+  .inSingletonScope();
+
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(MessageDeletedEvent)
   .inSingletonScope();
 
 container

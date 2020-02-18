@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [13.x]
     steps:
       - uses: actions/checkout@v1
       - name: Use Node.js v${{ matrix.node-version }}
@@ -37,4 +37,4 @@ jobs:
             rm yarn.lock
             yarn
             yarn build
-            pm2 restart "Nino Edge"
+            pm2 restart nino-edge

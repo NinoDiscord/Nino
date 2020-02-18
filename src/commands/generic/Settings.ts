@@ -99,12 +99,13 @@ export default class SettingsCommand extends Command {
 
   async set(ctx: Context) {
     const setting = ctx.args.get(1);
-    const subcommands = ['modlog', 'prefix', 'mutedrole', 'automod.swears'];
+    const subcommands = ['modlog', 'prefix', 'mutedrole', 'automod.swears', 'logging.channelID'];
     switch (setting) {
       case 'modlog': {
         const channelID = ctx.args.get(2);
         if (!channelID) return ctx.send('No channel ID was specified');
 
+        // TODO: Use regex for this
         const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
         if (id === null) return ctx.send(`Invalid channel ID: \`${channelID}\``);
 
@@ -148,7 +149,7 @@ export default class SettingsCommand extends Command {
       case 'automod.badwords':
       case 'automod.swears': {
         const list = ctx.args.get(2);
-        if (!list) return ctx.send('No list of bad words were provided (you can multiple with `, ` after! Example: `x!settings set automod.swears bitch, fuck`');
+        if (!list) return ctx.send('No list of bad words were provided (you can multiple with ` ` after! Example: `x!settings set automod.swears bitch, fuck`');
 
         const settings = await ctx.getSettings();
         const swears = ctx.args.slice(2);
@@ -162,13 +163,53 @@ export default class SettingsCommand extends Command {
 
         return ctx.send(message);
       }
+      case 'logging.ignore': {
+        const list = ctx.args.get(2);
+        if (!list) return ctx.send('No list of channels were provided');
+
+        const settings = await ctx.getSettings();
+        const channels = ctx.args.slice(2);
+        const errors = channels.filter(channelID =>
+          channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null
+        );
+
+        if (errors.some(e => e === null)) return ctx.send(`Invalid channels: ${errors.filter(e => e === null).map(s => `\`${s}\``).join(' | ')}`);
+        if (!settings!.logging.enabled) settings!.logging.enabled = true;
+        settings!.logging.ignore.push(...errors);
+        await settings!.save();
+
+        const message = !settings!.logging.enabled ?
+          `Added ${errors.length} channels to the ignore list, since you didn't enable the feature, I have enabled it for you.` :
+          `Added ${errors.length} channels to the ignore list.`;
+
+        return ctx.send(message);
+      }
+      case 'logging.channelID': {
+        const channelID = ctx.args.get(2);
+        if (!channelID) return ctx.send('No channel ID was specified');
+
+        const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
+        if (id === null) return ctx.send(`Invalid channel ID: \`${channelID}\``);
+
+        const channel = await this.bot.client.getRESTChannel(id);
+        if (!(channel instanceof TextChannel)) return ctx.send('The logging channel cannot be a DM, voice, category, or group channel');
+
+        let error!: any;
+        ctx.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'logging.channelID': channel.id
+          }
+        }, (error) => error = error);
+
+        error ? ctx.send('Unable to update the logging channel') : ctx.send(`Updated the logging channel to **${channel.mention}**`);
+      } break;
       default: return ctx.send(`${setting === undefined ? 'No setting was provided' : 'Invalid setting'} (${subcommands.join(' | ')})`);
     }
   }
 
   async enable(ctx: Context) {
     const setting = ctx.args.get(1);
-    const subcommands = ['automod', 'automod.dehoist', 'automod.invites', 'automod.spam', 'automod.mention', 'automod.raid', 'automod.swears/automod.badwords'];
+    const subcommands = ['automod', 'automod.dehoist', 'automod.invites', 'automod.spam', 'automod.mention', 'automod.raid', 'automod.swears or automod.badwords', 'logging.enabled', 'logging.events', 'loggings.events.messageDeleted'];
     switch (setting) {
       case 'automod': {
         await this.bot.settings.update(ctx.guild!.id, {
@@ -226,13 +267,35 @@ export default class SettingsCommand extends Command {
           }
         }, (error) => error ? ctx.send('Unable to enable the invites automod feature') : ctx.send('Enabled the invites automod feature'));
       } break;
+      case 'logging.enabled': {
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'logging.enabled': true
+          }
+        }, error => error ? ctx.send('Unable to enable the logging feature') : ctx.send('Enabled the logging feature, enable some or all events with `logging.events.[name]`! (example: `logging.events`: enable all events; `logging.events.messageDeleted`: enable just the message deleted event)'));
+      } break;
+      case 'logging.events': {
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'logging.events.messageDelete': true
+          }
+        }, error => error ? ctx.send('Unable to enable all events') : ctx.send('Enabled all logging events'));
+      } break;
+      case 'logging.events.messageDeleted':
+      case 'logging.events.messageDelete': {
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'logging.events.messageDelete': true
+          }
+        }, error => error ? ctx.send('Unable to enable the message deleted event') : ctx.send('Enabled the message deleted event')); 
+      } break;
       default: return ctx.send(setting === undefined ? `No subcommand was provided. (${subcommands.join(', ')})` : `Invalid subcommand "${setting}" (${subcommands.join(', ')})`);
     }
   }
 
   async disable(ctx: Context) {
     const setting = ctx.args.get(1);
-    const subcommands = ['automod', 'automod.dehoist', 'automod.invites', 'automod.spam', 'automod.mention', 'automod.raid', 'automod.swears/automod.badwords'];
+    const subcommands = ['automod', 'automod.dehoist', 'automod.invites', 'automod.spam', 'automod.mention', 'automod.raid', 'automod.swears or automod.badwords', 'logging.enabled', 'logging.events.messageDelete or logging.events.messageDeleted'];
     switch (setting) {
       case 'automod': {
         await this.bot.settings.update(ctx.guild!.id, {
@@ -289,6 +352,28 @@ export default class SettingsCommand extends Command {
             'automod.invites': false
           }
         }, (error) => error ? ctx.send('Unable to disable the invites automod feature') : ctx.send('Disabled the invites automod feature'));
+      } break;
+      case 'logging.enabled': {
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'logging.enabled': false
+          }
+        }, error => error ? ctx.send('Unable to disable the logging feature') : ctx.send('Disabled the logging feature, enable some or all events with `logging.events.[name]`! (example: `logging.events`: enable all events; `logging.events.messageDeleted`: enable just the message deleted event)'));
+      } break;
+      case 'logging.events': {
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'logging.events.messageDelete': false
+          }
+        }, error => error ? ctx.send('Unable to disable all events') : ctx.send('Disabled all logging events'));
+      } break;
+      case 'logging.events.messageDeleted':
+      case 'logging.events.messageDelete': {
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'logging.events.messageDelete': false
+          }
+        }, error => error ? ctx.send('Unable to disable the message deleted event') : ctx.send('Disabled the message deleted event')); 
       } break;
       default: return ctx.send(setting === undefined ? `No subcommand was provided. (${subcommands.join(', ')})` : `Invalid subcommand "${setting}" (${subcommands.join(', ')})`);
     }

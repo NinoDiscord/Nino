@@ -48,7 +48,7 @@ export class CommandInvocation {
       return `Currently, command \`${this.command.name}\` is globally disabled`;
     }
 
-    if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.userPermissions)) {
+    if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.botPermissions)) {
       const bytecode = this.command.userPermissions & ~this.bot.permission.allow;
       return `I am missing the following permissions: ${PermissionUtils.toString(bytecode)}`;
     }
@@ -119,18 +119,6 @@ export default class CommandService {
     for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;
 
     if (!prefix) return;
-    if (m.content.match(`^<@!?${this.bot.client.user.id}> `)) {
-      const embed = this.bot.getEmbed()
-        .setTitle(`Hello, ${m.author.username}`)
-        .setDescription(stripIndents`
-          > **My name is ${this.bot.client.user.username} and I am a moderation bot!**
-          **Since you pinged me, I'll list my prefixes that can execute any command:**
-
-          ${prefixes.map(s => `${s}<command>`)}
-        `);
-
-      return void m.channel.createMessage({ embed: embed.build() });
-    }
 
     const args = m.content.slice(prefix.length).trim().split(/ +/g);
     const ctx = new CommandContext(this.bot, m, args);
