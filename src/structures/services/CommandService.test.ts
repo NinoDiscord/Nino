@@ -19,6 +19,7 @@ describe('CommandService', () => {
       prefix: 'x!',
     },
     redis: {
+      password: undefined,
       host: 'localhost',
       port: 6379,
       database: undefined,
