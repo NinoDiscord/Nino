@@ -46,7 +46,6 @@ export interface Config {
     token: string;
   };
   redis: {
-    password: string | undefined;
     database: number | undefined;
     host: string;
     port: number;
@@ -113,7 +112,6 @@ export default class Bot {
     this.logger = new Logger();
     this.cases = new CaseSettings();
     this.redis = new RedisClient({
-      password: config.redis.password,
       port: config.redis.port,
       host: config.redis.host,
       db: config.redis.database
