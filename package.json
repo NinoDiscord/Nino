@@ -53,6 +53,6 @@
     "jest-mock-extended": "1.0.8",
     "nodemon": "2.0.2",
     "ts-jest": "25.2.1",
-    "typescript": "3.8.2"
+    "typescript": "3.8.3"
   }
 }
