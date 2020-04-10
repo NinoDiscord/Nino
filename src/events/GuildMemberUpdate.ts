@@ -32,7 +32,6 @@ export default class GuildMemberUpdateEvent extends Event {
 
     // Role was taken away
     if (old.roles.includes(settings.mutedRole)) {
-      console.log('test');
       const entries = logs.entries.filter(entry =>
         // Make sure the log type is 25 (MEMBER_ROLE_UPDATE) and it wasn't Nino who added it
         entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id  
@@ -49,7 +48,6 @@ export default class GuildMemberUpdateEvent extends Event {
     } 
     
     if (member.roles.includes(settings.mutedRole)) {
-      console.log('test');
       const entries = logs.entries.filter(entry =>
         // Make sure the log action is 25 (MEMBER_ROLE_UPDATE) and it wasn't Nino who added it
         entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id  
