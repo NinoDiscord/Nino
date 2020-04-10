@@ -30,8 +30,7 @@ export default class LockdownCommand extends Command {
       const channel = ctx.guild!.channels.get(s);
       if (!channel || [1, 2, 3, 4].includes(channel.type)) return;
       return (channel as TextChannel);
-    }
-    else if (/^<#[0-9]+>$/.test(s)) {
+    } else if (/^<#[0-9]+>$/.test(s)) {
       const id = s.substring(2, s.length - 1);
       const channel = ctx.guild!.channels.get(id);
       if (!channel || [1, 2, 3, 4].includes(channel.type)) return;
@@ -106,8 +105,7 @@ export default class LockdownCommand extends Command {
           }
 
           await this.bot.redis.del(`lockdown:${channel.id}`);
-        } 
-        else {
+        } else {
           for (const role of allRoles) {
             let allow = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.allow : 0;
             let denied = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.deny : 0;

@@ -90,14 +90,13 @@ export default class PunishmentManager {
     let warnings = await this.bot.warnings.get(member.guild.id, member.id);
     if (!warnings) {
       warnings = this.bot.warnings.create(member.guild.id, member.id);
-    }
-    else {
+    } else {
       await this.bot.warnings.update(member.guild.id, member.id, {
         amount: Math.min(warnings.amount + 1, 5)
       });
     }
 
-    const warns = Math.min(!!warnings ? warnings!.amount + 1 : 1, 5);
+    const warns = Math.min(warnings ? warnings!.amount + 1 : 1, 5);
     const result: Punishment[] = [];
     for (let options of settings.punishments.filter(x => x.warnings === warns)) {
       const punishment = new Punishment(options.type as PunishmentType, Object.assign({ moderator: me.user }, options));
@@ -133,7 +132,7 @@ export default class PunishmentManager {
    * @param punishment the punishment
    * @param reason the reason
    */
-  async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string) {
+  async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string, audit: boolean = false) {
     const me = member.guild.members.get(this.bot.client.user.id)!;
     const guild = member.guild;
     const settings = await this.bot.settings.get(guild.id);
@@ -178,7 +177,7 @@ export default class PunishmentManager {
             const topRole = PermissionUtils.topRole(me)!;
             await mutedRole.editPosition(topRole.position - 1);
 
-            for (let [id, channel] of guild.channels) {
+            for (let [, channel] of guild.channels) {
               const permissions = channel.permissionsOf(me.id);
               if (permissions.has('manageChannels')) {
                 await channel.editPermission(mutedRole.id, 0, Constants.Permissions.sendMessages, 'role', `[Automod] Override permissions for new Muted role in channel ${channel.name}`);
@@ -188,10 +187,11 @@ export default class PunishmentManager {
             settings!.mutedRole = mutedRole.id;
             settings!.save();
           }
-
-          await member.addRole((mutedRole as Role).id, reason);
-          if (!!temp) this.bot.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
         }
+
+        const id = mutedRole instanceof Role ? mutedRole.id : mutedRole;
+        if (!audit) await member.addRole(id, reason);
+        if (temp) this.bot.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
       } break;
 
       case PunishmentType.AddRole: {
@@ -207,7 +207,7 @@ export default class PunishmentManager {
         if (!mem) return;
 
         const muted = guild.roles.get(settings!.mutedRole)!;
-        if (!!(mem as Member).roles.find(x => x === muted.id)) await (mem! as Member).removeRole(muted.id, reason);
+        if (!audit && (mem as Member).roles.find(x => x === muted.id)) await (mem! as Member).removeRole(muted.id, reason);
       } break;
 
       case PunishmentType.Unban: {
@@ -225,20 +225,15 @@ export default class PunishmentManager {
       } break;
     }
 
-    if (
-      punishment.type !== PunishmentType.AddRole &&
-      punishment.type !== PunishmentType.RemoveRole
-    ) {
-      if (member instanceof Member) return this.postToModLog(member, punishment, reason);
-      else {
-        const user = await this.bot.client.getRESTUser(member.id);
-        return this.postToModLog({
-          username: user.username,
-          discriminator: user.discriminator,
-          guild: member.guild,
-          id: member.id
-        }, punishment, reason);
-      }
+    if (punishment.type === PunishmentType.AddRole || punishment.type === PunishmentType.RemoveRole) return undefined;
+    else {
+      const user = await this.bot.client.getRESTUser(member.id);
+      return this.postToModLog({
+        username: user.username,
+        discriminator: user.discriminator,
+        guild: member.guild,
+        id: member.id
+      }, punishment, reason);
     }
   }
 
@@ -273,7 +268,7 @@ export default class PunishmentManager {
               **User**: ${member.username}#${member.discriminator}
               **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}
               **Reason**: ${reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${c.id} <reason>\`*)`}
-              ${!!punishment.options.soft ? '**Type**: Soft Ban' : ''}
+              ${punishment.options.soft ? '**Type**: Soft Ban' : ''}
               ${!punishment.options.soft && !!punishment.options.temp ? `**Time**: ${ms(punishment.options.temp, { long: true })}` : ''}
             `)
             .build()
@@ -283,13 +278,11 @@ export default class PunishmentManager {
           message: message.id
         }, error => error ? this.bot.logger.error(`Unable to update case:\n${error}`) : null);
         return undefined;
-      }
-      catch(ex) {
+      } catch(ex) {
         this.bot.logger.error(`Unable to post to modlog:\n${ex}`);
         return `Sorry ${punishment.options.moderator.username}, I was unable to publish case #${c.id} to the mod log`;
       }
-    } 
-    else {
+    } else {
       this.bot.logger.error('Nino doesn\'t have permissions to publish to the mod log');
       return `Sorry ${punishment.options.moderator.username}, I was unable to post to the mod log due to me not having any permissions (\`Send Messages\`, \`Embed Links\`)`;
     }
@@ -319,7 +312,7 @@ export default class PunishmentManager {
       unban: 0xfff00,
       unmute: 0xfff00,
     }[type];
-    let suffix;
+    let suffix!: string;
     if (type === 'ban' || type === 'unban') suffix = 'ned';
     else if (type.endsWith('e')) suffix = 'd';
     else suffix = 'ed';

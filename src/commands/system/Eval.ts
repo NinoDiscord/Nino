@@ -1,12 +1,12 @@
-import { inspect } from 'util';
-import Bot from '../../structures/Bot';
-import Command from '../../structures/Command';
-import Context from '../../structures/Context';
-import EmbedBuilder from '../../structures/EmbedBuilder';
-import ts from 'typescript';
 import { writeFileSync, unlinkSync } from 'fs';
 import { injectable, inject } from 'inversify';
+import { stripIndents } from 'common-tags';
+import { inspect } from 'util';
 import { TYPES } from '../../types';
+import Command from '../../structures/Command';
+import Context from '../../structures/Context';
+import Bot from '../../structures/Bot';
+import ts from 'typescript';
 
 class CompilerError extends Error {
   constructor(m: string) {
@@ -31,31 +31,18 @@ export default class EvalCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const message = await ctx.embed(
-      new EmbedBuilder()
-        .setTitle('Evaluating...')
-        .setColor(0x00ff00)
-        .build()
-    );
+    const message = await ctx.send('Now evaluating script...');
     const script = ctx.args.join(' ');
-    const startTime = Date.now();
-    let result;
+    let result: any;
 
     const typescript = ctx.flags.get('ts');
-    if (typeof typescript === 'string')
-      return ctx.send('Um, I\'m sorry but it\'s just `--ts`');
+    if (typeof typescript === 'string') return ctx.send('Um, I\'m sorry but it\'s just `--ts`');
 
     const isAsync = script.includes('return') || script.includes('await');
 
     try {
-      if (typescript)
-        result = eval(
-          this.compileTypescript(
-            isAsync ? `(async() => {${script}})()` : script
-          )
-        );
+      if (typescript) result = eval(this.compileTypescript(isAsync ? `(async() => {${script}})()` : script));
       result = eval(isAsync ? `(async()=>{${script}})();` : script);
-      const evaluationTime = Date.now() - startTime;
       if ((result as any) instanceof Promise) result = await result;
       if (typeof result !== 'string')
         result = inspect(result, {
@@ -64,45 +51,19 @@ export default class EvalCommand extends Command {
         });
 
       const _res = this._redact(result);
-      await message.edit({
-        embed: new EmbedBuilder()
-          .setTitle('Evauluation')
-          .addField(
-            ':scroll: Script :scroll:',
-            `\`\`\`js\n${script}\n\`\`\``,
-            false
-          )
-          .addField(
-            ':white_check_mark: Result :white_check_mark:',
-            `\`\`\`js\n${_res}\n\`\`\``,
-            false
-          )
-          .addField(
-            ':alarm_clock: Evaluation Time :alarm_clock:',
-            `${evaluationTime}ms`,
-            false
-          )
-          .setColor(0x00ff00)
-          .build(),
-      });
-    }
-    catch (e) {
-      await message.edit({
-        embed: new EmbedBuilder()
-          .setTitle('Evaluation Error!')
-          .addField(
-            ':scroll: Script :scroll:',
-            `\`\`\`js\n${script}\n\`\`\``,
-            false
-          )
-          .addField(
-            ':no_entry_sign: Error :no_entry_sign:',
-            `\`\`\`js\n${e}\n\`\`\``,
-            false
-          )
-          .setColor(0xff0000)
-          .build(),
-      });
+      await message.edit(stripIndents`
+        > :pencil2: **Script was evaluated, here is the result:**
+        \`\`\`js
+        ${_res}
+        \`\`\`
+      `);
+    } catch (e) {
+      await message.edit(stripIndents`
+        > :x: **An error occured while running your script:**
+        \`\`\`js
+        ${e.message}
+        \`\`\`
+      `);
     }
   }
 
@@ -124,7 +85,7 @@ export default class EvalCommand extends Command {
         ]
       );
     }
-    tokens = tokens.filter(x => !!x);
+    tokens = tokens.filter(Boolean);
     const cancellationToken = new RegExp(tokens.join('|'), 'gi');
 
     return script.replace(cancellationToken, '--snip--');
@@ -132,11 +93,10 @@ export default class EvalCommand extends Command {
 
   // Stolen from: https://github.com/yamdbf/core/blob/master/src/command/base/EvalTS.ts#L68-L96
   compileTypescript(script: string) {
-    const file = `${process.cwd()}${require('path').sep}data${
-      require('path').sep
-    }eval_${Date.now()}.ts`;
+    const file = `${process.cwd()}${require('path').sep}data${require('path').sep}eval_${Date.now()}.ts`;
     writeFileSync(file, script);
-    const program: any = ts.createProgram([file], {
+
+    const program = ts.createProgram([file], {
       target: ts.ScriptTarget.ESNext,
       module: ts.ModuleKind.CommonJS,
       lib: [
@@ -190,6 +150,8 @@ export default class EvalCommand extends Command {
           'lib.es2016.d.ts',
           'lib.es2017.d.ts',
           'lib.es2018.d.ts',
+          'lib.es2019.d.ts',
+          'lib.es2020.d.ts',
           'lib.esnext.d.ts',
         ],
         declaration: false,

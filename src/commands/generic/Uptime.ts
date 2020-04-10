@@ -20,6 +20,6 @@ export default class UptimeCommand extends Command {
   }
 
   async run(ctx: Context) {
-    return ctx.send(humanize(Date.now() - this.bot.client.startTime));
+    return ctx.send(`:gear: **${humanize(Date.now() - this.bot.client.startTime)}**`);
   }
 }

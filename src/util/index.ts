@@ -27,5 +27,17 @@ export function humanize(ms: number) {
 
 // TODO: Add more content
 export function replaceMessage(text: string, user: User) {
-  return text.replace(/%author%/, `${user.username}#${user.discriminator}`);
+  return text
+    .replace(/%author%/, `${user.username}#${user.discriminator}`)
+    .replace(/%author.mention%/, user.mention);
+}
+
+export function formatSize(bytes: number) {
+  const kilo = bytes / 1024;
+  const mega = kilo / 1024;
+  const giga = mega / 1024;
+
+  if (kilo < 1024) return `${kilo.toFixed(1)}KB`;
+  else if (kilo > 1024 && mega < 1024) return `${mega.toFixed(1)}MB`;
+  else return `${giga.toFixed(1)}GB`; 
 }

@@ -56,8 +56,7 @@ export default class MuteCommand extends Command {
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
       return ctx.send('User was successfully muted');
-    }
-    catch (ex) {
+    } catch (ex) {
       return ctx.send(`Unable to mute user: \`${ex.message}\``);
     }
   }

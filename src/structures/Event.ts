@@ -64,7 +64,7 @@ export type Emittable =
   | 'messageDelete';
 
 @injectable()
-export default class NinoEvent {
+export default abstract class NinoEvent {
   public bot: Client;
   public event: Emittable;
 
@@ -76,7 +76,5 @@ export default class NinoEvent {
     this.event = event;
   }
 
-  async emit(...args: any[]) {
-    throw new SyntaxError(`Unable to run event '${this.event}' without the 'emit' function.`);
-  }
+  public abstract emit(...args: any[]): Promise<any>;
 }

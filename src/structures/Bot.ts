@@ -41,6 +41,7 @@ export interface Config {
   status: string | undefined;
   owners: string[] | undefined;
   prometheus: number;
+  ksoft: string | undefined;
   discord: {
     prefix: string;
     token: string;
@@ -55,6 +56,10 @@ export interface Config {
     topggtoken: string | undefined;
     bfdtoken: string | undefined;
     blstoken: string | undefined;
+  } | undefined;
+  webhook: {
+    token: string;
+    id: string;
   } | undefined;
 }
 
@@ -116,6 +121,8 @@ export default class Bot {
       host: config.redis.host,
       db: config.redis.database
     });
+
+    this.addRedisEvents();
   }
 
   async build() {
@@ -151,5 +158,17 @@ export default class Bot {
 
   report(ex: any) {
     captureException(ex);
+  }
+
+  private addRedisEvents() {
+    this.redis.once('ready', () => this.logger.redis(`Created a Redis pool at ${this.config.redis.host}:${this.config.redis.port}${this.config.redis.database ? `, with database ID: ${this.config.redis.database}` : ''}`));
+    this.redis.on('wait', async () => {
+      this.logger.redis('Redis has disconnected and awaiting a new pool...');
+      if (this.config.webhook) {
+        await this.client.executeWebhook(this.config.webhook.id, this.config.webhook.token, {
+          content: ':pencil2: **| Redis connection is unstable, waiting for a new pool to be established...**'
+        });
+      }
+    });
   }
 }

@@ -1,10 +1,10 @@
+import { injectable, inject } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { execSync } from 'child_process';
-import Bot from '../../structures/Bot';
+import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../../types';
+import Bot from '../../structures/Bot';
 
 @injectable()
 export default class ShellCommand extends Command {
@@ -21,49 +21,27 @@ export default class ShellCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const message = await ctx.embed(
-      this.bot
-        .getEmbed()
-        .setTitle(':computer: Executing...')
-        .build()
-    );
+    const message = await ctx.send('Evaluating script...');
     const script = ctx.args.join(' ');
-    const time = Date.now();
-    let result;
+    let result: string;
     try {
       result = execSync(script)
         .toString()
         .trim();
-      await message.edit({
-        embed: this.bot
-          .getEmbed()
-          .addField(':scroll: Script', `\`\`\`\n${script}\`\`\``, false)
-          .addField(
-            ':white_check_mark: Result',
-            `\`\`\`\n${result}\`\`\``,
-            false
-          )
-          .addField(
-            ':alarm_clock: Evaluation Time',
-            `**${Date.now() - time}ms**`,
-            false
-          )
-          .build(),
-      });
-    }
-    catch (ex) {
-      await message.edit({
-        embed: this.bot
-          .getEmbed()
-          .addField(':scroll: Script', `\`\`\`\n${script}\`\`\``, false)
-          .addField(':white_check_mark: Result', `\`\`\`\n${ex}\`\`\``, false)
-          .addField(
-            ':alarm_clock: Evaluation Time',
-            `**${Date.now() - time}ms**`,
-            false
-          )
-          .build(),
-      });
+
+      await message.edit(stripIndents`
+        > :pencil2: **Script was evaluated successfully, here is the result:**
+        \`\`\`sh
+        ${result}
+        \`\`\`
+      `);
+    } catch (ex) {
+      await message.edit(stripIndents`
+        > :x: **Unable to evaluate script:**
+        \`\`\`sh
+        ${ex.message}
+        \`\`\`
+      `);
     }
   }
 }

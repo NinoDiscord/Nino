@@ -27,7 +27,7 @@ export default class CaseSettings implements Base<CaseModel> {
       type,
       victim: user,
       reason,
-      id: !!newest[0] ? newest[0].id + 1 : 1,
+      id: newest[0] ? newest[0].id + 1 : 1,
     });
     query.save();
     return query;

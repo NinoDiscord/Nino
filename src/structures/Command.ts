@@ -19,7 +19,7 @@ export interface CommandInfo {
 }
 
 @injectable()
-export default class NinoCommand {
+export default abstract class NinoCommand {
   public bot: Client;
   public name: string;
   public description: string;
@@ -56,16 +56,10 @@ export default class NinoCommand {
     this.userPermissions = info.userPermissions || 0;
   }
 
-  async run(ctx: Context): Promise<any> {
-    return ctx.send(
-      `The command \`${this.name}\` is disabled due to no functionality.`
-    );
-  }
+  public abstract run(ctx: Context): Promise<any>;
 
   format() {
-    return `${this.bot.config.discord.prefix}${this.name}${
-      this.usage ? ` ${this.usage}` : ''
-    }`;
+    return `${this.bot.config.discord.prefix}${this.name}${this.usage ? ` ${this.usage}` : ''}`;
   }
 
   help() {
@@ -75,13 +69,7 @@ export default class NinoCommand {
       .setDescription(`**${this.description}**`)
       .addField('Syntax', this.format(), true)
       .addField('Category', this.category, true)
-      .addField(
-        'Aliases',
-        this.aliases.length > 1
-          ? this.aliases.join(', ')
-          : 'No aliases available',
-        true
-      )
+      .addField('Aliases', this.aliases.length > 1 ? this.aliases.join(', ') : 'No aliases available', true)
       .addField('Guild Only', this.guildOnly ? 'Yes' : 'No', true)
       .addField('Owner Only', this.ownerOnly ? 'Yes' : 'No', true)
       .addField('Cooldown', `${this.cooldown} seconds`, true);

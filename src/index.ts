@@ -9,8 +9,7 @@ const bot = container.get<Bot>(TYPES.Bot);
 
 if (!config.sentryDSN) {
   console.warn('WARNING: Missing "sentryDSN" in the "config.yml" file! This is optional to add but recommnended!');
-} 
-else {
+} else {
   init({
     dsn: config.sentryDSN,
     release: `${pkg.version}`,

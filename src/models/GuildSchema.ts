@@ -45,6 +45,7 @@ export interface GuildModel extends Document {
     ignore: string[];
     events: {
       messageDelete: boolean;
+      messageUpdate: boolean;
     };
   };
 }
@@ -110,6 +111,10 @@ const schema = new Schema<GuildModel>({
     },
     events: {
       messageDelete: {
+        type: Boolean,
+        default: false
+      },
+      messageUpdate: {
         type: Boolean,
         default: false
       }

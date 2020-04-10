@@ -43,8 +43,7 @@ export default class CommandStatisticsManager {
         command: name.key as string,
         size: name.uses
       };
-    } 
-    else {
+    } else {
       return {
         command: 'None',
         size: 0
@@ -57,8 +56,7 @@ export default class CommandStatisticsManager {
     if (['eval', 'shell'].includes(cmd.name)) {
       this.commandsExecuted++;
       this.commandUsages.delete(cmd.name);
-    } 
-    else {
+    } else {
       let usage = this.commandUsages.get(cmd.name)!;
       this.commandsExecuted++;
       this.commandUsages.set(cmd.name, usage++);

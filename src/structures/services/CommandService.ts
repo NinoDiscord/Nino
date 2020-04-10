@@ -144,8 +144,7 @@ export default class CommandService {
         await invoked.command.run(ctx);
         this.bot.prometheus.commandsExecuted.inc();
         this.bot.statistics.increment(invoked.command);
-      }
-      catch(ex) {
+      } catch(ex) {
         const embed = this.bot.getEmbed();
         const owners = this.bot.owners.map(userID => {
           const user = this.bot.client.users.get(userID)!;

@@ -24,7 +24,7 @@ export default class RedisQueue {
    * @remarks
    * Works in O(1) time complexity
    */
-  push(value: string | string[]): Promise<void> {
+  push(value: string | string[]) {
     return this.redis.rpush(this.key, value);
   }
 
@@ -34,7 +34,7 @@ export default class RedisQueue {
    * @remarks
    * Works in O(1) time complexity
    */
-  pop(): Promise<string> {
+  pop() {
     return this.redis.lpop(this.key);
   }
 
@@ -44,7 +44,7 @@ export default class RedisQueue {
    * @remarks
    * Works in O(1) time complexity
    */
-  peek(): Promise<string> {
+  peek() {
     return this.redis.lindex(this.key, 0);
   }
 
@@ -54,7 +54,7 @@ export default class RedisQueue {
    * @remarks
    * Works in O(1) time complexity
    */
-  peekEnd(): Promise<string> {
+  peekEnd() {
     return this.redis.lindex(this.key, -1);
   }
 
@@ -64,7 +64,7 @@ export default class RedisQueue {
    * @remarks
    * Works in O(1) time complexity
    */
-  length(): Promise<number> {
+  length() {
     return this.redis.llen(this.key);
   }
 }

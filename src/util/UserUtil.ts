@@ -10,6 +10,6 @@ export function findId(query: string): string | undefined {
 
 export default function(bot: Bot, query: string): User | undefined {
   const id = findId(query);
-  if (!!id) return bot.client.users.get(id);
+  if (id) return bot.client.users.get(id);
   else return undefined;
 }

@@ -85,8 +85,7 @@ export default class TimeoutsManager {
               }),
               '[Automod] Time\'s up!'
             );
-          }
-          finally {
+          } finally {
             await this.bot.redis.del(timedate);
           }
         }

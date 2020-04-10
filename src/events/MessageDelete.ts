@@ -48,7 +48,6 @@ export default class MessageDeleteEvent extends Event {
 
         - Timestamp: ${msgEmbed.timestamp ? new Date(msgEmbed.timestamp).toUTCString() : '12/31/2014 (00:00)'}
         - Footer: ${msgEmbed.footer ? msgEmbed.footer.text : 'None'}
-        ${msgEmbed.image ? `- Image: ${msgEmbed.image.url}` : msgEmbed.thumbnail ? `- Thumbnail: ${msgEmbed.thumbnail.url}` : ''}
       `);
 
       if (msgEmbed.fields && msgEmbed.fields.length) {
@@ -56,9 +55,9 @@ export default class MessageDeleteEvent extends Event {
           embed.addField(field.name!, field.value!, field.inline);
         }
       }
-    }
-    else {
-      embed.setDescription(`> **${message.content}**`);
+    } else {
+      const msg = message.content.startsWith('> ') ? message.content : `> ${message.content}`;
+      embed.setDescription(msg);
     }
 
     // TODO: Add customizable messages to this

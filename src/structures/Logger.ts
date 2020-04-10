@@ -8,6 +8,7 @@ enum LogLevel {
   INFO,
   WARN,
   ERROR,
+  REDIS,
   DATABASE
 }
 
@@ -53,6 +54,10 @@ export default class Logger {
         lvlText = this.colors.bgRed(`[ERROR/${process.pid}]`);
       } break;
 
+      case LogLevel.REDIS: {
+        lvlText = leeks.hexBg('#D82C20', `[REDIS/${process.pid}]`);
+      } break;
+
       case LogLevel.DATABASE: {
         lvlText = leeks.rgbBg([88, 150, 54], this.colors.black(`[MONGODB/${process.pid}]`));
       } break;
@@ -76,6 +81,10 @@ export default class Logger {
 
   error(...message: LoggerMessage) {
     this.write(LogLevel.ERROR, ...message);
+  }
+
+  redis(...message: LoggerMessage) {
+    this.write(LogLevel.REDIS, ...message);
   }
 
   database(...message: LoggerMessage) {

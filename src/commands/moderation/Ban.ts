@@ -66,8 +66,7 @@ export default class BanCommand extends Command {
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
       return ctx.send('User was successfully banned');
-    }
-    catch(e) {
+    } catch(e) {
       ctx.send(`Unable to ban user: \`${e.message}\``);
     }
   }

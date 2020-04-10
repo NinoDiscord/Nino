@@ -1,5 +1,6 @@
 import { inject, injectable } from 'inversify';
 import { Message, Member } from 'eris';
+import AutomodAccounts from '../automod/Accounts';
 import AutomodSwearing from '../automod/Badwords';
 import AutomodDehoist from '../automod/Dehoisting';
 import AutomodMention from '../automod/Mention';
@@ -21,9 +22,11 @@ import 'reflect-metadata';
  * * anti-raid
  * * auto dehoist
  * * auto mention
+ * * raid-member detection
  */
 @injectable()
 export default class AutomodService {
+  private accounts: AutomodAccounts;
   private swearing: AutomodSwearing;
   private mentions: AutomodMention;
   private invites: AutomodInvite;
@@ -34,6 +37,7 @@ export default class AutomodService {
   constructor(
     @inject(TYPES.Bot) bot: Bot
   ) {
+    this.accounts = new AutomodAccounts(bot);
     this.swearing = new AutomodSwearing(bot);
     this.mentions = new AutomodMention(bot);
     this.dehoist  = new AutomodDehoist(bot);
@@ -64,6 +68,7 @@ export default class AutomodService {
     return (
       await this.raid.handle(m) ||
       await this.dehoist.handle(m) ||
+      await this.accounts.handle(m) || 
       false
     );
   }
