@@ -1,76 +1,107 @@
-// import CommandService from './CommandService';
-// import { Message, User, Member, Channel, TextableChannel, MessageContent, Client, Guild, GuildChannel, TextChannel } from 'eris';
-// import NinoClient, { NinoConfig } from '../Client';
-
-// function dummyConfig(): NinoConfig {
-//     return {
-//         environment: '',
-//         databaseUrl: '',
-//         discord: {
-//             prefix: '',
-//             token: '',
-//         },
-//         redis: {
-//             host: '',
-//             port: 0,
-//         },
-//         webhook: {
-//             id: '',
-//             token: '',
-//         },
-//         webserver: 0,
-//         mode: '',
-//         sentryDSN: '',
-//         botlists: {
-//             topggtoken: '',
-//             bfdtoken: '',
-//             dboatstoken: '',
-//             blstoken: '',
-//         }
-//     };
-// }
-
-// function dummyGuild(client: Client): Guild {
-//     return new Guild({
-//         id: '0',
-//         joined_at: Date.now(),
-//         member_count: 1
-//     }, client);
-// }
-
-// function dummyClient(): NinoClient {
-//     let c = new NinoClient(dummyConfig());
-//     let g = dummyGuild(c);
-//     g.channels.add(dummyChannel(1, g) as TextChannel);
-//     c.guilds.add(g);
-
-//     return c;
-// }
-
-// function dummyChannel(type: number, guild: Guild): GuildChannel {
-//     return new GuildChannel({
-//         id: '1',
-//         type
-//     }, guild);
-// }
-
-// describe('CommandService', () => {
-//     let client: NinoClient;
-//     let cmdservice: CommandService;
-
-
-//     beforeAll(() => {
-//         client = dummyClient();
-//         cmdservice = new CommandService(client);
-//     });
-
-//     it('it should return invocation of the correct command', () => {
-//         const message = dummyMessage('!ban hello', )
-//     })
-// });
+import container from '../../inversify.config';
+import Bot, { Config } from '../Bot';
+import { TYPES } from '../../types';
+import { Message, TextableChannel, User } from 'eris';
+import CommandContext from '../Context';
 
 describe('CommandService', () => {
-    it('WIP', () => {
-        
-    });
+  container.rebind<Config>(TYPES.Config).toConstantValue({
+    status: undefined,
+    statusType: undefined,
+    environment: 'development',
+    databaseUrl: 'mongodb://localhost:27017/nino',
+    disabledCommands: [],
+    disabledCategories: undefined,
+    owners: undefined,
+    prometheus: 5595,
+    discord: {
+      token: '',
+      prefix: 'x!',
+    },
+    redis: {
+      host: 'localhost',
+      port: 6379,
+      database: undefined,
+    },
+    sentryDSN: undefined,
+    botlists: undefined,
+    webhook: undefined,
+    ksoft: undefined
+  });
+  const bot = container.get<Bot>(TYPES.Bot);
+  const commandService = bot.manager.service;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('it should create a command invocation', () => {
+    const message = { content: '!help hi' } as Message;
+    const args = ['help', 'hi'];
+    const context = new CommandContext(bot, message, args);
+    expect(context).toBeDefined();
+    expect(context.args).toBeDefined();
+    expect(context.args.args).toEqual(expect.arrayContaining(args));
+    const invocation = commandService.getCommandInvocation(context);
+    expect(invocation).toBeDefined();
+    expect(invocation!.command.name).toBe('help');
+  }, 5);
+
+  it('it should not create a command invocation', () => {
+    const message = { content: '' } as Message;
+    const args = [];
+    const context = new CommandContext(bot, message, args);
+    expect(context).toBeDefined();
+    expect(context.args).toBeDefined();
+    expect(context.args.args).toEqual(expect.arrayContaining(args));
+    const invocation = commandService.getCommandInvocation(context);
+    expect(invocation).toBeUndefined();
+  });
+
+  it('it should be able to invoke the command', () => {
+    const message = { content: '!help hi' } as Message;
+    const args = ['help', 'hi'];
+    const context = new CommandContext(bot, message, args);
+    const invocation = commandService.getCommandInvocation(context);
+    expect(invocation).toBeDefined();
+    expect(invocation!.canInvoke()).toBeUndefined();
+  });
+
+  it('it should not be able to invoke the command because it\'s disabled', () => {
+    bot.manager.getCommand('help')!.disabled = true;
+    const message = { content: '!help hi' } as Message;
+    const args = ['help', 'hi'];
+    const context = new CommandContext(bot, message, args);
+    const invocation = commandService.getCommandInvocation(context);
+    expect(invocation).toBeDefined();
+    expect(invocation!.canInvoke()).toEqual('Currently, command `help` is globally disabled');
+  });
+
+  it('it should not be able to invoke the command because the command is guild only', () => {
+    const message = {
+      content: '!settings',
+      channel: { type: 1 } as TextableChannel,
+    } as Message;
+    const args = ['settings'];
+    const context = new CommandContext(bot, message, args);
+    const invocation = commandService.getCommandInvocation(context);
+    expect(invocation).toBeDefined();
+    expect(invocation!.canInvoke()).toEqual(
+      'Sorry, but you need to be in a guild to execute the `settings` command.'
+    );
+  });
+
+  it('it should not be able to invoke the command because the command is owner only', () => {
+    const message = {
+      content: '!eval',
+      author: { id: '1' } as User,
+    } as Message;
+    const args = ['eval'];
+    const context = new CommandContext(bot, message, args);
+    const invocation = commandService.getCommandInvocation(context);
+    expect(invocation).toBeDefined();
+    expect(invocation!.canInvoke()).toEqual(
+      'Sorry, but you need to be a developer to execute the `eval` command.'
+    );
+  });
 });

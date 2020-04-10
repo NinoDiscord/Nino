@@ -1,21 +1,27 @@
-import Event from '../structures/Event';
-import NinoClient from '../structures/Client';
+import { injectable, inject } from 'inversify';
 import { User, Member } from 'eris';
+import { TYPES } from '../types';
+import Event from '../structures/Event';
+import Bot from '../structures/Bot';
 
+@injectable()
 export default class UserUpdateEvent extends Event {
-    constructor(client: NinoClient) {
-        super(client, 'userUpdate');
+  constructor(
+    @inject(TYPES.Bot) client: Bot
+  ) {
+    super(client, 'userUpdate');
+  }
+
+  getMutualGuilds(user: User) {
+    let members: Member[] = [];
+    for (const guild of this.bot.client.guilds.values()) {
+      if (guild.members.has(user.id)) members.push(guild.members.get(user.id)!);
     }
 
-    getMutualGuilds(user: User): Member[] {
-        let members: Member[] = [];
-        for (let [,guild] of this.client.guilds) {
-            if (!!guild.members[user.id]) members.push(guild.members[user.id]);
-        }
-        return members;
-    }
+    return members;
+  }
 
-    async emit(user: User) {
-        for (let member of this.getMutualGuilds(user)) this.client.autoModService.handleMemberNameUpdate(member);
-    }
+  async emit(user: User) {
+    for (const member of this.getMutualGuilds(user)) this.bot.automod.handleMemberNameUpdate(member);
+  }
 }

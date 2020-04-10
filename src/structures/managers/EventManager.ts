@@ -1,50 +1,47 @@
+import 'reflect-metadata';
+import { injectable, inject, multiInject } from 'inversify';
 import { readdir } from 'fs';
 import { sep } from 'path';
-import Client from '../Client';
+import Bot from '../Bot';
 import Event from '../Event';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class EventManager {
-    public client: Client;
-    public path: string = `${process.cwd()}${sep}dist${sep}events`;
+  public bot: Bot;
+  public events: Event[];
 
-    /**
-     * Creates a new instance of the event manager
-     * @param client The client instance
-     */
-    constructor(client: Client) {
-        this.client = client;
-    }
+  /**
+   * Creates a new instance of the event manager
+   * @param bot The client instance
+   * @param events The events to listen to
+   */
+  constructor(
+    @inject(TYPES.Bot) bot: Bot,
+    @multiInject(TYPES.Event) events: Event[]
+  ) {
+    this.bot = bot;
+    this.events = events;
+  }
 
-    /**
-     * Starts the event manager's process
-     */
-    start() {
-        readdir(this.path, (error, files) => {
-            if (error && !!error.stack) this.client.logger.log('error', error.stack);
-            this.client.logger.log('info', `Building ${files.length} event${files.length > 1? 's': ''}!`);
-            files.forEach((file) => {
-                try {
-                    const event = require(`${this.path}${sep}${file}`);
-                    const ev: Event = new event.default(this.client);
-                    this.emit(ev);
-                } catch (ignored) {}
-                
-            });
-        });
-    }
+  run() {
+    for (const event of this.events) this.emit(event);
+  }
 
-    /**
-     * Emits the event to the `EventEmitter` from the Eris client
-     * @param ev The event
-     */
-    emit(ev: Event) {
-        const wrapper = async(...args) => {
-            try {
-                await ev.emit(...args);
-            } catch(ex) {
-                this.client.logger.log('error', `Unable to run the '${ev.event}' event:\n${ex}`);
-            }
-        };
-        this.client.on(ev.event, wrapper);
-    }
+  /**
+   * Emits the event to the `EventEmitter` from the Eris client
+   * @param ev The event
+   */
+  emit(ev: Event) {
+    const wrapper = async (...args) => {
+      try {
+        await ev.emit(...args);
+      } catch (ex) {
+        this.bot.logger.error(`Unable to run event ${ev.event}:`, ex);
+      }
+    };
+
+    this.bot.logger.info(`Built event "${ev.event}"`);
+    this.bot.client.on(ev.event, wrapper);
+  }
 }

@@ -1,50 +1,46 @@
-import { readdir, readdirSync } from 'fs';
+import { inject, injectable, multiInject } from 'inversify';
 import { Collection } from '@augu/immutable';
 import CommandService from '../services/CommandService';
+import { TYPES } from '../../types';
 import Command from '../Command';
-import { sep } from 'path';
-import Client from '../Client';
+import Bot from '../Bot';
+import 'reflect-metadata';
 
+@injectable()
 export default class CommandManager {
-    public client: Client;
-    public service: CommandService;
-    public path: string = `${process.cwd()}${sep}dist${sep}commands`;
-    public commands: Collection<Command> = new Collection('nino:commands');
+  public bot: Bot;
+  public service: CommandService;
+  public commands: Collection<Command> = new Collection();
 
-    /**
-     * Creates a new instance of the `CommandManager`
-     * @param client The client instance
-     */
-    constructor(client: Client) {
-        this.client  = client;
-        this.service = new CommandService(client);
+  /**
+   * Creates a new instance of the `CommandManager`
+   * @param bot The client instance
+   */
+  constructor(
+    @inject(TYPES.Bot) bot: Bot,
+    @inject(TYPES.CommandService) service: CommandService,
+    @multiInject(TYPES.Command) commands: Command[]
+  ) {
+    this.bot = bot;
+    this.service = service;
+    for (let command of commands) {
+      this.commands.set(command.name, command);
+      if (
+        (this.bot.config.disabledCommands || []).includes(command.name) ||
+        (this.bot.config.disabledCategories || []).includes(command.category)
+      ) {
+        command.disabled = true;
+      }
     }
+  }
 
-    /**
-     * Starts the command manager's process
-     */
-    async start() {
-        const groups = await readdirSync(this.path);
-        for (let i = 0; i < groups.length; i++) {
-            const category = groups[i];
-            readdir(`${this.path}${sep}${category}`, (error, files) => {
-                if (error && !!error.stack) this.client.logger.log('error', error.stack);
-                this.client.logger.log('info', `Building ${files.length} command${files.length > 1? 's': ''}`);
-                files.forEach((file) => {
-                    try {
-                        const command = require(`${this.path}${sep}${category}${sep}${file}`);
-                        const cmd: Command = new command.default(this.client);
-    
-                        cmd.setParent(category, file);
-                            
-                        this.commands.set(cmd.name, cmd);
-                        this.client.logger.log('info', `Initialized command ${cmd.name}!`);
-                    } catch (err) {
-                        this.client.logger.log('error', `Couldn't initialize command ${file}. Error: ${err}`);
-                    }
-                    
-                });
-            });
-        }
-    }
+  /**
+   * Returns the command matching the name given
+   * @param name the name or alias of the command
+   */
+  getCommand(name: string): Command | undefined {
+    return this.bot.manager.commands.filter(
+      c => c.name === name || c.aliases!.includes(name)
+    )[0];
+  }
 }

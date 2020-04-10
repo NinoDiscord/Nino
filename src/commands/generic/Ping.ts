@@ -1,22 +1,28 @@
-import NinoClient from '../../structures/Client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import Bot from '../../structures/Bot';
 
+@injectable()
 export default class PingCommand extends Command {
-    constructor(client: NinoClient) {
-        super(client, {
-            name: 'ping',
-            description: 'Gives you the bot\'s ping.',
-            aliases: [ 'pong', 'pang' ],
-            category: 'Generic',
-            ownerOnly: false
-        });
-    }
+  constructor(
+    @inject(TYPES.Bot) client: Bot
+  ) {
+    super(client, {
+      name: 'ping',
+      description: 'Shows you the bot\'s ping.',
+      aliases: ['pong', 'pang'],
+      category: 'Generic',
+      ownerOnly: false,
+    });
+  }
 
-    async run(ctx: Context) {
-        const startedAt = Date.now();
-        const message = await ctx.send(':pong: Pong, I guess? Why do you want it...?');
-        await message.delete();
-        return ctx.send(`:ping_pong: Pong! \`${Date.now() - startedAt}ms\``);
-    }
+  async run(ctx: Context) {
+    const startedAt = Date.now();
+    const message = await ctx.send(':ping_pong: Uhm, I was wondering why you used this command?');
+    
+    const ws = this.bot.client.shards.reduce((a, b) => a + b.latency, 0);
+    return message.edit(`:ping_pong: Pong! (**WS #${ctx.guild ? ctx.guild.shard.id : 0}**: \`${ws}ms\` | **Message**: \`${Date.now() - startedAt}ms\`)`);
+  }
 }

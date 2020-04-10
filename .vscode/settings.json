@@ -1,9 +1,6 @@
 {
     "typescript.tsdk": "node_modules\\typescript\\lib",
-    "eslint.validate": [
-        {
-            "language": "typescript",
-            "autoFix": true
-        }
-    ]
+    "eslint.validate": ["typescript"],
+    "editor.tabSize": 2,
+    "jest.pathToJest": "yarn test --"
 }

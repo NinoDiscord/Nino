@@ -1,14 +1,19 @@
+import { injectable, inject } from 'inversify';
 import { Message } from 'eris';
-import Client from '../structures/Client';
+import { TYPES } from '../types';
+import Client from '../structures/Bot';
 import Event from '../structures/Event';
 
+@injectable()
 export default class MessageReceivedEvent extends Event {
-    constructor(client: Client) {
-        super(client, 'messageCreate');
-    }
+  constructor(
+    @inject(TYPES.Bot) client: Client
+  ) {
+    super(client, 'messageCreate');
+  }
 
-    async emit(m: Message) {
-        this.client.manager.service.handle(m);
-        this.client.autoModService.handleMessage(m);
-    }
+  async emit(m: Message) {
+    this.bot.manager.service.handle(m);
+    this.bot.automod.handleMessage(m);
+  }
 }

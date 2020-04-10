@@ -1,51 +1,69 @@
+import { injectable, inject } from 'inversify';
+import { Config } from '../Bot';
+import { TYPES } from '../../types';
 import { Admin } from 'mongodb';
 import mongoose from 'mongoose';
+import Logger from '../Logger';
+import 'reflect-metadata';
 
 interface BuildInfo {
-    version: string;
-    gitVersion: string;
-    modules: any[];
-    allocator: string;
-    javascriptEngine: string;
-    sysInfo: 'deprecated';
-    versionArray: number[];
-    debug: false;
-    maxBsonObjectSize: number;
-    storageEngines: string[];
-    ok: number;
-    openssl: { running: string; compiled: string; }
-    buildEnvironment: {
-        distmod: string;
-        distarch: string;
-        cc: string;
-        ccflags: string;
-        cxx: string;
-        linkflags: string;
-        target_arch: string;
-        target_os: string;
-    }
+  version: string;
+  gitVersion: string;
+  modules: any[];
+  allocator: string;
+  javascriptEngine: string;
+  sysInfo: 'deprecated';
+  versionArray: number[];
+  debug: false;
+  maxBsonObjectSize: number;
+  storageEngines: string[];
+  ok: number;
+  openssl: { running: string; compiled: string };
+  buildEnvironment: {
+    distmod: string;
+    distarch: string;
+    cc: string;
+    ccflags: string;
+    cxx: string;
+    linkflags: string;
+    target_arch: string;
+    target_os: string;
+  };
 }
+
+@injectable()
 export default class DatabaseManager {
-    public uri: string = 'mongodb://localhost:27017/nino';
-    public admin!: Admin;
-    public build!: BuildInfo;
-    public m!: typeof mongoose;
+  public admin!: Admin;
+  public build!: BuildInfo;
+  public logger: Logger = new Logger();
+  public uri: string;
+  public m!: typeof mongoose;
 
-    constructor(uri: string = 'mongodb://localhost:27017/nino') {
-        this.uri = uri;
-    }
+  constructor(
+    @inject(TYPES.Config) config: Config
+  ) {
+    this.uri = config.databaseUrl;
+  }
 
-    async connect() {
-        this.m = await mongoose.connect(this.uri, { useNewUrlParser: true });
-        this.m.connection.on('error', (error) => {
-            if (error) console.error(error);
-        });
-    }
+  async connect() {
+    this.m = await mongoose.connect(this.uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      autoIndex: false,
+    });
 
-    async getBuild(): Promise<any> {
-        if (!this.admin) this.admin = this.m.connection.db.admin();
-        if (!this.build) this.build = await this.admin.buildInfo();
+    this.m.connection.on('error', error => error ? this.logger.error(error) : null);
+    this.logger.database(`Opened a connection to MongoDB with URI: ${this.uri}`);
+  }
 
-        return this.build;
-    }
+  dispose() {
+    this.m.connection.close();
+    this.logger.warn('Database connection was disposed');
+  }
+
+  async getBuild() {
+    if (!this.admin) this.admin = this.m.connection.db.admin();
+    if (!this.build) this.build = await this.admin.buildInfo();
+    return this.build;
+  }
 }

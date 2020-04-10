@@ -1,63 +1,95 @@
-import { Constants } from 'eris';
+import { injectable, inject } from 'inversify';
+import { Constants, Message } from 'eris';
 import { stripIndents } from 'common-tags';
-import NinoClient from '../../structures/Client';
+import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
+import Bot from '../../structures/Bot';
 
-const weeks = (Date.now() - (1000 * 60 * 60 * 24 * 14));
-
+@injectable()
 export default class PruneCommand extends Command {
-    public filters: string[];
+  public filters: string[] = ['new', 'bot', 'user', 'self'];
+  public weeks: number = Date.now() - (1000 * 60 * 60 * 24 * 14);
 
-    constructor(client: NinoClient) {
-        super(client, {
-            name: 'prune',
-            description: 'Prunes messages from the current channel',
-            usage: '<amount> [--filter=\'bot\' | \'user\' | \'new\']',
-            aliases: [ 'purge' ],
-            category: 'Moderation',
-            userpermissions: Constants.Permissions.manageMessages,
-            botpermissions: Constants.Permissions.manageMessages
-        });
+  constructor(@inject(TYPES.Bot) client: Bot) {
+    super(client, {
+      name: 'prune',
+      description: 'Prunes messages by a filter from the current or a different channel',
+      usage: '<amount> [--filter="bot" | "user" | "new" | "self"]',
+      aliases: ['purge', 'delmsg'],
+      category: 'Moderation',
+      userPermissions: Constants.Permissions.manageMessages,
+      botPermissions: Constants.Permissions.manageMessages
+    });
+  }
 
-        this.filters = [ 'bot', 'user', 'new' ];
+  async run(ctx: Context) {
+    if (!ctx.args.has(0)) return ctx.send('You must provide an amount of messages to delete.');
+
+    const arg = ctx.args.get(0);
+    const amount = Number(arg);
+
+    if (isNaN(amount)) return ctx.send('You didn\'t provide a valid number.');
+    if (amount < 2) return ctx.send('The amount of messages has to be greater or equal to 2');
+    if (amount > 100) return ctx.send('The amount of messages has to be less than or equal to 2');
+
+    const allMsgs = await ctx.message.channel.getMessages(amount);
+    const filter = ctx.flags.get('filter') || ctx.flags.get('f');
+
+    if (typeof filter === 'boolean') return ctx.send(`You must append a value to the \`--filter\` flag. Example: **--filter=new** (Avaliable filters: ${this.filters.join(', ')})`);
+    if (filter && !this.filters.includes(filter)) return ctx.send(`Invalid filter (${this.filters.join(', ')})`);
+  
+    const shouldDelete = allMsgs.filter(x => 
+      (filter === 'user' ? !x.author.bot : true) &&
+      (filter === 'self' ? x.author.id === this.bot.client.user.id : true) &&
+      (filter === 'bot' ? x.author.bot : true) &&
+      (filter === 'new' ? x.timestamp > this.weeks : true)   
+    );
+
+    if (!shouldDelete.length) return ctx.send(`Couldn't find any messages with filter: \`${filter}\``);
+
+    const message = await ctx.send(`Now deleting ${shouldDelete.length} messages...`);
+    try {
+      shouldDelete.map(async (msg) => await ctx.message.channel.deleteMessage(msg.id));
+      const msgs: string[] = [];
+
+      // This looks ugly but it's gonna have to do I guess?
+      shouldDelete.map(x => {
+        if (!msgs.includes(x.author.id)) msgs.push(x.author.id);
+      });
+
+      const allUsers = msgs.map(x => {
+        const author = this.bot.client.users.get(x)!;
+        const messages = shouldDelete.filter(e => e.author.id === x).length;
+        return `${author.username}#${author.discriminator} with ${messages} messages`;
+      });
+
+      const embed = this.bot.getEmbed()
+        .setTitle('Results')
+        .setDescription(stripIndents`
+          **Deleted ${shouldDelete.length} messages**
+          \`\`\`prolog
+          ${allUsers}
+          \`\`\`
+        `);
+
+      await message.delete();
+      return ctx.embed(embed.build());
+    } catch(ex) {
+      if (ex.message.includes(' is more then 2 weeks old.')) {
+        const messages = shouldDelete.filter(x => x.timestamp < this.weeks);
+        return ctx.send(`Unable to delete ${messages.length} messages due to Discord's limitations.`);
+      } else {
+        const embed = this.bot.getEmbed()
+          .setTitle('Unable to delete messages')
+          .setDescription(stripIndents`
+            \`\`\`js
+            ${ex.stack ? ex.stack.split('\n')[0] : ex.message}
+            \`\`\`
+          `);
+        
+        return ctx.embed(embed.build());
+      }
     }
-
-    async run(ctx: Context) {
-        if (!ctx.args.has(0)) return ctx.send('You must provide 1-2 arguments. Check the command usage.');
-
-        const arg = ctx.args.get(0);
-        if (Number(arg) < 2) return ctx.send('The `amount` must be greater or equal to 2.');
-        if (Number(arg) > 100) return ctx.send('The `amount` must be less then or equal to 100.');
-
-        const messages = await ctx.message.channel.getMessages(Number(arg));
-        const filter   = (ctx.flags.get('filter') || ctx.flags.get('f'));
-        if (typeof filter === 'boolean') return ctx.send('The `filter` flag must be a string.');
-        if (!!filter && !this.filters.includes(filter)) return ctx.send(`Invalid filter. (\`${this.filters.map(s => s).join(', ')}\`)`);
-
-        const toDelete = messages.filter(m =>
-            (filter === 'bot'? m.author.bot: true) &&
-            (filter === 'user'? !m.author.bot: true) &&
-            (filter === 'new'? m.timestamp > weeks: true)
-        );
-        if (toDelete.length < 1) return ctx.send('No messages was found by the `' + filter + '` filter!');
-
-        try {
-            toDelete.map(async(m) => await ctx.message.channel.deleteMessage(m.id));
-            return ctx.send(`I've deleted \`${toDelete.length}\` messages!`);
-        } catch(ex) {
-            if (ex.message.includes(' is more then 2 weeks old.')) {
-                const m = toDelete.filter(m => m.timestamp < weeks);
-                return ctx.send(`There were ${m.length} messages that I c-cant delete because Discord puts messages at bulk after 2 weeks has past.`);
-            } else {
-                return ctx.code('js', stripIndents`
-                    // Unable to delete messages because of:
-                    ${ex.stack.split('\n')[0]}
-                    ${ex.stack.split('\n')[1]}
-                    ${ex.stack.split('\n')[2]}
-                    ${ex.stack.split('\n')[3]}
-                `);
-            }
-        }
-    }
+  }
 }

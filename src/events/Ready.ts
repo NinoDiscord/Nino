@@ -1,33 +1,28 @@
-import Webserver from '../webserver/server';
-import Client from '../structures/Client';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../types';
+import Client from '../structures/Bot';
 import Event from '../structures/Event';
 
+@injectable()
 export default class ReadyEvent extends Event {
-    public web: Webserver;
+  constructor(
+    @inject(TYPES.Bot) client: Client
+  ) {
+    super(client, 'ready');
+  }
 
-    constructor(client: Client) {
-        super(client, 'ready');
-        this.web = new Webserver(client);
-    }
+  async emit() {
+    const name = `${this.bot.client.user.username}#${this.bot.client.user.discriminator} (${this.bot.client.user.id})`;
 
-    async emit() {
-        this.client.logger.log('discord', `Logged in as ${this.client.user.username}#${this.client.user.discriminator} (${this.client.user.id})`);
-        this.client.editStatus('online', {
-            name: `${this.client.config['discord'].prefix}help | ${this.client.guilds.size.toLocaleString()} Guilds`,
-            type: 0
-        });
-        setInterval(() => {
-            this.client.editStatus('online', {
-                name: `${this.client.config['discord'].prefix}help | ${this.client.guilds.size.toLocaleString()} Guilds`,
-                type: 0
-            });
-        }, 600000);
-        this.client.promServer.listen(5595, () => this.client.logger.log('info', 'Metrics is now listening on port \'5595\''));
-        await this.client.redis.set('guilds', this.client.guilds.size);
-        this.client.stats.guildCount = this.client.guilds.size;
-        this.client.prom.guildCount.set(this.client.stats.guildCount, Date.now());
-        this.client.botlistservice.start();
-        this.client.timeouts.reapplyTimeouts();
-        this.web.start();
-    }
+    this.bot.logger.info(`Logged in as ${name}`);
+    this.bot.status.updateStatus();
+    setInterval(() => this.bot.status.updateStatus(), 600000);
+
+    this.bot.prometheus.server.listen(this.bot.config.prometheus, () => this.bot.logger.info(`Metrics server is now listening at localhost:${this.bot.config.prometheus}`));
+    await this.bot.redis.set('guilds', this.bot.client.guilds.size);
+
+    this.bot.statistics.guildCount = this.bot.client.guilds.size;
+    this.bot.prometheus.guildCount.set(this.bot.statistics.guildCount, Date.now());
+    this.bot.timeouts.reapplyTimeouts();
+  }
 }
