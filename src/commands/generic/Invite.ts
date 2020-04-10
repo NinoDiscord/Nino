@@ -1,9 +1,9 @@
 import { injectable, inject } from 'inversify';
+import { stripIndents } from 'common-tags';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
-import { stripIndents } from 'common-tags';
 
 @injectable()
 export default class InviteCommand extends Command {

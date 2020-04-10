@@ -47,7 +47,7 @@ export default class PermissionUtils {
    * @param member the member
    */
   public static topRole(member: Member): Role | undefined {
-    if (!member.roles || member.roles === null) return undefined;
+    if (!member.roles.length || member === null) return undefined;
     return member.roles
       .map(r => member.guild.roles.get(r))
       .sort((a, b) => b!.position - a!.position)[0];

@@ -19,9 +19,10 @@ export default class PingCommand extends Command {
   }
 
   async run(ctx: Context) {
+    const startedAt = Date.now();
     const message = await ctx.send(':ping_pong: Uhm, I was wondering why you used this command?');
     
     const ws = this.bot.client.shards.reduce((a, b) => a + b.latency, 0);
-    return message.edit(`:ping_pong: Pong! (**WS #${ctx.guild ? ctx.guild.shard.id : 0}**: \`${ws}ms\` | **Message**: \`${Date.now() - message.createdAt}\`)`);
+    return message.edit(`:ping_pong: Pong! (**WS #${ctx.guild ? ctx.guild.shard.id : 0}**: \`${ws}ms\` | **Message**: \`${Date.now() - startedAt}ms\`)`);
   }
 }
