@@ -31,7 +31,7 @@ jobs:
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           script: |
-            cd ~/nino
+            cd ~/nino-prod
             git pull
             rm -fr node_modules
             rm yarn.lock
