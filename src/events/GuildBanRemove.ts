@@ -7,9 +7,7 @@ import Bot from '../structures/Bot';
 
 @injectable()
 export default class GuildBanAddEvent extends Event {
-  constructor(
-    @inject(TYPES.Bot) bot: Bot
-  ) {
+  constructor(@inject(TYPES.Bot) bot: Bot) {
     super(bot, 'guildBanRemove');
   }
 

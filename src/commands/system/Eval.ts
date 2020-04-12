@@ -75,19 +75,12 @@ export default class EvalCommand extends Command {
       this.bot.config.redis.host,
       this.bot.config.sentryDSN,
     ];
-    if (this.bot.config.botlists) {
-      tokens.push(
-        ...[
-          this.bot.config.botlists.bfdtoken,
-          this.bot.config.botlists.blstoken,
-          this.bot.config.botlists.topggtoken,
-          this.bot.config.botlists.dboatstoken,
-        ]
-      );
-    }
+
+    if (this.bot.config.ksoft) tokens.push(this.bot.config.ksoft);
+    if (this.bot.config.botlists) tokens.push(this.bot.config.botlists.bfdtoken, this.bot.config.botlists.blstoken, this.bot.config.botlists.topggtoken, this.bot.config.botlists.dboatstoken);
+    
     tokens = tokens.filter(Boolean);
     const cancellationToken = new RegExp(tokens.join('|'), 'gi');
-
     return script.replace(cancellationToken, '--snip--');
   }
 

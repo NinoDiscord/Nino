@@ -6,9 +6,7 @@ import Event from '../structures/Event';
 
 @injectable()
 export default class GuildJoinedEvent extends Event {
-  constructor(
-    @inject(TYPES.Bot) client: Client
-  ) {
+  constructor(@inject(TYPES.Bot) client: Client) {
     super(client, 'guildCreate');
   }
 

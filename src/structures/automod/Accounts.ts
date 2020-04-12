@@ -53,7 +53,6 @@ export default class AccountsAutomod {
 
       try {
         const data = req.json();
-        console.log(data);
         if (data.code || data.detail) return false;
 
         const punishment = new Punishment(PunishmentType.Ban, {
