@@ -1,14 +1,11 @@
-import {
-  Punishment,
-  PunishmentType,
-} from '../../structures/managers/PunishmentManager';
-import { Constants } from 'eris';
-import Bot from '../../structures/Bot';
+import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
+import { injectable, inject } from 'inversify';
+import { Constants, Member } from 'eris';
+import { TYPES } from '../../types';
 import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../../types';
+import Bot from '../../structures/Bot';
 
 @injectable()
 export default class UnmuteCommand extends Command {
@@ -46,7 +43,9 @@ export default class UnmuteCommand extends Command {
     });
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
-      await ctx.send('User successfully unmuted.');
+      const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
+
+      return ctx.send(`${prefix} was successfully banned`);
     } catch (e) {
       ctx.send('Cannot unmute user, ' + e.message);
     }

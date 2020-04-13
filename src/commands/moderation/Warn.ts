@@ -31,12 +31,14 @@ export default class WarnCommand extends Command {
     if (!member) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
 
     const punishments = await this.bot.punishments.addWarning(member!);
-    for (let i of punishments)
+    for (let i of punishments) {
       try {
         await this.bot.punishments.punish(member!, i, 'Automod');
       } catch (e) {
-        return ctx.send(`Unable to punish, ${e.message}`);
+        return ctx.send(`Unable to punish: \`${e.message}\``);
       }
+    }
+
     const warns = await this.bot.warnings.get(ctx.guild!.id, member.id);
     return ctx.send(`Successfully warned ${member.username}#${member.discriminator}! They now have ${warns === null ? 1 : warns.amount} warnings!`);
   }

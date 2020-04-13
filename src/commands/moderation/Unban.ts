@@ -44,12 +44,8 @@ export default class UnbanCommand extends Command {
       moderator: ctx.sender,
     });
     try {
-      await this.bot.punishments.punish(
-        { id, guild: ctx.guild! },
-        punishment,
-        reason
-      );
-      await ctx.send('User successfully unbanned.');
+      await this.bot.punishments.punish({ id, guild: ctx.guild! }, punishment, reason);
+      return ctx.send('User was successfully unbanned');
     } catch (e) {
       ctx.send('Cannot unban user, ' + e.message);
     }
