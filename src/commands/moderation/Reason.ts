@@ -16,7 +16,7 @@ export default class ReasonCommand extends Command {
       category: 'Moderation',
       guildOnly: true,
       userPermissions: Constants.Permissions.banMembers,
-      botPermissions: Constants.Permissions.manageMessages,
+      botPermissions: Constants.Permissions.manageMessages
     });
   }
 

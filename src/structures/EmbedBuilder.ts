@@ -29,8 +29,8 @@ export interface EmbedImage {
 }
 
 export interface EmbedField {
-  name?: string;
-  value?: string;
+  name: string;
+  value: string;
   inline?: boolean;
 }
 
@@ -39,15 +39,14 @@ export interface EmbedFooter {
   icon_url?: string;
 }
 
-export type StringResolvable = string | string[];
-
-export function toString(str: StringResolvable): string {
+type StringResolvable = string | string[];
+function toString(str: StringResolvable): string {
   if (str instanceof Array) return str.join('\n');
   if (typeof str === 'string') return str;
   return String(str);
 }
 
-export function clone(obj: object) {
+function clone(obj: object) {
   const object = Object.create(obj);
   return Object.assign(obj, object);
 }
@@ -143,22 +142,19 @@ export default class EmbedBuilder {
     return {
       title: this.title,
       description: this.description,
-      type: 'rich',
       fields: this.fields,
       author: this.author
         ? {
           name: this.author.name,
           url: this.author.url,
-          icon_url: this.author.icon_url,
-          proxy_icon_url: this.author.icon_url,
+          icon_url: this.author.icon_url
         }
         : undefined,
       image: this.image ? this.image : undefined,
       footer: this.footer
         ? {
           text: this.footer.text,
-          icon_url: this.footer.icon_url,
-          proxy_icon_url: this.footer.icon_url,
+          icon_url: this.footer.icon_url
         }
         : undefined,
       color: this.color,

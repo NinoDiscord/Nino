@@ -22,6 +22,7 @@ export default class MuteCommand extends Command {
       category: 'Moderation',
       userPermissions: Constants.Permissions.manageRoles,
       botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
+      guildOnly: true
     });
   }
 

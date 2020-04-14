@@ -21,7 +21,7 @@ export default class KickCommand extends Command {
       category: 'Moderation',
       guildOnly: true,
       botPermissions: Constants.Permissions.kickMembers,
-      userPermissions: Constants.Permissions.kickMembers,
+      userPermissions: Constants.Permissions.kickMembers
     });
   }
 

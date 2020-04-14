@@ -22,7 +22,7 @@ export default class BanCommand extends Command {
       category: 'Moderation',
       guildOnly: true,
       userPermissions: Constants.Permissions.banMembers,
-      botPermissions: Constants.Permissions.banMembers,
+      botPermissions: Constants.Permissions.banMembers
     });
   }
 

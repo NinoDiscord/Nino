@@ -54,7 +54,7 @@ export default class StatisticsCommand extends Command {
         Eris Version        => ${version}
         Nino Version        => ${pkg.version} (${commit.slice(0, 7)})
         Database Connection => ${connection.ok === 1 ? 'Online' : 'Offline'}
-        Memory Usaage       => ${memoryUsage}
+        Memory Usage        => ${memoryUsage}
         \`\`\`
       `)
       .build();

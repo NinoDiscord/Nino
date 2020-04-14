@@ -28,7 +28,7 @@ export class CommandInvocation {
     return this.ctx.guild ? this.ctx.me : this.ctx.client.user;
   }
 
-  get channel(): Channel {
+  get channel() {
     return this.ctx.channel;
   }
 
@@ -144,6 +144,7 @@ export default class CommandService {
         await invoked.command.run(ctx);
         this.bot.prometheus.commandsExecuted.inc();
         this.bot.statistics.increment(invoked.command);
+        this.bot.logger.info(`Ran command "${prefix}${invoked.command.name}" for ${ctx.sender.username}#${ctx.sender.discriminator} in ${ctx.guild ? `guild ${ctx.guild.name}` : 'DMs'}, now at ${this.bot.statistics.commandsExecuted.toLocaleString()} commands executed!`);
       } catch(ex) {
         const embed = this.bot.getEmbed();
         const owners = this.bot.owners.map(userID => {

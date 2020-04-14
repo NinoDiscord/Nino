@@ -19,7 +19,7 @@ export default class UnmuteCommand extends Command {
       userPermissions: Constants.Permissions.manageRoles,
       botPermissions:
         Constants.Permissions.manageRoles |
-        Constants.Permissions.manageChannels,
+        Constants.Permissions.manageChannels
     });
   }
 

@@ -13,15 +13,13 @@ export default class LockdownCommand extends Command {
   ) {
     super(client, {
       name: 'lockdown',
-      description:
-        'Locks down a channel, multiple channels or all channels for all roles below the specified role. Put + or - before the role to specify whether to allow the role to write or deny the permission.',
+      description: 'Locks down a channel, multiple channels or all channels for all roles below the specified role. Put + or - before the role to specify whether to allow the role to write or deny the permission.',
       aliases: ['lock'],
       category: 'Moderation',
       guildOnly: true,
       botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
       userPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
-      usage:
-        '[all] <channel> <channel>... [--roles=[+/-]<role>, [+/-]<role>, ...] [--release]',
+      usage: '[all] <channel> <channel>... [--roles=[+/-]<role>, [+/-]<role>, ...] [--release]'
     });
   }
 

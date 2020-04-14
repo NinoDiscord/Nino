@@ -1,4 +1,5 @@
-# Nino [![Build Status](https://travis-ci.org/auguwu/Nino.svg?branch=master)](https://travis-ci.org/auguwu/Nino)
+# Nino 
+[![Build Status](https://travis-ci.org/auguwu/Nino.svg?branch=master)](https://travis-ci.org/auguwu/Nino)
 
 > :hammer: **| Moderation-based Discord bot initally created for the Discord hackweek, now it is still regularly maintained.**
 >

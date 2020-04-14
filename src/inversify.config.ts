@@ -92,7 +92,6 @@ try {
 container.bind<Client>(TYPES.Client).toConstantValue(
   new Client(config.discord.token, {
     maxShards: 'auto',
-    disableEveryone: true,
     getAllUsers: true,
     restMode: true,
   })

@@ -18,7 +18,6 @@ import GuildSettings from './settings/GuildSettings';
 import CaseSettings from './settings/CaseSettings';
 import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
-import NinoCommand from './Command';
 import { TYPES } from '../types';
 import Warnings from './settings/Warning';
 import Logger from './Logger';
@@ -36,7 +35,7 @@ export interface Config {
   disabledCommands: string[] | undefined;
   environment: 'development' | 'production';
   databaseUrl: string;
-  statusType: number | undefined;
+  statusType: 0 | 1 | 2 | 3 | undefined;
   sentryDSN: string | undefined;
   status: string | undefined;
   owners: string[] | undefined;

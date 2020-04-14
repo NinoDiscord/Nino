@@ -16,7 +16,7 @@ export default class ShellCommand extends Command {
       aliases: ['exec', 'sh'],
       category: 'System Adminstration',
       ownerOnly: true,
-      hidden: true,
+      hidden: true
     });
   }
 
@@ -32,7 +32,7 @@ export default class ShellCommand extends Command {
       await message.edit(stripIndents`
         > :pencil2: **Script was evaluated successfully, here is the result:**
         \`\`\`sh
-        ${result}
+        ${this.redact(result)}
         \`\`\`
       `);
     } catch (ex) {
@@ -43,5 +43,22 @@ export default class ShellCommand extends Command {
         \`\`\`
       `);
     }
+  }
+
+  redact(script: string) {
+    let tokens = [
+      this.bot.client.token,
+      this.bot.config.databaseUrl,
+      this.bot.config.discord.token,
+      this.bot.config.redis.host,
+      this.bot.config.sentryDSN
+    ];
+
+    if (this.bot.config.ksoft) tokens.push(this.bot.config.ksoft);
+    if (this.bot.config.botlists) tokens.push(this.bot.config.botlists.bfdtoken, this.bot.config.botlists.blstoken, this.bot.config.botlists.topggtoken, this.bot.config.botlists.dboatstoken);
+    
+    tokens = tokens.filter(Boolean);
+    const cancellationToken = new RegExp(tokens.join('|'), 'gi');
+    return script.replace(cancellationToken, '--snip--');
   }
 }

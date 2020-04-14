@@ -29,10 +29,7 @@ export default class GuildBanAddEvent extends Event {
       moderator: mod
     });
 
-    await this.bot.punishments.punish(
-      guild.members.get(user.id) || { id: user.id, guild },
-      punishment,
-      log.reason
-    );
+    const member = guild.members.get(user.id) || { id: user.id, guild };
+    await this.bot.punishments.punish(guild.members.get(user.id) || { id: user.id, guild }, punishment, log.reason);
   }
 }

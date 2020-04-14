@@ -12,7 +12,7 @@ export default class HelpCommand extends Command {
   ) {
     super(client, {
       name: 'help',
-      description: (bot) => `Gives a list of ${bot.client.user ? bot.client.user.username : 'Nino#0989'}'s commands or shows documentation on a specific command`,
+      description: (bot) => `Gives a list of ${bot.client.user ? bot.client.user.username : 'Nino'}'s commands or shows documentation on a specific command`,
       usage: '[command]',
       aliases: ['cmds', 'commands']
     });
