@@ -16,11 +16,7 @@ export default class CommandManager {
    * Creates a new instance of the `CommandManager`
    * @param bot The client instance
    */
-  constructor(
-    @inject(TYPES.Bot) bot: Bot,
-    @inject(TYPES.CommandService) service: CommandService,
-    @multiInject(TYPES.Command) commands: Command[]
-  ) {
+  constructor(@inject(TYPES.Bot) bot: Bot, @inject(TYPES.CommandService) service: CommandService, @multiInject(TYPES.Command) commands: Command[]) {
     this.bot = bot;
     this.service = service;
     for (let command of commands) {

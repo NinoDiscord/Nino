@@ -50,7 +50,7 @@ export default class EvalCommand extends Command {
           showHidden: false,
         });
 
-      const _res = this._redact(result);
+      const _res = this.redact(result);
       await message.edit(stripIndents`
         > :pencil2: **Script was evaluated, here is the result:**
         \`\`\`js
@@ -67,27 +67,20 @@ export default class EvalCommand extends Command {
     }
   }
 
-  _redact(script: string) {
+  redact(script: string) {
     let tokens = [
       this.bot.client.token,
       this.bot.config.databaseUrl,
       this.bot.config.discord.token,
       this.bot.config.redis.host,
-      this.bot.config.sentryDSN,
+      this.bot.config.sentryDSN
     ];
-    if (this.bot.config.botlists) {
-      tokens.push(
-        ...[
-          this.bot.config.botlists.bfdtoken,
-          this.bot.config.botlists.blstoken,
-          this.bot.config.botlists.topggtoken,
-          this.bot.config.botlists.dboatstoken,
-        ]
-      );
-    }
+
+    if (this.bot.config.ksoft) tokens.push(this.bot.config.ksoft);
+    if (this.bot.config.botlists) tokens.push(this.bot.config.botlists.bfdtoken, this.bot.config.botlists.blstoken, this.bot.config.botlists.topggtoken, this.bot.config.botlists.dboatstoken);
+    
     tokens = tokens.filter(Boolean);
     const cancellationToken = new RegExp(tokens.join('|'), 'gi');
-
     return script.replace(cancellationToken, '--snip--');
   }
 

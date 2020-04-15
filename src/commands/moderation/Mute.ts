@@ -1,7 +1,7 @@
 import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
 import { injectable, inject } from 'inversify';
+import { Constants, Member } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
-import { Constants } from 'eris';
 import { TYPES } from '../../types';
 import findUser from '../../util/UserUtil'; 
 import Command from '../../structures/Command';
@@ -22,6 +22,7 @@ export default class MuteCommand extends Command {
       category: 'Moderation',
       userPermissions: Constants.Permissions.manageRoles,
       botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
+      guildOnly: true
     });
   }
 
@@ -55,7 +56,9 @@ export default class MuteCommand extends Command {
     await this.bot.timeouts.cancelTimeout(member.id, ctx.guild!, 'unmute');
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
-      return ctx.send('User was successfully muted');
+
+      const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
+      return ctx.send(`${prefix} was successfully muted`);
     } catch (ex) {
       return ctx.send(`Unable to mute user: \`${ex.message}\``);
     }

@@ -12,6 +12,6 @@ export default class ShardReadyEvent extends Event {
   }
 
   async emit(id: number) {
-    this.bot.logger.info(`Shard #${id} is connected to Discord!`);
+    this.bot.logger.info(`Shard #${id} has connected to Discord!`);
   }
 }

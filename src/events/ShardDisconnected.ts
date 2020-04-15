@@ -12,6 +12,6 @@ export default class ShardDisconnectedEvent extends Event {
   }
 
   async emit(error: any, id: number) {
-    this.bot.logger.warn(`Shard #${id} died`, error);
+    this.bot.logger.warn(`Shard #${id} died`, error || 'Connection has died');
   }
 }

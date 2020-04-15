@@ -25,13 +25,11 @@ export default class GuildMemberUpdateEvent extends Event {
     const logs = await guild.getAuditLogs(10);
     if (!logs.entries.length) return; // Don't do anything if there is no entries
 
-    const roles = ([] as string[]).concat(
-      old.roles.map(x => x),
-      member.roles.map(x => x)
-    );
+    // If the member is a bot, don't do anything
+    if (member.user.bot) return;
 
     // Role was taken away
-    if (old.roles.includes(settings.mutedRole)) {
+    if (!member.roles.includes(settings.mutedRole) && old.roles.includes(settings.mutedRole)) {
       const entries = logs.entries.filter(entry =>
         // Make sure the log type is 25 (MEMBER_ROLE_UPDATE) and it wasn't Nino who added it
         entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id  
@@ -47,7 +45,7 @@ export default class GuildMemberUpdateEvent extends Event {
       await this.bot.punishments.punish(member, punishment, '[Automod] Moderator has removed the Muted role', true);
     } 
     
-    if (member.roles.includes(settings.mutedRole)) {
+    if (member.roles.includes(settings.mutedRole) && !old.roles.includes(settings.mutedRole)) {
       const entries = logs.entries.filter(entry =>
         // Make sure the log action is 25 (MEMBER_ROLE_UPDATE) and it wasn't Nino who added it
         entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id  

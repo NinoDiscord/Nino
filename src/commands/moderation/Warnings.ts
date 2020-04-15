@@ -18,6 +18,7 @@ export default class WarningsCommand extends Command {
       userPermissions:
         Constants.Permissions.manageRoles |
         Constants.Permissions.manageChannels,
+      guildOnly: true
     });
   }
 

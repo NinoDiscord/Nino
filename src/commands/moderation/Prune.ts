@@ -19,7 +19,8 @@ export default class PruneCommand extends Command {
       aliases: ['purge', 'delmsg'],
       category: 'Moderation',
       userPermissions: Constants.Permissions.manageMessages,
-      botPermissions: Constants.Permissions.manageMessages
+      botPermissions: Constants.Permissions.manageMessages,
+      guildOnly: true
     });
   }
 

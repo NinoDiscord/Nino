@@ -47,7 +47,11 @@ export default class PermissionUtils {
    * @param member the member
    */
   public static topRole(member: Member): Role | undefined {
-    if (!member.roles.length || member === null) return undefined;
+    if (
+      member === null ||
+      !member.roles.length
+    ) return undefined;
+    
     return member.roles
       .map(r => member.guild.roles.get(r))
       .sort((a, b) => b!.position - a!.position)[0];
@@ -68,11 +72,9 @@ export default class PermissionUtils {
    */
   public static permissionsOf(role: Role, channel: GuildChannel) {
     let permission = role.permissions.allow;
-    if (permission & Constants.Permissions.administrator)
-      return Constants.Permissions.all;
+    if (permission & Constants.Permissions.administrator) return Constants.Permissions.all;
     let overwrite = channel.permissionOverwrites.get(channel.guild.id);
-    if (overwrite)
-      permission = (permission & ~overwrite.deny) | overwrite.allow;
+    if (overwrite) permission = (permission & ~overwrite.deny) | overwrite.allow;
     let deny = 0;
     let allow = 0;
     const roles = channel.guild.roles

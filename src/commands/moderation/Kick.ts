@@ -1,7 +1,7 @@
 import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
 import { injectable, inject } from 'inversify';
+import { Constants, Member } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
-import { Constants } from 'eris';
 import { TYPES } from '../../types';
 import findUser from '../../util/UserUtil'; 
 import Command from '../../structures/Command';
@@ -21,7 +21,7 @@ export default class KickCommand extends Command {
       category: 'Moderation',
       guildOnly: true,
       botPermissions: Constants.Permissions.kickMembers,
-      userPermissions: Constants.Permissions.kickMembers,
+      userPermissions: Constants.Permissions.kickMembers
     });
   }
 
@@ -43,7 +43,9 @@ export default class KickCommand extends Command {
 
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
-      return ctx.send('User was successfully kicked');
+
+      const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
+      return ctx.send(`${prefix} was successfully kicked`);
     } catch(e) {
       ctx.send(`Unable to kick user: \`${e.message}\``);
     }

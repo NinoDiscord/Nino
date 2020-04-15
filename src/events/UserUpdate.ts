@@ -1,8 +1,9 @@
 import { injectable, inject } from 'inversify';
-import { User, Member } from 'eris';
+import { User, Member, GuildAuditLogEntry, Guild } from 'eris';
 import { TYPES } from '../types';
 import Event from '../structures/Event';
 import Bot from '../structures/Bot';
+import { textChangeRangeIsUnchanged } from 'typescript';
 
 @injectable()
 export default class UserUpdateEvent extends Event {

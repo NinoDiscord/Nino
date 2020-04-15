@@ -1,15 +1,20 @@
-import { mkdirSync, existsSync, appendFileSync } from 'fs';
+import { mkdirSync, existsSync, appendFileSync, unlinkSync, writeFileSync } from 'fs';
+import { sep, join } from 'path';
 import { inspect } from 'util';
-import { sep } from 'path';
 import leeks from 'leeks.js';
 
-type LoggerMessage = (string | object)[];
+type LogMessage = (string | object | any[])[];
 enum LogLevel {
   INFO,
   WARN,
   ERROR,
   REDIS,
   DATABASE
+}
+
+enum LogSeverity {
+  NONE,
+  ERROR
 }
 
 export default class Logger {
@@ -31,63 +36,66 @@ export default class Logger {
     return `[${hours}:${minutes}:${seconds} ${ampm}]`;
   }
 
-  initialize() {
+  private initialize() {
     if (!existsSync(this.logPath)) mkdirSync(this.logPath);
+    if (existsSync(join(this.logPath, 'Nino.log'))) {
+      unlinkSync(join(this.logPath, 'Nino.log'));
+      writeFileSync(join(this.logPath, 'Nino.log'), '');
+    }
   }
 
-  strip(message: string) {
+  private strip(message: string) {
     return message.replace(/\u001b\[.*?m/g, '');
   }
 
-  private write(level: LogLevel, ...message: LoggerMessage) {
+  private write(level: LogLevel, severity: LogSeverity, ...message: LogMessage) {
     let lvlText!: string;
     switch (level) {
       case LogLevel.INFO: {
-        lvlText = this.colors.bgMagenta(this.colors.black(`[INFO/${process.pid}]`));
+        lvlText = this.colors.cyan(`[INFO/${process.pid}]`);
       } break;
 
       case LogLevel.WARN: {
-        lvlText = this.colors.bgYellow(this.colors.black(`[WARN/${process.pid}]`));
+        lvlText = this.colors.yellow(`[WARN/${process.pid}]`);
       } break;
 
       case LogLevel.ERROR: {
-        lvlText = this.colors.bgRed(`[ERROR/${process.pid}]`);
+        lvlText = this.colors.red(`[ERROR/${process.pid}]`);
       } break;
 
       case LogLevel.REDIS: {
-        lvlText = leeks.hexBg('#D82C20', `[REDIS/${process.pid}]`);
+        lvlText = leeks.hex('#D82C20', `[REDIS/${process.pid}]`);
       } break;
 
       case LogLevel.DATABASE: {
-        lvlText = leeks.rgbBg([88, 150, 54], this.colors.black(`[MONGODB/${process.pid}]`));
+        lvlText = leeks.rgb([88, 150, 54], `[MONGODB/${process.pid}]`);
       } break;
     }
 
-    const msg = message.map(m =>
-      m instanceof Object ? inspect(m) : m  
-    ).join('\n');
-
+    const msg = message.map(m => m instanceof Array ? `[${(m as any[]).join(', ')}]` : m instanceof Object ? inspect(m) : m as string).join('\n');
     appendFileSync(`${this.logPath}${sep}Nino.log`, `${this.getDate()} ${this.strip(lvlText)} -> ${this.strip(msg)}\n`);
-    process.stdout.write(`${this.colors.bgGray(this.getDate())} ${lvlText} -> ${msg}\n`);
+    
+    const output = severity === LogSeverity.ERROR ? process.stderr : process.stdout;
+    output.write(`${this.colors.gray(this.getDate())} ${lvlText} -> ${msg}\n`);
   }
 
-  info(...message: LoggerMessage) {
-    this.write(LogLevel.INFO, ...message);
+  info(...message: LogMessage) {
+    this.write(LogLevel.INFO, LogSeverity.NONE, ...message);
   }
 
-  warn(...message: LoggerMessage) {
-    this.write(LogLevel.WARN, ...message);
+  warn(...message: LogMessage) {
+    this.write(LogLevel.WARN, LogSeverity.NONE, ...message);
   }
 
-  error(...message: LoggerMessage) {
-    this.write(LogLevel.ERROR, ...message);
+  error(...message: LogMessage) {
+    this.write(LogLevel.ERROR, LogSeverity.ERROR, ...message);
   }
 
-  redis(...message: LoggerMessage) {
-    this.write(LogLevel.REDIS, ...message);
+  redis(...message: LogMessage) {
+    this.write(LogLevel.REDIS, LogSeverity.NONE, ...message);
   }
 
-  database(...message: LoggerMessage) {
-    this.write(LogLevel.DATABASE, ...message);
+  database(...message: LogMessage) {
+    this.write(LogLevel.DATABASE, LogSeverity.NONE, ...message);
   }
 }

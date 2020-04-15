@@ -20,7 +20,7 @@ export default class SettingsCommand extends Command {
       usage:
         'set <key> <value> / reset <key> / view / add <warnings> <punishment> [--time <time> (mute/ban)] [<roleID> (role/unrole)] [--soft (ban)] [--days <amount> (ban: delete messages)] / remove <punishment index> / response <add|remove> <message>',
       userPermissions: Constants.Permissions.manageGuild,
-      guildOnly: true,
+      guildOnly: true
     });
   }
 

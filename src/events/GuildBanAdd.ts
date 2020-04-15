@@ -1,6 +1,6 @@
 import { Punishment, PunishmentType } from '../structures/managers/PunishmentManager';
-import { Guild, User, TextChannel } from 'eris';
 import { inject, injectable } from 'inversify';
+import { Guild, User } from 'eris';
 import { TYPES } from '../types';
 import Event from '../structures/Event';
 import Bot from '../structures/Bot';
@@ -29,10 +29,7 @@ export default class GuildBanAddEvent extends Event {
       moderator: mod
     });
 
-    await this.bot.punishments.punish(
-      guild.members.get(user.id) || { id: user.id, guild },
-      punishment,
-      log.reason
-    );
+    const member = guild.members.get(user.id) || { id: user.id, guild };
+    await this.bot.punishments.punish(member, punishment, log.reason);
   }
 }

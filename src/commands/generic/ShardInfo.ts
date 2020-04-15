@@ -14,7 +14,7 @@ export default class ShardInfoCommand extends Command {
       description: 'Gives you the bot shard info.',
       aliases: ['si', 'shards'],
       category: 'Generic',
-      ownerOnly: false,
+      guildOnly: true
     });
   }
 

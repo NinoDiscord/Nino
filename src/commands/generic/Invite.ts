@@ -7,9 +7,7 @@ import Bot from '../../structures/Bot';
 
 @injectable()
 export default class InviteCommand extends Command {
-  constructor(
-    @inject(TYPES.Bot) client: Bot
-  ) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'invite',
       description: 'Gives you the invite for the bot.',

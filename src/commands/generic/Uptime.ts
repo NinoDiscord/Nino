@@ -14,8 +14,7 @@ export default class UptimeCommand extends Command {
       name: 'uptime',
       description: 'Gives you the uptime for the bot.',
       aliases: ['up'],
-      category: 'Generic',
-      ownerOnly: false,
+      category: 'Generic'
     });
   }
 
