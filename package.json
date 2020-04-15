@@ -4,8 +4,8 @@
   "version": "0.7.1",
   "main": "dist/index.js",
   "scripts": {
-    "build:watch": "yarn lint && yarn test && yarn clean && tsc -w",
-    "build": "yarn lint && yarn test && yarn clean && tsc",
+    "build:watch": "yarn lint && yarn clean && tsc -w",
+    "build": "yarn lint && yarn clean && tsc",
     "clean": "rm -fr dist",
     "main": "yarn build && node dist/index.js",
     "lint": "eslint src --ext .ts --fix",
