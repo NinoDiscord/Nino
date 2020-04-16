@@ -2,5 +2,5 @@
   "extends": ["config:base"],
   "automerge": true,
   "baseBranches": ["edge"],
-  "ignoreDeps": ["eris"]
+  "ignoreDeps": ["prom-client"]
 }
