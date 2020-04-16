@@ -32,7 +32,7 @@ export default class GuildMemberUpdateEvent extends Event {
     if (!member.roles.includes(settings.mutedRole) && old.roles.includes(settings.mutedRole)) {
       const entries = logs.entries.filter(entry =>
         // Make sure the log type is 25 (MEMBER_ROLE_UPDATE) and it wasn't Nino who added it
-        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id  
+        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id && !entry.user.bot
       );
 
       if (!entries.length) return; // Don't do anything if no entries were found
@@ -48,7 +48,7 @@ export default class GuildMemberUpdateEvent extends Event {
     if (member.roles.includes(settings.mutedRole) && !old.roles.includes(settings.mutedRole)) {
       const entries = logs.entries.filter(entry =>
         // Make sure the log action is 25 (MEMBER_ROLE_UPDATE) and it wasn't Nino who added it
-        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id  
+        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id && !entry.user.bot
       );
 
       if (!entries.length) return; // Don't do anything if no entries were found
