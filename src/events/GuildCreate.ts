@@ -24,7 +24,7 @@ export default class GuildJoinedEvent extends Event {
       const chan = (channel as TextChannel);
       const embed = this.bot.getEmbed()
         .setAuthor(`| Joined ${guild.name} (${guild.id})`, undefined, this.bot.client.user.dynamicAvatarURL('png', 1024))
-        .setFooter(`Now at ${this.bot.client.guilds.size} Guilds`, this.bot.client.user.dynamicAvatarURL('png', 1024))
+        .setFooter(`Now at ${this.bot.client.guilds.size} Guilds`)
         .build();
 
       chan.createMessage({ embed });

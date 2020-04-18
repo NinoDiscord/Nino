@@ -24,8 +24,8 @@ export default class GuildLeftEvent extends Event {
     if (channel.type === 0) {
       const chan = (channel as TextChannel);
       const embed = this.bot.getEmbed()
-        .setAuthor(`| Joined ${guild.name} (${guild.id})`, undefined, this.bot.client.user.dynamicAvatarURL('png', 1024))
-        .setFooter(`Now at ${this.bot.client.guilds.size} Guilds`, this.bot.client.user.dynamicAvatarURL('png', 1024))
+        .setAuthor(`| Left ${guild.name} (${guild.id})`, undefined, this.bot.client.user.dynamicAvatarURL('png', 1024))
+        .setFooter(`Now at ${this.bot.client.guilds.size} Guilds`)
         .build();
 
       chan.createMessage({ embed });

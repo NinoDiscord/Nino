@@ -1,9 +1,22 @@
-import { Message, TextChannel } from 'eris';
+import { Message, TextChannel, Attachment, EmbedOptions } from 'eris';
 import { injectable, inject } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
+
+interface OldMessage {
+  editedTimestamp: number;
+  channelMentions: string[];
+  roleMentions: string[];
+  mentionedBy: { [x: string]: any };
+  attachments: Attachment[];
+  mentions: string[];
+  content: string;
+  embeds: EmbedOptions[];
+  pinned: boolean;
+  tts: boolean;
+}
 
 @injectable()
 export default class MessageUpdatedEvent extends Event {
@@ -13,7 +26,7 @@ export default class MessageUpdatedEvent extends Event {
     super(client, 'messageUpdate');
   }
 
-  async emit(m: Message) {
+  async emit(m: Message, old: OldMessage | null) {
     // Do the automod service first
     await this.bot.automod.handleMessage(m);
 
@@ -42,31 +55,24 @@ export default class MessageUpdatedEvent extends Event {
     // Don't log anything that wasn't edited by Nino
     if (m.author.id === this.bot.client.user.id) return;
 
+    // Don't log any bot-related data
+    if (m.author.bot) return;
+
     const channel = (<TextChannel> guild.channels.get(settings.logging.channelID)!);
     const timestamp = new Date(m.createdAt);
     const embed = this.bot.getEmbed()
       .setAuthor(`${m.author.username}#${m.author.discriminator} in #${(m.channel as TextChannel).name}`, undefined, m.author.dynamicAvatarURL('png', 1024))
-      .setTimestamp(timestamp);
-
-    if (m.embeds.length > 0) {
-      const msgEmbed = m.embeds[0];
-      embed.setDescription(stripIndents`
-        __**${msgEmbed.title}**__
-        > **${msgEmbed.description}**
-  
-        - Timestamp: ${msgEmbed.timestamp ? new Date(msgEmbed.timestamp).toUTCString() : '12/31/2014 (00:00)'}
-        - Footer: ${msgEmbed.footer ? msgEmbed.footer.text : 'None'}
+      .setTimestamp(timestamp)
+      .addField('Old Content', stripIndents`
+        \`\`\`prolog
+        ${old ? old.content : 'None?'}
+        \`\`\`
+      `)
+      .addField('New Content', stripIndents`
+        \`\`\`prolog
+        ${m.content}
+        \`\`\`
       `);
-  
-      if (msgEmbed.fields && msgEmbed.fields.length) {
-        for (const field of msgEmbed.fields) {
-          embed.addField(field.name!, field.value!, field.inline);
-        }
-      }
-    } else {
-      const msg = m.content.startsWith('> ') ? m.content : `> ${m.content}`;
-      embed.setDescription(msg);
-    }
   
     // TODO: Add customizable messages to this
     channel.createMessage({

@@ -40,25 +40,19 @@ export default class MessageDeleteEvent extends Event {
       .setAuthor(`${message.author.username}#${message.author.discriminator} in #${(message.channel as TextChannel).name}`, undefined, message.author.dynamicAvatarURL('png', 1024))
       .setTimestamp(timestamp);
 
-    if (message.embeds.length > 0) {
-      const msgEmbed = message.embeds[0];
-      embed.setDescription(stripIndents`
-        __**${msgEmbed.title}**__
-        > **${msgEmbed.description}**
-
-        - Timestamp: ${msgEmbed.timestamp ? new Date(msgEmbed.timestamp).toUTCString() : '12/31/2014 (00:00)'}
-        - Footer: ${msgEmbed.footer ? msgEmbed.footer.text : 'None'}
-      `);
-
-      if (msgEmbed.fields && msgEmbed.fields.length) {
-        for (const field of msgEmbed.fields) {
-          embed.addField(field.name!, field.value!, field.inline);
-        }
-      }
+    let content!: string;
+    if (message.embeds.length) {
+      const em = message.embeds[0];
+      content = `${em.title ? em.title : 'None'}\n${em.description ? em.description : '...'}${em.timestamp instanceof Date ? `\n(${em.timestamp.toISOString()})` : ''}`;
     } else {
-      const msg = message.content.startsWith('> ') ? message.content : `> ${message.content}`;
-      embed.setDescription(msg);
+      content = message.content;
     }
+
+    embed.addField('Content', stripIndents`
+      \`\`\`prolog
+      ${content}
+      \`\`\`
+    `);
 
     // TODO: Add customizable messages to this
     channel.createMessage({

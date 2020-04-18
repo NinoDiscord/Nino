@@ -62,11 +62,11 @@ export default class PruneCommand extends Command {
       const allUsers = msgs.map(x => {
         const author = this.bot.client.users.get(x)!;
         const messages = shouldDelete.filter(e => e.author.id === x).length;
-        return `${author.username}#${author.discriminator} with ${messages} messages`;
-      });
+        return `${author.username}#${author.discriminator} with ${messages} message${messages > 1 ? 's' : ''}`;
+      }).join('\n');
 
       const embed = this.bot.getEmbed()
-        .setTitle('Results')
+        .setAuthor('| Pruned Results', undefined, this.bot.client.user.dynamicAvatarURL('png', 1024))
         .setDescription(stripIndents`
           **Deleted ${shouldDelete.length} messages**
           \`\`\`prolog

@@ -26,16 +26,12 @@ export default class UnbanCommand extends Command {
   }
 
   async run(ctx: Context) {
-    if (!ctx.args.has(0))
-      return ctx.send('Sorry but you will need to specify a user.');
+    if (!ctx.args.has(0)) return ctx.send('Sorry but you will need to specify a user.');
 
     const id = findId(ctx.args.get(0));
 
-    if (!id)
-      return ctx.send('Please type the id or mention the user (<@id>/<@!id>)');
-
-    if (!(await ctx.guild!.getBans()).find(v => v.user.id === id))
-      return ctx.send('The user is not banned from this guild.');
+    if (!id) return ctx.send('Please type the id or mention the user (<@id>/<@!id>)');
+    if (!(await ctx.guild!.getBans()).find(v => v.user.id === id)) return ctx.send('The user is not banned from this guild.');
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     await this.bot.timeouts.cancelTimeout(id, ctx.guild!, 'unban');
@@ -43,6 +39,7 @@ export default class UnbanCommand extends Command {
     const punishment = new Punishment(PunishmentType.Unban, {
       moderator: ctx.sender,
     });
+    
     try {
       await this.bot.punishments.punish({ id, guild: ctx.guild! }, punishment, reason);
       return ctx.send('User was successfully unbanned');
