@@ -58,6 +58,14 @@ export default class MessageUpdatedEvent extends Event {
     // Don't log any bot-related data
     if (m.author.bot) return;
 
+    // Don't log http/https links
+    const HTTPS_REGEX = /^https?:\/\/(.*)/;
+
+    // But why?
+    // `old` can be represented as null (according to Eris' docs), so we check for if `old` is null and if `old.content` exists
+    const ternary = old ? old.content && HTTPS_REGEX.test(old.content) : false;
+    if (HTTPS_REGEX.test(m.content) && ternary) return;
+
     const channel = (<TextChannel> guild.channels.get(settings.logging.channelID)!);
     const timestamp = new Date(m.createdAt);
     const embed = this.bot.getEmbed()
