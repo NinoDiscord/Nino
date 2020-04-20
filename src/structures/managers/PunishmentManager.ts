@@ -260,17 +260,23 @@ export default class PunishmentManager {
       const action = this.determineType(punishment.type);
       const c = await this.bot.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
       try {
+        let description = stripIndents`
+          **User**: ${member.username}#${member.discriminator}
+          **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}
+          **Reason**: ${reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${c.id} <reason>\`*)`}
+        `;
+
+        if (punishment.options.soft) description += '\n**Type**: Soft Ban';
+        if (!punishment.options.soft && punishment.options.temp) {
+          const time = ms(punishment.options.temp, { long: true });
+          description += `\n**Time**: ${time}`;
+        }
+
         const message = await modlog.createMessage({
           embed: new EmbedBuilder()
             .setTitle(`Case #${c.id} | ${member.username} has been ${punishment.type + action.suffix}`)
             .setColor(action.color)
-            .setDescription(stripIndents`
-              **User**: ${member.username}#${member.discriminator}
-              **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}
-              **Reason**: ${reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${c.id} <reason>\`*)`}
-              ${punishment.options.soft ? '**Type**: Soft Ban' : ''}
-              ${!punishment.options.soft && !!punishment.options.temp ? `**Time**: ${ms(punishment.options.temp, { long: true })}` : ''}
-            `)
+            .setDescription(description)
             .build()
         });
 
