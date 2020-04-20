@@ -46,7 +46,7 @@ export default class UnmuteCommand extends Command {
       await this.bot.punishments.punish(member!, punishment, reason);
       const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
 
-      return ctx.send(`${prefix} was successfully unmuted.`);
+      return ctx.send(`${prefix} was successfully unmuted`);
     } catch (e) {
       ctx.send('Cannot unmute user, ' + e.message);
     }
