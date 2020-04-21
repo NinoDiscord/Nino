@@ -29,6 +29,7 @@ import InviteCommand from './commands/generic/Invite';
 import PingCommand from './commands/generic/Ping';
 import SettingsCommand from './commands/generic/Settings';
 import ShardInfoCommand from './commands/generic/ShardInfo';
+import TimeCommand from './commands/generic/Time';
 import StatisticsCommand from './commands/generic/Statistics';
 import UptimeCommand from './commands/generic/Uptime';
 import BanCommand from './commands/moderation/Ban';
