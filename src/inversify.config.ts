@@ -31,6 +31,7 @@ import SettingsCommand from './commands/generic/Settings';
 import ShardInfoCommand from './commands/generic/ShardInfo';
 import StatisticsCommand from './commands/generic/Statistics';
 import UptimeCommand from './commands/generic/Uptime';
+import TimeCommand from './commands/generic/Time';
 import BanCommand from './commands/moderation/Ban';
 import KickCommand from './commands/moderation/Kick';
 import LockdownCommand from './commands/moderation/Lockdown';
@@ -197,6 +198,11 @@ container
 container
   .bind<NinoCommand>(TYPES.Command)
   .to(UptimeCommand)
+  .inSingletonScope();
+
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(TimeCommand)
   .inSingletonScope();
 
 // Moderation Commands
