@@ -27,16 +27,20 @@ export default class MuteCommand extends Command {
   }
 
   async run(ctx: Context) {
-    if (!ctx.args.has(0)) return ctx.send('No user has been specified');
+    const locale = await ctx.getLocale();
+    if (!ctx.args.has(0)) return ctx.send(locale.translate('global.noUser'));
 
     const userID = ctx.args.get(0);
     const user = findUser(this.bot, userID);
-    if (!user || user === undefined) return ctx.send('Cannot find member in this guild');
+    if (!user || user === undefined) return ctx.send(locale.translate('global.unableToFind'));
 
     const member = ctx.guild!.members.get(user.id);
-    if (!member) return ctx.send(`User **\`${user.username}#${user.discriminator}\`** isn't in the guild`);
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.send('The user is above or the same heirarchy as you');
+    if (!member) return ctx.send(locale.translate('commands.moderation.notInGuild', {
+      user: `${user.username}#${user.discriminator}`
+    }));
 
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.send(locale.translate('global.heirarchy'));
+    
     const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     let reason!: string;
     let time!: string;
@@ -58,9 +62,14 @@ export default class MuteCommand extends Command {
       await this.bot.punishments.punish(member!, punishment, reason);
 
       const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
-      return ctx.send(`${prefix} was successfully muted`);
-    } catch (ex) {
-      return ctx.send(`Unable to mute user: \`${ex.message}\``);
+      return ctx.send(locale.translate('commands.moderation.mute', {
+        type: prefix
+      }));
+    } catch(e) {
+      return ctx.send(locale.translate('commands.moderation.unable', {
+        type: member instanceof Member ? member.user.bot ? 'bot' : 'user' : 'user',
+        message: e.message
+      }));
     }
   }
 }

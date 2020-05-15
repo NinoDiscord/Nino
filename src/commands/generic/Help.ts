@@ -30,20 +30,32 @@ export default class HelpCommand extends Command {
   }
 
   async run(ctx: Context) {
+    const locale = await ctx.getLocale();
     const settings = await ctx.getSettings();
     const categories = this.getAllCategories();
 
     if (!ctx.args.has(0)) {
+      const title = locale.translate('commands.generic.help.embed.title', {
+        username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator} `
+      });
+
+      const description = locale.translate('commands.generic.help.embed.description', {
+        website: 'https://nino.augu.dev',
+        commands: this.bot.manager.commands.size
+      });
+
+      const footer = locale.translate('commands.generic.help.embed.footer', {
+        prefix: settings ? settings.prefix : 'x!'
+      });
+
       const embed = ctx.bot.getEmbed()
-        .setTitle(`${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator} | Commands List`)
-        .setDescription(stripIndents`
-          More information is available on the [website](https://nino.augu.dev)!
-          There are currently **${ctx.bot.manager.commands.size}** commands available!
-        `)
-        .setFooter(`Use "${settings!.prefix}help <command name>" to get documentation on a specific command`);
+        .setTitle(title)
+        .setDescription(description)
+        .setFooter(footer);
 
       for (const category in categories) {
-        embed.addField(`${category} [${categories[category].length}]`, categories[category].map(s => `\`${s.name}\``).join(', '));
+        const localized = locale.translate(`commands.generic.help.categories.${category.toLowerCase()}`);
+        embed.addField(`${localized} [${categories[category].length}]`, categories[category].map(s => `\`${s.name}\``).join(', '));
       }
 
       return ctx.embed(embed.build());
@@ -51,9 +63,13 @@ export default class HelpCommand extends Command {
       const arg = ctx.args.get(0);
       const command = ctx.bot.manager.getCommand(arg);
 
-      if (!command) return ctx.send(`Sorry, I was not able to find the command \`${arg}\``);
+      const notFound = locale.translate('commands.generic.help.notFound', {
+        command: arg
+      });
+
+      if (!command) return ctx.send(notFound);
       else {
-        const embed = command.help();
+        const embed = await command.help(ctx);
         return ctx.embed(embed);
       }
     }

@@ -34,16 +34,15 @@ export default class BotListService {
    * Stop posting guild stats
    */
   stop() {
-    if (this.interval) {
-      this.interval.unref();
-    }
+    if (this.interval) this.interval.unref();
   }
 
   /**
    * Post guild stats
    */
   postCount(guilds: number) {
-    if (this.bot.config.botlists && this.bot.config.botlists.topggtoken) {
+    if (!this.bot.config.botlists) return;
+    if (this.bot.config.botlists.topggtoken) {
       wumpfetch({
         url: `https://top.gg/api/bots/${this.bot.client.user.id}/stats`,
         method: 'POST',
@@ -63,7 +62,7 @@ export default class BotListService {
           this.bot.logger.error('Failed to post guild stats to top.gg');
         });
     }
-    if (this.bot.config.botlists && this.bot.config.botlists.bfdtoken) {
+    if (this.bot.config.botlists.bfdtoken) {
       wumpfetch({
         url: `https://botsfordiscord.com/api/bot/${this.bot.client.user.id}`,
         method: 'POST',
@@ -83,7 +82,7 @@ export default class BotListService {
           this.bot.logger.error('Failed to post guild stats to Bots For Discord.');
         });
     }
-    if (this.bot.config.botlists && this.bot.config.botlists.dboatstoken) {
+    if (this.bot.config.botlists.dboatstoken) {
       wumpfetch({
         url: `https://discord.boats/api/bot/${this.bot.client.user.id}`,
         method: 'POST',
@@ -103,7 +102,7 @@ export default class BotListService {
           this.bot.logger.error('Failed to post guild stats to Discord Boats.');
         });
     }
-    if (this.bot.config.botlists && this.bot.config.botlists.blstoken) {
+    if (this.bot.config.botlists.blstoken) {
       wumpfetch({
         url: `https://api.botlist.space/v1/bots/${this.bot.client.user.id}`,
         method: 'POST',

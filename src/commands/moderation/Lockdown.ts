@@ -49,11 +49,12 @@ export default class LockdownCommand extends Command {
   }
 
   async run(ctx: CommandContext) {
-    if (!ctx.args.has(0)) return ctx.send('The channels argument is required.');
+    const locale = await ctx.getLocale();
+    if (!ctx.args.has(0)) return ctx.send(locale.translate('commands.moderation.lockdown.noChannels'));
 
     const roles = ctx.flags.get('roles');
-    if (!roles) return ctx.send('You must first specify the roles to change permissions to using the --roles flag!');
-    if (typeof roles === 'boolean') return ctx.send('The roles flag must have a `=` after the flag! (example: `--roles=Muted, Proxy`)');
+    if (!roles) return ctx.send(locale.translate('commands.moderation.lockdown.noRoles'));
+    if (typeof roles === 'boolean') return ctx.send(locale.translate('global.invalidFlag.string'));
 
     const release = ctx.flags.get('release');
     const allRoles = (roles as string)
@@ -67,15 +68,15 @@ export default class LockdownCommand extends Command {
         role && PermissionUtils.topRole(ctx.me) && PermissionUtils.topRole(ctx.me)!.position > role.position
       ).map(role => role!);
 
-    if (!roles.length) return ctx.send('All the roles you specified, I can\'t modify! Check if the roles are under me in heirarchy!');
+    if (!roles.length) return ctx.send(locale.translate('commands.moderation.lockdown.cantModify'));
 
     const channels = ctx.args.args.findIndex(x => x === 'all') === -1 ?
       ctx.guild!.channels.filter(c => c.type === 0).map(c => c as TextChannel) :
       ctx.args.args.map(x => this.getChannel(x, ctx)).filter(x => x).map(tc => tc!);
 
-    if (!channels.length) return ctx.send('No valid channels were selected');
+    if (!channels.length) return ctx.send(locale.translate('commands.moderation.lockdown.cantModifyChannels'));
     if (!release) {
-      const message = await ctx.send('Now backing up former permissions');
+      const message = await ctx.send(locale.translate('commands.moderation.lockdown.backingUp'));
       const state = channels.map(c => ({
         channel: c,
         position: c.permissionOverwrites
@@ -88,7 +89,7 @@ export default class LockdownCommand extends Command {
       }));
 
       for (const current of state) await this.bot.redis.set(`lockdown:${current.channel.id}`, JSON.stringify(current.position));
-      return message.edit('Backed up all former permissions');
+      await message.edit(locale.translate('commands.moderation.lockdown.backedUp'));
     }
 
     for (const channel of channels) {
@@ -99,7 +100,9 @@ export default class LockdownCommand extends Command {
           if (former) {
             for (const pos of JSON.parse(former)) await channel.editPermission(pos.role, pos.allow, pos.deny, 'role', '[Lockdown] Lockdown is over');
             for (const role of allRoles.filter(r => !JSON.parse(former).find(role => r.role!.id === role.id))) await channel.deletePermission(role.role!.id, '[Lockdown] Lockdown is over');
-            return ctx.send(`Channel ${channel.mention} is now unlocked`);
+            return ctx.send(locale.translate('commands.moderation.lockdown.unlock', {
+              channel: channel.mention
+            }));
           }
 
           await this.bot.redis.del(`lockdown:${channel.id}`);
@@ -111,7 +114,9 @@ export default class LockdownCommand extends Command {
             else if (role.perm === '-') await channel.editPermission(role.role!.id, allow & ~Constants.Permissions.sendMessages, denied | Constants.Permissions.sendMessages, 'role', '[Lockdown] Channel lockdown has started');
           }
 
-          return ctx.send(`Channel ${channel.mention} is now on lockdown`);
+          return ctx.send(locale.translate('commands.moderation.lockdown.locked', {
+            channel: channel.mention
+          }));
         }
       }
     }

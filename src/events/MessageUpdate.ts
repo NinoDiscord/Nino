@@ -1,6 +1,7 @@
 import { Message, TextChannel, Attachment, EmbedOptions } from 'eris';
 import { injectable, inject } from 'inversify';
 import { stripIndents } from 'common-tags';
+import { humanize } from '../util';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
@@ -71,12 +72,14 @@ export default class MessageUpdatedEvent extends Event {
     const embed = this.bot.getEmbed()
       .setAuthor(`${m.author.username}#${m.author.discriminator} in #${(m.channel as TextChannel).name}`, undefined, m.author.dynamicAvatarURL('png', 1024))
       .setTimestamp(timestamp)
-      .addField('Old Content', stripIndents`
+      .addField(`Old Content${old ? ` (${new Date(old.editedTimestamp).toLocaleString()})` : ''}`, stripIndents`
         \`\`\`prolog
         ${old ? old.content : 'None?'}
+        
+        ${old ? old.attachments.length ? old.attachments.slice(0, 3).map(x => x.url).join('\n') : '' : ''}
         \`\`\`
       `)
-      .addField('New Content', stripIndents`
+      .addField(`New Content (${timestamp.toLocaleString()})`, stripIndents`
         \`\`\`prolog
         ${m.content}
         \`\`\`

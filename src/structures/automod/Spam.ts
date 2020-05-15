@@ -31,7 +31,10 @@ export default class AutoModSpam {
    */
   async handle(m: Message): Promise<boolean> {
     const guild = (m.channel as TextChannel).guild;
-    const me = guild.members.get(this.bot.client.user.id)!;
+    const me = guild.members.get(this.bot.client.user.id);
+
+    if (me === undefined) return false;
+
     if (
       !PermissionUtils.above(me, m.member!) ||
       m.author.bot ||

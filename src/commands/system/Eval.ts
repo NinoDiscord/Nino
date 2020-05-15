@@ -26,7 +26,7 @@ export default class EvalCommand extends Command {
       aliases: ['js', 'evl'],
       category: 'System Adminstration',
       ownerOnly: true,
-      hidden: true,
+      hidden: true
     });
   }
 

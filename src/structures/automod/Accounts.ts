@@ -12,6 +12,8 @@ export default class AccountsAutomod {
   }
 
   async handle(m: Member) {
+    if (m === null) return false;
+
     const guild = m.guild;
     const me = guild.members.get(this.bot.client.user.id)!;
     if (!PermissionUtils.above(me, m) || m.bot || Date.now() - m.createdAt > 7 * 86400000) return false;

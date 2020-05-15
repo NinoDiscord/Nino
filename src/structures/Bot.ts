@@ -1,9 +1,10 @@
-import { Client as DiscordClient, Guild, AnyChannel, Role } from 'eris';
+import { Client as DiscordClient } from 'eris';
 import { collectDefaultMetrics } from 'prom-client';
 import CommandStatisticsManager from './managers/CommandStatisticsManager';
 import { inject, injectable } from 'inversify';
 import RedisClient, { Redis } from 'ioredis';
 import { captureException } from '@sentry/node';
+import LocalizationManager from './managers/LocalizationManager';
 import PrometheusManager from './managers/PrometheusManager';
 import PunishmentManager from './managers/PunishmentManager';
 import { setDefaults } from 'wumpfetch';
@@ -15,6 +16,7 @@ import AutomodService from './services/AutomodService';
 import BotListService from './services/BotListService';
 import StatusManager from './managers/StatusManager';
 import GuildSettings from './settings/GuildSettings';
+import UserSettings from './settings/UserSettings';
 import CaseSettings from './settings/CaseSettings';
 import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
@@ -65,6 +67,7 @@ export interface Config {
 @injectable()
 export default class Bot {
   public warnings: Warnings;
+  public locales: LocalizationManager;
   public logger: Logger;
   public owners: string[];
   public client: DiscordClient;
@@ -105,11 +108,15 @@ export default class Bot {
   @lazyInject(TYPES.PunishmentManager)
   public punishments!: PunishmentManager;
 
+  @lazyInject(TYPES.UserSettings)
+  public userSettings!: UserSettings;
+
   constructor(
     @inject(TYPES.Config) config: Config,
     @inject(TYPES.Client) client: DiscordClient 
   ) {
     this.warnings = new Warnings();
+    this.locales = new LocalizationManager(this);
     this.config = config;
     this.client = client;
     this.owners = config.owners || [];
@@ -137,6 +144,9 @@ export default class Bot {
     this.logger.info('Success! Initializing events...');
     this.events.run();
 
+    this.logger.info('Success! Initializing locales...');
+    this.locales.run();
+
     this.logger.info('Success! Connecting to Discord...');
     await this.client.connect()
       .then(() => this.logger.info('Connecting to Discord...'))
@@ -161,13 +171,6 @@ export default class Bot {
 
   private addRedisEvents() {
     this.redis.once('ready', () => this.logger.redis(`Created a Redis pool at ${this.config.redis.host}:${this.config.redis.port}${this.config.redis.database ? `, with database ID: ${this.config.redis.database}` : ''}`));
-    this.redis.on('wait', async () => {
-      this.logger.redis('Redis has disconnected and awaiting a new pool...');
-      if (this.config.webhook) {
-        await this.client.executeWebhook(this.config.webhook.id, this.config.webhook.token, {
-          content: ':pencil2: **| Redis connection is unstable, waiting for a new pool to be established...**'
-        });
-      }
-    });
+    this.redis.on('wait', () => this.logger.redis('Redis has disconnected and awaiting a new pool...'));
   }
 }
