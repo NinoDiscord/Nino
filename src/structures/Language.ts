@@ -45,7 +45,7 @@ export default class Language {
   public contributorIDs: string[];
 
   /** The translator */
-  public translatorID: string;
+  public translator: string;
 
   /** The percentage that the language is completed */
   public completion: LanguageStatus;
@@ -69,16 +69,12 @@ export default class Language {
    */
   constructor(private bot: Bot, info: LanguageInfo) {
     this.contributorIDs = info.contributors;
-    this.translatorID = info.translator;
+    this.translator = info.translator;
     this.completion = getStatus(info.completion);
     this.strings = info.strings;
     this.code = info.code;
     this.flag = info.flag;
     this.full = info.full;
-  }
-
-  get translator() {
-    return this.bot.client.users.get(this.translatorID);
   }
 
   get percentage(): number {
@@ -125,8 +121,7 @@ export default class Language {
 
   private _translate(translated: string, args?: { [x: string]: string }) {
     const KEY_REGEX = /[$]\{\s*([\w\.]+)\}\s*/g;
-    return translated.replace(KEY_REGEX, (selector) => {
-      const key = selector.slice(2, selector.length - 1);
+    return translated.replace(KEY_REGEX, (_, key) => {
       return args ? args.hasOwnProperty(key) ? args[key] : '?' : '?';
     });
   }

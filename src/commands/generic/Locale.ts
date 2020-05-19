@@ -45,8 +45,7 @@ export default class ShardInfoCommand extends Command {
     switch (subcommand) {
       case 'list': {
         const locales = this.bot.locales.map(locale =>
-          // TODO: translate this
-          `${locale.flag} **${locale.full}** by **${locale.translator!.username}#${locale.translator!.discriminator}** (with **${locale.contributors.length}** contributors)`  
+          locale.translate('commands.generic.locale.list.locale', { flag: locale.flag, full: locale.full, translator: locale.translator, contributors: locale.contributors.length })
         ).join('\n');
 
         const embed = this.bot.getEmbed()

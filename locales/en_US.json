@@ -1,6 +1,6 @@
 {
   "contributors": [],
-  "translator": "280158289667555328",
+  "translator": "August#5820",
   "completion": "completed",
   "code": "en_US",
   "flag": ":flag_us:",
@@ -99,6 +99,7 @@
             ]
           },
           "list": {
+            "locale": "${flag} **${full}** by **${translator}** (with **${contributors}** contributors)",
             "title": "Languages"
           },
           "set": {
