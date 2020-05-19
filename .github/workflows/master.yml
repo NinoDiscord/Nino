@@ -3,6 +3,12 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - '.github/**'
+      - '.vscode/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '**.md'
 jobs:
   build:
     runs-on: ubuntu-latest
