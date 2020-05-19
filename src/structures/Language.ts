@@ -118,6 +118,7 @@ export default class Language {
   lazy_translate(translation: Translation): string {
     return this.translate(translation.key, translation.args);
   }
+  
 
   private _translate(translated: string, args?: { [x: string]: string }) {
     const KEY_REGEX = /[$]\{\s*([\w\.]+)\}\s*/g;
