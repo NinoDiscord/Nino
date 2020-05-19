@@ -3,8 +3,10 @@ import Bot, { Config } from '../Bot';
 import { TYPES } from '../../types';
 import { Message, TextableChannel, User } from 'eris';
 import CommandContext from '../Context';
+import Language from '../Language';
 
 describe('CommandService', () => {
+
   container.rebind<Config>(TYPES.Config).toConstantValue({
     status: undefined,
     statusType: undefined,
@@ -74,7 +76,9 @@ describe('CommandService', () => {
     const context = new CommandContext(bot, message, args);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
-    expect(invocation!.canInvoke()).toEqual('Currently, command `help` is globally disabled');
+    expect(invocation!.canInvoke()).toBeDefined();
+    expect(invocation!.canInvoke()!.key).toEqual('errors.disabled');
+    expect(invocation!.canInvoke()!.args).toEqual({ command: 'help' });
   });
 
   it('it should not be able to invoke the command because the command is guild only', () => {
@@ -86,9 +90,9 @@ describe('CommandService', () => {
     const context = new CommandContext(bot, message, args);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
-    expect(invocation!.canInvoke()).toEqual(
-      'Sorry, but you need to be in a guild to execute the `settings` command.'
-    );
+    expect(invocation!.canInvoke()).toBeDefined();
+    expect(invocation!.canInvoke()!.key).toEqual('errors.guildOnly');
+    expect(invocation!.canInvoke()!.args).toEqual({ command: 'settings' });
   });
 
   it('it should not be able to invoke the command because the command is owner only', () => {
@@ -100,8 +104,8 @@ describe('CommandService', () => {
     const context = new CommandContext(bot, message, args);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
-    expect(invocation!.canInvoke()).toEqual(
-      'Sorry, but you need to be a developer to execute the `eval` command.'
-    );
+    expect(invocation!.canInvoke()).toBeDefined();
+    expect(invocation!.canInvoke()!.key).toEqual('errors.ownerOnly');
+    expect(invocation!.canInvoke()!.args).toEqual({ command: 'eval' });
   });
 });

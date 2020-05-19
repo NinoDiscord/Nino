@@ -10,7 +10,7 @@ enum LanguageStatus {
 interface LanguageInfo {
   contributors: string[];
   translator: string;
-  completed: 'missing' | 'incomplete' | 'completed';
+  completion: 'missing' | 'incomplete' | 'completed';
   code: string;
   flag: string;
   full: string;
@@ -25,6 +25,18 @@ function getStatus(type: 'missing' | 'incomplete' | 'completed') {
     case 'completed': return LanguageStatus.Completed;
     case 'missing': return LanguageStatus.Missing;
     default: return LanguageStatus.Missing;
+  }
+}
+
+/**
+ * The translation object allows lazy translation of messages.
+ */
+export class Translation {
+  public key: string;
+  public args?: { [x: string]: any };
+  constructor(key: string, args: { [x: string]: any } | undefined) {
+    this.key = key;
+    this.args = args;
   }
 }
 
@@ -58,7 +70,7 @@ export default class Language {
   constructor(private bot: Bot, info: LanguageInfo) {
     this.contributorIDs = info.contributors;
     this.translatorID = info.translator;
-    this.completion = getStatus(info.completed);
+    this.completion = getStatus(info.completion);
     this.strings = info.strings;
     this.code = info.code;
     this.flag = info.flag;
@@ -87,7 +99,7 @@ export default class Language {
    * @param key The language key itself
    * @param args Any additional arguments to parse
    */
-  translate(key: string, args?: { [x: string]: any }) {
+  translate(key: string, args?: { [x: string]: any }): string {
     const nodes = key.split('.');
     let translated: any = this.strings;
 
@@ -105,6 +117,10 @@ export default class Language {
 
     if (Array.isArray(translated)) return (translated as string[]).map(x => this._translate(x, args)).join('\n');
     else return this._translate(translated, args);
+  }
+
+  lazy_translate(translation: Translation): string {
+    return this.translate(translation.key, translation.args);
   }
 
   private _translate(translated: string, args?: { [x: string]: string }) {

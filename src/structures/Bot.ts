@@ -127,8 +127,6 @@ export default class Bot {
       host: config.redis.host,
       db: config.redis.database
     });
-
-    this.addRedisEvents();
   }
 
   async build() {
@@ -138,6 +136,8 @@ export default class Bot {
     await this.database.connect();
 
     this.logger.info('Success! Connecting to the Redis pool...');
+
+    this.addRedisEvents();
     // eslint-disable-next-line
     await this.redis.connect().catch(() => {});
 

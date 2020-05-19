@@ -13,6 +13,10 @@ export default class LocalizationManager extends Collection<Language> {
     this.bot = bot;
   }
 
+  addLanguage(locale: Language) {
+    this.set(locale.code, locale);
+  }
+
   run() {
     const files = readdirSync(`${process.cwd()}${sep}locales`);
     if (!files.length) return this.bot.logger.info('Couldn\'t find any localization files!');
@@ -25,9 +29,8 @@ export default class LocalizationManager extends Collection<Language> {
 
       const lang = require(`${process.cwd()}${sep}locales${sep}${file}`);
       this.bot.logger.info(`Found language ${lang.code}!`);
-
       const locale = new Language(this.bot, lang);
-      this.set(locale.code, locale);
+      this.addLanguage(locale);
     }
   }
 

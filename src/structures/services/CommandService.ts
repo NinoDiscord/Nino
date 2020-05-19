@@ -6,7 +6,7 @@ import PermissionUtils from '../../util/PermissionUtils';
 import CommandContext from '../Context';
 import NinoCommand from '../Command';
 import { TYPES } from '../../types';
-import Language from '../Language';
+import Language, { Translation } from '../Language';
 import Bot from '../Bot';
 import 'reflect-metadata';
 
@@ -40,29 +40,22 @@ export class CommandInvocation {
   /**
    * Returns an error string if cannot invoke, otherwise it will return undefined.
    */
-  canInvoke() {
-    // Sorta hacky solution to make this function synchronous (also i dont feel like editing Jest to make this asynchronous)
-    let locale!: Language;
-    this.getLocale()
-      .then((lang) => {
-        locale = lang;
-      });
-
+  canInvoke(): Translation | undefined {
     if (this.command.guildOnly && [1, 3].includes(this.channel.type)) {
-      return locale.translate('errors.guildOnly', { command: this.command.name });
+      return new Translation('errors.guildOnly', { command: this.command.name });
     }
 
     if (this.command.ownerOnly && !this.command.bot.owners.includes(this.user.id)) {
-      return locale.translate('errors.ownerOnly', { command: this.command.name });
+      return new Translation('errors.ownerOnly', { command: this.command.name });
     }
 
     if (this.command.disabled && !this.onetime) {
-      return locale.translate('errors.disabled', { command: this.command.name });
+      return new Translation('errors.disabled', { command: this.command.name });
     }
 
     if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.botPermissions)) {
       const bytecode = this.command.userPermissions & ~this.bot.permission.allow;
-      return locale.translate('errors.permissions.bot', {
+      return new Translation('errors.permissions.bot', {
         command: this.command.name,
         perms: PermissionUtils.toString(bytecode)
       });
@@ -70,7 +63,7 @@ export class CommandInvocation {
 
     if (this.user instanceof Member && !PermissionUtils.overlaps(this.user.permission.allow, this.command.userPermissions)) {
       const bytecode = this.command.userPermissions & ~this.user.permission.allow;
-      return locale.translate('errors.permissions.user', {
+      return new Translation('errors.permissions.user', {
         command: this.command.name,
         perms: PermissionUtils.toString(bytecode)
       });
@@ -96,7 +89,7 @@ export default class CommandService {
    * @param args the message arguments
    * @param m the message object
    */
-  getCommandInvocation(ctx: CommandContext) {
+  getCommandInvocation(ctx: CommandContext): CommandInvocation | undefined {
     if (!ctx.args.args.length) return undefined;
 
     const name = ctx.args.args.shift()!;
@@ -146,7 +139,7 @@ export default class CommandService {
       if (message) {
         const embed = this.bot.getEmbed()
           .setTitle(locale.translate('errors.title', { command: invoked.command.name }))
-          .setDescription(message);
+          .setDescription(locale.lazy_translate(message));
 
         return void ctx.embed(embed.build());
       }
