@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify';
-import { Constants, Message } from 'eris';
+import { Constants, Message, TextableChannel } from 'eris';
 import { stripIndents } from 'common-tags';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
@@ -44,7 +44,7 @@ export default class PruneCommand extends Command {
       filter
     }));
 
-    const shouldDelete = allMsgs.filter(x => 
+    const shouldDelete = allMsgs.filter((x: Message<TextableChannel>) => 
       (filter === 'user' ? !x.author.bot : false) &&
       (filter === 'self' ? x.author.id === this.bot.client.user.id : false) &&
       (filter === 'bot' ? x.author.bot : false) &&
