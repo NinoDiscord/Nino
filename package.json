@@ -11,8 +11,8 @@
   "bugs": "https://github.com/NinoDiscord/Nino/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
   "main": "dist/index.js",
   "scripts": {
-    "build:watch": "yarn lint && yarn clean && tsc -w",
-    "build": "yarn lint && yarn clean && tsc",
+    "build:watch": "yarn lint && yarn clean && yarn tsc -w",
+    "build": "yarn lint && yarn clean && yarn tsc",
     "clean": "rm -fr dist",
     "main": "yarn build && node dist/index.js",
     "lint": "eslint src --ext .ts --fix",

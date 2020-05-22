@@ -1,5 +1,5 @@
 import { injectable, inject } from 'inversify';
-import { Constants, Message } from 'eris';
+import { Constants, Message, TextChannel } from 'eris';
 import { stripIndents } from 'common-tags';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
@@ -40,7 +40,7 @@ export default class PruneCommand extends Command {
     if (typeof filter === 'boolean') return ctx.send(`You must append a value to the \`--filter\` flag. Example: **--filter=new** (Avaliable filters: ${this.filters.join(', ')})`);
     if (filter && !this.filters.includes(filter)) return ctx.send(`Invalid filter (${this.filters.join(', ')})`);
   
-    const shouldDelete = allMsgs.filter(x => 
+    const shouldDelete = (allMsgs as Message<TextChannel>[]).filter(x => 
       (filter === 'user' ? !x.author.bot : true) &&
       (filter === 'self' ? x.author.id === this.bot.client.user.id : true) &&
       (filter === 'bot' ? x.author.bot : true) &&
