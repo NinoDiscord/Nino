@@ -36,17 +36,9 @@ export class CommandInvocation {
    * Returns an error string if cannot invoke, otherwise it will return undefined.
    */
   canInvoke() {
-    if (this.command.guildOnly && [1, 3].includes(this.channel.type)) {
-      return `Sorry, but you need to be in a guild to execute the \`${this.command.name}\` command.`;
-    }
-
-    if (this.command.ownerOnly && !this.command.bot.owners.includes(this.user.id)) {
-      return `Sorry, but you need to be a developer to execute the \`${this.command.name}\` command.`;
-    }
-
-    if (this.command.disabled && !this.onetime) {
-      return `Currently, command \`${this.command.name}\` is globally disabled`;
-    }
+    if (this.command.guildOnly && [1, 3].includes(this.channel.type)) return `Sorry, but you need to be in a guild to execute the \`${this.command.name}\` command.`;
+    if (this.command.ownerOnly && !this.command.bot.owners.includes(this.user.id)) return `Sorry, but you need to be a developer to execute the \`${this.command.name}\` command.`;
+    if (this.command.disabled && !this.onetime) return `Currently, command \`${this.command.name}\` is globally disabled`;
 
     if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.botPermissions)) {
       const bytecode = this.command.userPermissions & ~this.bot.permission.allow;

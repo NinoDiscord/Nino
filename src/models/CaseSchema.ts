@@ -30,5 +30,4 @@ const schema = new Schema<CaseModel>({
   },
 });
 
-const _model = model<CaseModel>('cases', schema, 'cases');
-export default _model;
+export default model<CaseModel>('cases', schema, 'cases');

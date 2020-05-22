@@ -1,7 +1,14 @@
 {
+  "private": true,
   "name": "nino",
   "description": "Moderation bot for Discord's hack week entry.",
   "version": "0.7.2",
+  "homepage": "https://nino.augu.dev",
+  "license": "MIT",
+  "repository": {
+    "url": "github:NinoDiscord/Nino"
+  },
+  "bugs": "https://github.com/NinoDiscord/Nino/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
   "main": "dist/index.js",
   "scripts": {
     "build:watch": "yarn lint && yarn clean && tsc -w",
@@ -40,7 +47,6 @@
   "devDependencies": {
     "@augu/eslint-config": "1.5.2",
     "@types/common-tags": "1.8.0",
-    "@types/express": "4.17.6",
     "@types/ioredis": "4.16.2",
     "@types/jest": "25.2.3",
     "@types/js-yaml": "3.12.4",

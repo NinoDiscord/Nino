@@ -1,4 +1,4 @@
-import { Client as DiscordClient, Guild, AnyChannel, Role } from 'eris';
+import { Client as DiscordClient } from 'eris';
 import { collectDefaultMetrics } from 'prom-client';
 import CommandStatisticsManager from './managers/CommandStatisticsManager';
 import { inject, injectable } from 'inversify';
@@ -26,7 +26,7 @@ import 'reflect-metadata';
 const pkg = require('../../package.json');
 setDefaults({
   headers: {
-    'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/auguwu/Nino)`
+    'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/NinoDiscord/Nino)`
   }
 });
 

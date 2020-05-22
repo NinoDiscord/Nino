@@ -122,5 +122,4 @@ const schema = new Schema<GuildModel>({
   }
 });
 
-const _model = model<GuildModel>('guilds', schema, 'guilds');
-export default _model;
+export default model<GuildModel>('guilds', schema, 'guilds');

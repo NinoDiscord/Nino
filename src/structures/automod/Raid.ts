@@ -52,7 +52,7 @@ export default class AutoModRaid {
           await this.bot.punishments.punish(
             m,
             new Punishment(PunishmentType.Ban, { moderator: me.user }),
-            '[Automod] Raid detected'
+            '[Automod] Raiding'
           );
 
           const [, id] = (await queue.pop()).split('U');
