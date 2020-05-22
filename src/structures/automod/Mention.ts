@@ -30,7 +30,7 @@ export default class AutoModMention {
       for (let punish of punishments) await this.bot.punishments.punish(
         m.member!,
         punish,
-        'Automod (Mention Spam)'
+        '[Automod] Mention Spam'
       );
 
       const response = !settings.responses.mention.enabled ?

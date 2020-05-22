@@ -28,7 +28,7 @@ import 'reflect-metadata';
 const pkg = require('../../package.json');
 setDefaults({
   headers: {
-    'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/auguwu/Nino)`
+    'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/NinoDiscord/Nino)`
   }
 });
 

@@ -31,7 +31,7 @@ export default class AccountsAutomod {
         const old = Number.parseInt(await bucket.pop());
         if (Date.now() - old <= 1000) {
           do {
-            await this.bot.punishments.punish(m, new Punishment(PunishmentType.Ban, { moderator: me.user }), '[Automod] Raid detected');
+            await this.bot.punishments.punish(m, new Punishment(PunishmentType.Ban, { moderator: me.user }), '[Automod] Raiding');
           
             const id = (await bucket.pop()).split(':')[1];
             m = guild.members[id];

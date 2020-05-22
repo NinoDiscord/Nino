@@ -50,7 +50,7 @@ export default class AutoModBadWords {
 
         await m.channel.createMessage(response);
         await m.delete();
-        for (let punishment of punishments) await this.bot.punishments.punish(m.member!, punishment, 'Automod (Swearing)');
+        for (let punishment of punishments) await this.bot.punishments.punish(m.member!, punishment, '[Automod] Swearing');
         return true;
       }
     }

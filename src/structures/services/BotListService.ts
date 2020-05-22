@@ -47,6 +47,7 @@ export default class BotListService {
         url: `https://top.gg/api/bots/${this.bot.client.user.id}/stats`,
         method: 'POST',
         data: {
+          // eslint-disable-next-line camelcase
           server_count: guilds,
         },
       })
@@ -67,6 +68,7 @@ export default class BotListService {
         url: `https://botsfordiscord.com/api/bot/${this.bot.client.user.id}`,
         method: 'POST',
         data: {
+          // eslint-disable-next-line camelcase
           server_count: guilds,
         },
       })
@@ -87,6 +89,7 @@ export default class BotListService {
         url: `https://discord.boats/api/bot/${this.bot.client.user.id}`,
         method: 'POST',
         data: {
+          // eslint-disable-next-line camelcase
           server_count: guilds,
         },
       })
@@ -107,6 +110,7 @@ export default class BotListService {
         url: `https://api.botlist.space/v1/bots/${this.bot.client.user.id}`,
         method: 'POST',
         data: {
+          // eslint-disable-next-line camelcase
           server_count: guilds,
         },
       })

@@ -15,9 +15,8 @@ export default class WarningsCommand extends Command {
       usage: '<user>',
       aliases: ['warns'],
       category: 'Moderation',
-      userPermissions:
-        Constants.Permissions.manageRoles |
-        Constants.Permissions.manageChannels,
+      userPermissions: Constants.Permissions.manageRoles,
+      botPermissions: Constants.Permissions.manageRoles,
       guildOnly: true
     });
   }
