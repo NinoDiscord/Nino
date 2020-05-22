@@ -17,13 +17,13 @@ export default class TimeCommand extends Command {
   }
 
   async run(ctx: Context) {
-    let date_Ob = new Date();
-    let date = ("0" + date_Ob.getDate()).slice(-2);
-    let month = ("0" + (date_Ob.getMonth() + 1)).slice(-2);
-    let year = date_Ob.getFullYear();
-    let hours = date_Ob.getHours();
-    let minutes = date_Ob.getMinutes();
-    let seconds = date_Ob.getSeconds();
+    let dateOb = new Date();
+    let date = ('0' + dateOb.getDate()).slice(-2);
+    let month = ('0' + (dateOb.getMonth() + 1)).slice(-2);
+    let year = dateOb.getFullYear();
+    let hours = dateOb.getHours();
+    let minutes = dateOb.getMinutes();
+    let seconds = dateOb.getSeconds();
     return ctx.send(`It is ${date}/${month}/${year} at ${hours}h ${minutes}m ${seconds}s`);
   }
 }

@@ -1,4 +1,8 @@
 {
+  "globals": {
+    "_config": false,
+    "console": true
+  },
   "compilerOptions": {
     "target": "ESNext",
     "module": "CommonJS",

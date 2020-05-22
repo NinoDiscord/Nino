@@ -26,8 +26,8 @@ interface BuildInfo {
     ccflags: string;
     cxx: string;
     linkflags: string;
-    target_arch: string;
-    target_os: string;
+    targetArch: string;
+    targetOs: string;
   };
 }
 
