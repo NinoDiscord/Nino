@@ -14,6 +14,9 @@ export default class GuildBanAddEvent extends Event {
   }
 
   async emit(guild: Guild, user: User) {
+    if (!guild.members.get(this.bot.client.user.id)!.permission.has('viewAuditLogs')) {
+      return;
+    }
     const logs = await guild.getAuditLogs(10);
     const botLogs = logs.entries.filter(entry =>
       // Check if the action was ban and if Nino didn't do it
