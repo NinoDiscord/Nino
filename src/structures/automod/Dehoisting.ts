@@ -41,8 +41,8 @@ export default class AutoModDehoist {
     while (index < name.length && name[index] < '0') index++;
 
     const good = name.substring(index).trim();
-    if (good === '' && m.username >= '0') return m.edit({ nick: m.username }, '[Automod] Dehoisted to normal username');
-    else if (good === '') return m.edit({ nick: 'hoister' }, '[Automod] Dehoisted to "hoister"');
-    else return m.edit({ nick: good }, `[Automod] Dehoisted to "${good}"`);
+    if (good === '' && m.username >= '0') return m.edit({ nick: m.username }, '[Automod] Dehoisted');
+    else if (good === '') return m.edit({ nick: 'hoister' }, '[Automod] Dehoisted');
+    else return m.edit({ nick: good }, '[Automod] Dehoisted');
   }
 }
