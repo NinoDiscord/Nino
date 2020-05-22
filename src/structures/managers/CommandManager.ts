@@ -24,9 +24,7 @@ export default class CommandManager {
       if (
         (this.bot.config.disabledCommands || []).includes(command.name) ||
         (this.bot.config.disabledCategories || []).includes(command.category)
-      ) {
-        command.disabled = true;
-      }
+      ) command.disabled = true;
     }
   }
 

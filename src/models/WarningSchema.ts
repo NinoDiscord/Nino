@@ -22,5 +22,4 @@ const schema = new Schema<WarningModel>({
   },
 });
 
-const _model = model<WarningModel>('warnings', schema, 'warnings');
-export default _model;
+export default model<WarningModel>('warnings', schema, 'warnings');

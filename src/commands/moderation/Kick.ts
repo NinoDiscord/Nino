@@ -17,7 +17,7 @@ export default class KickCommand extends Command {
       name: 'kick',
       description: 'Kicks a user from the guild',
       usage: '<user> <reason> [--reason]',
-      aliases: ['boot'],
+      aliases: ['boot', 'yeet'],
       category: 'Moderation',
       guildOnly: true,
       botPermissions: Constants.Permissions.kickMembers,

@@ -107,12 +107,9 @@ export default class EmbedBuilder {
   }
 
   addField(name: string, value: string, inline: boolean = false) {
-    if (!name)
-      throw new Error('You d-didn\'t set a name to the field you baka!!');
-    if (!value)
-      throw new Error('You d-didn\'t set a value to the field you baka!!');
-    if (this.fields!.length > 25)
-      throw new Error('Unable to add anymore fields. (FIELD_LIMIT_THRESHOLD)');
+    if (!name) throw new Error('You d-didn\'t set a name to the field you baka!!');
+    if (!value) throw new Error('You d-didn\'t set a value to the field you baka!!');
+    if (this.fields!.length > 25) throw new Error('Unable to add anymore fields. (FIELD_LIMIT_THRESHOLD)');
 
     this.fields!.push({ name, value: toString(value), inline });
     return this;

@@ -13,10 +13,11 @@ import Bot from '../Bot';
  * * discord.me
  * * discord.link
  * * invite.gg
+ * * invite.ink
  */
 export default class AutoModInvite {
   public bot: Bot;
-  private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg)\/\w+/;
+  private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg|invite.ink)\/\w+/;
 
   constructor(client: Bot) {
     this.bot = client;

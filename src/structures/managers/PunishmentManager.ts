@@ -88,9 +88,8 @@ export default class PunishmentManager {
     if (!settings) return [];
 
     let warnings = await this.bot.warnings.get(member.guild.id, member.id);
-    if (!warnings) {
-      warnings = this.bot.warnings.create(member.guild.id, member.id);
-    } else {
+    if (!warnings) warnings = this.bot.warnings.create(member.guild.id, member.id);
+    else {
       await this.bot.warnings.update(member.guild.id, member.id, {
         amount: Math.min(warnings.amount + 1, 5)
       });
@@ -179,9 +178,7 @@ export default class PunishmentManager {
 
             for (let [, channel] of guild.channels) {
               const permissions = channel.permissionsOf(me.id);
-              if (permissions.has('manageChannels')) {
-                await channel.editPermission(mutedRole.id, 0, Constants.Permissions.sendMessages, 'role', `[Automod] Override permissions for new Muted role in channel ${channel.name}`);
-              }
+              if (permissions.has('manageChannels')) await channel.editPermission(mutedRole.id, 0, Constants.Permissions.sendMessages, 'role', `[Automod] Override permissions for new Muted role in channel ${channel.name}`);
             }
 
             settings!.mutedRole = mutedRole.id;
