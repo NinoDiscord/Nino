@@ -43,7 +43,7 @@ export default class MessageDeleteEvent extends Event {
     let content!: string;
     if (message.embeds.length) {
       const em = message.embeds[0];
-      content = `${em.title ? em.title : 'None'}\n${em.description ? em.description : '...'}${em.timestamp instanceof Date ? `\n(${em.timestamp.toISOString()})` : ''}`;
+      content = `[Embed]\n${em.title ? em.title : 'None'}\n${em.description ? em.description : '...'}${em.timestamp instanceof Date ? `\n(${em.timestamp.toISOString()})` : ''}`;
     } else {
       content = message.content;
     }
@@ -51,6 +51,8 @@ export default class MessageDeleteEvent extends Event {
     embed.addField('Content', stripIndents`
       \`\`\`prolog
       ${content}
+
+      ${message.attachments.length ? message.attachments.slice(0, 3).map(x => x.url).join('\n') : ''}
       \`\`\`
     `);
 

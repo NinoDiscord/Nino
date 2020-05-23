@@ -25,21 +25,31 @@ export default class PardonCommand extends Command {
   }
 
   async run(ctx: Context) {
-    if (!ctx.args.has(0)) return ctx.send('You\'ll need to specify a user');
-    if (!ctx.args.has(1) || !(/^[0-9]+$/).test(ctx.args.get(1))) return ctx.send('You didn\'t specify an amount of warnings to remove');
+    const locale = await ctx.getLocale();
+    if (!ctx.args.has(0)) return ctx.send(locale.translate('global.noUser'));
+    if (!ctx.args.has(1) || !(/^[0-9]+$/).test(ctx.args.get(1))) return ctx.send(locale.translate('commands.moderation.pardon.notSpecified'));
 
     const userID = ctx.args.get(0);
     const user = findUser(this.bot, userID);
-    if (!user || user === undefined) return ctx.send('Cannot find member in this guild');
+    if (!user || user === undefined) return ctx.send(locale.translate('global.unableToFind'));
 
     const member = ctx.guild!.members.get(user.id);
     const amount = Number(ctx.args.get(1));
-    if (!member) return ctx.send(`User **\`${user.username}#${user.discriminator}\`** isn't in the guild`);
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.send('The user is above or the same heirarchy as you');
-  
+    if (!member) return ctx.send(locale.translate('commands.moderation.notInGuild', {
+      user: `${user.username}#${user.discriminator}`
+    }));
+
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.send(locale.translate('global.heirarchy'));
+
     await this.bot.punishments.pardon(member!, amount);
     const warns = await this.bot.warnings.get(ctx.guild!.id, member.id);
-    if (!warns) return ctx.send(`${member.username}#${member.discriminator} now has no warnings`);
-    else return ctx.send(`Warned ${member.username}#${member.discriminator}! Now they have ${warns!.amount} warnings.`);
+    const message = warns === null 
+      ? locale.translate('commands.moderation.pardon.noWarnings', { user: `${user.username}#${user.discriminator}` })
+      : locale.translate('commands.moderation.pardon.warnings', {
+        warnings: warns.amount,
+        user: `${user.username}#${user.discriminator}`
+      });
+
+    return ctx.send(message);
   }
 }

@@ -13,42 +13,43 @@ export default class UnmuteCommand extends Command {
     super(client, {
       name: 'unmute',
       description: 'Unmutes a user from a guild',
-      usage: '<user> <reason> [--reason]',
+      usage: '<user> <reason>',
       category: 'Moderation',
       guildOnly: true,
       userPermissions: Constants.Permissions.manageRoles,
-      botPermissions:
-        Constants.Permissions.manageRoles |
-        Constants.Permissions.manageChannels
+      botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels
     });
   }
 
   async run(ctx: Context) {
-    if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
+    const locale = await ctx.getLocale();
+    if (!ctx.args.has(0)) return ctx.send(locale.translate('global.noUser'));
 
-    const u = findUser(this.bot, ctx.args.get(0))!;
-    if (!u) return ctx.send('I can\'t find this user!');
+    const userID = ctx.args.get(0);
+    const u = findUser(this.bot, userID);
+    if (!u || u === undefined) return ctx.send(locale.translate('global.unableToFind'));
 
     const member = ctx.guild!.members.get(u.id);
-
-    if (!member || member === null)
-      return ctx.send(
-        `User \`${u.username}#${u.discriminator}\` is not in this guild?`
-      );
+    if (!member) return ctx.send(locale.translate('commands.moderation.notInGuild', {
+      user: `${u.username}#${u.discriminator}`
+    }));
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     await this.bot.timeouts.cancelTimeout(member.id, ctx.guild!, 'unmute');
     const punishment = new Punishment(PunishmentType.Unmute, {
-      moderator: ctx.sender,
+      moderator: ctx.sender
     });
     
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
       const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
 
-      return ctx.send(`${prefix} was successfully unmuted`);
+      return ctx.send(locale.translate('commands.moderation.unmute', { type: prefix }));
     } catch (e) {
-      ctx.send('Cannot unmute user, ' + e.message);
+      return ctx.send(locale.translate('commands.moderation.unable', {
+        message: e.message,
+        type: member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User'
+      }));
     }
   }
 }

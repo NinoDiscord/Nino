@@ -2,7 +2,7 @@
   "private": true,
   "name": "nino",
   "description": "Moderation bot for Discord's hack week entry.",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": {

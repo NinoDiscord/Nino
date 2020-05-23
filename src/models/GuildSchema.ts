@@ -5,6 +5,7 @@ export interface GuildModel extends Document {
   prefix: string;
   mutedRole: string;
   modlog: string;
+  locale: string;
   automod: {
     dehoist: boolean;
     spam: boolean;
@@ -119,6 +120,10 @@ const schema = new Schema<GuildModel>({
         default: false
       }
     }
+  },
+  locale: {
+    type: String,
+    default: 'en_US'
   }
 });
 

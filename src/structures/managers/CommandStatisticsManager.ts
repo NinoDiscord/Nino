@@ -1,18 +1,17 @@
 import { inject, injectable } from 'inversify';
-import { Collection } from '@augu/immutable';
 import NinoCommand from '../Command';
 import { TYPES } from '../../types';
 import Bot from '../Bot';
 
 interface CommandUsage {
   command: string;
-  size: number;
+  uses: number;
 }
 
 @injectable()
 export default class CommandStatisticsManager {
   public commandsExecuted: number;
-  public commandUsages: Collection<number>;
+  public commandUsages: { [x: string]: number; };
   public messagesSeen: number;
   public guildCount: number;
   public bot: Bot;
@@ -21,45 +20,41 @@ export default class CommandStatisticsManager {
     @inject(TYPES.Bot) bot: Bot
   ) {
     this.commandsExecuted = 0;
-    this.commandUsages = new Collection();
+    this.commandUsages = {};
     this.messagesSeen = 0;
     this.guildCount = 0;
     this.bot = bot;
   }
 
   getCommandUsages(): CommandUsage {
-    const keys = [...this.commandUsages.keys()];
-    if (keys.length > 0) {
-      const name = keys
-        .map(s => {
-          const usage = this.commandUsages.get(s)!;
-          return {
-            uses: usage,
-            key: s
-          };
-        }).sort((a, b) => b.uses - a.uses)[0];
+    if (Object.keys(this.commandUsages).length) {
+      const command = Object.keys(this.commandUsages)
+        .map(key => ({
+          key,
+          uses: this.commandUsages[key]
+        })).sort((first, second) => first.uses - second.uses)[0];
 
       return {
-        command: name.key as string,
-        size: name.uses
+        command: command.key,
+        uses: command.uses
       };
     } else {
       return {
         command: 'None',
-        size: 0
+        uses: 0
       };
     }
   }
 
   increment(cmd: NinoCommand) {
-    if (!this.commandUsages.has(cmd.name)) this.commandUsages.set(cmd.name, 0);
+    if (!this.commandUsages.hasOwnProperty(cmd.name)) this.commandUsages[cmd.name] = 0;
+
     if (['eval', 'shell'].includes(cmd.name)) {
       this.commandsExecuted++;
-      this.commandUsages.delete(cmd.name);
+      delete this.commandUsages[cmd.name];
     } else {
-      let usage = this.commandUsages.get(cmd.name)!;
       this.commandsExecuted++;
-      this.commandUsages.set(cmd.name, usage++);
+      this.commandUsages[cmd.name]++;
     }
   }
 }

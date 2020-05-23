@@ -18,14 +18,13 @@ export default class InviteCommand extends Command {
   }
 
   async run(ctx: Context) {
+    const locale = await ctx.getLocale();
     const embed = this.bot.getEmbed()
-      .setTitle('Invite Me')
-      .setDescription(stripIndents`
-        > **Invite me to your server today o-or join my owner's Discord to get updates and such...**
-
-        :link: **<https://discordapp.com/oauth2/authorize?client_id=${ctx.me.id}&scope=bot>**
-        :island: **<https://discord.gg/7TtMP2n>**
-      `)
+      .setTitle(locale.translate('commands.generic.invite.title'))
+      .setDescription(locale.translate('commands.generic.invite.description', {
+        invite: `<https://discordapp.com/oauth2/authorize?client_id=${ctx.me.id}&scope=bot>`,
+        server: 'https://discord.gg/7TtMP2n'
+      }))
       .build();
 
     return ctx.embed(embed);

@@ -1,4 +1,5 @@
 import { injectable, unmanaged } from 'inversify';
+import { stripIndents } from 'common-tags';
 import Context from './Context';
 import Client from './Bot';
 import 'reflect-metadata';
@@ -62,17 +63,36 @@ export default abstract class NinoCommand {
     return `${this.bot.config.discord.prefix}${this.name}${this.usage ? ` ${this.usage}` : ''}`;
   }
 
-  help() {
+  async help(ctx: Context) {
+    const locale = await ctx.getLocale();
+    const getPart = (type: 
+      'title' |
+      'name' |
+      'syntax' |
+      'category' |
+      'aliases' |
+      'guildOnly' |
+      'ownerOnly' |
+      'cooldown'
+    ) => locale.translate(`commands.generic.help.command.${type}`);
+
+    const getGlobalPart = (type: 'yes' | 'no') => locale.translate(`global.${type}`);
+
     const embed = this.bot
       .getEmbed()
-      .setTitle(`Command ${this.name}`)
-      .setDescription(`**${this.description}**`)
-      .addField('Syntax', this.format(), true)
-      .addField('Category', this.category, true)
-      .addField('Aliases', this.aliases.length > 1 ? this.aliases.join(', ') : 'No aliases available', true)
-      .addField('Guild Only', this.guildOnly ? 'Yes' : 'No', true)
-      .addField('Owner Only', this.ownerOnly ? 'Yes' : 'No', true)
-      .addField('Cooldown', `${this.cooldown} seconds`, true);
+      .setTitle(locale.translate('commands.generic.help.command.title', { command: this.name }))
+      .setDescription(stripIndents`
+        **${this.description}**
+
+        \`\`\`apache
+        ${getPart('name')}:       ${this.name}
+        ${getPart('syntax')}:     ${this.format()}
+        ${this.aliases.length ? `${getPart('aliases')}:    ${this.aliases.join(', ')}` : `${getPart('aliases')}:    None`}
+        ${getPart('guildOnly')}: ${this.guildOnly ? getGlobalPart('yes') : getGlobalPart('no')}
+        ${getPart('ownerOnly')}: ${this.ownerOnly ? getGlobalPart('yes') : getGlobalPart('no')}
+        ${getPart('cooldown')}:   ${this.cooldown} second${this.cooldown > 1 ? 's' : ''}
+        \`\`\`
+      `);
 
     return embed.build();
   }

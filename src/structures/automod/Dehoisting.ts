@@ -23,6 +23,8 @@ export default class AutoModDehoist {
    * @param m the member
    */
   async handle(m: Member): Promise<void> {
+    if (m === null) return;
+
     const guild = m.guild;
     const me = guild.members.get(this.bot.client.user.id)!;
     const name = m.nick || m.username;

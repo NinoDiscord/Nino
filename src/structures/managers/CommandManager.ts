@@ -33,7 +33,7 @@ export default class CommandManager {
    * @param name the name or alias of the command
    */
   getCommand(name: string): Command | undefined {
-    return this.bot.manager.commands.filter(
+    return this.commands.filter(
       c => c.name === name || c.aliases!.includes(name)
     )[0];
   }

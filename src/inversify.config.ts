@@ -26,6 +26,7 @@ import CommandStatisticsManager from './structures/managers/CommandStatisticsMan
 import NinoCommand from './structures/Command';
 import HelpCommand from './commands/generic/Help';
 import InviteCommand from './commands/generic/Invite';
+import LocaleCommand from './commands/generic/Locale';
 import PingCommand from './commands/generic/Ping';
 import SettingsCommand from './commands/generic/Settings';
 import ShardInfoCommand from './commands/generic/ShardInfo';
@@ -60,6 +61,7 @@ import ShardDisconnectedEvent from './events/ShardDisconnected';
 import ShardReadyEvent from './events/ShardReady';
 import ShardResumedEvent from './events/ShardResume';
 import UserUpdateEvent from './events/UserUpdate';
+import UserSettings from './structures/settings/UserSettings';
 
 let config: Config;
 try {
@@ -156,6 +158,11 @@ container
   .inSingletonScope();
 
 container
+  .bind<UserSettings>(TYPES.UserSettings)
+  .to(UserSettings)
+  .inSingletonScope();
+
+container
   .bind<BotListService>(TYPES.BotListService)
   .to(BotListService)
   .inSingletonScope();
@@ -178,8 +185,14 @@ container
 
 container
   .bind<NinoCommand>(TYPES.Command)
+  .to(LocaleCommand)
+  .inSingletonScope();
+
+container
+  .bind<NinoCommand>(TYPES.Command)
   .to(PingCommand)
   .inSingletonScope();
+
 container
   .bind<NinoCommand>(TYPES.Command)
   .to(SettingsCommand)

@@ -67,6 +67,15 @@ export default class CommandContext {
     return this.guild ? this.bot.settings.getOrCreate(this.guild.id) : null;
   }
 
+  async getLocale() {
+    const guild = await this.getSettings()!;
+    const user = await this.bot.userSettings.getOrCreate(this.sender.id);
+
+    return user.locale === 'en_US' 
+      ? this.bot.locales.get(guild.locale)!
+      : this.bot.locales.get(user.locale)!;
+  }
+
   get redis() {
     return this.bot.redis;
   }

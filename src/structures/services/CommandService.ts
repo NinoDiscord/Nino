@@ -1,4 +1,4 @@
-import { Message, TextChannel, User, Member, Channel } from 'eris';
+import { Message, TextChannel, Member } from 'eris';
 import { inject, injectable } from 'inversify';
 import { stripIndents } from 'common-tags';
 import RatelimitBucket from '../bucket/RatelimitBucket';
@@ -6,6 +6,7 @@ import PermissionUtils from '../../util/PermissionUtils';
 import CommandContext from '../Context';
 import NinoCommand from '../Command';
 import { TYPES } from '../../types';
+import Language, { Translation } from '../Language';
 import Bot from '../Bot';
 import 'reflect-metadata';
 
@@ -32,22 +33,40 @@ export class CommandInvocation {
     return this.ctx.channel;
   }
 
+  getLocale() {
+    return this.ctx.getLocale();
+  }
+
   /**
    * Returns an error string if cannot invoke, otherwise it will return undefined.
    */
-  canInvoke() {
-    if (this.command.guildOnly && [1, 3].includes(this.channel.type)) return `Sorry, but you need to be in a guild to execute the \`${this.command.name}\` command.`;
-    if (this.command.ownerOnly && !this.command.bot.owners.includes(this.user.id)) return `Sorry, but you need to be a developer to execute the \`${this.command.name}\` command.`;
-    if (this.command.disabled && !this.onetime) return `Currently, command \`${this.command.name}\` is globally disabled`;
+  canInvoke(): Translation | undefined {
+    if (this.command.guildOnly && [1, 3].includes(this.channel.type)) {
+      return new Translation('errors.guildOnly', { command: this.command.name });
+    }
+
+    if (this.command.ownerOnly && !this.command.bot.owners.includes(this.user.id)) {
+      return new Translation('errors.ownerOnly', { command: this.command.name });
+    }
+
+    if (this.command.disabled && !this.onetime) {
+      return new Translation('errors.disabled', { command: this.command.name });
+    }
 
     if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.botPermissions)) {
       const bytecode = this.command.userPermissions & ~this.bot.permission.allow;
-      return `I am missing the following permissions: ${PermissionUtils.toString(bytecode)}`;
+      return new Translation('errors.permissions.bot', {
+        command: this.command.name,
+        perms: PermissionUtils.toString(bytecode)
+      });
     }
 
     if (this.user instanceof Member && !PermissionUtils.overlaps(this.user.permission.allow, this.command.userPermissions)) {
       const bytecode = this.command.userPermissions & ~this.user.permission.allow;
-      return `You are missing the following permissions: ${PermissionUtils.toString(bytecode)}`;
+      return new Translation('errors.permissions.user', {
+        command: this.command.name,
+        perms: PermissionUtils.toString(bytecode)
+      });
     }
 
     return undefined;
@@ -70,7 +89,7 @@ export default class CommandService {
    * @param args the message arguments
    * @param m the message object
    */
-  getCommandInvocation(ctx: CommandContext) {
+  getCommandInvocation(ctx: CommandContext): CommandInvocation | undefined {
     if (!ctx.args.args.length) return undefined;
 
     const name = ctx.args.args.shift()!;
@@ -97,7 +116,6 @@ export default class CommandService {
     const guild = (m.channel as TextChannel).guild;
     const me = guild.members.get(this.bot.client.user.id);
     if (!(m.channel as TextChannel).permissionsOf(me!.id).has('sendMessages')) return;
-
     const mention = new RegExp(`^<@!?${this.bot.client.user.id}> `).exec(m.content);
     const settings = await this.bot.settings.getOrCreate(guild.id);
     const prefixes = [
@@ -109,19 +127,19 @@ export default class CommandService {
 
     let prefix: string | null = null;
     for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;
-
     if (!prefix) return;
 
     const args = m.content.slice(prefix.length).trim().split(/ +/g);
     const ctx = new CommandContext(this.bot, m, args);
     const invoked = this.getCommandInvocation(ctx);
+    const locale = await ctx.getLocale();
 
     if (invoked) {
       const message = invoked.canInvoke();
       if (message) {
         const embed = this.bot.getEmbed()
-          .setTitle(`Unable to run ${invoked.command.name}!`)
-          .setDescription(message);
+          .setTitle(locale.translate('errors.title', { command: invoked.command.name }))
+          .setDescription(locale.lazy_translate(message));
 
         return void ctx.embed(embed.build());
       }
@@ -129,7 +147,10 @@ export default class CommandService {
       this.bucket
         .initialize(invoked.command)
         .check(invoked.command, invoked.user instanceof Member ? invoked.user.user : invoked.user, left => {
-          ctx.send(`**${invoked.user.username}**, the command \`${invoked.command.name}\` is on cooldown for \`${left}\`!`);
+          ctx.send(locale.translate('errors.cooldown', {
+            command: invoked.command.name,
+            seconds: left
+          }));
         });
 
       try {
@@ -146,11 +167,11 @@ export default class CommandService {
         }).join(', ');
 
         embed
-          .setTitle(`Command ${invoked.command.name} has failed`)
-          .setDescription(stripIndents`
-            The error that occured has been logged into our systems.
-            If the issue persists, contact ${owners} at https://discord.gg/7TtMP2n
-          `);
+          .setTitle(locale.translate('errors.failed'))
+          .setDescription(locale.translate('errors.unknown', {
+            owners,
+            server: 'https://discord.gg/7TtMP2n'
+          }));
 
         this.bot.logger.error(`Unable to run the '${invoked.command.name}' command!`, ex.stack ? ex.stack : ex.message);
         this.bot.report(ex);

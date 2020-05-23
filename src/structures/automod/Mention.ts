@@ -11,7 +11,9 @@ export default class AutoModMention {
 
   async handle(m: Message): Promise<boolean> {
     const channel = m.channel as TextChannel;
-    const nino = channel.guild.members.get(this.bot.client.user.id)!;
+    const nino = channel.guild.members.get(this.bot.client.user.id);
+
+    if (nino === undefined) return false;
 
     if (
       !PermissionUtil.above(nino, m.member!) ||
