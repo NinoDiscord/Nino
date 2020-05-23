@@ -97,6 +97,8 @@ export default class EvalCommand extends Command {
         'lib.es2016.d.ts',
         'lib.es2017.d.ts',
         'lib.es2018.d.ts',
+        'lib.es2019.d.ts',
+        'lib.es2020.d.ts',
         'lib.esnext.d.ts',
       ],
       declaration: false,

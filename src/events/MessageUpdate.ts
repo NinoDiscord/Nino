@@ -75,7 +75,6 @@ export default class MessageUpdatedEvent extends Event {
       .addField(`Old Content${old ? ` (${new Date(old.editedTimestamp).toLocaleString()})` : ''}`, stripIndents`
         \`\`\`prolog
         ${old ? old.content : 'None?'}
-        
         ${old ? old.attachments.length ? old.attachments.slice(0, 3).map(x => x.url).join('\n') : '' : ''}
         \`\`\`
       `)
