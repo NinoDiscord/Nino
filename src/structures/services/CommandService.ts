@@ -139,7 +139,7 @@ export default class CommandService {
       if (message) {
         const embed = this.bot.getEmbed()
           .setTitle(locale.translate('errors.title', { command: invoked.command.name }))
-          .setDescription(locale.lazy_translate(message));
+          .setDescription(locale.lazyTranslate(message));
 
         return void ctx.embed(embed.build());
       }

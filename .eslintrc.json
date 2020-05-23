@@ -71,23 +71,7 @@
     "@typescript-eslint/no-extra-semi": "error",
     "@typescript-eslint/no-namespace": ["error", { "allowDeclarations": true }],
     "@typescript-eslint/array-type": "error",
-    "@typescript-eslint/brace-style": ["error", "1tbs"],
-    "@typescript-eslint/ban-types": ["warn", {
-      "types": {
-        "{}": {
-          "message": "Use an object instead",
-          "fixWith": "object"
-        },
-        "Number": {
-          "message": "Use `number` instead",
-          "fixWith": "number"
-        },
-        "String": {
-          "message": "Use `string` instead",
-          "fixWith": "string"
-        }
-      }
-    }]
+    "@typescript-eslint/brace-style": ["error", "1tbs"]
   },
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint"]

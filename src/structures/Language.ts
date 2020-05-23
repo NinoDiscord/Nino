@@ -115,7 +115,7 @@ export default class Language {
     else return this._translate(translated, args);
   }
 
-  lazy_translate(translation: Translation): string {
+  lazyTranslate(translation: Translation): string {
     return this.translate(translation.key, translation.args);
   }
 
