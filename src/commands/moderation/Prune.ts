@@ -36,7 +36,7 @@ export default class PruneCommand extends Command {
     if (amount > 100) return ctx.send(locale.translate('commands.moderation.prune.tooHigh'));
 
     const allMsgs = await ctx.message.channel.getMessages(amount);
-    const filter = ctx.flags.get('filter') || ctx.flags.get('f');
+    const filter = ctx.flags.get('filter') || ctx.flags.get('f') || 'user';
 
     if (typeof filter === 'boolean') return ctx.send(locale.translate('global.invalidFlag.boolean'));
     if (filter && !this.filters.includes(filter)) return ctx.send(locale.translate('commands.moderation.prune.invalidFilter', {
