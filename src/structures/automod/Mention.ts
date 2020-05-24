@@ -33,7 +33,7 @@ export default class AutoModMention {
         '[Automod] Mention Spam'
       );
 
-      const response = !settings.responses.mention.enabled ?
+      const response = (!settings.responses || !settings.responses.mention.enabled) ?
         replaceMessage('%author%, please don\'t mention more than 4 people at once!', m.author) :
         replaceMessage(settings.responses.mention.message, m.author);
 
