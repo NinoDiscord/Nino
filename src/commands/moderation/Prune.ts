@@ -87,7 +87,7 @@ export default class PruneCommand extends Command {
     } catch(ex) {
       if (ex.message.includes(' is more then 2 weeks old.')) {
         const messages = shouldDelete.filter(x => x.timestamp < this.weeks);
-        return ctx.send(locale.translate('commands.moderation.prune.tooWeeks', { messages: messages.length }));
+        return ctx.send(locale.translate('commands.moderation.prune.twoWeeks', { messages: messages.length }));
       } else {
         const embed = this.bot.getEmbed()
           .setTitle(locale.translate('commands.moderation.prune.error.title'))
