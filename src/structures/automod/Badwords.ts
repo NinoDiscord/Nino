@@ -45,7 +45,7 @@ export default class AutoModBadWords {
     for (let word of settings.automod.badwords.wordlist) {
       if (m.content.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
         const punishments = await this.bot.punishments.addWarning(m.member!);
-        const response = !settings.responses.badwords.enabled ?
+        const response = (!settings.responses || !settings.responses.badwords.enabled) ?
           replaceMessage('Watch your language, %author%', m.author) :
           replaceMessage(settings.responses.badwords.message, m.author);
 

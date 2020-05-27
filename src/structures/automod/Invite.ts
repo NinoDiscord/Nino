@@ -50,7 +50,7 @@ export default class AutoModInvite {
       const settings = await this.bot.settings.get(guild.id);
       if (!settings || !settings.automod.invites) return false;
 
-      const response = !settings.responses.invite.enabled ?
+      const response = (!settings.responses || !settings.responses.invite.enabled) ?
         replaceMessage('Please don\'t advertise, %author%', m.author) :
         replaceMessage(settings.responses.invite.message, m.author);
       await m.channel.createMessage(response);

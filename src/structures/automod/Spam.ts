@@ -63,7 +63,7 @@ export default class AutoModSpam {
           `[Automod] Spamming in <#${m.channel.id}>`
         );
 
-        const response = !settings.responses.spam.enabled ?
+        const response = (!settings.responses || !settings.responses.spam.enabled) ?
           replaceMessage('Spamming is not allowed, %author%', m.author) :
           replaceMessage(settings.responses.spam.message, m.author);
 
