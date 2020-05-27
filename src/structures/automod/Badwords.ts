@@ -24,6 +24,7 @@ export default class AutoModBadWords {
    * @param m the message
    */
   async handle(m: Message): Promise<boolean> {
+    if (!m || m === null) return false;
     const channel = m.channel as TextChannel;
     const guild = channel.guild;
     const me = guild.members.get(this.bot.client.user.id)!;

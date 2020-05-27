@@ -21,7 +21,6 @@ import TimeoutsManager from './structures/managers/TimeoutsManager';
 import GuildSettings from './structures/settings/GuildSettings';
 import BotListService from './structures/services/BotListService';
 import StatusManager from './structures/managers/StatusManager';
-import PrometheusManager from './structures/managers/PrometheusManager';
 import CommandStatisticsManager from './structures/managers/CommandStatisticsManager';
 import NinoCommand from './structures/Command';
 import HelpCommand from './commands/generic/Help';
@@ -135,11 +134,6 @@ container
 container
   .bind<TimeoutsManager>(TYPES.TimeoutsManager)
   .to(TimeoutsManager)
-  .inSingletonScope();
-
-container
-  .bind<PrometheusManager>(TYPES.PrometheusManager)
-  .to(PrometheusManager)
   .inSingletonScope();
 
 container

@@ -18,11 +18,8 @@ export default class ReadyEvent extends Event {
     this.bot.status.updateStatus();
     setInterval(() => this.bot.status.updateStatus(), 600000);
 
-    this.bot.prometheus.server.listen(this.bot.config.prometheus, () => this.bot.logger.info(`Metrics server is now listening at localhost:${this.bot.config.prometheus}`));
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
-
     this.bot.statistics.guildCount = this.bot.client.guilds.size;
-    this.bot.prometheus.guildCount.set(this.bot.statistics.guildCount, Date.now());
     this.bot.timeouts.reapplyTimeouts();
   }
 }

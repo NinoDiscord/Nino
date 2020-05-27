@@ -10,6 +10,7 @@ export default class AutoModMention {
   }
 
   async handle(m: Message): Promise<boolean> {
+    if (!m || m === null) return false;
     const channel = m.channel as TextChannel;
     const nino = channel.guild.members.get(this.bot.client.user.id);
 

@@ -1,4 +1,5 @@
 import { Message, TextChannel, User, EmbedOptions } from 'eris';
+import { unembedify } from '../util';
 import ArgumentParser from './parsers/ArgumentParser';
 import FlagParser from './parsers/FlagParser';
 import Bot from './Bot';
@@ -27,9 +28,19 @@ export default class CommandContext {
   }
 
   embed(content: EmbedOptions) {
-    return this.message.channel.createMessage({
-      embed: content,
-    });
+    if (this.guild) {
+      if (this.member!.clientStatus !== undefined && this.member!.clientStatus.mobile !== 'offline') {
+        const message = unembedify(content);
+        return this.send(message);
+      } else if (!this.me.permission.has('embedLinks')) {
+        const message = unembedify(content);
+        return this.send(message);
+      } else {
+        return this.message.channel.createMessage({ embed: content });
+      }
+    } else {
+      return this.message.channel.createMessage({ embed: content });
+    }
   }
 
   code(lang: string, content: string) {

@@ -14,7 +14,6 @@ export const TYPES = {
   GuildSettings: Symbol.for('GuildSettings'),
   BotListService: Symbol.for('BotListService'),
   StatusManager: Symbol.for('StatusManager'),
-  PrometheusManager: Symbol.for('PrometheusManager'),
   CommandStatisticsManager: Symbol.for('CommandStatisticsManager'),
   UserSettings: Symbol.for('UserSettings'),
   GuildCounterManager: Symbol.for('GuildCounterManager')

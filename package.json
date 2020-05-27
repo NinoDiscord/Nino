@@ -40,7 +40,6 @@
     "leeks.js": "0.0.8",
     "mongoose": "5.9.15",
     "ms": "2.1.2",
-    "prom-client": "11.5.3",
     "reflect-metadata": "0.1.13",
     "wumpfetch": "0.3.1"
   },

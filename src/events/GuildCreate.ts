@@ -15,7 +15,6 @@ export default class GuildJoinedEvent extends Event {
     this.bot.logger.info(`Joined guild ${guild.name} (${guild.id})`);
 
     this.bot.status.updateStatus();
-    this.bot.prometheus.guildCount.inc();
     this.bot.statistics.guildCount++;
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
 

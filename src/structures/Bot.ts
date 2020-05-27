@@ -5,7 +5,6 @@ import { inject, injectable } from 'inversify';
 import RedisClient, { Redis } from 'ioredis';
 import { captureException } from '@sentry/node';
 import LocalizationManager from './managers/LocalizationManager';
-import PrometheusManager from './managers/PrometheusManager';
 import PunishmentManager from './managers/PunishmentManager';
 import { setDefaults } from 'wumpfetch';
 import TimeoutsManager from './managers/TimeoutsManager';
@@ -81,9 +80,6 @@ export default class Bot {
   @lazyInject(TYPES.CommandManager)
   public manager!: CommandManager;
 
-  @lazyInject(TYPES.PrometheusManager)
-  public prometheus!: PrometheusManager;
-
   @lazyInject(TYPES.TimeoutsManager)
   public timeouts!: TimeoutsManager;
 
@@ -138,6 +134,7 @@ export default class Bot {
     this.logger.info('Success! Connecting to the Redis pool...');
 
     this.addRedisEvents();
+    this.addDebugMonitor();
     // eslint-disable-next-line
     await this.redis.connect().catch(() => {});
 
@@ -172,5 +169,22 @@ export default class Bot {
   private addRedisEvents() {
     this.redis.once('ready', () => this.logger.redis(`Created a Redis pool at ${this.config.redis.host}:${this.config.redis.port}${this.config.redis.database ? `, with database ID: ${this.config.redis.database}` : ''}`));
     this.redis.on('wait', () => this.logger.redis('Redis has disconnected and awaiting a new pool...'));
+  }
+
+  private addDebugMonitor() {
+    if (this.config.environment === 'development') {
+      this.logger.info('Environment is in development mode, adding monitoring with Redis...');
+      this.redis.monitor((error, monitor) => {
+        if (error) this.logger.error('Unable to initialize the debug monitor', error);
+
+        this.logger.info('Initialized monitoring!');
+        monitor.on('monitor', (time: number, args: string[]) => {
+          const date = new Date(Math.floor(time) * 1000);
+          const command = args.shift()!;
+
+          this.logger.redis(`At ${date.toDateString()}, we executed command ${command.toUpperCase()} with args "${args.join(':')}"`);
+        });
+      });
+    }
   }
 }

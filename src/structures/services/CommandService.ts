@@ -109,7 +109,6 @@ export default class CommandService {
   }
 
   async handle(m: Message) {
-    this.bot.prometheus.messagesSeen.inc();
     this.bot.statistics.messagesSeen++;
     if (m.author.bot) return;
 
@@ -155,7 +154,6 @@ export default class CommandService {
 
       try {
         await invoked.command.run(ctx);
-        this.bot.prometheus.commandsExecuted.inc();
         this.bot.statistics.increment(invoked.command);
         this.bot.logger.info(`Ran command "${prefix}${invoked.command.name}" for ${ctx.sender.username}#${ctx.sender.discriminator} in ${ctx.guild ? `guild ${ctx.guild.name}` : 'DMs'}, now at ${this.bot.statistics.commandsExecuted.toLocaleString()} commands executed!`);
       } catch(ex) {
@@ -167,9 +165,9 @@ export default class CommandService {
         }).join(', ');
 
         embed
-          .setTitle(locale.translate('errors.failed'))
+          .setTitle(locale.translate('errors.failed', { command: invoked.command.name }))
           .setDescription(locale.translate('errors.unknown', {
-            owners,
+            owners: `${owners} `,
             server: 'https://discord.gg/7TtMP2n'
           }));
 
