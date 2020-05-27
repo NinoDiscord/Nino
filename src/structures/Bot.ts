@@ -1,5 +1,4 @@
 import { Client as DiscordClient } from 'eris';
-import { collectDefaultMetrics } from 'prom-client';
 import CommandStatisticsManager from './managers/CommandStatisticsManager';
 import { inject, injectable } from 'inversify';
 import RedisClient, { Redis } from 'ioredis';
@@ -126,8 +125,6 @@ export default class Bot {
   }
 
   async build() {
-    collectDefaultMetrics();
-
     this.logger.info('Connecting to the database...');
     await this.database.connect();
 
