@@ -5,6 +5,8 @@ import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
 
+const pkg = require('../../../package.json');
+
 @injectable()
 export default class StatisticsCommand extends Command {
   constructor(
@@ -43,7 +45,8 @@ export default class StatisticsCommand extends Command {
         name: command,
         executions: uses,
         connected: connection.ok === 1 ? locale.translate('global.online') : locale.translate('global.offline'),
-        memoryUsage
+        memoryUsage,
+        version: pkg.version
       }))
       .build();
 
