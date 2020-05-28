@@ -21,12 +21,11 @@ First, check our [contributing guidelines](https://github.com/NinoDiscord/Nino/b
 
 ## Installation
 ### Requirements
-* [Node.js](https://nodejs.org)
+* [Node.js](https://nodejs.org) (Node v10 or higher is supported!)
 * [Git](https://git-scm.com) (optional)
 * [MongoDB](https://www.mongodb.com)
 * [Redis](https://redis.io)
 * [Sentry](https://sentry.io) (optional)
-* [Prometheus](https://prometheus.io) (optional)
 
 ### Setting up the bot
 1. Clone the repository using Git: ``git clone https://github.com/NinoDiscord/Nino`` (If you don't have Git, just go to "Clone or download" and click "Download ZIP" then extract)
