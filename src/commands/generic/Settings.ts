@@ -719,6 +719,7 @@ export default class SettingsCommand extends Command {
     return ctx.embed(embed);
   }
 
+  // TODO: Translate this
   async response(ctx: Context) {
     const subcommands = ['add', 'remove'];
     const subcommand = ctx.args.get(1);

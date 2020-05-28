@@ -24,7 +24,7 @@ export default class ShardInfoCommand extends Command {
 
     if (!ctx.args.has(0)) {
       const title = locale.translate('commands.generic.locale.embed.title', {
-        username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator} `
+        username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator}`
       });
 
       const description = locale.translate('commands.generic.locale.embed.description', {
@@ -50,7 +50,7 @@ export default class ShardInfoCommand extends Command {
 
         const embed = this.bot.getEmbed()
           .setTitle(locale.translate('commands.generic.locale.list.title', {
-            username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator} `
+            username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator}`
           }))
           .setDescription(locales)
           .build();

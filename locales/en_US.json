@@ -85,7 +85,7 @@
         "locale": {
           "invalidSubcommand": "Invalid subcommand **${subcommand}**",
           "embed": {
-            "title": "Localization",
+            "title": "${username} | Localization",
             "description": [
               "__**Current Settings**__",
               "```apache",
@@ -333,20 +333,20 @@
           "title": "Shard Information"
         },
         "statistics": {
-          "title": "Realtime Statistics",
+          "title": "${username} | Realtime Statistics",
           "description": [
-            "```apache",
-            "Guilds:            ${guilds}",
-            "Users:             ${users}",
-            "Channels:          ${channels}",
-            "Shards:            ${current}/${total} (~${latency}ms)",
-            "Uptime:            ${uptime}",
-            "Commands:          ${commands}",
-            "Messages Seen:     ${messages}",
-            "Command Executed:  ${executed}",
-            "Most Used Command: ${name} (${executions} Executions)",
-            "Database:          ${connected}",
-            "Memory Usage:      ${memoryUsage}",
+            "```prolog",
+            "Guilds              ${guilds}",
+            "Users               ${users}",
+            "Channels            ${channels}",
+            "Shards              ${current}/${total} (~${latency}ms)",
+            "Uptime              ${uptime}",
+            "Commands            ${commands}",
+            "Messages Seen       ${messages}",
+            "Command Executed    ${executed}",
+            "Most Used Command   ${name} (${executions} Executions)",
+            "Database Connection ${connected}",
+            "Memory Usage        ${memoryUsage}",
             "```"
           ]
         },

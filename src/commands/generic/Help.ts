@@ -36,7 +36,7 @@ export default class HelpCommand extends Command {
 
     if (!ctx.args.has(0)) {
       const title = locale.translate('commands.generic.help.embed.title', {
-        username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator} `
+        username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator}`
       });
 
       const description = locale.translate('commands.generic.help.embed.description', {
@@ -45,7 +45,7 @@ export default class HelpCommand extends Command {
       });
 
       const footer = locale.translate('commands.generic.help.embed.footer', {
-        prefix: settings ? settings.prefix : 'x!'
+        prefix: settings ? settings.prefix : this.bot.config.discord.prefix
       });
 
       const embed = ctx.bot.getEmbed()

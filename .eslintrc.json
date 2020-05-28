@@ -62,7 +62,6 @@
     "quotes": ["error", "single"],
     "semi": ["error", "always"],
     "yoda": "error",
-    "@typescript-eslint/naming-convention": "warn",
     "@typescript-eslint/adjacent-overload-signatures": "warn",
     "@typescript-eslint/consistent-type-definitions": ["error", "interface"],
     "@typescript-eslint/no-array-constructor": "error",

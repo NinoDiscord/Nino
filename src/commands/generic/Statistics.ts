@@ -28,7 +28,7 @@ export default class StatisticsCommand extends Command {
     const memoryUsage = formatSize(process.memoryUsage().heapUsed);
 
     const embed = this.bot.getEmbed()
-      .setTitle(locale.translate('commands.generic.statistics.title'))
+      .setTitle(locale.translate('commands.generic.statistics.title', { username: `${this.bot.client.user.username}#${this.bot.client.user.discriminator}` }))
       .setDescription(locale.translate('commands.generic.statistics.description', {
         guilds: this.bot.client.guilds.size.toLocaleString(),
         users,
