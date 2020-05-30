@@ -3,6 +3,9 @@ import { unembedify } from '../util';
 import ArgumentParser from './parsers/ArgumentParser';
 import FlagParser from './parsers/FlagParser';
 import Bot from './Bot';
+import Language from './Language';
+import GuildSettings from './settings/GuildSettings';
+import { GuildModel } from '../models/GuildSchema';
 
 export interface DMOptions {
   user: User;
@@ -15,12 +18,16 @@ export default class CommandContext {
   public message: Message;
   public args: ArgumentParser;
   public flags: FlagParser;
+  public locale: Language | undefined;
+  public settings: GuildModel | undefined;
 
-  constructor(bot: Bot, m: Message, args: string[]) {
+  constructor(bot: Bot, m: Message, args: string[], locale: Language | undefined, settings: GuildModel | undefined) {
     this.bot = bot;
     this.message = m;
     this.args = new ArgumentParser(args);
     this.flags = new FlagParser(args);
+    this.locale = locale;
+    this.settings = settings;
   }
 
   send(content: string) {
@@ -78,13 +85,12 @@ export default class CommandContext {
     return this.guild ? this.bot.settings.getOrCreate(this.guild.id) : null;
   }
 
-  async getLocale() {
-    const guild = await this.getSettings()!;
-    const user = await this.bot.userSettings.getOrCreate(this.sender.id);
+  translate(key: string, args?: { [x: string]: any } | undefined): string {
+    return this.locale?.translate(key, args) ?? 'Failed translation.';
+  }
 
-    return user.locale === 'en_US' 
-      ? this.bot.locales.get(guild.locale)!
-      : this.bot.locales.get(user.locale)!;
+  async sendTranslate(key: string, args?: { [x: string]: any } | undefined) {
+    return this.send(this.translate(key, args));
   }
 
   get redis() {

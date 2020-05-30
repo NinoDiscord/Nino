@@ -30,21 +30,20 @@ export default class HelpCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
     const settings = await ctx.getSettings();
     const categories = this.getAllCategories();
 
     if (!ctx.args.has(0)) {
-      const title = locale.translate('commands.generic.help.embed.title', {
+      const title = ctx.translate('commands.generic.help.embed.title', {
         username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator}`
       });
 
-      const description = locale.translate('commands.generic.help.embed.description', {
+      const description = ctx.translate('commands.generic.help.embed.description', {
         website: 'https://nino.augu.dev',
         commands: this.bot.manager.commands.size
       });
 
-      const footer = locale.translate('commands.generic.help.embed.footer', {
+      const footer = ctx.translate('commands.generic.help.embed.footer', {
         prefix: settings ? settings.prefix : this.bot.config.discord.prefix
       });
 
@@ -54,7 +53,7 @@ export default class HelpCommand extends Command {
         .setFooter(footer);
 
       for (const category in categories) {
-        const localized = locale.translate(`commands.generic.help.categories.${category.toLowerCase()}`);
+        const localized = ctx.translate(`commands.generic.help.categories.${category.toLowerCase()}`);
         embed.addField(`${localized} [${categories[category].length}]`, categories[category].map(s => `\`${s.name}\``).join(', '));
       }
 
@@ -63,7 +62,7 @@ export default class HelpCommand extends Command {
       const arg = ctx.args.get(0);
       const command = ctx.bot.manager.getCommand(arg);
 
-      const notFound = locale.translate('commands.generic.help.notFound', {
+      const notFound = ctx.translate('commands.generic.help.notFound', {
         command: arg
       });
 

@@ -57,15 +57,14 @@ export default abstract class NinoCommand {
     this.userPermissions = info.userPermissions || 0;
   }
 
-  public abstract run(ctx: Context): Promise<any>;
+  public abstract run(ctx: Context, ...args: any[]): Promise<any>;
 
   format() {
     return `${this.bot.config.discord.prefix}${this.name}${this.usage ? ` ${this.usage}` : ''}`;
   }
 
   async help(ctx: Context) {
-    const locale = await ctx.getLocale();
-    const getPart = (type: 
+    const getPart = (type:
       'title' |
       'name' |
       'syntax' |
@@ -74,13 +73,13 @@ export default abstract class NinoCommand {
       'guildOnly' |
       'ownerOnly' |
       'cooldown'
-    ) => locale.translate(`commands.generic.help.command.${type}`);
+    ) => ctx.translate(`commands.generic.help.command.${type}`);
 
-    const getGlobalPart = (type: 'yes' | 'no') => locale.translate(`global.${type}`);
+    const getGlobalPart = (type: 'yes' | 'no') => ctx.translate(`global.${type}`);
 
     const embed = this.bot
       .getEmbed()
-      .setTitle(locale.translate('commands.generic.help.command.title', { command: this.name }))
+      .setTitle(ctx.translate('commands.generic.help.command.title', { command: this.name }))
       .setDescription(stripIndents`
         **${this.description}**
 

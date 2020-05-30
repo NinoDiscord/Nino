@@ -33,10 +33,6 @@ export class CommandInvocation {
     return this.ctx.channel;
   }
 
-  getLocale() {
-    return this.ctx.getLocale();
-  }
-
   /**
    * Returns an error string if cannot invoke, otherwise it will return undefined.
    */
@@ -123,15 +119,19 @@ export default class CommandService {
       `${mention}`,
       'nino '
     ];
+    const user = await this.bot.userSettings.get(m.author.id);
+
+    const locale =  !user 
+      ? this.bot.locales.get(settings.locale)!
+      : this.bot.locales.get(user.locale)!;
 
     let prefix: string | null = null;
     for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;
     if (!prefix) return;
 
     const args = m.content.slice(prefix.length).trim().split(/ +/g);
-    const ctx = new CommandContext(this.bot, m, args);
+    const ctx = new CommandContext(this.bot, m, args, locale, settings);
     const invoked = this.getCommandInvocation(ctx);
-    const locale = await ctx.getLocale();
 
     if (invoked) {
       const message = invoked.canInvoke();
