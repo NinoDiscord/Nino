@@ -35,7 +35,7 @@
     "eris": "0.13.1",
     "inversify": "5.0.1",
     "inversify-inject-decorators": "3.1.0",
-    "ioredis": "4.17.1",
+    "ioredis": "4.17.3",
     "js-yaml": "3.14.0",
     "leeks.js": "0.0.8",
     "mongoose": "5.9.15",
@@ -45,7 +45,7 @@
   },
   "devDependencies": {
     "@types/common-tags": "1.8.0",
-    "@types/ioredis": "4.16.2",
+    "@types/ioredis": "4.16.3",
     "@types/jest": "25.2.3",
     "@types/js-yaml": "3.12.4",
     "@types/mongoose": "5.7.21",
@@ -57,7 +57,7 @@
     "jest": "26.0.1",
     "jest-mock-extended": "1.0.8",
     "nodemon": "2.0.4",
-    "ts-jest": "26.0.0",
+    "ts-jest": "26.1.0",
     "typescript": "3.9.3"
   }
 }
