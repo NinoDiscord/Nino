@@ -42,50 +42,40 @@ export default class SettingsCommand extends Command {
     const warnings = ctx.args.get(1);
     const punishment = ctx.args.get(2);
     const punishments = ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'];
-    const locale = await ctx.getLocale();
 
     if (!warnings || !(/^[0-9]$/).test(warnings) || Number(warnings) < 1 || Number(warnings) > 5) {
-      const required = locale.translate('commands.generic.settings.add.amountRequired');
-      return ctx.send(required);
+      return ctx.sendTranslate('commands.generic.settings.add.amountRequired');
     }
 
     if (!punishments.includes(punishment)) {
-      const all = punishments.join(', ');
-      const invalid = locale.translate('commands.generic.settings.add.invalidPunishment', {
-        punishments: all,
+      return ctx.sendTranslate('commands.generic.settings.add.invalidPunishment', {
+        punishments: punishments.join(', '),
         punishment
       });
-
-      return ctx.send(invalid);
     }
   
     const temp = ctx.flags.get('time');
     if (temp && (typeof temp === 'boolean') || (typeof temp === 'string') && (!ms(temp as string) || ms(temp as string) < 1000)) {
-      const invalid = locale.translate('commands.generic.settings.add.invalidTime');
-      return ctx.send(invalid);
+      return ctx.sendTranslate('commands.generic.settings.add.invalidTime');
     }
 
     const soft = ctx.flags.get('soft');
     if (soft && typeof soft === 'string') {
-      const invalid = locale.translate('global.invalidFlag.boolean');
-      return ctx.send(invalid);
+      return ctx.sendTranslate('global.invalidFlag.boolean');
     }
 
     const roleID = ctx.args.get(3);
     if (!roleID && (['unrole', 'role'].includes(punishment))) {
-      const invalid = locale.translate('commands.generic.settings.add.missingRoleID');
-      return ctx.send(invalid);
+      return ctx.sendTranslate('commands.generic.settings.add.missingRoleID');
     }
 
     if (roleID && !((/^[0-9]+$/).test(roleID) || !ctx.guild!.roles.has(roleID))) {
-      const invalid = locale.translate('commands.generic.settings.add.invalidRole');
-      return ctx.send(invalid);
+      return ctx.sendTranslate('commands.generic.settings.add.invalidRole');
     }
 
     const days = ctx.flags.get('days');
     if (days && (typeof days === 'boolean' || (typeof days === 'string') && !(/^[0-9]{1,2}$/).test(days))) {
-      const invalid = locale.translate('commands.generic.settings.add.invalidDays');
-      return ctx.send(invalid);
+      return ctx.sendTranslate('commands.generic.settings.add.invalidDays');
     }
 
     this.bot.settings.update(ctx.guild!.id, {
@@ -100,66 +90,56 @@ export default class SettingsCommand extends Command {
         }
       }
     }, (error, packet) => {
-      if (error) return ctx.send(locale.translate('commands.generic.settings.add.errored'));
-      if (packet.n) return ctx.send(locale.translate('commands.generic.settings.add.success'));
-      else return ctx.send(locale.translate('commands.generic.settings.add.amountExceeded'));
+      if (error) return ctx.sendTranslate('commands.generic.settings.add.errored');
+      if (packet.n) return ctx.sendTranslate('commands.generic.settings.add.success');
+      else return ctx.sendTranslate('commands.generic.settings.add.amountExceeded');
     });
   }
 
   async remove(ctx: Context) {
     const index = ctx.args.get(1);
-    const locale = await ctx.getLocale();
 
     if (!index || !/^[0-9]+$/.test(index) || Number(index) < 1) {
-      const invalid = locale.translate('commands.generic.settings.remove.invalidIndex');
-      return ctx.send(invalid);
+      return ctx.sendTranslate('commands.generic.settings.remove.invalidIndex');
     }
 
     const settings = await ctx.getSettings();
     if (!settings || !settings.punishments.length) {
-      const none = locale.translate('commands.generic.settings.remove.noPunishments');
-      return ctx.send(none);
+      return ctx.sendTranslate('commands.generic.settings.remove.noPunishments');
     }
 
     if (Number(index) <= settings!.punishments.length) {
       const i = Math.round(Number(index)) - 1;
       settings!.punishments.splice(i, 1);
     }
-
-    const removed = locale.translate('commands.generic.settings.remove.success', { index });
     settings!.save();
-    return ctx.send(removed);
+    return ctx.sendTranslate('commands.generic.settings.remove.success', { index });
   }
 
   async set(ctx: Context) {
     const setting = ctx.args.get(1);
     const subcommands = ['modlog', 'prefix', 'mutedrole', 'mutedRole', 'automod.swears', 'logging.channelID', 'logging.ignore'];
-    const locale = await ctx.getLocale();
     
     switch (setting) {
       case 'modlog': {
         const channelID = ctx.args.get(2);
         if (!channelID) {
-          const noChannel = locale.translate('commands.generic.settings.noChannel');
-          return ctx.send(noChannel);
+          return ctx.sendTranslate('commands.generic.settings.noChannel');
         }
 
         const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
         if (id === null) {
-          const invalidChannel = locale.translate('global.invalidChannel', { channel: channelID });
-          return ctx.send(invalidChannel);
+          return ctx.sendTranslate('global.invalidChannel', { channel: channelID });
         }
 
         const channel = await this.bot.client.getRESTChannel(id);
         if (!(channel instanceof TextChannel)) {
-          const notText = locale.translate('global.notText', { channel: channel.id });
-          return ctx.send(notText);
+          return ctx.sendTranslate('global.notText', { channel: channel.id });
         }
 
         const permissions = channel.permissionsOf(this.bot.client.user.id);
         if (!permissions.has('sendMessages') || !permissions.has('embedLinks')) {
-          const text = locale.translate('commands.generic.settings.set.modlog.noPerms', { channel: channel.name });
-          return ctx.send(text);
+          return ctx.sendTranslate('commands.generic.settings.set.modlog.noPerms', { channel: channel.name });
         }
 
         await ctx.bot.settings.update(ctx.guild!.id, {
@@ -167,11 +147,9 @@ export default class SettingsCommand extends Command {
             modlog: channel.id
           }
         }, (error) => {
-          const message = error
-            ? locale.translate('commands.generic.settings.set.modlog.unable', { channel: channel.name })
-            : locale.translate('commands.generic.settings.set.modlog.success', { channel: channel.name });
-
-          return ctx.send(message);
+          return error
+            ? ctx.sendTranslate('commands.generic.settings.set.modlog.unable', { channel: channel.name })
+            : ctx.sendTranslate('commands.generic.settings.set.modlog.success', { channel: channel.name });
         });
       } break;
       case 'prefix': {
@@ -179,25 +157,21 @@ export default class SettingsCommand extends Command {
         const settings = await ctx.getSettings()!;
 
         if (!prefix) {
-          const none = locale.translate('commands.generic.settings.set.prefix.none');
-          return ctx.send(none);
+          return ctx.sendTranslate('commands.generic.settings.set.prefix.none');
         }
 
         if (prefix.length > 20) {
           // Calculate the length of the prefix
           const length = prefix.length - 20;
-          const over20 = locale.translate('commands.generic.settings.set.prefix.over20', { chars: length });
-          return ctx.send(over20);
+          return ctx.sendTranslate('commands.generic.settings.set.prefix.over20', { chars: length });
         }
 
         if (['@everyone', '@here'].includes(prefix)) {
-          const pinged = locale.translate('commands.generic.settings.set.prefix.atEveryone');
-          return ctx.send(pinged);
+          return ctx.sendTranslate('commands.generic.settings.set.prefix.atEveryone');
         }
 
         if (settings.prefix === prefix) {
-          const already = locale.translate('commands.generic.settings.set.prefix.already', { prefix });
-          return ctx.send(already);
+          return ctx.sendTranslate('commands.generic.settings.set.prefix.already', { prefix });
         }
 
         ctx.bot.settings.update(ctx.guild!.id, {
@@ -205,44 +179,38 @@ export default class SettingsCommand extends Command {
             prefix
           }
         }, (error) => {
-          const message = error 
-            ? locale.translate('commands.generic.settings.set.prefix.unable', { prefix })
-            : locale.translate('commands.generic.settings.set.prefix.success', { prefix });
-
-          return ctx.send(message);
+          return error 
+            ? ctx.sendTranslate('commands.generic.settings.set.prefix.unable', { prefix })
+            : ctx.sendTranslate('commands.generic.settings.set.prefix.success', { prefix });
         });
       } break;
       case 'mutedrole':
       case 'mutedRole': {
         const mutedRole = ctx.args.get(2);
         if (!mutedRole || !/^[0-9]+$/.test(mutedRole)) {
-          const message = !mutedRole ? 
-            locale.translate('commands.generic.settings.set.mutedRole.none') :
-            locale.translate('commands.generic.settings.set.mutedRole.invalid');
-
-          return ctx.send(message);
+          return !mutedRole ? 
+            ctx.sendTranslate('commands.generic.settings.set.mutedRole.none') :
+            ctx.sendTranslate('commands.generic.settings.set.mutedRole.invalid');
         }
 
         const role = ctx.guild!.roles.find(role => role.id === mutedRole);
         if (!role) {
-          const noneFound = locale.translate('commands.generic.settings.set.mutedRole.noneFound', { id: mutedRole });
-          return ctx.send(noneFound);
+          return ctx.sendTranslate('commands.generic.settings.set.mutedRole.noneFound', { id: mutedRole });
         }
 
-        const unable = locale.translate('commands.generic.settings.set.mutedRole.unable', { role: role.name });
-        const success = locale.translate('commands.generic.settings.set.mutedRole.success', { role: role.name });
         this.bot.settings.update(ctx.guild!.id, {
           $set: {
             mutedRole: role.id
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.set.mutedRole.unable', { role: role.name }) 
+          : ctx.sendTranslate('commands.generic.settings.set.mutedRole.success', { role: role.name }));
       } break;
       case 'automod.badwords':
       case 'automod.swears': {
         const list = ctx.args.get(2);
         if (!list) {
-          const none = locale.translate('commands.generic.settings.set.badwords.none');
-          return ctx.send(none);
+          return ctx.sendTranslate('commands.generic.settings.set.badwords.none');
         }
 
         const settings = await ctx.getSettings();
@@ -251,18 +219,15 @@ export default class SettingsCommand extends Command {
         settings!.automod.badwords.wordlist.push(...swears);
         await settings!.save();
 
-        const message = !settings!.automod.badwords.enabled ?
-          locale.translate('commands.generic.settings.set.badwords.added.notEnabled', { words: swears.length }) :
-          locale.translate('commands.generic.settings.set.badwords.added.enabled', { words: swears.length });
-
-        return ctx.send(message);
+        return !settings!.automod.badwords.enabled ?
+          ctx.sendTranslate('commands.generic.settings.set.badwords.added.notEnabled', { words: swears.length }) :
+          ctx.sendTranslate('commands.generic.settings.set.badwords.added.enabled', { words: swears.length });
       }
       case 'logging.ignore':
       case 'logging.ignored': {
         const list = ctx.args.get(2);
         if (!list) {
-          const none = locale.translate('commands.generic.settings.set.ignored.none');
-          return ctx.send(none);
+          return ctx.sendTranslate('commands.generic.settings.set.ignored.none');
         }
 
         const settings = await ctx.getSettings();
@@ -277,46 +242,36 @@ export default class SettingsCommand extends Command {
             .map(s => `**${s}**`)
             .join(', ');
 
-          const text = locale.translate('commands.generic.settings.set.ignored.invalid', { channels: invalid });
-          return ctx.send(text);
+          return ctx.sendTranslate('commands.generic.settings.set.ignored.invalid', { channels: invalid });
         }
 
         if (!settings!.logging.enabled) settings!.logging.enabled = true;
         settings!.logging.ignore.push(...errors);
         await settings!.save();
 
-        const notEnabled = locale.translate('commands.generic.settings.set.ignored.added.notEnabled', { channels: errors.length });
-        const enabled = locale.translate('commands.generic.settings.set.ignored.added.enabled', { channels: errors.length });
-
-        const message = !settings!.logging.enabled ?
-          notEnabled :
-          enabled;
-
-        return ctx.send(message);
+        return !settings!.logging.enabled ?
+          ctx.sendTranslate('commands.generic.settings.set.ignored.added.notEnabled', { channels: errors.length }) :
+          ctx.sendTranslate('commands.generic.settings.set.ignored.added.enabled', { channels: errors.length });
       }
       case 'logging.channelID': {
         const channelID = ctx.args.get(2);
         if (!channelID) {
-          const noChannel = locale.translate('commands.generic.settings.noChannel');
-          return ctx.send(noChannel);
+          return ctx.sendTranslate('commands.generic.settings.noChannel');
         }
 
         const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
         if (id === null) {
-          const invalidChannel = locale.translate('global.invalidChannel', { channel: channelID });
-          return ctx.send(invalidChannel);
+          return ctx.sendTranslate('global.invalidChannel', { channel: channelID });
         }
 
         const channel = await this.bot.client.getRESTChannel(id);
         if (!(channel instanceof TextChannel)) {
-          const notText = locale.translate('global.notText', { channel: channel.id });
-          return ctx.send(notText);
+          return ctx.sendTranslate('global.notText', { channel: channel.id });
         }
 
         const permissions = channel.permissionsOf(this.bot.client.user.id);
         if (!permissions.has('sendMessages') || !permissions.has('embedLinks')) {
-          const text = locale.translate('commands.generic.settings.set.logChannel.noPerms', { channel: channel.name });
-          return ctx.send(text);
+          return ctx.sendTranslate('commands.generic.settings.set.logChannel.noPerms', { channel: channel.name });
         }
 
         let error!: any;
@@ -324,20 +279,17 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.channelID': channel.id
           }
-        }, (error) => error = error);
-
-        const unable = locale.translate('commands.generic.settings.set.logChannel.unable', { channel: channel.name });
-        const success = locale.translate('commands.generic.settings.enable.automod.success', { channel: channel.name });
-        error ? ctx.send(unable) : ctx.send(success);
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.set.logChannel.unable', { channel: channel.name }) 
+          : ctx.sendTranslate('commands.generic.settings.enable.automod.success', { channel: channel.name }));
       } break;
       default: {
-        const notFound = locale.translate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') });
-        const invalid = locale.translate('commands.generic.settings.invalidSubcommand', { 
-          subcommand: setting, 
-          subcommands: subcommands.join(', ') 
-        });
-
-        return ctx.send(setting === undefined ? notFound : invalid);
+        return setting === undefined 
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
+            subcommand: setting, 
+            subcommands: subcommands.join(', ') 
+          });
       }
     }
   }
@@ -345,12 +297,9 @@ export default class SettingsCommand extends Command {
   async enable(ctx: Context) {
     const setting = ctx.args.get(1);
     const subcommands = ['automod', 'automod.dehoist', 'automod.invites', 'automod.spam', 'automod.mention', 'automod.raid', 'automod.swears',  'automod.badwords', 'logging', 'logging.events', 'logging.events.messageDeleted', 'logging.events.messageDelete', 'logging.events.messageUpdate', 'logging.events.messageUpdated'];
-    const locale = await ctx.getLocale();
 
     switch (setting) {
       case 'automod': {
-        const unable = locale.translate('commands.generic.settings.enable.automod.unable');
-        const success = locale.translate('commands.generic.settings.enable.automod.success');
 
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
@@ -362,120 +311,111 @@ export default class SettingsCommand extends Command {
             'automod.badwords.enabled': true,
             'automod.badwords.wordlist': []
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.automod.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.automod.success'));
       } break;
       case 'automod.dehoist': {
-        const unable = locale.translate('commands.generic.settings.enable.dehoist.unable');
-        const success = locale.translate('commands.generic.settings.enable.dehoist.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.dehoist': true
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.dehoist.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.dehoist.success'));
       } break;
       case 'automod.spam': {
-        const unable = locale.translate('commands.generic.settings.enable.spam.unable');
-        const success = locale.translate('commands.generic.settings.enable.spam.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.spam': true
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.spam.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.spam.success'));
       } break;
       case 'automod.raid': {
-        const unable = locale.translate('commands.generic.settings.enable.raid.unable');
-        const success = locale.translate('commands.generic.settings.enable.raid.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.raid': true
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.raid.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.raid.success'));
       } break;
       case 'automod.mention': {
-        const unable = locale.translate('commands.generic.settings.enable.mention.unable');
-        const success = locale.translate('commands.generic.settings.enable.mention.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.mention': true
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.mention.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.mention.success'));
       } break;
       case 'automod.swears':
       case 'automod.badwords': {
-        const unable = locale.translate('commands.generic.settings.enable.badwords.unable');
-        const success = locale.translate('commands.generic.settings.enable.badwords.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.badwords.enabled': true
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.badwords.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.badwords.success'));
       } break;
       case 'automod.invites': {
-        const unable = locale.translate('commands.generic.settings.enable.invites.unable');
-        const success = locale.translate('commands.generic.settings.enable.invites.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.invites': true
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.invites.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.invites.success'));
       } break;
       case 'logging': {
-        const unable = locale.translate('commands.generic.settings.enable.logging.unable');
-        const success = locale.translate('commands.generic.settings.enable.logging.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.enabled': true
           }
-        }, error => error ? ctx.send(unable) : ctx.send(success));
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.logging.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.logging.success'));
       } break;
       case 'logging.events': {
-        const unable = locale.translate('commands.generic.settings.enable.logEvents.unable');
-        const success = locale.translate('commands.generic.settings.enable.logEvents.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.events.messageDelete': true,
             'logging.events.messageUpdate': true
           }
-        }, error => error ? ctx.send(unable) : ctx.send(success));
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.logEvents.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.logEvents.success'));
       } break;
       case 'logging.events.messageDeleted':
       case 'logging.events.messageDelete': {
-        const unable = locale.translate('commands.generic.settings.enable.messageDelete.unable');
-        const success = locale.translate('commands.generic.settings.enable.messageDelete.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.events.messageDelete': true
           }
-        }, error => error ? ctx.send(unable) : ctx.send(success)); 
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.messageDelete.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.messageDelete.success')); 
       } break;
       case 'logging.events.messageUpdated':
       case 'logging.events.messageUpdate': {
-        const unable = locale.translate('commands.generic.settings.enable.messageUpdate.unable');
-        const success = locale.translate('commands.generic.settings.enable.messageUpdate.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.events.messageUpdate': true
           }
-        }, error => error ? ctx.send(unable) : ctx.send(success)); 
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.messageUpdate.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.messageUpdate.success')); 
       } break;
       default: {
-        const notFound = locale.translate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') });
-        const invalid = locale.translate('commands.generic.settings.invalidSubcommand', { 
-          subcommand: setting, 
-          subcommands: subcommands.join(', ') 
-        });
-
-        return ctx.send(setting === undefined ? notFound : invalid);
+        return setting === undefined 
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
+            subcommand: setting, 
+            subcommands: subcommands.join(', ') 
+          });
       }
     }
   }
@@ -483,13 +423,8 @@ export default class SettingsCommand extends Command {
   async disable(ctx: Context) {
     const setting = ctx.args.get(1);
     const subcommands = ['automod', 'automod.dehoist', 'automod.invites', 'automod.spam', 'automod.mention', 'automod.raid', 'automod.swears or automod.badwords', 'logging', 'logging.events.messageDelete',  'logging.events.messageDeleted', 'logging.events.messageUpdate', 'logging.events.messageUpdated'];
-    const locale = await ctx.getLocale();
-    
     switch (setting) {
       case 'automod': {
-        const unable = locale.translate('commands.generic.settings.disable.automod.unable');
-        const success = locale.translate('commands.generic.settings.disable.automod.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.dehoist': false,
@@ -499,199 +434,183 @@ export default class SettingsCommand extends Command {
             'automod.invites': false,
             'automod.badwords.enabled': false
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.automod.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.automod.success'));
       } break;
       case 'automod.dehoist': {
-        const unable = locale.translate('commands.generic.settings.disable.dehoist.unable');
-        const success = locale.translate('commands.generic.settings.disable.dehoist.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.dehoist': false
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.dehoist.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.dehoist.success'));
       } break;
       case 'automod.spam': {
-        const unable = locale.translate('commands.generic.settings.disable.spam.unable');
-        const success = locale.translate('commands.generic.settings.disable.spam.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.spam': false
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.spam.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.spam.success'));
       } break;
       case 'automod.raid': {
-        const unable = locale.translate('commands.generic.settings.disable.raid.unable');
-        const success = locale.translate('commands.generic.settings.disable.raid.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.raid': false
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.raid.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.raid.success'));
       } break;
       case 'automod.mention': {
-        const unable = locale.translate('commands.generic.settings.disable.mention.unable');
-        const success = locale.translate('commands.generic.settings.disable.mention.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.mention': false
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.mention.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.mention.success'));
       } break;
       case 'automod.swears':
       case 'automod.badwords': {
-        const unable = locale.translate('commands.generic.settings.disable.badwords.unable');
-        const success = locale.translate('commands.generic.settings.disable.badwords.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.badwords.enabled': false,
             'automod.badwords.wordlist': []
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.badwords.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.badwords.success'));
       } break;
       case 'automod.invites': {
-        const unable = locale.translate('commands.generic.settings.disable.invites.unable');
-        const success = locale.translate('commands.generic.settings.disable.invites.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.invites': false
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.invites.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.invites.success'));
       } break;
       case 'logging': {
-        const unable = locale.translate('commands.generic.settings.disable.logging.unable');
-        const success = locale.translate('commands.generic.settings.disable.logging.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.enabled': false
           }
-        }, error => error ? ctx.send(unable) : ctx.send(success));
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.logging.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.logging.success'));
       } break;
       case 'logging.events': {
-        const unable = locale.translate('commands.generic.settings.disable.logEvents.unable');
-        const success = locale.translate('commands.generic.settings.disable.logEvents.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.events.messageDelete': false,
             'logging.events.messageUpdate': false
           }
-        }, error => error ? ctx.send(unable) : ctx.send(success));
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.logEvents.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.logEvents.success'));
       } break;
       case 'logging.events.messageDeleted':
       case 'logging.events.messageDelete': {
-        const unable = locale.translate('commands.generic.settings.disable.messageDelete.unable');
-        const success = locale.translate('commands.generic.settings.disable.messageDelete.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.events.messageDelete': false
           }
-        }, error => error ? ctx.send(unable) : ctx.send(success)); 
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.messageDelete.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.messageDelete.success')); 
       } break;
       case 'logging.events.messageUpdated':
       case 'logging.events.messageUpdate': {
-        const unable = locale.translate('commands.generic.settings.disable.messageUpdate.unable');
-        const success = locale.translate('commands.generic.settings.disable.messageUpdate.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.events.messageUpdate': false
           }
-        }, error => error ? ctx.send(unable) : ctx.send(success)); 
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.messageUpdate.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.messageUpdate.success')); 
       } break;
       default: {
-        const notFound = locale.translate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') });
-        const invalid = locale.translate('commands.generic.settings.invalidSubcommand', { 
-          subcommand: setting, 
-          subcommands: subcommands.join(', ') 
-        });
-
-        return ctx.send(setting === undefined ? notFound : invalid);
+        return setting === undefined
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') })
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
+            subcommand: setting, 
+            subcommands: subcommands.join(', ') 
+          });
       }
     }
   }
 
   async reset(ctx: Context) {
-    const locale = await ctx.getLocale();
     const subcommands = ['punishments', 'modlog', 'mutedrole', 'prefix'];
     const setting = ctx.args.get(1);
 
     switch (setting) {
       case 'punishments': {
-        const unable = locale.translate('commands.generic.settings.reset.punishments.unable');
-        const success = locale.translate('commands.generic.settings.reset.punishments.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'punishments': []
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.reset.punishments.unable') 
+          : ctx.sendTranslate('commands.generic.settings.reset.punishments.success'));
       } break;
       case 'prefix': {
-        const unable = locale.translate('commands.generic.settings.reset.prefix.unable');
-        const success = locale.translate('commands.generic.settings.reset.prefix.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'prefix': this.bot.config.discord.prefix
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.reset.prefix.unable') 
+          : ctx.sendTranslate('commands.generic.settings.reset.prefix.success'));
       } break;
       case 'modlog': {
-        const unable = locale.translate('commands.generic.settings.reset.modlog.unable');
-        const success = locale.translate('commands.generic.settings.reset.modlog.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'modlog': null
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.reset.modlog.unable') 
+          : ctx.sendTranslate('commands.generic.settings.reset.modlog.success'));
       } break;
       case 'mutedrole': {
-        const unable = locale.translate('commands.generic.settings.reset.mutedRole.unable');
-        const success = locale.translate('commands.generic.settings.reset.mutedRole.success');
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'mutedRole': null
           }
-        }, (error) => error ? ctx.send(unable) : ctx.send(success));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.reset.mutedRole.unable') 
+          : ctx.sendTranslate('commands.generic.settings.reset.mutedRole.success'));
       } break;
       default: {
-        const notFound = locale.translate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') });
-        const invalid = locale.translate('commands.generic.settings.invalidSubcommand', { 
-          subcommand: setting, 
-          subcommands: subcommands.join(', ') 
-        });
-
-        return ctx.send(setting === undefined ? notFound : invalid);
+        return setting === undefined 
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
+            subcommand: setting, 
+            subcommands: subcommands.join(', ') 
+          });
       }
     }
   }
 
   async view(ctx: Context, provided: boolean = false) {
     const settings = await ctx.getSettings()!;
-    const locale = await ctx.getLocale();
 
-    const title = locale.translate('commands.generic.settings.view.title', {
+    const title = ctx.translate('commands.generic.settings.view.title', {
       guild: ctx.guild!.name
     });
 
-    const yes = locale.translate('global.yes');
-    const no = locale.translate('global.no');
+    const yes = ctx.translate('global.yes');
+    const no = ctx.translate('global.no');
     const events: string[] = [];
 
     if (settings.logging.events.messageUpdate) events.push('Message Updates');
     if (settings.logging.events.messageDelete) events.push('Message Deletions');
 
-    const desc = locale.translate('commands.generic.settings.view.description', {
+    const desc = ctx.translate('commands.generic.settings.view.description', {
       prefix: settings.prefix,
       mutedRole: ctx.guild!.roles.find(x => x.id === settings.mutedRole) ? ctx.guild!.roles.get(settings.mutedRole)!.name : 'None',
       modlog: ctx.guild!.channels.find(x => x.id === settings.modlog) ? ctx.guild!.channels.get(settings.modlog)!.name : 'None',
@@ -709,7 +628,7 @@ export default class SettingsCommand extends Command {
       'badwords.enabled': settings.automod.badwords ? yes : no
     });
 
-    const footer = locale.translate('commands.generic.settings.view.footer');
+    const footer = ctx.translate('commands.generic.settings.view.footer');
 
     const embed = this.bot.getEmbed()
       .setTitle(title)

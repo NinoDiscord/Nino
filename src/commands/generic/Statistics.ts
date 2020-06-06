@@ -21,7 +21,6 @@ export default class StatisticsCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
     const { command, uses } = this.bot.statistics.getCommandUsages();
     const users = this.bot.client.guilds.reduce((a, b) => a + b.memberCount, 0).toLocaleString();
     const channels = Object.keys(this.bot.client.channelGuildMap).length;
@@ -30,8 +29,8 @@ export default class StatisticsCommand extends Command {
     const memoryUsage = formatSize(process.memoryUsage().heapUsed);
 
     const embed = this.bot.getEmbed()
-      .setTitle(locale.translate('commands.generic.statistics.title', { username: `${this.bot.client.user.username}#${this.bot.client.user.discriminator}` }))
-      .setDescription(locale.translate('commands.generic.statistics.description', {
+      .setTitle(ctx.translate('commands.generic.statistics.title', { username: `${this.bot.client.user.username}#${this.bot.client.user.discriminator}` }))
+      .setDescription(ctx.translate('commands.generic.statistics.description', {
         guilds: this.bot.client.guilds.size.toLocaleString(),
         users,
         channels,
@@ -44,7 +43,7 @@ export default class StatisticsCommand extends Command {
         executed: this.bot.statistics.commandsExecuted.toLocaleString(),
         name: command,
         executions: uses,
-        connected: connection.ok === 1 ? locale.translate('global.online') : locale.translate('global.offline'),
+        connected: connection.ok === 1 ? ctx.translate('global.online') : ctx.translate('global.offline'),
         memoryUsage,
         version: pkg.version
       }))

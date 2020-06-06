@@ -14,7 +14,7 @@ export default class UserSettings implements Base<UserModel> {
   }
 
   async get(id: string) {
-    const document = await this.model.findOne({ guildID: id }).exec();
+    const document = await this.model.findOne({ userID: id }).exec();
     if (!document || document === null) return null;
     return document;
   }
@@ -22,16 +22,16 @@ export default class UserSettings implements Base<UserModel> {
   async getOrCreate(id: string) {
     let settings = await this.get(id);
     if (!settings || settings === null)
-      settings = this.client.settings.create(id);
+      settings = await this.create(id);
     return settings!;
   }
 
-  create(id: string) {
+  async create(id: string) {
     const query = new this.model({
       userID: id,
       locale: 'en_US'
     });
-    query.save();
+    await query.save();
     return query;
   }
 

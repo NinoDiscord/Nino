@@ -18,13 +18,12 @@ export default class ShardInfoCommand extends Command {
 
   async run(ctx: Context) {
     let info = '';
-    const locale = await ctx.getLocale();
 
     ctx.bot.client.shards.map(shard => {
       const current = ctx.guild!.shard.id === shard.id ? '(current)' : '';
       const guilds = ctx.bot.client.guilds.filter(g => g.shard.id === shard.id);
       const members = guilds.reduce((a, b) => a + b.memberCount, 0);
-      const translated = locale.translate('commands.generic.shardinfo.shard', {
+      const translated = ctx.translate('commands.generic.shardinfo.shard', {
         current,
         latency: shard.latency,
         guilds,
@@ -36,7 +35,7 @@ export default class ShardInfoCommand extends Command {
     });
 
     const embed = ctx.bot.getEmbed()
-      .setTitle(locale.translate('commands.generic.shardinfo.title'))
+      .setTitle(ctx.translate('commands.generic.shardinfo.title'))
       .setDescription(`\`\`\`diff\n${info}\n\`\`\``);
 
     return ctx.embed(embed.build());

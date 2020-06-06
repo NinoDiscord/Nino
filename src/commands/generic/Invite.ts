@@ -18,10 +18,9 @@ export default class InviteCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
     const embed = this.bot.getEmbed()
-      .setTitle(locale.translate('commands.generic.invite.title'))
-      .setDescription(locale.translate('commands.generic.invite.description', {
+      .setTitle(ctx.translate('commands.generic.invite.title'))
+      .setDescription(ctx.translate('commands.generic.invite.description', {
         invite: `<https://discordapp.com/oauth2/authorize?client_id=${ctx.me.id}&scope=bot>`,
         server: 'https://discord.gg/7TtMP2n'
       }))

@@ -19,7 +19,7 @@ export default class TimeCommand extends Command {
   async run(ctx: Context) {
     const date = new Date();
     const convert = (t: any) => `0${t}`.slice(-2);
-    const translated = (await ctx.getLocale()).translate('commands.generic.time', {
+    return ctx.sendTranslate('commands.generic.time', {
       days: date.getDate(),
       month: date.getMonth(),
       year: date.getFullYear(),
@@ -27,7 +27,5 @@ export default class TimeCommand extends Command {
       minutes: convert(date.getMinutes()),
       seconds: convert(date.getSeconds())
     });
-
-    return ctx.send(translated);
   }
 }

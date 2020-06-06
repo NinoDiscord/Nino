@@ -3,7 +3,7 @@ import { Model, Document, Query } from 'mongoose';
 export interface SettingsBase<T extends Document> {
   model: Model<T, object>;
   get(id: string): Promise<T | null>;
-  create(id: string): T;
+  create(id: string): Promise<T>;
   remove(id: string): void;
   update(
     id: string,

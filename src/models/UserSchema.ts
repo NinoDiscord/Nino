@@ -6,7 +6,7 @@ export interface UserModel extends Document {
 }
 
 const schema = new Schema<UserModel>({
-  guildID: {
+  userID: {
     type: String,
     unique: true,
   },

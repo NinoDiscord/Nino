@@ -26,19 +26,18 @@ export default class KickCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
-    if (!ctx.args.has(0)) return ctx.send(locale.translate('global.noUser'));
+    if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const userID = ctx.args.get(0);
     const user = findUser(this.bot, userID);
-    if (!user || user === undefined) return ctx.send(locale.translate('global.unableToFind'));
+    if (!user || user === undefined) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(user.id);
-    if (!member) return ctx.send(locale.translate('commands.moderation.notInGuild', {
+    if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
       user: `${user.username}#${user.discriminator}`
-    }));
+    });
 
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.send(locale.translate('global.heirarchy'));
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.heirarchy');
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     const punishment = new Punishment(PunishmentType.Kick, {
@@ -49,14 +48,14 @@ export default class KickCommand extends Command {
       await this.bot.punishments.punish(member!, punishment, reason);
 
       const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
-      return ctx.send(locale.translate('commands.moderation.kick', {
+      return ctx.sendTranslate('commands.moderation.kick', {
         type: prefix
-      }));
+      });
     } catch(e) {
-      return ctx.send(locale.translate('commands.moderation.unable', {
+      return ctx.sendTranslate('commands.moderation.unable', {
         type: member instanceof Member ? member.user.bot ? 'bot' : 'user' : 'user',
         message: e.message
-      }));
+      });
     }
   }
 }

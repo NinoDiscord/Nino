@@ -22,17 +22,16 @@ export default class UnmuteCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
-    if (!ctx.args.has(0)) return ctx.send(locale.translate('global.noUser'));
+    if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const userID = ctx.args.get(0);
     const u = findUser(this.bot, userID);
-    if (!u || u === undefined) return ctx.send(locale.translate('global.unableToFind'));
+    if (!u || u === undefined) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(u.id);
-    if (!member) return ctx.send(locale.translate('commands.moderation.notInGuild', {
+    if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
       user: `${u.username}#${u.discriminator}`
-    }));
+    });
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     await this.bot.timeouts.cancelTimeout(member.id, ctx.guild!, 'unmute');
@@ -44,12 +43,12 @@ export default class UnmuteCommand extends Command {
       await this.bot.punishments.punish(member!, punishment, reason);
       const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
 
-      return ctx.send(locale.translate('commands.moderation.unmute', { type: prefix }));
+      return ctx.sendTranslate('commands.moderation.unmute', { type: prefix });
     } catch (e) {
-      return ctx.send(locale.translate('commands.moderation.unable', {
+      return ctx.sendTranslate('commands.moderation.unable', {
         message: e.message,
         type: member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User'
-      }));
+      });
     }
   }
 }

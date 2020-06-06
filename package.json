@@ -14,7 +14,7 @@
     "build:watch": "yarn lint && yarn clean && yarn tsc -w",
     "build": "yarn lint && yarn clean && yarn tsc",
     "clean": "rm -fr dist",
-    "main": "yarn build && node dist/index.js",
+    "main": "node dist/index.js",
     "lint": "eslint src --ext .ts --fix",
     "test": "jest --config jest.config.js --forceExit",
     "dev": "nodemon dist/index.js"

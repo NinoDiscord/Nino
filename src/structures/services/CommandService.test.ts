@@ -40,7 +40,7 @@ describe('CommandService', () => {
   it('it should create a command invocation', () => {
     const message = { content: '!help hi' } as Message;
     const args = ['help', 'hi'];
-    const context = new CommandContext(bot, message, args);
+    const context = new CommandContext(bot, message, args, bot.locales.get('en_US'), undefined);
     expect(context).toBeDefined();
     expect(context.args).toBeDefined();
     expect(context.args.args).toEqual(expect.arrayContaining(args));
@@ -52,7 +52,7 @@ describe('CommandService', () => {
   it('it should not create a command invocation', () => {
     const message = { content: '' } as Message;
     const args = [];
-    const context = new CommandContext(bot, message, args);
+    const context = new CommandContext(bot, message, args, bot.locales.get('en_US'), undefined);
     expect(context).toBeDefined();
     expect(context.args).toBeDefined();
     expect(context.args.args).toEqual(expect.arrayContaining(args));
@@ -63,7 +63,7 @@ describe('CommandService', () => {
   it('it should be able to invoke the command', () => {
     const message = { content: '!help hi' } as Message;
     const args = ['help', 'hi'];
-    const context = new CommandContext(bot, message, args);
+    const context = new CommandContext(bot, message, args, bot.locales.get('en_US'), undefined);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
     expect(invocation!.canInvoke()).toBeUndefined();
@@ -73,7 +73,7 @@ describe('CommandService', () => {
     bot.manager.getCommand('help')!.disabled = true;
     const message = { content: '!help hi' } as Message;
     const args = ['help', 'hi'];
-    const context = new CommandContext(bot, message, args);
+    const context = new CommandContext(bot, message, args, bot.locales.get('en_US'), undefined);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
     expect(invocation!.canInvoke()).toBeDefined();
@@ -87,7 +87,7 @@ describe('CommandService', () => {
       channel: { type: 1 } as TextableChannel,
     } as Message;
     const args = ['settings'];
-    const context = new CommandContext(bot, message, args);
+    const context = new CommandContext(bot, message, args, bot.locales.get('en_US'), undefined);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
     expect(invocation!.canInvoke()).toBeDefined();
@@ -101,7 +101,7 @@ describe('CommandService', () => {
       author: { id: '1' } as User,
     } as Message;
     const args = ['eval'];
-    const context = new CommandContext(bot, message, args);
+    const context = new CommandContext(bot, message, args, bot.locales.get('en_US'), undefined);
     const invocation = commandService.getCommandInvocation(context);
     expect(invocation).toBeDefined();
     expect(invocation!.canInvoke()).toBeDefined();

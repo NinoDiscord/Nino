@@ -20,8 +20,8 @@ export default class UptimeCommand extends Command {
 
   async run(ctx: Context) {
     const uptime = Math.round(process.uptime()) * 1000;
-    return ctx.send(ctx.translate('commands.generic.uptime', {
+    return ctx.sendTranslate('commands.generic.uptime', {
       uptime: humanize(uptime)
-    }));
+    });
   }
 }

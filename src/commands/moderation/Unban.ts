@@ -26,13 +26,12 @@ export default class UnbanCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
-    if (!ctx.args.has(0)) return ctx.send(locale.translate('global.noUser'));
+    if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const id = findId(ctx.args.get(0));
 
-    if (!id) return ctx.send(locale.translate('global.unableToFind'));
-    if (!(await ctx.guild!.getBans()).find(v => v.user.id === id)) return ctx.send(locale.translate('global.notInBanList'));
+    if (!id) return ctx.sendTranslate('global.unableToFind');
+    if (!(await ctx.guild!.getBans()).find(v => v.user.id === id)) return ctx.sendTranslate('global.notInBanList');
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     await this.bot.timeouts.cancelTimeout(id, ctx.guild!, 'unban');
@@ -43,12 +42,12 @@ export default class UnbanCommand extends Command {
     
     try {
       await this.bot.punishments.punish({ id, guild: ctx.guild! }, punishment, reason);
-      return ctx.send(locale.translate('commands.moderation.unban'));
+      return ctx.sendTranslate('commands.moderation.unban');
     } catch (e) {
-      return ctx.send(locale.translate('commands.moderation.unable', {
+      return ctx.sendTranslate('commands.moderation.unable', {
         type: 'User',
         message: e.message
-      }));
+      });
     }
   }
 }

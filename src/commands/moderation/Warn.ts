@@ -22,34 +22,31 @@ export default class WarnCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
-    if (!ctx.args.has(0)) return ctx.send(locale.translate('global.noUser'));
+    if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const userID = ctx.args.get(0);
     const u = findUser(this.bot, userID);
-    if (!u || u === undefined) return ctx.send(locale.translate('global.unableToFind'));
+    if (!u || u === undefined) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(u.id);
-    if (!member) return ctx.send(locale.translate('commands.moderation.notInGuild', {
+    if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
       user: `${u.username}#${u.discriminator}`
-    }));
+    });
 
     const punishments = await this.bot.punishments.addWarning(member!);
     for (let i of punishments) {
       try {
         await this.bot.punishments.punish(member!, i, '[Automod] Moderator warned user');
       } catch (e) {
-        return ctx.send(locale.translate('global.unable', { error: e.message }));
+        return ctx.sendTranslate('global.unable', { error: e.message });
       }
     }
 
     const warns = await this.bot.warnings.get(ctx.guild!.id, member.id);
-    const message = locale.translate('commands.moderation.warned', {
+    return ctx.sendTranslate('commands.moderation.warned', {
       warnings: warns === null ? 1 : warns.amount,
       suffix: warns === null ? '' : warns.amount > 1 ? 's' : '',
       user: `${member.username}#${member.discriminator}`
     });
-
-    return ctx.send(message);
   }
 }

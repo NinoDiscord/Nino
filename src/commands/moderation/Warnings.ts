@@ -22,23 +22,21 @@ export default class WarningsCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
     if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
 
     const userID = ctx.args.get(0);
     const u = findUser(this.bot, userID);
-    if (!u || u === undefined) return ctx.send(locale.translate('global.unableToFind'));
+    if (!u || u === undefined) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(u.id);
-    if (!member) return ctx.send(locale.translate('commands.moderation.notInGuild', {
+    if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
       user: `${u.username}#${u.discriminator}`
-    }));
+    });
 
     const settings = await this.bot.warnings.get(ctx.guild!.id, member.id);
-    const message = !settings
-      ? locale.translate('commands.moderation.warnings.none')
-      : locale.translate('commands.moderation.warnings.message', { warnings: settings.amount });
 
-    return ctx.send(message);
+    return !settings
+      ? ctx.sendTranslate('commands.moderation.warnings.none')
+      : ctx.sendTranslate('commands.moderation.warnings.message', { warnings: settings.amount });
   }
 }

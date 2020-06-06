@@ -86,7 +86,7 @@ export default class CommandContext {
   }
 
   translate(key: string, args?: { [x: string]: any } | undefined): string {
-    return this.locale?.translate(key, args) ?? 'Failed translation.';
+    return this.locale ? this.locale.translate(key, args) : 'Failed translation.';
   }
 
   async sendTranslate(key: string, args?: { [x: string]: any } | undefined) {

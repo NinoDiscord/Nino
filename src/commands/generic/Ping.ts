@@ -17,13 +17,12 @@ export default class PingCommand extends Command {
   }
 
   async run(ctx: Context) {
-    const locale = await ctx.getLocale();
 
     const startedAt = Date.now();
-    const message = await ctx.send(locale.translate('commands.generic.ping.oldMessage'));
+    const message = await ctx.sendTranslate('commands.generic.ping.oldMessage');
     
     const ws = this.bot.client.shards.reduce((a, b) => a + b.latency, 0);
-    const m = locale.translate('commands.generic.ping.message', {
+    const m = ctx.translate('commands.generic.ping.message', {
       id: ctx.guild ? ctx.guild.shard.id : 0,
       shard: ws,
       messageLatency: Date.now() - startedAt
