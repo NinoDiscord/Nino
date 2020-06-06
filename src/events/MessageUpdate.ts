@@ -1,7 +1,6 @@
 import { Message, TextChannel, Attachment, EmbedOptions } from 'eris';
 import { injectable, inject } from 'inversify';
 import { stripIndents } from 'common-tags';
-import { humanize } from '../util';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
@@ -62,17 +61,20 @@ export default class MessageUpdatedEvent extends Event {
     // Don't log http/https links
     const HTTPS_REGEX = /^https?:\/\/(.*)/;
 
-    // But why?
     // `old` can be represented as null (according to Eris' docs), so we check for if `old` is null and if `old.content` exists
     const ternary = old ? old.content && HTTPS_REGEX.test(old.content) : false;
-    if (HTTPS_REGEX.test(m.content) && ternary) return;
+    if (HTTPS_REGEX.test(m.content) || ternary) return;
+
+    // Embeds are considered as "updated"?
+    if (old && old.embeds.length) return;
 
     const channel = (<TextChannel> guild.channels.get(settings.logging.channelID)!);
     const timestamp = new Date(m.createdAt);
+    const oldDate = old ? old.editedTimestamp !== undefined ? `(${new Date(old.editedTimestamp).toLocaleString()})` : '(Unknown)' : '(Unknown)';
     const embed = this.bot.getEmbed()
       .setAuthor(`${m.author.username}#${m.author.discriminator} in #${(m.channel as TextChannel).name}`, undefined, m.author.dynamicAvatarURL('png', 1024))
       .setTimestamp(timestamp)
-      .addField(`Old Content${old ? ` (${new Date(old.editedTimestamp).toLocaleString()})` : ''}`, stripIndents`
+      .addField(`Old Content ${oldDate}`, stripIndents`
         \`\`\`prolog
         ${old ? old.content : 'None?'}
         ${old ? old.attachments.length ? old.attachments.slice(0, 3).map(x => x.url).join('\n') : '' : ''}
