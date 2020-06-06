@@ -21,7 +21,11 @@ export default class GuildMemberUpdateEvent extends Event {
     if (member.nick != old.nick) return this.bot.automod.handleMemberNameUpdate(member);
     if (!settings || !settings.mutedRole) return; // Muted role doesn't exist, don't do anything
 
+    
     // Fetch audit logs
+    if (!guild.members.get(this.bot.client.user.id)!.permission.has('viewAuditLogs')) {
+      return;
+    }
     const logs = await guild.getAuditLogs(10);
     if (!logs.entries.length) return; // Don't do anything if there is no entries
 
