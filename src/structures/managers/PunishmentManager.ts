@@ -134,7 +134,7 @@ export default class PunishmentManager {
   async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string, audit: boolean = false) {
     const me = member.guild.members.get(this.bot.client.user.id)!;
     const guild = member.guild;
-    const settings = await this.bot.settings.get(guild.id);
+    const settings = await this.bot.settings.getOrCreate(guild.id);
 
     if (
       (member instanceof Member && !PermissionUtils.above(me, member)) ||
@@ -178,33 +178,40 @@ export default class PunishmentManager {
 
             for (let [, channel] of guild.channels) {
               const permissions = channel.permissionsOf(me.id);
-              if (permissions.has('manageChannels')) await channel.editPermission(mutedRole.id, 0, Constants.Permissions.sendMessages, 'role', `[Automod] Override permissions for new Muted role in channel ${channel.name}`);
+              if (permissions.has('manageChannels')) 
+                await channel.editPermission(mutedRole.id, 0, Constants.Permissions.sendMessages, 'role', '[Automod] Override permissions for new Muted role.');
             }
 
             settings!.mutedRole = mutedRole.id;
-            settings!.save();
+            await settings!.save();
           }
         }
 
         const id = mutedRole instanceof Role ? mutedRole.id : mutedRole;
-        if (!audit) await member.addRole(id, reason);
-        if (temp) this.bot.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
+        if (!audit) 
+          await member.addRole(id, reason);
+        if (temp) 
+          await this.bot.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
       } break;
 
       case PunishmentType.AddRole: {
         if (!(member instanceof Member)) return;
 
         const role = member.guild.roles.get(punishment.options.roleid!);
-        if (!!role && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > role.position) await member.addRole(role.id, reason);
+        if (!!role && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > role.position) 
+          await member.addRole(role.id, reason);
       } break;
 
       case PunishmentType.Unmute: {
         let mem: Member | { id: string; guild: Guild; } | undefined = member;
-        if (!(member instanceof Member)) mem = guild.members.get(mem.id);
-        if (!mem) return;
+        if (!(member instanceof Member)) 
+          mem = guild.members.get(mem.id);
+        if (!mem) 
+          return;
 
         const muted = guild.roles.get(settings!.mutedRole)!;
-        if (!audit && (mem as Member).roles.find(x => x === muted.id)) await (mem! as Member).removeRole(muted.id, reason);
+        if (!audit && (mem as Member).roles.find(x => x === muted.id)) 
+          await (mem! as Member).removeRole(muted.id, reason);
       } break;
 
       case PunishmentType.Unban: {
