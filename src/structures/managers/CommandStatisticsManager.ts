@@ -49,7 +49,7 @@ export default class CommandStatisticsManager {
   increment(cmd: NinoCommand) {
     if (!this.commandUsages.hasOwnProperty(cmd.name)) this.commandUsages[cmd.name] = 0;
 
-    if (['eval', 'shell'].includes(cmd.name)) {
+    if (['eval', 'shell', 'profiler'].includes(cmd.name)) {
       this.commandsExecuted++;
       delete this.commandUsages[cmd.name];
     } else {

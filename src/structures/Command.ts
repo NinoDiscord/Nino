@@ -1,5 +1,6 @@
 import { injectable, unmanaged } from 'inversify';
 import { stripIndents } from 'common-tags';
+import { Module } from '../util';
 import Context from './Context';
 import Client from './Bot';
 import 'reflect-metadata';
@@ -8,7 +9,7 @@ export interface CommandInfo {
   name: string;
   description: string | ((client: Client) => string);
   usage?: string;
-  category?: string;
+  category?: Module;
   aliases?: string[];
   guildOnly?: boolean;
   ownerOnly?: boolean;
@@ -25,7 +26,7 @@ export default abstract class NinoCommand {
   public name: string;
   public description: string;
   public usage: string;
-  public category: string;
+  public category: Module;
   public aliases: string[];
   public guildOnly: boolean;
   public ownerOnly: boolean;
@@ -35,10 +36,7 @@ export default abstract class NinoCommand {
   public botPermissions: number;
   public userPermissions: number;
 
-  constructor(
-    client: Client, 
-    @unmanaged() info: CommandInfo
-  ) {
+  constructor(client: Client, @unmanaged() info: CommandInfo) {
     this.bot = client;
     this.name = info.name;
     this.description =
@@ -46,7 +44,7 @@ export default abstract class NinoCommand {
         ? info.description(client)
         : info.description;
     this.usage = info.usage || '';
-    this.category = info.category || 'Generic';
+    this.category = info.category || Module.Generic;
     this.aliases = info.aliases || [];
     this.guildOnly = info.guildOnly || false;
     this.ownerOnly = info.ownerOnly || false;

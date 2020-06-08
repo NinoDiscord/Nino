@@ -11,7 +11,6 @@ export default class ShardInfoCommand extends Command {
       name: 'locale',
       description: 'View or edit a user or guild\'s locale',
       aliases: ['lang', 'language'],
-      category: 'Generic',
       guildOnly: true,
       usage: 'locale / locale list / locale reset [--guild] / locale set <locale> [--guild]'
     });

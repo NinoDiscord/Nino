@@ -70,6 +70,12 @@ export function unembedify(embed: EmbedOptions) {
   return strings.join('\n');
 }
 
+export enum Module {
+  Moderation = 'Moderation',
+  Generic = 'Generic',
+  System = 'System Administration'
+}
+
 function convertTime(date: Date) {
   const escape = (type: any) => `0${type}`.slice(-2);
   const ampm = date.getHours() >= 12 ? 'PM' : 'AM';

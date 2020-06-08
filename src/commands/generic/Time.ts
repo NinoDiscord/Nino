@@ -11,7 +11,6 @@ export default class TimeCommand extends Command {
       name: 'time',
       description: 'Tells you what day it is and what\'s the time.',
       aliases: ['when', 'day'],
-      category: 'Generic',
       guildOnly: true
     });
   }

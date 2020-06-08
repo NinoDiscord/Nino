@@ -1,6 +1,7 @@
 import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
 import { injectable, inject } from 'inversify';
 import { Constants, Member } from 'eris';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
@@ -14,7 +15,7 @@ export default class UnmuteCommand extends Command {
       name: 'unmute',
       description: 'Unmutes a user from a guild',
       usage: '<user> <reason>',
-      category: 'Moderation',
+      category: Module.Moderation,
       guildOnly: true,
       userPermissions: Constants.Permissions.manageRoles,
       botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels

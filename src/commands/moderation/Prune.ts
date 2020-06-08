@@ -1,6 +1,7 @@
+import { Constants, Message, TextableChannel } from 'eris';
 import { injectable, inject } from 'inversify';
-import { Constants, Message, TextableChannel, TextChannel } from 'eris';
 import { stripIndents } from 'common-tags';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -17,7 +18,7 @@ export default class PruneCommand extends Command {
       description: 'Prunes messages by a filter from the current or a different channel',
       usage: '<amount> [--filter="bot" | "user" | "new" | "self"]',
       aliases: ['purge', 'delmsg'],
-      category: 'Moderation',
+      category: Module.Moderation,
       userPermissions: Constants.Permissions.manageMessages,
       botPermissions: Constants.Permissions.manageMessages,
       guildOnly: true

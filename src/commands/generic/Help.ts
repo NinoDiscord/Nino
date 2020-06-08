@@ -7,9 +7,7 @@ import Bot from '../../structures/Bot';
 
 @injectable()
 export default class HelpCommand extends Command {
-  constructor(
-    @inject(TYPES.Bot) client: Bot
-  ) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'help',
       description: (bot) => `Gives a list of ${bot.client.user ? bot.client.user.username : 'Nino'}'s commands or shows documentation on a specific command`,

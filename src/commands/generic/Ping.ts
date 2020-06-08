@@ -11,7 +11,6 @@ export default class PingCommand extends Command {
       name: 'ping',
       description: 'Shows you the bot\'s ping.',
       aliases: ['pong', 'pang'],
-      category: 'Generic',
       guildOnly: true
     });
   }

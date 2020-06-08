@@ -1,14 +1,12 @@
-import {
-  Punishment,
-  PunishmentType,
-} from '../../structures/managers/PunishmentManager';
+import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
+import { injectable, inject } from 'inversify';
 import { Constants } from 'eris';
-import Bot from '../../structures/Bot';
 import { findId } from '../../util/UserUtil';
+import { Module } from '../../util';
+import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
-import { injectable, inject } from 'inversify';
-import { TYPES } from '../../types';
+import Bot from '../../structures/Bot';
 
 @injectable()
 export default class UnbanCommand extends Command {
@@ -18,7 +16,7 @@ export default class UnbanCommand extends Command {
       description: 'Unbans a user from a guild',
       usage: '<user> <reason> [--reason]',
       aliases: ['unbanne'],
-      category: 'Moderation',
+      category: Module.Moderation,
       guildOnly: true,
       userPermissions: Constants.Permissions.banMembers,
       botPermissions: Constants.Permissions.banMembers

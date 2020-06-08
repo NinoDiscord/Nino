@@ -2,6 +2,7 @@ import { Constants, TextChannel } from 'eris';
 import { injectable, inject } from 'inversify';
 import PermissionUtils from '../../util/PermissionUtils';
 import CommandContext from '../../structures/Context';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Bot from '../../structures/Bot';
@@ -15,7 +16,7 @@ export default class LockdownCommand extends Command {
       name: 'lockdown',
       description: 'Locks down a channel, multiple channels or all channels for all roles below the specified role. Put + or - before the role to specify whether to allow the role to write or deny the permission.',
       aliases: ['lock'],
-      category: 'Moderation',
+      category: Module.Moderation,
       guildOnly: true,
       botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
       userPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,

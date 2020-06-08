@@ -1,6 +1,7 @@
 import { injectable, inject } from 'inversify';
 import PermissionUtils from '../../util/PermissionUtils';
 import { Constants } from 'eris';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
@@ -17,7 +18,7 @@ export default class PardonCommand extends Command {
       description: 'Pardon a member from this guild',
       usage: '<user> <amount>',
       aliases: ['unwarn', 'forgive'],
-      category: 'Moderation',
+      category: Module.Moderation,
       userPermissions: Constants.Permissions.manageRoles,
       botPermissions: Constants.Permissions.manageRoles,
       guildOnly: true

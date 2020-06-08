@@ -2,6 +2,7 @@ import { Punishment, PunishmentType } from '../../structures/managers/Punishment
 import { Constants, Member, Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import PermissionUtils from '../../util/PermissionUtils';
+import { Module } from '../../util';
 import { findId } from '../../util/UserUtil'; 
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
@@ -19,7 +20,7 @@ export default class BanCommand extends Command {
       description: 'Ban a member in the current guild',
       usage: '<user> <reason> [--soft] [--days]',
       aliases: ['banne', 'bean'],
-      category: 'Moderation',
+      category: Module.Moderation,
       guildOnly: true,
       userPermissions: Constants.Permissions.banMembers,
       botPermissions: Constants.Permissions.banMembers

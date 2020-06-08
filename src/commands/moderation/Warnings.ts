@@ -1,7 +1,8 @@
 import { injectable, inject } from 'inversify';
 import { Constants } from 'eris';
-import findUser from '../../util/UserUtil';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
+import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
@@ -14,7 +15,7 @@ export default class WarningsCommand extends Command {
       description: 'Shows the amount of warnings a member has.',
       usage: '<user>',
       aliases: ['warns'],
-      category: 'Moderation',
+      category: Module.Moderation,
       userPermissions: Constants.Permissions.manageRoles,
       botPermissions: Constants.Permissions.manageRoles,
       guildOnly: true

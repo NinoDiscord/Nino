@@ -2,6 +2,7 @@ import { Punishment, PunishmentType } from '../../structures/managers/Punishment
 import { injectable, inject } from 'inversify';
 import { Constants, Member } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import findUser from '../../util/UserUtil'; 
 import Command from '../../structures/Command';
@@ -18,7 +19,7 @@ export default class KickCommand extends Command {
       description: 'Kicks a user from the guild',
       usage: '<user> <reason> [--reason]',
       aliases: ['boot', 'yeet'],
-      category: 'Moderation',
+      category: Module.Moderation,
       guildOnly: true,
       botPermissions: Constants.Permissions.kickMembers,
       userPermissions: Constants.Permissions.kickMembers

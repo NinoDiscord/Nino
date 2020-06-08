@@ -12,7 +12,6 @@ export default class InviteCommand extends Command {
       name: 'invite',
       description: 'Gives you the invite for the bot.',
       aliases: ['inv'],
-      category: 'Generic',
       ownerOnly: false,
     });
   }

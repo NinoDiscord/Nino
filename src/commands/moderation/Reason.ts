@@ -1,5 +1,6 @@
 import { injectable, inject } from 'inversify';
 import { Constants } from 'eris';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -13,7 +14,7 @@ export default class ReasonCommand extends Command {
       description: 'Updates a case\'s reason',
       usage: '<caseID> <reason>',
       aliases: ['update'],
-      category: 'Moderation',
+      category: Module.Moderation,
       guildOnly: true,
       userPermissions: Constants.Permissions.banMembers,
       botPermissions: Constants.Permissions.manageMessages

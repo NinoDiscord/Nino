@@ -45,6 +45,7 @@ import WarnCommand from './commands/moderation/Warn';
 import WarningsCommand from './commands/moderation/Warnings';
 import EvalCommand from './commands/system/Eval';
 import ShellCommand from './commands/system/Shell';
+import ProfilerCommand from './commands/system/Profiler';
 import NinoEvent from './structures/Event';
 import GuildBanAddEvent from './events/GuildBanAdd';
 import GuildBanRemoveEvent from './events/GuildBanRemove';
@@ -277,6 +278,11 @@ container
 container
   .bind<NinoCommand>(TYPES.Command)
   .to(ShellCommand)
+  .inSingletonScope();
+
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(ProfilerCommand)
   .inSingletonScope();
 
 // Events
