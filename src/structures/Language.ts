@@ -42,7 +42,7 @@ export class Translation {
 
 export default class Language {
   /** A list of contributors by their user ID on Discord */
-  public contributorIDs: string[];
+  public contributors: string[];
 
   /** The translator */
   public translator: string;
@@ -68,7 +68,7 @@ export default class Language {
    * @param info The information
    */
   constructor(private bot: Bot, info: LanguageInfo) {
-    this.contributorIDs = info.contributors;
+    this.contributors = info.contributors;
     this.translator = info.translator;
     this.completion = getStatus(info.completion);
     this.strings = info.strings;
@@ -84,10 +84,6 @@ export default class Language {
       case LanguageStatus.Missing: return 0;
       default: return 0;
     }
-  }
-
-  get contributors() {
-    return this.contributorIDs.map(x => this.bot.client.users.get(x)!);
   }
 
   /**
