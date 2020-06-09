@@ -171,6 +171,7 @@ export default class BotListService {
 
         const func = res.statusCode === 200 ? 'info' : 'warn';
         this.bot.logger[func](`Posted statistics to botlist.space (${res.statusCode}): ${res.body}`);
+        this.hasPostedCmds = true;
       }
     }
   }
