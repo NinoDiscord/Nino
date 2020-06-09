@@ -51,6 +51,7 @@ export interface Config {
     port: number;
   };
   botlists: {
+    dservicestoken: string | undefined;
     dboatstoken: string | undefined;
     topggtoken: string | undefined;
     bfdtoken: string | undefined;
@@ -151,6 +152,8 @@ export default class Bot {
     this.database.dispose();
     this.redis.disconnect();
     this.client.disconnect({ reconnect: false });
+    this.botlists.stop();
+
     this.logger.warn('Bot connection was disposed');
   }
 
