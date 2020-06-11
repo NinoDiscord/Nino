@@ -1,11 +1,9 @@
 import { Message, TextChannel, User, EmbedOptions } from 'eris';
-import { unembedify } from '../util';
 import ArgumentParser from './parsers/ArgumentParser';
+import { GuildModel } from '../models/GuildSchema';
 import FlagParser from './parsers/FlagParser';
 import Bot from './Bot';
 import Language from './Language';
-import GuildSettings from './settings/GuildSettings';
-import { GuildModel } from '../models/GuildSchema';
 
 export interface DMOptions {
   user: User;
