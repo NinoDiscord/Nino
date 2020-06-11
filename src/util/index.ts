@@ -1,4 +1,4 @@
-import { User, EmbedOptions } from 'eris';
+import { User } from 'eris';
 
 export function humanize(ms: number, long: boolean = false) {
   const weeks = Math.floor(ms / 1000 / 60 / 60 / 24 / 7);
@@ -50,35 +50,8 @@ export function formatSize(bytes: number) {
   else return `${giga.toFixed(1)}GB`; 
 }
 
-export function unembedify(embed: EmbedOptions) {
-  const strings: string[] = [];
-
-  if (embed.title) strings.push(`__**${embed.title}**__`);
-  if (embed.description) strings.push(`> ${embed.description}`);
-  if (embed.fields) {
-    for (const field of embed.fields) {
-      strings.push(`\n- ${field.name}: ${field.value}`);
-    }
-  }
-  if (embed.footer) {
-    let text = `\n${embed.footer.text}`;
-    if (embed.timestamp) text += ` (${embed.timestamp instanceof Date ? convertTime(embed.timestamp) : embed.timestamp})`;
-  
-    strings.push(text);
-  }
-
-  return strings.join('\n');
-}
-
 export enum Module {
   Moderation = 'Moderation',
   Generic = 'Generic',
   System = 'System Administration'
-}
-
-function convertTime(date: Date) {
-  const escape = (type: any) => `0${type}`.slice(-2);
-  const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-
-  return `${escape(date.getMonth())}/${escape(date.getDate())}/${escape(date.getFullYear())} at ${escape(date.getHours())}/${escape(date.getMinutes())}/${escape(date.getSeconds())}${ampm}`;
 }

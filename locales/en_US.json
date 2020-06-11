@@ -318,7 +318,7 @@
               "[Invites Automod]: ${invites.enabled}",
               "[Raid Automod]: ${raid.enabled}",
               "[Spam Automod]: ${spam.enabled}",
-              "[Swear Automod]: ${badwords.enabled}",
+              "[Swear Automod]: ${badwords.enabled} (${words})",
               "[Logging]: ${logging.enabled}",
               "[Logging Channel]: ${logging}",
               "[Enabled Logging Events]: ${events}",

@@ -35,19 +35,7 @@ export default class CommandContext {
   }
 
   embed(content: EmbedOptions) {
-    if (this.guild) {
-      if (this.member!.clientStatus !== undefined && this.member!.clientStatus.mobile !== 'offline') {
-        const message = unembedify(content);
-        return this.send(message);
-      } else if (!this.me.permission.has('embedLinks')) {
-        const message = unembedify(content);
-        return this.send(message);
-      } else {
-        return this.message.channel.createMessage({ embed: content });
-      }
-    } else {
-      return this.message.channel.createMessage({ embed: content });
-    }
+    return this.message.channel.createMessage({ embed: content });
   }
 
   code(lang: string, content: string) {
@@ -85,11 +73,11 @@ export default class CommandContext {
     return this.guild ? this.bot.settings.getOrCreate(this.guild.id) : null;
   }
 
-  translate(key: string, args?: { [x: string]: any } | undefined): string {
+  translate(key: string, args?: { [x: string]: any }): string {
     return this.locale ? this.locale.translate(key, args) : 'Failed translation.';
   }
 
-  async sendTranslate(key: string, args?: { [x: string]: any } | undefined) {
+  async sendTranslate(key: string, args?: { [x: string]: any }) {
     return this.send(this.translate(key, args));
   }
 

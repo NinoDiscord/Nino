@@ -625,7 +625,8 @@ export default class SettingsCommand extends Command {
       'raid.enabled': settings.automod.raid ? yes : no,
       'spam.enabled': settings.automod.spam ? yes : no,
       'logging.enabled': settings.logging.enabled ? yes : no,
-      'badwords.enabled': settings.automod.badwords ? yes : no
+      'badwords.enabled': settings.automod.badwords.enabled ? yes : no,
+      words: settings.automod.badwords.enabled ? settings.automod.badwords.wordlist.join(', ') : 'None'
     });
 
     const footer = ctx.translate('commands.generic.settings.view.footer');
