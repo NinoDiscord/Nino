@@ -1,6 +1,4 @@
 import PermissionUtils from './PermissionUtils';
-import { Member } from 'eris';
-import mock from 'jest-mock-extended';
 
 describe('PermissionUtils', () => {
   it('the admin should overlap an all permission denying channel', () => {

@@ -1,4 +1,4 @@
-import { User } from 'eris';
+import { User, EmbedOptions } from 'eris';
 
 export function humanize(ms: number, long: boolean = false) {
   const weeks = Math.floor(ms / 1000 / 60 / 60 / 24 / 7);
@@ -54,4 +54,35 @@ export enum Module {
   Moderation = 'Moderation',
   Generic = 'Generic',
   System = 'System Administration'
+}
+
+export function unembedify(embed: EmbedOptions) {
+  let text = '';
+
+  function getTime(now: number) {
+    const date = new Date(now);
+    const escape = (value) => `0${value}`.slice(-2);
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+    return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()} at ${escape(date.getHours())}:${escape(date.getMinutes())}:${escape(date.getSeconds())}${ampm}`;
+  }
+
+  if (embed.title) text += `__**${embed.title}**__`;
+  if (embed.description) text += `\n${embed.description.includes('> ') ? embed.description : `> **${embed.description}**`}`;
+  if (embed.fields) {
+    text += '\n';
+    for (const field of embed.fields) text += `\n- ${field.name}: ${field.value}`;
+  }
+  if (embed.footer) {
+    let field = `\n\n**${embed.footer.text}`;
+
+    if (embed.timestamp) {
+      const time = embed.timestamp instanceof Date ? getTime(embed.timestamp.getTime()) : embed.timestamp;
+      field += `at ${time}`;
+    }
+
+    text += `${field}**`;
+  }
+
+  return text;
 }
