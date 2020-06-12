@@ -9,7 +9,7 @@ import Bot from '../../structures/Bot';
 
 @injectable()
 export default class PruneCommand extends Command {
-  public filters: string[] = ['new', 'bot', 'user', 'self', 'image'];
+  public filters: string[] = ['none', 'new', 'bot', 'user', 'self', 'image'];
   public weeks: number = Date.now() - (1000 * 60 * 60 * 24 * 14);
 
   constructor(@inject(TYPES.Bot) client: Bot) {
@@ -36,7 +36,7 @@ export default class PruneCommand extends Command {
     if (amount > 100) return ctx.sendTranslate('commands.moderation.prune.tooHigh');
 
     const allMsgs = await ctx.message.channel.getMessages(amount);
-    const filter = ctx.flags.get('filter') || ctx.flags.get('f') || 'user';
+    const filter = ctx.flags.get('filter') || ctx.flags.get('f');
 
     if (typeof filter === 'boolean') return ctx.sendTranslate('global.invalidFlag.boolean');
     if (filter && !this.filters.includes(filter)) return ctx.sendTranslate('commands.moderation.prune.invalidFilter', {
@@ -45,10 +45,11 @@ export default class PruneCommand extends Command {
     });
 
     const shouldDelete = (allMsgs as Message<TextableChannel>[]).filter((x: Message<TextableChannel>) => 
-      (filter === 'user' ? !x.author.bot : false) &&
-      (filter === 'self' ? x.author.id === this.bot.client.user.id : false) &&
-      (filter === 'bot' ? x.author.bot : false) &&
-      (filter === 'new' ? x.timestamp > this.weeks : false) &&
+      !filter || filter === 'none' ||
+      (filter === 'user' ? !x.author.bot : false) ||
+      (filter === 'self' ? x.author.id === this.bot.client.user.id : false) ||
+      (filter === 'bot' ? x.author.bot : false) ||
+      (filter === 'new' ? x.timestamp > this.weeks : false) ||
       (filter === 'image' ? x.attachments.length : false)
     );
 
