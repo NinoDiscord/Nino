@@ -15,7 +15,7 @@ describe('Utilities', () => {
     expect(time).toStrictEqual('5 seconds');
   });
 
-  it('should return "235.0KB" as the size', () => {
+  it('should return "229.5KB" as the size', () => {
     const size = util.formatSize(235000);
 
     expect(size).toBeDefined();

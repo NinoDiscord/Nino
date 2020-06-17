@@ -25,7 +25,7 @@ export default class StatisticsCommand extends Command {
     const channels = Object.keys(this.bot.client.channelGuildMap).length;
     const shardPing = this.bot.client.shards.reduce((a, b) => a + b.latency, 0);
     const connection = await this.bot.database.admin.ping();
-    const memoryUsage = formatSize(process.memoryUsage().heapUsed);
+    const memoryUsage = formatSize(process.memoryUsage().rss);
 
     const embed = this.bot.getEmbed()
       .setTitle(ctx.translate('commands.generic.statistics.title', { username: `${this.bot.client.user.username}#${this.bot.client.user.discriminator}` }))

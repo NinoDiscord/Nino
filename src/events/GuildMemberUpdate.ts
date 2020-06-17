@@ -23,9 +23,7 @@ export default class GuildMemberUpdateEvent extends Event {
 
     
     // Fetch audit logs
-    if (!guild.members.get(this.bot.client.user.id)!.permission.has('viewAuditLogs')) {
-      return;
-    }
+    if (!guild.members.get(this.bot.client.user.id)!.permission.has('viewAuditLogs')) return;
     const logs = await guild.getAuditLogs(10);
     if (!logs.entries.length) return; // Don't do anything if there is no entries
 

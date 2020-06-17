@@ -329,7 +329,7 @@
           }
         },
         "shardinfo": {
-          "shard": "Shard #${id} ${current} | G: ${guilds} | U: ${users} | L: ${latency}ms",
+          "shard": "Shard #${id} ${current} | G: ${guilds} | U: ${users} | L: ${latency}ms | M: ${memory}",
           "title": "Shard Information"
         },
         "statistics": {
@@ -352,7 +352,7 @@
           ]
         },
         "time": "It is currently ${day}/${month}/${year} at ${h}:${m}:${s}",
-        "uptime": ":gear: **${uptime}**"
+        "uptime": ":gear: **Process: ${process} / Connection: ${connection}**"
       },
       "moderation": {
         "ban": "${type} was successfully banned.",

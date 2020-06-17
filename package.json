@@ -1,13 +1,11 @@
 {
-  "private": true,
   "name": "nino",
   "description": "Moderation bot for Discord's hack week entry.",
   "version": "0.8.0",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
-  "repository": {
-    "url": "github:NinoDiscord/Nino"
-  },
+  "repository": "https://github.com/NinoDiscord/Nino",
+  "private": true,
   "bugs": "https://github.com/NinoDiscord/Nino/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
   "main": "dist/index.js",
   "scripts": {

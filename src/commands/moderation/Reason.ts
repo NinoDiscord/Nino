@@ -44,7 +44,7 @@ export default class ReasonCommand extends Command {
       const message = await this.bot.client.getMessage(settings!.modlog, _case.message);
       await this.bot.punishments.editModlog(_case, message);
 
-      return ctx.sendTranslate('commands.moderaion.reason.edited', {
+      return ctx.sendTranslate('commands.moderation.reason.edited', {
         reason,
         id
       });

@@ -1,4 +1,5 @@
 import { injectable, inject } from 'inversify';
+import { formatSize } from '../../util';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -18,20 +19,23 @@ export default class ShardInfoCommand extends Command {
   async run(ctx: Context) {
     let info = '';
 
-    ctx.bot.client.shards.map(shard => {
+    for (const shard of ctx.bot.client.shards.values()) {
       const current = ctx.guild!.shard.id === shard.id ? '(current)' : '';
       const guilds = ctx.bot.client.guilds.filter(g => g.shard.id === shard.id);
       const members = guilds.reduce((a, b) => a + b.memberCount, 0);
+      const memory = formatSize(process.memoryUsage().rss);
       const translated = ctx.translate('commands.generic.shardinfo.shard', {
         current,
         latency: shard.latency,
-        guilds,
+        guilds: guilds.length,
         users: members,
-        id: shard.id
+        id: shard.id,
+        memory
       });
 
-      info += `${shard.status === 'disconnected' ? '-' : shard.status === 'connecting' || shard.status === 'handshaking' ? '*' : '+'} | ${translated} |`;
-    });
+      const prefix = shard.status === 'disconnected' ? '-' : shard.status === 'connecting' || shard.status === 'handshaking' ? '*' : '+';
+      info += `${prefix} | ${translated}`;
+    }
 
     const embed = ctx.bot.getEmbed()
       .setTitle(ctx.translate('commands.generic.shardinfo.title'))
