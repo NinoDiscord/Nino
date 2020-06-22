@@ -116,7 +116,7 @@ export default class CommandService {
     const prefixes = [
       settings!.prefix,
       this.bot.config.discord.prefix,
-      `${mention}`,
+      `${mention || ''}`,
       'nino '
     ];
     const user = await this.bot.userSettings.get(m.author.id);
