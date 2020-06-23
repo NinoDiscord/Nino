@@ -116,9 +116,10 @@ export default class CommandService {
     const prefixes = [
       settings!.prefix,
       this.bot.config.discord.prefix,
-      `${mention || ''}`,
       'nino '
     ];
+    if (mention !== null) prefixes.push(`${mention}`);
+
     const user = await this.bot.userSettings.get(m.author.id);
 
     const locale =  !user 
@@ -127,8 +128,8 @@ export default class CommandService {
 
     let prefix: string | null = null;
     for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;
-    if (!prefix) return;
-
+    if (prefix === null) return;
+    
     const args = m.content.slice(prefix.length).trim().split(/ +/g);
     const ctx = new CommandContext(this.bot, m, args, locale, settings);
     const invoked = this.getCommandInvocation(ctx);
