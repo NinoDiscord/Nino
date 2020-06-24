@@ -141,9 +141,9 @@
             "invalidPunishment": "Punishment **${punishment}** is not a valid punishment to add. (${punishments})",
             "missingRoleID": "You are currently missing a role ID.",
             "invalidDays": "Incorrect amount of days. The `days` flag is the amount of days of messages to delete when banning.",
-            "errored": "I was unable to set the punishment, try again later.",
+            "errored": "I was unable to set the punishment, please try again later.",
             "amountExceeded": "Punishments are limited to 15 per server, please remove any punishment you don't want.",
-            "success": "I was successfully added punishment to the database.",
+            "success": "I have added the punishment to the database.",
             "invalidTime": "The `--time` flag must be a currect time expression, it can be from 0.5h, 30m, 0.5 hours, or 30 minutes.",
             "invalidRole": "The role wasn't found or it was invalid"
           },
