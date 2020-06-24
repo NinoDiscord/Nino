@@ -1,9 +1,7 @@
 import { Message, TextChannel } from 'eris';
-import { replaceMessage } from '../../util';
 import PermissionUtils from '../../util/PermissionUtils';
-import RedisQueue from '../../util/RedisQueue';
-import Bot from '../Bot';
 import { Collection } from '@augu/immutable';
+import Bot from '../Bot';
 
 /**
  * An event handler to check for ongoing spam.
@@ -22,7 +20,7 @@ export default class AutoModSpam {
     this.bot = client;
   }
 
-  __CleanUp(guildId: string) {
+  __cleanUp(guildId: string) {
     let now = Date.now();
     let ids: (string | number)[] = [];
     this.buckets.get(guildId)!.forEach((v, k) => {
@@ -59,34 +57,30 @@ export default class AutoModSpam {
    *
    * @param m the message
    */
-  async handle(m: Message): Promise<boolean> {
+  async handle(m: Message<TextChannel>): Promise<boolean> {
     if (!m || m === null) return false;
+    if (!(m.channel instanceof TextChannel)) return false;
 
-    const guild = (m.channel as TextChannel).guild;
-    
-    const me = guild.members.get(this.bot.client.user.id);
-
-    if (me === undefined) return false;
+    const me = m.channel.guild.members.get(this.bot.client.user.id)!;
 
     if (
       !PermissionUtils.above(me, m.member!) ||
+      !m.channel.permissionsOf(me.id).has('manageMessages') ||
       m.author.bot ||
-      (m.channel as TextChannel)
-        .permissionsOf(m.author.id)
-        .has('manageMessages')
+      m.channel.permissionsOf(m.author.id).has('manageMessages')
     ) return false;
 
-    const settings = await this.bot.settings.get(guild.id);
+    const settings = await this.bot.settings.get(m.channel.guild.id);
     if (!settings || !settings.automod.spam) return false;
 
-    const queue = this.__getQueue(guild.id!, m.author.id!);
+    const queue = this.__getQueue(m.channel.guild.id, m.author.id);
     queue.push(m.timestamp);
 
     if (queue.length >= 5) {
       const oldTime = queue.shift()!;
       if (m.editedTimestamp && m.editedTimestamp > m.timestamp) return false;
       if (m.timestamp - oldTime <= 3000) {
-        this.__clearQueue(guild.id, m.author.id);
+        this.__clearQueue(m.channel.guild.id, m.author.id);
         let punishments = await this.bot.punishments.addWarning(m.member!);
         for (let punishment of punishments) await this.bot.punishments.punish(
           m.member!,
@@ -94,16 +88,18 @@ export default class AutoModSpam {
           `[Automod] Spamming in <#${m.channel.id}>`
         );
 
-        const response = (!settings.responses || !settings.responses.spam.enabled) ?
-          replaceMessage('Spamming is not allowed, %author%', m.author) :
-          replaceMessage(settings.responses.spam.message, m.author);
-
+        const user = await this.bot.userSettings.get(m.author.id);
+        const locale = user === null
+          ? this.bot.locales.get(settings.locale)!
+          : this.bot.locales.get(user.locale)!;
+  
+        const response = locale.translate('automod.invites', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });  
         await m.channel.createMessage(response);
         return true;
       }
     }
     
-    this.__CleanUp(guild.id);
+    this.__cleanUp(m.channel.guild.id);
 
     return false;
   }

@@ -9,11 +9,11 @@
     "global": {
       "invalidFlag": {
         "boolean": "Flag **${flag}** doesn't get a value, it's just `--${flag}`!",
-        "string": "Flag **${flag}** requires a value, append it with `=`! (Example: `--${flag}=potatoes)"
+        "string": "Flag **${flag}** requires a value, append it with `=`! (Example: `--${flag}=potatoes`)"
       },
       "yes": "Yes",
       "no": "No",
-      "nan": "The number you specified is not a number.",
+      "nan": "The input you specified is not a number.",
       "online": "Online",
       "offline": "Offline",
       "invalidChannel": "Channel **${channel}** was invalid.",
@@ -45,6 +45,12 @@
         "The error that occured has been logged into our systems.",
         "If this is repeative, report it to ${owners} at ${server}."
       ]
+    },
+    "automod": {
+      "badwords": "Please don't swear in this server, ${member}.",
+      "invite": "Please don't advertise on this server, ${member}.",
+      "mentions": "Please don't mention more then 4 users, ${member}.",
+      "spam": "Please don't spam here, ${member}."
     },
     "commands": {
       "generic": {

@@ -117,12 +117,11 @@ export default class CommandService {
       settings!.prefix,
       this.bot.config.discord.prefix,
       'nino '
-    ];
+    ].filter(Boolean);
     if (mention !== null) prefixes.push(`${mention}`);
 
     const user = await this.bot.userSettings.get(m.author.id);
-
-    const locale =  !user 
+    const locale = !user 
       ? this.bot.locales.get(settings.locale)!
       : this.bot.locales.get(user.locale)!;
 

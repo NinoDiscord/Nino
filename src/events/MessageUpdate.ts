@@ -26,7 +26,7 @@ export default class MessageUpdatedEvent extends Event {
     super(client, 'messageUpdate');
   }
 
-  async emit(m: Message, old: OldMessage | null) {
+  async emit(m: Message<TextChannel>, old: OldMessage | null) {
     // Do the automod service first
     await this.bot.automod.handleMessage(m);
 

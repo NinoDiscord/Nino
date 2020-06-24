@@ -17,24 +17,6 @@ export interface GuildModel extends Document {
     raid: boolean;
     mention: boolean;
   };
-  responses: {
-    badwords: {
-      enabled: boolean;
-      message: string;
-    }
-    invite: {
-      enabled: boolean;
-      message: string
-    }
-    mention: {
-      enabled: boolean;
-      message: string;
-    }
-    spam: {
-      enabled: boolean;
-      message: string;
-    }
-  };
   punishments: { 
     type: string; 
     warnings: number; 
