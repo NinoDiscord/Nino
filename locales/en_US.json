@@ -149,7 +149,7 @@
           },
           "remove": {
             "invalidIndex": "The index you provided was not a valid index. You can view the punishment index by `x!settings view`.",
-            "noPunishments": "No punishments were not found.",
+            "noPunishments": "No punishments were found in the database.",
             "success": "Removed punishment #**${id}**."
           },
           "set": {
