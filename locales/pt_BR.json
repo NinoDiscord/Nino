@@ -1,0 +1,410 @@
+{
+  "contributors": [],
+  "translator": "deprilula28#3609",
+  "completion": "completed",
+  "code": "pt_BR",
+  "flag": ":flag_br:",
+  "full": "Português (BR)",
+  "strings": {
+    "global": {
+      "invalidFlag": {
+        "boolean": "O argumento **${flag}** não precisa de valor, você só usa `--${flag}`!",
+        "string": "O argumento **${flag}** precisa de um valor, coloque depois do `=`! (Por exemplo: `--${flag}=batata)"
+      },
+      "yes": "Sim",
+      "no": "Não",
+      "nan": "Especifique um número correto.",
+      "online": "Online",
+      "offline": "Offline",
+      "invalidChannel": "O canal **${channel}** é inválido.",
+      "notText": "O canal **${channel}** não é um canal de texto.",
+      "noUser": "Usuário não especificado.",
+      "heirarchy": "Usuário está acima de você ou no mesmo nível.",
+      "notInGuild": "Usuário não está no servidor?",
+      "unableToPunish": "Não consegui punir o usuário.",
+      "unableToFind": "Não consegui achar o usuário.",
+      "notInBanList": "O usuário está banido nesse servidor.",
+      "unable": "Não consegui fazer isso. `${error}`",
+      "members": {
+        "bot": "Bot",
+        "user": "Usuário"
+      }
+    },
+    "errors": {
+      "title": "Não foi possível usar comando ${command}!",
+      "guildOnly": "Desculpe, mas o comando `${command}` deve ser usado num servidor!",
+      "ownerOnly": "Desculpe, mas o comando `${command}` é restringido a desenvolvedores, boa tentativa.",
+      "disabled": "Desculpe, mas o comando `${command}` está desativado globalmente.",
+      "cooldown": "O comando `${command}` está limitado por mais **${seconds}**.",
+      "failed": "O comando ${command} não conseguiu ser executado.",
+      "permissions": {
+        "user": "Desculpe, mas você não tem essas permissões: ${perms}.",
+        "bot": "Desculpe, mas eu preciso dessas permissões: ${perms}."
+      },
+      "unknown": [
+        "O erro ocorrido foi registrado nos nossos sistemas.",
+        "Se ele for repetidido, reporte-o para ${owners} em ${server}."
+      ]
+    },
+    "commands": {
+      "generic": {
+        "help": {
+          "notFound": "Não foi possível encontrar comando ${command}.",
+          "embed": {
+            "title": "${username} | Lista de Comandos",
+            "footer": "Use ${prefix}help <commando> para ter mais documentação sobre um comando!",
+            "description": [
+              "Mais informações disponíveis no [site](${website})!",
+              "Tem **${commands}** comandos disponíveis."
+            ]
+          },
+          "categories": {
+            "generic": "Genérico",
+            "moderation": "Moderação"
+          },
+          "command": {
+            "title": "Comando ${command}",
+            "name": "Nome",
+            "syntax": "Sintaxe",
+            "category": "Categoria",
+            "aliases": "Àliases",
+            "guildOnly": "Apenas em Servidor",
+            "ownerOnly": "Apenas para Donos",
+            "cooldown": "Limite de Usos"
+          }
+        },
+        "invite": {
+          "title": "Me Convide",
+          "description": [
+            "> **Me convide para seu servidor hoje o-ou entre no Discord do meu dono para ter atualizações e tal...**",
+            "",
+            ":link: **${invite}**",
+            ":island: **${server}**"
+          ]
+        },
+        "locale": {
+          "invalidSubcommand": "Sub comando inválido **${subcommand}**",
+          "embed": {
+            "title": "${username} | Localização",
+            "description": [
+              "__**Configurações Atuais**__",
+              "```apache",
+              "Servidor: ${server}",
+              "Usuário: ${user}",
+              "```",
+              "",
+              "Use `${prefix}locale list` para uma lista de línguas para usar",
+              "Use `${prefix}locale set [locale] [--guild]` para alterar a língua de um servidor ou pessoal",
+              "Use `${prefix}locale reset` para voltar a língua ao Inglês"
+            ]
+          },
+          "list": {
+            "locale": "${flag} **${full}** por **${translator}** (com **${contributors}** contribuidores)",
+            "title": "Línguas"
+          },
+          "set": {
+            "none": "Nenhuma língua selecionada, use `${prefix}locale list` para ver uma lista completa.",
+            "invalid": "A língua ${locale} não existe, use `${prefix}locale list` para ver uma lista completa..",
+            "unable:guild": "Não foi possível alterar língua do servidor.",
+            "success:guild": "A língua do servidor foi alterada para ${locale}",            
+            "unable:user": "Não foi possível alterar sua língua",
+            "success:user": "Sua língua foi alterada para ${locale}"
+          },
+          "reset": {
+            "unable:guild": "Não foi possível resetar língua do servidor.",
+            "success:guild": "A língua do servidor foi resetada para en_US.",
+            "unable:user": "Não foi possível resetar sua língua.",
+            "success:user": "A sua língua foi resetada para en_US."
+          }
+        },
+        "ping": {
+          "oldMessage": ":ping_pong: Por que tá usando isso?",
+          "message": [
+            ":ping_pong: Pong!",
+            "",
+            "**Shard #${id}**: ${shard}ms",
+            "**Mensagem**: ${messageLatency}ms"
+          ]
+        },
+        "settings": {
+          "invalidSubcommand": "Sub comando **${subcommand}** não existe. (${subcommands})",
+          "noSubcommand": "Nenhum sub comando provido. (${subcommands})",
+          "noChannel": "Falta o ID do canal, menção ou nome.",
+          "add": {
+            "amountRequired": "Quantidade de alertas para resultar em punição! Deve ser um número entre 1 e 5.",
+            "invalidPunishment": "Punição **${punishment}** não é válida para adicionar. (${punishments})",
+            "missingRoleID": "Você precisa prover o ID de um cargo.",
+            "invalidDays": "Quantidade incorreta de dias. A flag `days` é a quantidade de dias para remover as mensagens ao banir.",
+            "errored": "Não foi possível alterar as punições, tente novamente mais tarde.",
+            "amountExceeded": "Punições limitadas a 15 por servidor, por favor remova as punições que não quer.",
+            "success": "Punição adicionada ao banco de dados.",
+            "invalidTime": "A flag `--time` deve ser uma expressão de tempo correta, exemplos válidos são 0.5h, 30m, 0.5 horas, ou 30 minutos.",
+            "invalidRole": "Cargo inválido ou não encontrado."
+          },
+          "remove": {
+            "invalidIndex": "Índice provido inválido. Veja o rótulo utilizando `x!settings view`.",
+            "noPunishments": "Nenhuma punição encontrada.",
+            "success": "Removida punição #**${id}**."
+          },
+          "set": {
+            "modlog": {
+              "unable": "Não foi possível utilizar o canal **${channel}** para registro de mods.",
+              "success": "O canal **${channel}** é onde todos os registros de mods estarão.",
+              "noPerms": "Eu não tenho permissões de `Enviar Mensagens` ou `Colocar Links` em **${channel}**"
+            },
+            "prefix": {
+              "none": "Você precisa prover um prefixo para ser escolhido.",
+              "already": "O prefixo já é **${prefix}**.",
+              "atEveryone": "Você não pode usar arroba everyone ou here como o prefixo, ah e também deixou o povo brabo.",
+              "over20": "O prefixo surpassa o limite de 20 caracteres por ${chars}.",
+              "unable": "Não foi possível alterar o prefixo para **${prefix}**, tente novamente depois.",
+              "success": "Prefixo **${prefix}** agora é o prefixo do servidor. Teste com `${prefix}ping`."
+            },
+            "mutedRole": {
+              "none": "Você precisa prover um ID de cargo.",
+              "invalid": "ID de cargo inválido.",
+              "noneFound": "Não foi possível encontrar um cargo com ID **${id}**.",
+              "unable": "Não foi possível alterar o cargo mutado para **${prefix}**, tente novamente depois.",
+              "success": "O cargo mutado agora é **${role}**."
+            },
+            "badwords": {
+              "none": "Você precisa prover uma lista de palavras para banir! Você pode adicionar múltiplas com um espaço, por exemplo `x!settings set automod.badwords putinha viadinho`.",
+              "added": {
+                "notEnabled": "Bani as palavras **${words}**. Já que não havia ativado o filtro, ativei para você.",
+                "enabled": "Bani as palavras **${words}**."
+              }
+            },
+            "ignored": {
+              "none": "Você precisa prover uma lista de ID de canais, menções ou nomes. Você pode adicionar múltiplas com um espaço, por exemplo `x!settings set logging.ignore #abc abcd 92827492`.",
+              "invalid": "Esses canais são inválidos para ignorar: ${channels}",
+              "added": {
+                "notEnabled": "Adicionei os canais **${channels}**. Já que não havia ativado o registro, ativei para você.",
+                "enabled": "Adicionei os canais **${channels}**."
+              }
+            },
+            "logChannel": {
+              "unable": "Não foi possível utilizar o canal **${channel}** para registro de mods.",
+              "success": "O canal **${channel}** é onde todos os registros de mods estarão.",
+              "noPerms": "Eu não tenho permissões de `Enviar Mensagens` ou `Colocar Links` em **${channel}**"
+            }
+          },
+          "reset": {
+            "modlog": {
+              "unable": "Não consegui resetar o canal de registro de moderadores.",
+              "success": "Eu resetei o canal de registro de moderadores."
+            },
+            "prefix": {
+              "unable": "Não consegui resetar o prefixo.",
+              "success": "Eu resetei o prefixo de volta para `x!`."  
+            },
+            "mutedRole": {
+              "unable": "Não consegui resetar the muted role.",
+              "success": "Eu resetei o cargo de mutado."
+            },
+            "ignored": {
+              "unable": "Não consegui resetar todos os canais mutados.",
+              "success": "Eu resetei os canais ignorados."
+            },
+            "logChannel": {
+              "unable": "Não consegui resetar o canal **${channel}**.",
+              "success": "O canal foi resetado."
+            },
+            "punishments": {
+              "unable": "Não consegui resetar todas punições.",
+              "success": "Punições foram resetadas."
+            }
+          },
+          "enable": {
+            "automod": {
+              "unable": "Não consegui ativar todas funções de moderador automático.",
+              "success": "Eu ativei todas funções de moderador automático."
+            },
+            "dehoist": {
+              "unable": "Não consegui ativar a função anti-hoist automática.",
+              "success": "Eu ativei a função anti-hoist automática."
+            },
+            "spam": {
+              "unable": "Não consegui ativar a função anti-spam automática.",
+              "success": "Eu ativei a função anti-spam automática."
+            },
+            "raid": {
+              "unable": "Não consegui ativar a função anti-invasão automática.",
+              "success": "Eu ativei a função anti-invasão automática."
+            },
+            "mention": {
+              "unable": "Não consegui ativar a função de menções.",
+              "success": "Eu ativei a função de menções."
+            },
+            "badwords": {
+              "unable": "Não consegui ativar a função anti-palavrão automática.",
+              "success": "Eu ativei a função anti-palavrão automática."
+            },
+            "invites": {
+              "unable": "Não consegui ativar a função anti-convites automática.",
+              "success": "Eu ativei a função anti-convites automática."
+            },
+            "logging": {
+              "unable": "Não consegui ativar o registro.",
+              "success": "Eu ativei o registro."
+            },
+            "logEvents": {
+              "unable": "Não consegui ativar todos eventos de registro.",
+              "success": "Eu ativei todos eventos de registro."
+            },
+            "messageDelete": {
+              "unable": "Não consegui ativar o registro ao deletar mensagens.",
+              "success": "Eu ativei o registro ao deletar mensagens."
+            },
+            "messageUpdate": {
+              "unable": "Não consegui ativar o registro ao editar mensagens.",
+              "success": "Eu ativei o registro ao editar mensagens."
+            }
+          },
+          "disable": {
+            "automod": {
+              "unable": "Não consegui desativar todas funções de moderador automático.",
+              "success": "Eu desativei todas funções de moderador automático."
+            },
+            "dehoist": {
+              "unable": "Não consegui desativar a função anti-hoist automática.",
+              "success": "Eu desativei a função anti-hoist automática."
+            },
+            "spam": {
+              "unable": "Não consegui desativar a função anti-spam automática.",
+              "success": "Eu desativei a função anti-spam automática."
+            },
+            "raid": {
+              "unable": "Não consegui desativar a função anti-invasão automática.",
+              "success": "Eu desativei a função anti-invasão automática."
+            },
+            "mention": {
+              "unable": "Não consegui desativar a função de menções.",
+              "success": "Eu desativei a função de menções."
+            },
+            "badwords": {
+              "unable": "Não consegui desativar a função anti-palavrão automática.",
+              "success": "Eu desativei a função anti-palavrão automática."
+            },
+            "invites": {
+              "unable": "Não consegui desativar a função anti-convites automática.",
+              "success": "Eu desativei a função anti-convites automática."
+            },
+            "logging": {
+              "unable": "Não consegui desativar o registro.",
+              "success": "Eu desativei o registro."
+            },
+            "logEvents": {
+              "unable": "Não consegui desativar todos eventos de registro.",
+              "success": "Eu desativei todos eventos de registro."
+            },
+            "messageDelete": {
+              "unable": "Não consegui desativar o registro ao deletar mensagens.",
+              "success": "Eu desativei o registro ao deletar mensagens."
+            },
+            "messageUpdate": {
+              "unable": "Não consegui desativar o registro ao editar mensagens.",
+              "success": "Eu desativei o registro ao editar mensagens."
+            }
+          },
+          "view": {
+            "title": "Congigurações para ${guild}",
+            "description": [
+              "```ini",
+              "[Prefixo]: ${prefix}",
+              "[Cargo de Mutado]: ${mutedRole}",
+              "[Registro de Mods]: ${modlog}",
+              "[Anti-Hoisting]: ${dehoist.enabled}",
+              "[Menções]: ${mention.enabled}",
+              "[Anti-Convites]: ${invites.enabled}",
+              "[Anti-Invasão]: ${raid.enabled}",
+              "[Anti-Spam]: ${spam.enabled}",
+              "[Anti-Palavrão]: ${badwords.enabled} (${words})",
+              "[Registro]: ${logging.enabled}",
+              "[Canal de Registros]: ${logging}",
+              "[Eventos Ativados para Registro]: ${events}",
+              "[Punições]:\n${punishments}",
+              "```"
+            ],
+            "footer": "Você está vendo isso pois não proveu um subcomando ou ele não existe."
+          }
+        },
+        "shardinfo": {
+          "shard": "Shard #${id} ${current} | G: ${guilds} | U: ${users} | L: ${latency}ms | M: ${memory}",
+          "title": "Informações das Shards"
+        },
+        "statistics": {
+          "title": "${username} | Estatísticas em Tempo Real",
+          "description": [
+            "```prolog",
+            "Servidores                => ${guilds}",
+            "Usuários                  => ${users}",
+            "Canais                    => ${channels}",
+            "Shards                    => ${current}/${total} (~${latency}ms)",
+            "Tempo Ativo               => ${uptime}",
+            "Comandos                  => ${commands}",
+            "Mensagens Vistas          => ${messages}",
+            "Comando Executado         => ${executed}",
+            "Comando Mais Executado    => ${name} (${executions} usos)",
+            "Conexão ao Banco de Dados => ${connected}",
+            "Uso de Memória            => ${memoryUsage}",
+            "Versão Atual              => ${version}",
+            "```"
+          ]
+        },
+        "time": "Atualmente, é ${day}/${month}/${year} às ${h}:${m}:${s}",
+        "uptime": ":gear: **Processo: ${process} / Conexão: ${connection}**"
+      },
+      "moderation": {
+        "ban": "${type} banido com sucesso.",
+        "kick": "${type} expulso com sucesso.",
+        "mute": "${type} mutado com sucesso.",
+        "unban": "Usuário desbanido com sucesso.",
+        "unmute": "${type} desmutado com sucesso.",
+        "warned": "Avisei **${user}**, agora ele(a) tem **${warnings}** aviso${suffix}.",
+        "unable": "Não foi possível ${type}: `${message}`",
+        "invalidSnowflake": "Usuário já estava ${type}.",
+        "notInGuild": "Usuário `${user}` não está no servidor.",
+        "lockdown": {
+          "noRoles": "Você precisa especificar os cargos para alterar permissão primeiro com a flag --roles!",
+          "cantModify": "Não posso modificar esses cargos, eu tenho a permissão `Gerenciar Cargos`?",
+          "noChannels": "Canal para restringir não especificado.",
+          "backingUp": "Criando back-up das permissões...",
+          "backedUp": "Criei o back-up das permissões!",
+          "unlocked": "O canal **${channel}** está aberto novamente.",
+          "locked": "O canal **${channel}** foi restringido.",
+          "cantModifyChannels": "Não posso modificar canais."
+        },
+        "pardon": {
+          "notSpecified": "Você não especificou a quantidade de avisos para restringir.",
+          "noWarnings": "O usuário **${user}** não tem mais avisos.",
+          "warnings": "O usuário **${user}** agora tem **${warnings}** avisos."
+        },
+        "prune": {
+          "noAmount": "Terá que especificar a quantidade para remover",
+          "tooLow": "A quantidade de mensagens foi abaixo de 2, ela deve ser igual ou maior que 2",
+          "tooHigh": "A quantidade de mensagens foi acima de 100, ela deve ser igual ou menor que 100",
+          "invalidFilter": "O fitro **${filter}** não é válido. (${filters})",
+          "noMessages": "Não foi possível encontrar mais mensagens com filtro **${filter}**.",
+          "twoWeeks": "Não consegui deletar ${messages} mensagens mais velhas que 2 semanas por limites do Discord.",
+          "title": "Resultados da Limpeza",
+          "userEntry": "${user} com ${messages} mensagens${suffix}",
+          "nowDel": "Deletando ${messages} mensagens...",
+          "error": {
+            "title": "Não foi possível deletar mensagens"
+          }
+        },
+        "reason": {
+          "noCase": "Você não proveu o ID do caso para editar.",
+          "noReason": "Você não proveu a razão.",
+          "invalid": "Caso #**${id}** não encontrado!",
+          "edited": ":ok_hand: Atualizado caso #**${id}** com razão **${reason}**",
+          "error": "Não foi possível alterar caso #${id}."
+        },
+        "warnings": {
+          "none": "Usuário não tem avisos.",
+          "message": "Usuário tem **${warnings}** avisos."
+        }
+      }
+    }
+  }
+}
