@@ -2,6 +2,7 @@
   "contributors": ["dondish#8072"],
   "translator": "August#5820",
   "completion": "completed",
+  "aliases": ["en", "en-us", "english"],
   "code": "en_US",
   "flag": ":flag_us:",
   "full": "English (US)",
@@ -101,7 +102,7 @@
               "",
               "Use `${prefix}locale list` for a list of locales to set",
               "Use `${prefix}locale set [locale] [--guild]` to set a guild's or your locale",
-              "Use `${prefix}locale reset` to reset it back to English"
+              "Use `${prefix}locale reset [--guild]` to reset it back to English"
             ]
           },
           "list": {

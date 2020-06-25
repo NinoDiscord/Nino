@@ -2,6 +2,7 @@
   "contributors": [],
   "translator": "deprilula28#3609",
   "completion": "completed",
+  "aliases": ["port", "portuges", "português"],
   "code": "pt_BR",
   "flag": ":flag_br:",
   "full": "Português (BR)",
@@ -95,7 +96,7 @@
               "",
               "Use `${prefix}locale list` para uma lista de línguas para usar",
               "Use `${prefix}locale set [locale] [--guild]` para alterar a língua de um servidor ou pessoal",
-              "Use `${prefix}locale reset` para voltar a língua ao Inglês"
+              "Use `${prefix}locale reset [--guild]` para voltar a língua ao Inglês"
             ]
           },
           "list": {

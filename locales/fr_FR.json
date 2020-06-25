@@ -2,6 +2,7 @@
     "contributors": [],
     "translator": "jacob#5418",
     "completion": "completed",
+    "aliases": ["french", "francias", "françias", "fr"],
     "code": "fr_FR",
     "flag": ":flag_fr:",
     "full": "Françias (FR)",
@@ -46,13 +47,19 @@
                 "Si cela est répétifif, signalez-le à ${owners} sur ${server}."
             ]
         },
+        "automod": {
+            "badwords": "Veuillez ne pas jurer sur ce serveur, ${member}",
+            "invite": "Veuillez ne pas faire de publicité sur ce serveur, ${member}",
+            "mentions": "Veuillez ne pas mentionner plus de 4 utilisateurs, ${member}",
+            "spam": "Veuilllez ne pas spammer ici, ${member}"
+        },
         "commands": {
             "generic": {
                 "help": {
                     "notFound": "Impossible de trouver la commande ${command}.",
                     "embed": {
                         "title": "${username} | Liste des commandes",
-                        "footer": "Use ${prefix}help <command> pour obtenir plus de documentations sur une commande!",
+                        "footer": "Utilisez ${prefix}help <command> pour obtenir plus de documentations sur une commande!",
                         "description": [
                             "Plus d'informantions sont disponibles sur le [website](${website})!",
                             "Il existe acuellement **${commands}** disponibles."
@@ -95,7 +102,7 @@
                             "",
                             "Utilisez `${prefix}locale list` pour une liste de paramètres régionaux à définir",
                             "Utilisez `${prefix}locale set [locale] [--guild]` pour définir une guilde ou votre locale",
-                            "Utilisez `${prefix}locale reset` pour le réinitaliser en anglais"
+                            "Utilisez `${prefix}locale reset [--guild]` pour le réinitaliser en anglais"
                         ]
                     },
                     "list": {
@@ -344,11 +351,11 @@
                         "Commandes          => ${commands}",
                         "Messages vus       => ${messages}",
                         "Commande exécutée  => ${executed}",
-                        "Commande la plus utilisée => ${nom} (${executions} utilise)",
+                        "Commande la plus utilisée => ${name} (${executions} utilise)",
                         "Connexion à la base de données => ${connected}",
                         "Utilisation de la mémoire => ${memoryUsage}",
                         "Version actuelle => ${version}",
-                        "` `` "
+                        "```"
                       ]
                 },
                 "time": "Il s'agit actuellement de ${day}/${month}/${year} à ${h}:${m}:${s}",

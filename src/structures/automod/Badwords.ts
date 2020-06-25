@@ -42,9 +42,7 @@ export default class AutoModBadWords {
     ) return false;
 
     const user = await this.bot.userSettings.get(m.author.id);
-    const locale = user === null
-      ? this.bot.locales.get(settings.locale)!
-      : this.bot.locales.get(user.locale)!;
+    const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
 
     for (let word of settings.automod.badwords.wordlist) {
       if (m.content.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
