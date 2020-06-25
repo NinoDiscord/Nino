@@ -102,7 +102,7 @@
                             "",
                             "Utilisez `${prefix}locale list` pour une liste de paramètres régionaux à définir",
                             "Utilisez `${prefix}locale set [locale] [--guild]` pour définir une guilde ou votre locale",
-                            "Utilisez `${prefix}locale reset` pour le réinitaliser en anglais"
+                            "Utilisez `${prefix}locale reset [--guild]` pour le réinitaliser en anglais"
                         ]
                     },
                     "list": {
@@ -351,7 +351,7 @@
                         "Commandes          => ${commands}",
                         "Messages vus       => ${messages}",
                         "Commande exécutée  => ${executed}",
-                        "Commande la plus utilisée => ${nom} (${executions} utilise)",
+                        "Commande la plus utilisée => ${name} (${executions} utilise)",
                         "Connexion à la base de données => ${connected}",
                         "Utilisation de la mémoire => ${memoryUsage}",
                         "Version actuelle => ${version}",
