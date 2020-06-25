@@ -33,9 +33,7 @@ export default class AutoModMention {
       );
 
       const user = await this.bot.userSettings.get(m.author.id);
-      const locale = user === null
-        ? this.bot.locales.get(settings.locale)!
-        : this.bot.locales.get(user.locale)!;
+      const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
 
       const response = locale.translate('automod.mentions', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });
       await m.channel.createMessage(response);

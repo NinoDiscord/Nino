@@ -29,12 +29,12 @@ export default class LocalizationManager extends Collection<Language> {
 
       const lang = require(`${process.cwd()}${sep}locales${sep}${file}`);
       this.bot.logger.info(`Found language ${lang.code}!`);
-      const locale = new Language(this.bot, lang);
+      const locale = new Language(lang);
       this.addLanguage(locale);
     }
   }
 
   getLocale(code: string) {
-    return this.find(x => x.code === code);
+    return this.find(x => x.code === code || x.aliases.includes(code));
   }
 }

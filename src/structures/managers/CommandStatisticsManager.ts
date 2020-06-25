@@ -32,7 +32,7 @@ export default class CommandStatisticsManager {
         .map(key => ({
           key,
           uses: this.commandUsages[key]
-        })).sort((first, second) => first.uses - second.uses)[0];
+        })).sort((first, second) => second.uses - first.uses)[0];
 
       return {
         command: command.key,
@@ -54,7 +54,7 @@ export default class CommandStatisticsManager {
       delete this.commandUsages[cmd.name];
     } else {
       this.commandsExecuted++;
-      this.commandUsages[cmd.name]++;
+      this.commandUsages[cmd.name] = (this.commandUsages[cmd.name] || 0) + 1;
     }
   }
 }

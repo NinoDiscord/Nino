@@ -11,6 +11,7 @@ interface LanguageInfo {
   contributors: string[];
   translator: string;
   completion: 'missing' | 'incomplete' | 'completed';
+  aliases?: string[];
   code: string;
   flag: string;
   full: string;
@@ -50,6 +51,9 @@ export default class Language {
   /** The percentage that the language is completed */
   public completion: LanguageStatus;
 
+  /** Any additional aliases to set the locale as */
+  public aliases: string[];
+
   /** The language strings itself */
   public strings: { [x: string]: string | object };
 
@@ -67,10 +71,11 @@ export default class Language {
    * @param bot The bot instance
    * @param info The information
    */
-  constructor(private bot: Bot, info: LanguageInfo) {
+  constructor(info: LanguageInfo) {
     this.contributors = info.contributors;
     this.translator = info.translator;
     this.completion = getStatus(info.completion);
+    this.aliases = info.aliases || [];
     this.strings = info.strings;
     this.code = info.code;
     this.flag = info.flag;

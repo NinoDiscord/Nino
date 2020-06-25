@@ -121,9 +121,7 @@ export default class CommandService {
     if (mention !== null) prefixes.push(`${mention}`);
 
     const user = await this.bot.userSettings.get(m.author.id);
-    const locale = !user 
-      ? this.bot.locales.get(settings.locale)!
-      : this.bot.locales.get(user.locale)!;
+    const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
 
     let prefix: string | null = null;
     for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;

@@ -2,6 +2,7 @@
     "contributors": [],
     "translator": "jacob#5418",
     "completion": "completed",
+    "aliases": ["french", "francias", "françias", "fr"],
     "code": "fr_FR",
     "flag": ":flag_fr:",
     "full": "Françias (FR)",
@@ -45,6 +46,12 @@
                 "L'erreur qui s'est produite a été enregistrée dans nos systémes.",
                 "Si cela est répétifif, signalez-le à ${owners} sur ${server}."
             ]
+        },
+        "automod": {
+            "badwords": "Veuillez ne pas jurer sur ce serveur, ${member}",
+            "invite": "Veuillez ne pas faire de publicité sur ce serveur, ${member}",
+            "mentions": "Veuillez ne pas mentionner plus de 4 utilisateurs, ${member}",
+            "spam": "Veuilllez ne pas spammer ici, ${member}"
         },
         "commands": {
             "generic": {
@@ -348,7 +355,7 @@
                         "Connexion à la base de données => ${connected}",
                         "Utilisation de la mémoire => ${memoryUsage}",
                         "Version actuelle => ${version}",
-                        "` `` "
+                        "```"
                       ]
                 },
                 "time": "Il s'agit actuellement de ${day}/${month}/${year} à ${h}:${m}:${s}",
