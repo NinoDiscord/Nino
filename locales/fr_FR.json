@@ -52,7 +52,7 @@
                     "notFound": "Impossible de trouver la commande ${command}.",
                     "embed": {
                         "title": "${username} | Liste des commandes",
-                        "footer": "Use ${prefix}help <command> pour obtenir plus de documentations sur une commande!",
+                        "footer": "Utilisez ${prefix}help <command> pour obtenir plus de documentations sur une commande!",
                         "description": [
                             "Plus d'informantions sont disponibles sur le [website](${website})!",
                             "Il existe acuellement **${commands}** disponibles."
