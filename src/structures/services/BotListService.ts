@@ -1,7 +1,15 @@
-import Bot, { Config } from '../Bot';
-import wumpfetch from 'wumpfetch';
+/* eslint-disable camelcase */
 import { injectable, inject } from 'inversify';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
+import Bot from '../Bot';
+import w from 'wumpfetch';
+
+interface CommandArray {
+  category: string;
+  command: string;
+  desc: string;
+}
 
 /**
  * Service that posts guild count to botlists.
@@ -10,8 +18,10 @@ import { TYPES } from '../../types';
  */
 @injectable()
 export default class BotListService {
-  private bot: Bot;
+  // We post the commands to discordservices.net, so this is just a way to see if we did
+  private hasPostedCmds: boolean = false;
   private interval?: NodeJS.Timeout;
+  private bot: Bot;
 
   constructor(
     @inject(TYPES.Bot) bot: Bot
@@ -34,94 +44,135 @@ export default class BotListService {
    * Stop posting guild stats
    */
   stop() {
-    if (this.interval) {
-      this.interval.unref();
-    }
+    if (this.interval) this.interval.unref();
   }
 
   /**
    * Post guild stats
    */
-  postCount(guilds: number) {
-    if (this.bot.config.botlists && this.bot.config.botlists.topggtoken) {
-      wumpfetch({
-        url: `https://top.gg/api/bots/${this.bot.client.user.id}/stats`,
+  async postCount(guilds: number) {
+    if (!this.bot.config.botlists) return;
+    
+    if (this.bot.config.botlists.hasOwnProperty('topggtoken')) {
+      this.bot.logger.info('Found top.gg token, now posting...');
+      const res = await w({
         method: 'POST',
         data: {
-          server_count: guilds,
+          server_count: guilds
         },
+        url: `https://top.gg/api/bots/${this.bot.client.user.id}/stats`
       })
         .header({
-          Authorization: this.bot.config.botlists.topggtoken,
           'Content-Type': 'application/json',
+          Authorization: this.bot.config.botlists.topggtoken!
         })
-        .send()
-        .then(res => {
-          this.bot.logger.info(`Posted guild stats to top.gg: ${res.statusCode}: ${res.body}`);
-        })
-        .catch(() => {
-          this.bot.logger.error('Failed to post guild stats to top.gg');
-        });
+        .send();
+
+      const func = res.statusCode === 200 ? 'info' : 'warn';
+      this.bot.logger[func](`Posted statistics to top.gg (${res.statusCode}): ${res.body}`);
     }
-    if (this.bot.config.botlists && this.bot.config.botlists.bfdtoken) {
-      wumpfetch({
-        url: `https://botsfordiscord.com/api/bot/${this.bot.client.user.id}`,
+
+    if (this.bot.config.botlists.hasOwnProperty('bfdtoken')) {
+      this.bot.logger.info('Found Bots for Discord token, now posting...');
+      const res = await w({
         method: 'POST',
         data: {
-          server_count: guilds,
+          server_count: guilds
         },
+        url: `https://botsfordiscord.com/api/bot/${this.bot.client.user.id}`
       })
         .header({
-          Authorization: this.bot.config.botlists.bfdtoken,
           'Content-Type': 'application/json',
+          Authorization: this.bot.config.botlists.bfdtoken!
         })
-        .send()
-        .then(res => {
-          this.bot.logger.info(`Posted guild stats to Bots For Discord: ${res.statusCode}: ${res.body}`);
-        })
-        .catch(() => {
-          this.bot.logger.error('Failed to post guild stats to Bots For Discord.');
-        });
+        .send();
+
+      const func = res.statusCode === 200 ? 'info' : 'warn';
+      this.bot.logger[func](`Posted statistics to Bots for Discord (${res.statusCode}): ${res.body}`);
     }
-    if (this.bot.config.botlists && this.bot.config.botlists.dboatstoken) {
-      wumpfetch({
-        url: `https://discord.boats/api/bot/${this.bot.client.user.id}`,
+
+    if (this.bot.config.botlists.hasOwnProperty('dboatstoken')) {
+      this.bot.logger.info('Found Discord Boats token, now posting...');
+      const res = await w({
         method: 'POST',
         data: {
-          server_count: guilds,
+          server_count: guilds
         },
+        url: `https://discord.boats/api/v2/bot/${this.bot.client.user.id}`
       })
         .header({
-          Authorization: this.bot.config.botlists.dboatstoken,
           'Content-Type': 'application/json',
+          Authorization: this.bot.config.botlists.dboatstoken!
         })
-        .send()
-        .then(res => {
-          this.bot.logger.info(`Posted guild stats to Discord Boats: ${res.statusCode}: ${res.body}`);
-        })
-        .catch(() => {
-          this.bot.logger.error('Failed to post guild stats to Discord Boats.');
-        });
+        .send();
+
+      const func = res.statusCode === 200 ? 'info' : 'warn';
+      this.bot.logger[func](`Posted statistics to Discord Boats (${res.statusCode}): ${res.body}`);
     }
-    if (this.bot.config.botlists && this.bot.config.botlists.blstoken) {
-      wumpfetch({
+
+    if (this.bot.config.botlists.hasOwnProperty('blstoken')) {
+      this.bot.logger.info('Found botlist.space token, now posting...');
+      const res = await w({
+        method: 'POST',
+        data: {
+          server_count: guilds
+        },
         url: `https://api.botlist.space/v1/bots/${this.bot.client.user.id}`,
-        method: 'POST',
-        data: {
-          server_count: guilds,
-        },
       })
         .header({
-          Authorization: this.bot.config.botlists.blstoken,
           'Content-Type': 'application/json',
+          Authorization: this.bot.config.botlists.blstoken!
         })
-        .send()
-        .then(res => {
-          this.bot.logger.info(`Posted guild stats to botlist.space: ${res.statusCode}: ${res.body}`);
+        .send();
+
+      const func = res.statusCode === 200 ? 'info' : 'warn';
+      this.bot.logger[func](`Posted statistics to botlist.space (${res.statusCode}): ${res.body}`);
+    }
+
+    if (this.bot.config.botlists.hasOwnProperty('dservicestoken')) {
+      this.bot.logger.info('Found Discord Services token, now posting...');
+      const res = await w({
+        method: 'POST',
+        data: {
+          server_count: guilds
+        },
+        url: `https://api.discordservices.net/bot/${this.bot.client.user.id}/stats`,
+      })
+        .header({
+          'Content-Type': 'application/json',
+          Authorization: this.bot.config.botlists.bfdtoken!
         })
-        .catch(() => {
-          this.bot.logger.error('Failed to post guild stats to botlist.space.');
-        });
+        .send();
+
+      const func = res.statusCode === 200 ? 'info' : 'warn';
+      this.bot.logger[func](`Posted statistics to Discord Services (${res.statusCode}): ${res.body}`);
+
+      if (!this.hasPostedCmds) {
+        const commands: CommandArray[] = [];
+        for (const command of this.bot.manager.commands.values()) {
+          // Don't post commands that only the owners can use
+          if (command.category === Module.System) continue;
+
+          commands.push({
+            category: command.category,
+            command: command.name,
+            desc: command.description
+          });
+        }
+
+        const res = await w({
+          method: 'POST',
+          url: `https://api.discordservices.net/bot/${this.bot.client.user.id}/commands`,
+          data: commands
+        }).header({
+          'Content-Type': 'application/json',
+          Authorization: this.bot.config.botlists.dservicestoken!
+        }).send();
+
+        const func = res.statusCode === 200 ? 'info' : 'warn';
+        this.bot.logger[func](`Posted statistics to botlist.space (${res.statusCode}): ${res.body}`);
+        this.hasPostedCmds = true;
+      }
     }
   }
 }

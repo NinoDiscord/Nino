@@ -1,7 +1,8 @@
 import { injectable, inject } from 'inversify';
 import { Constants } from 'eris';
-import findUser from '../../util/UserUtil';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
+import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
@@ -14,33 +15,39 @@ export default class WarnCommand extends Command {
       description: 'Warns a member from this guild',
       usage: '<user>',
       aliases: ['addwarn'],
-      category: 'Moderation',
-      userPermissions:
-        Constants.Permissions.manageRoles |
-        Constants.Permissions.manageChannels,
+      category: Module.Moderation,
+      userPermissions: Constants.Permissions.manageRoles,
+      botPermissions: Constants.Permissions.manageRoles,
       guildOnly: true
     });
   }
 
   async run(ctx: Context) {
-    if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
+    if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
-    const u = findUser(this.bot, ctx.args.get(0))!;
-    if (!u) return ctx.send('I can\'t find this user!');
+    const userID = ctx.args.get(0);
+    const u = findUser(this.bot, userID);
+    if (!u || u === undefined) return ctx.sendTranslate('global.unableToFind');
+
     const member = ctx.guild!.members.get(u.id);
-
-    if (!member) return ctx.send(`User \`${u.username}#${u.discriminator}\` is not in this guild?`);
+    if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
+      user: `${u.username}#${u.discriminator}`
+    });
 
     const punishments = await this.bot.punishments.addWarning(member!);
     for (let i of punishments) {
       try {
-        await this.bot.punishments.punish(member!, i, 'Automod');
+        await this.bot.punishments.punish(member!, i, '[Automod] Moderator warned user');
       } catch (e) {
-        return ctx.send(`Unable to punish: \`${e.message}\``);
+        return ctx.sendTranslate('global.unable', { error: e.message });
       }
     }
 
     const warns = await this.bot.warnings.get(ctx.guild!.id, member.id);
-    return ctx.send(`Successfully warned ${member.username}#${member.discriminator}! They now have ${warns === null ? 1 : warns.amount} warnings!`);
+    return ctx.sendTranslate('commands.moderation.warned', {
+      warnings: warns === null ? 1 : warns.amount,
+      suffix: warns === null ? '' : warns.amount > 1 ? 's' : '',
+      user: `${member.username}#${member.discriminator}`
+    });
   }
 }

@@ -17,15 +17,14 @@ export default class GuildLeftEvent extends Event {
     this.bot.logger.warn(`Left guild ${guild.name} (${guild.id})`);
 
     this.bot.status.updateStatus();
-    this.bot.prometheus.guildCount.inc();
     this.bot.statistics.guildCount--;
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
     const channel = await this.bot.client.getRESTChannel('529593466729267200');
     if (channel.type === 0) {
       const chan = (channel as TextChannel);
       const embed = this.bot.getEmbed()
-        .setAuthor(`| Joined ${guild.name} (${guild.id})`, undefined, this.bot.client.user.dynamicAvatarURL('png', 1024))
-        .setFooter(`Now at ${this.bot.client.guilds.size} Guilds`, this.bot.client.user.dynamicAvatarURL('png', 1024))
+        .setAuthor(`| Left ${guild.name} (${guild.id})`, undefined, this.bot.client.user.dynamicAvatarURL('png', 1024))
+        .setFooter(`Now at ${this.bot.client.guilds.size} Guilds`)
         .build();
 
       chan.createMessage({ embed });

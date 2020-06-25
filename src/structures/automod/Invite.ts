@@ -1,5 +1,4 @@
 import { Message, TextChannel } from 'eris';
-import { replaceMessage } from '../../util';
 import PermissionUtils from '../../util/PermissionUtils';
 import Bot from '../Bot';
 
@@ -13,10 +12,11 @@ import Bot from '../Bot';
  * * discord.me
  * * discord.link
  * * invite.gg
+ * * invite.ink
  */
 export default class AutoModInvite {
   public bot: Bot;
-  private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg)\/\w+/;
+  private regex: RegExp = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg|invite.ink)\/\w+/;
 
   constructor(client: Bot) {
     this.bot = client;
@@ -32,25 +32,29 @@ export default class AutoModInvite {
    *
    * @param m the message
    */
-  async handle(m: Message): Promise<boolean> {
-    const channel = m.channel as TextChannel;
-    const guild = channel.guild;
-    const me = guild.members.get(this.bot.client.user.id)!;
+  async handle(m: Message<TextChannel>): Promise<boolean> {
+    if (!m || m === null) return false;
+    if (!(m.channel instanceof TextChannel)) return false;
+
+    const me = m.channel.guild.members.get(this.bot.client.user.id)!;
 
     if (
       !PermissionUtils.above(me, m.member!) ||
-      !channel.permissionsOf(me.id).has('manageMessages') ||
+      !m.channel.permissionsOf(me.id).has('manageMessages') ||
       m.author.bot ||
-      channel.permissionsOf(m.author.id).has('manageMessages')
+      m.channel.permissionsOf(m.author.id).has('manageMessages')
     ) return false;
 
     if (m.content.match(this.regex)) {
-      const settings = await this.bot.settings.get(guild.id);
+      const settings = await this.bot.settings.get(m.channel.guild.id);
       if (!settings || !settings.automod.invites) return false;
 
-      const response = !settings.responses.invite.enabled ?
-        replaceMessage('Please don\'t advertise, %author%', m.author) :
-        replaceMessage(settings.responses.invite.message, m.author);
+      const user = await this.bot.userSettings.get(m.author.id);
+      const locale = user === null
+        ? this.bot.locales.get(settings.locale)!
+        : this.bot.locales.get(user.locale)!;
+
+      const response = locale.translate('automod.invites', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });
       await m.channel.createMessage(response);
       await m.delete();
 

@@ -1,7 +1,7 @@
-import { init } from '@sentry/node';
 import Bot, { Config } from './structures/Bot';
 import container from './inversify.config';
 import { TYPES } from './types';
+import { init } from '@sentry/node';
 
 const pkg: any = require('../package.json');
 const config = container.get<Config>(TYPES.Config);

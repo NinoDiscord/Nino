@@ -21,7 +21,9 @@ export default class GuildMemberUpdateEvent extends Event {
     if (member.nick != old.nick) return this.bot.automod.handleMemberNameUpdate(member);
     if (!settings || !settings.mutedRole) return; // Muted role doesn't exist, don't do anything
 
+    
     // Fetch audit logs
+    if (!guild.members.get(this.bot.client.user.id)!.permission.has('viewAuditLogs')) return;
     const logs = await guild.getAuditLogs(10);
     if (!logs.entries.length) return; // Don't do anything if there is no entries
 
@@ -31,34 +33,46 @@ export default class GuildMemberUpdateEvent extends Event {
     // Role was taken away
     if (!member.roles.includes(settings.mutedRole) && old.roles.includes(settings.mutedRole)) {
       const entries = logs.entries.filter(entry =>
-        // Make sure the log type is 25 (MEMBER_ROLE_UPDATE) and it wasn't Nino who added it
-        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id && !entry.user.bot
+        // Make sure the log type is 25 (MEMBER_ROLE_UPDATE) and it wasn't a bot
+        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && !entry.user.bot
       );
 
-      if (!entries.length) return; // Don't do anything if no entries were found
+      // Check if the first entry is the bot itself
+      if (entries[0].user.id === this.bot.client.user.id) return;
+      else {
+        const all = entries.filter(x => x.user.id !== this.bot.client.user.id);
+        if (!all.length) return;
 
-      const log = entries[0];
-      const punishment = new Punishment(PunishmentType.Unmute, {
-        moderator: log.user
-      });
-
-      await this.bot.punishments.punish(member, punishment, '[Automod] Moderator has removed the Muted role', true);
+        const log = all[0];
+        const punishment = new Punishment(PunishmentType.Unmute, {
+          moderator: log.user
+        });
+  
+        await this.bot.punishments.punish(member, punishment, '[Automod] Moderator removed the Muted role', true);
+      }
     } 
     
     if (member.roles.includes(settings.mutedRole) && !old.roles.includes(settings.mutedRole)) {
       const entries = logs.entries.filter(entry =>
-        // Make sure the log action is 25 (MEMBER_ROLE_UPDATE) and it wasn't Nino who added it
-        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.bot.client.user.id && !entry.user.bot
+        // Make sure the log action is 25 (MEMBER_ROLE_UPDATE) and it wasn't a bot
+        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && !entry.user.bot
       );
 
       if (!entries.length) return; // Don't do anything if no entries were found
 
-      const log = entries[0];
-      const punishment = new Punishment(PunishmentType.Mute, {
-        moderator: log.user
-      });
+      // Check if the first entry is the bot itself
+      if (entries[0].user.id === this.bot.client.user.id) return;
+      else {
+        const all = entries.filter(x => x.user.id !== this.bot.client.user.id);
+        if (!all.length) return;
 
-      await this.bot.punishments.punish(member, punishment, '[Automod] Moderator added the Muted role', true);
+        const log = all[0];
+        const punishment = new Punishment(PunishmentType.Mute, {
+          moderator: log.user
+        });
+    
+        await this.bot.punishments.punish(member, punishment, '[Automod] Moderator added the Muted role', true);
+      }
     }
   }
 }

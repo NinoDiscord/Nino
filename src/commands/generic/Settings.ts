@@ -1,7 +1,6 @@
 import { Constants, TextChannel } from 'eris';
 import { injectable, inject } from 'inversify';
 import { replaceMessage } from '../../util';
-import { stripIndents } from 'common-tags';
 import { TYPES } from '../../types';
 import Context from '../../structures/Context';
 import Command from '../../structures/Command';
@@ -34,7 +33,6 @@ export default class SettingsCommand extends Command {
       case 'remove': return this.remove(ctx);
       case 'disable': return this.disable(ctx);
       case 'enable': return this.enable(ctx);
-      case 'response': return this.response(ctx);
       default: return this.view(ctx, false);
     }
   }
@@ -44,24 +42,40 @@ export default class SettingsCommand extends Command {
     const punishment = ctx.args.get(2);
     const punishments = ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'];
 
-    if (!warnings || !(/^[0-9]$/).test(warnings) || Number(warnings) < 1 || Number(warnings) > 5) return ctx.send('An amount of warnings is required, it also needs to between 1 and 5');
-    if (!punishments.includes(punishment)) return ctx.send(`Invalid punishment: "${punishment}" (${punishments.join(' | ')})`);
+    if (!warnings || !(/^[0-9]$/).test(warnings) || Number(warnings) < 1 || Number(warnings) > 5) {
+      return ctx.sendTranslate('commands.generic.settings.add.amountRequired');
+    }
+
+    if (!punishments.includes(punishment)) {
+      return ctx.sendTranslate('commands.generic.settings.add.invalidPunishment', {
+        punishments: punishments.join(', '),
+        punishment
+      });
+    }
   
     const temp = ctx.flags.get('time');
-    if (temp && (typeof temp === 'boolean') || (typeof temp === 'string') && (!ms(temp as string) || ms(temp as string) < 1000))
-      return ctx.send('The "--time" flag must be a correct time expression, it can be 0.5h, 30m, 0.5 hours, or 30 minutes');
+    if (temp && (typeof temp === 'boolean') || (typeof temp === 'string') && (!ms(temp as string) || ms(temp as string) < 1000)) {
+      return ctx.sendTranslate('commands.generic.settings.add.invalidTime');
+    }
 
     const soft = ctx.flags.get('soft');
-    if (soft && typeof soft === 'string') return ctx.send('You appended a value to `--soft`, it should be `--soft`');
+    if (soft && typeof soft === 'string') {
+      return ctx.sendTranslate('global.invalidFlag.boolean');
+    }
 
     const roleID = ctx.args.get(3);
-    if (!roleID && (['unrole', 'role'].includes(punishment))) return ctx.send('You are missing a role ID to add or remove, since you wanted to add/remove a role');
-    if (roleID && (typeof roleID === 'boolean') || (typeof roleID === 'string') && !((/^[0-9]+$/).test(roleID) || !ctx.guild!.roles.has(roleID)))
-      return ctx.send(`Unable to find role "${roleID}" in the guild roles list`);
+    if (!roleID && (['unrole', 'role'].includes(punishment))) {
+      return ctx.sendTranslate('commands.generic.settings.add.missingRoleID');
+    }
+
+    if (roleID && !((/^[0-9]+$/).test(roleID) || !ctx.guild!.roles.has(roleID))) {
+      return ctx.sendTranslate('commands.generic.settings.add.invalidRole');
+    }
 
     const days = ctx.flags.get('days');
-    if (days && (typeof days === 'boolean' || (typeof days === 'string') && !(/^[0-9]{1,2}$/).test(days)))
-      return ctx.send('Incorrect amount of days. The `days` flag is the amount of days of messages to delete when banning');
+    if (days && (typeof days === 'boolean' || (typeof days === 'string') && !(/^[0-9]{1,2}$/).test(days))) {
+      return ctx.sendTranslate('commands.generic.settings.add.invalidDays');
+    }
 
     this.bot.settings.update(ctx.guild!.id, {
       $push: {
@@ -75,81 +89,128 @@ export default class SettingsCommand extends Command {
         }
       }
     }, (error, packet) => {
-      if (error) return ctx.send('I was unable to add the punishment');
-      if (packet.n) return ctx.send('Punishment was added to the database successfully!');
-      else return ctx.send('Sorry, we limited the amount of punishments per server to 15. Please remove some punishments before adding more');
+      if (error) return ctx.sendTranslate('commands.generic.settings.add.errored');
+      if (packet.n) return ctx.sendTranslate('commands.generic.settings.add.success');
+      else return ctx.sendTranslate('commands.generic.settings.add.amountExceeded');
     });
   }
 
   async remove(ctx: Context) {
     const index = ctx.args.get(1);
-    if (!index || !/^[0-9]+$/.test(index) || Number(index) < 1) return ctx.send('The punishment index is required, view the index number in `x!settings view`');
+
+    if (!index || !/^[0-9]+$/.test(index) || Number(index) < 1) {
+      return ctx.sendTranslate('commands.generic.settings.remove.invalidIndex');
+    }
 
     const settings = await ctx.getSettings();
-    if (!settings || !settings.punishments.length) return ctx.send('You didn\'t setup any permissions');
+    if (!settings || !settings.punishments.length) {
+      return ctx.sendTranslate('commands.generic.settings.remove.noPunishments');
+    }
 
     if (Number(index) <= settings!.punishments.length) {
       const i = Math.round(Number(index)) - 1;
       settings!.punishments.splice(i, 1);
     }
-
     settings!.save();
-    return ctx.send(`Removed punishment #${index} from the database`);
+    return ctx.sendTranslate('commands.generic.settings.remove.success', { index });
   }
 
   async set(ctx: Context) {
     const setting = ctx.args.get(1);
-    const subcommands = ['modlog', 'prefix', 'mutedrole', 'automod.swears', 'logging.channelID'];
+    const subcommands = ['modlog', 'prefix', 'mutedrole', 'mutedRole', 'automod.swears', 'logging.channelID', 'logging.ignore'];
+    
     switch (setting) {
       case 'modlog': {
         const channelID = ctx.args.get(2);
-        if (!channelID) return ctx.send('No channel ID was specified');
+        if (!channelID) {
+          return ctx.sendTranslate('commands.generic.settings.noChannel');
+        }
 
-        // TODO: Use regex for this
         const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
-        if (id === null) return ctx.send(`Invalid channel ID: \`${channelID}\``);
+        if (id === null) {
+          return ctx.sendTranslate('global.invalidChannel', { channel: channelID });
+        }
 
         const channel = await this.bot.client.getRESTChannel(id);
-        if (!(channel instanceof TextChannel)) return ctx.send('The mod log channel cannot be a DM, voice, category, or group channel');
+        if (!(channel instanceof TextChannel)) {
+          return ctx.sendTranslate('global.notText', { channel: channel.id });
+        }
 
-        let error!: any;
-        ctx.bot.settings.update(ctx.guild!.id, {
+        const permissions = channel.permissionsOf(this.bot.client.user.id);
+        if (!permissions.has('sendMessages') || !permissions.has('embedLinks')) {
+          return ctx.sendTranslate('commands.generic.settings.set.modlog.noPerms', { channel: channel.name });
+        }
+
+        await ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             modlog: channel.id
           }
-        }, (error) => error = error);
-
-        error ? ctx.send('Unable to update the mod log channel') : ctx.send(`Updated the mod log channel to **${channel.mention}**`);
+        }, (error) => {
+          return error
+            ? ctx.sendTranslate('commands.generic.settings.set.modlog.unable', { channel: channel.name })
+            : ctx.sendTranslate('commands.generic.settings.set.modlog.success', { channel: channel.name });
+        });
       } break;
       case 'prefix': {
         const prefix = ctx.args.slice(2).join(' ');
-        if (!prefix) return ctx.send('The `prefix` argument must be added');
-        if (prefix.length > 20) return ctx.send(`The prefix cannot be longer then 20 characters (went ${prefix.length - 20} over!)`);
-        if (['@everyone', '@here'].includes(prefix)) return ctx.send('The prefix cannot ping other members');
+        const settings = await ctx.getSettings()!;
+
+        if (!prefix) {
+          return ctx.sendTranslate('commands.generic.settings.set.prefix.none');
+        }
+
+        if (prefix.length > 20) {
+          // Calculate the length of the prefix
+          const length = prefix.length - 20;
+          return ctx.sendTranslate('commands.generic.settings.set.prefix.over20', { chars: length });
+        }
+
+        if (['@everyone', '@here'].includes(prefix)) {
+          return ctx.sendTranslate('commands.generic.settings.set.prefix.atEveryone');
+        }
+
+        if (settings.prefix === prefix) {
+          return ctx.sendTranslate('commands.generic.settings.set.prefix.already', { prefix });
+        }
 
         ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             prefix
           }
-        }, (error) => error ? ctx.send(`Unable to set the prefix to "${prefix}"`) : ctx.send(`Updated the prefix to "${prefix}" (test it out with \`${prefix}ping\`)`));
+        }, (error) => {
+          return error 
+            ? ctx.sendTranslate('commands.generic.settings.set.prefix.unable', { prefix })
+            : ctx.sendTranslate('commands.generic.settings.set.prefix.success', { prefix });
+        });
       } break;
-      case 'mutedrole': {
+      case 'mutedrole':
+      case 'mutedRole': {
         const mutedRole = ctx.args.get(2);
-        if (!mutedRole || !/^[0-9]+$/.test(mutedRole)) return ctx.send('Invalid role ID');
+        if (!mutedRole || !/^[0-9]+$/.test(mutedRole)) {
+          return !mutedRole ? 
+            ctx.sendTranslate('commands.generic.settings.set.mutedRole.none') :
+            ctx.sendTranslate('commands.generic.settings.set.mutedRole.invalid');
+        }
 
         const role = ctx.guild!.roles.find(role => role.id === mutedRole);
-        if (!role) return ctx.send(`Unable to find role with ID: "${mutedRole}"`);
+        if (!role) {
+          return ctx.sendTranslate('commands.generic.settings.set.mutedRole.noneFound', { id: mutedRole });
+        }
 
         this.bot.settings.update(ctx.guild!.id, {
           $set: {
             mutedRole: role.id
           }
-        }, (error) => error ? ctx.send(`Unable to set the muted role to "${role.name}"`) : ctx.send(`Muted role has been set to "${role.name}"`));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.set.mutedRole.unable', { role: role.name }) 
+          : ctx.sendTranslate('commands.generic.settings.set.mutedRole.success', { role: role.name }));
       } break;
       case 'automod.badwords':
       case 'automod.swears': {
         const list = ctx.args.get(2);
-        if (!list) return ctx.send('No list of bad words were provided (you can multiple with ` ` after! Example: `x!settings set automod.swears bitch, fuck`');
+        if (!list) {
+          return ctx.sendTranslate('commands.generic.settings.set.badwords.none');
+        }
 
         const settings = await ctx.getSettings();
         const swears = ctx.args.slice(2);
@@ -157,15 +218,16 @@ export default class SettingsCommand extends Command {
         settings!.automod.badwords.wordlist.push(...swears);
         await settings!.save();
 
-        const message = !settings!.automod.badwords.enabled ?
-          `We've added ${swears.length} to the list! Since you didn't have the swearing automod feature enabled, I have enabled it for you!` :
-          `Successfully added ${swears.length} new words to the list`;
-
-        return ctx.send(message);
+        return !settings!.automod.badwords.enabled ?
+          ctx.sendTranslate('commands.generic.settings.set.badwords.added.notEnabled', { words: swears.length }) :
+          ctx.sendTranslate('commands.generic.settings.set.badwords.added.enabled', { words: swears.length });
       }
-      case 'logging.ignore': {
+      case 'logging.ignore':
+      case 'logging.ignored': {
         const list = ctx.args.get(2);
-        if (!list) return ctx.send('No list of channels were provided');
+        if (!list) {
+          return ctx.sendTranslate('commands.generic.settings.set.ignored.none');
+        }
 
         const settings = await ctx.getSettings();
         const channels = ctx.args.slice(2);
@@ -173,45 +235,71 @@ export default class SettingsCommand extends Command {
           channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null
         );
 
-        if (errors.some(e => e === null)) return ctx.send(`Invalid channels: ${errors.filter(e => e === null).map(s => `\`${s}\``).join(' | ')}`);
+        if (errors.some(e => e === null)) {
+          const invalid = errors
+            .filter(error => error === null)
+            .map(s => `**${s}**`)
+            .join(', ');
+
+          return ctx.sendTranslate('commands.generic.settings.set.ignored.invalid', { channels: invalid });
+        }
+
         if (!settings!.logging.enabled) settings!.logging.enabled = true;
         settings!.logging.ignore.push(...errors);
         await settings!.save();
 
-        const message = !settings!.logging.enabled ?
-          `Added ${errors.length} channels to the ignore list, since you didn't enable the feature, I have enabled it for you.` :
-          `Added ${errors.length} channels to the ignore list.`;
-
-        return ctx.send(message);
+        return !settings!.logging.enabled ?
+          ctx.sendTranslate('commands.generic.settings.set.ignored.added.notEnabled', { channels: errors.length }) :
+          ctx.sendTranslate('commands.generic.settings.set.ignored.added.enabled', { channels: errors.length });
       }
       case 'logging.channelID': {
         const channelID = ctx.args.get(2);
-        if (!channelID) return ctx.send('No channel ID was specified');
+        if (!channelID) {
+          return ctx.sendTranslate('commands.generic.settings.noChannel');
+        }
 
         const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
-        if (id === null) return ctx.send(`Invalid channel ID: \`${channelID}\``);
+        if (id === null) {
+          return ctx.sendTranslate('global.invalidChannel', { channel: channelID });
+        }
 
         const channel = await this.bot.client.getRESTChannel(id);
-        if (!(channel instanceof TextChannel)) return ctx.send('The logging channel cannot be a DM, voice, category, or group channel');
+        if (!(channel instanceof TextChannel)) {
+          return ctx.sendTranslate('global.notText', { channel: channel.id });
+        }
+
+        const permissions = channel.permissionsOf(this.bot.client.user.id);
+        if (!permissions.has('sendMessages') || !permissions.has('embedLinks')) {
+          return ctx.sendTranslate('commands.generic.settings.set.logChannel.noPerms', { channel: channel.name });
+        }
 
         let error!: any;
         ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.channelID': channel.id
           }
-        }, (error) => error = error);
-
-        error ? ctx.send('Unable to update the logging channel') : ctx.send(`Updated the logging channel to **${channel.mention}**`);
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.set.logChannel.unable', { channel: channel.name }) 
+          : ctx.sendTranslate('commands.generic.settings.enable.automod.success', { channel: channel.name }));
       } break;
-      default: return ctx.send(`${setting === undefined ? 'No setting was provided' : 'Invalid setting'} (${subcommands.join(' | ')})`);
+      default: {
+        return setting === undefined 
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
+            subcommand: setting, 
+            subcommands: subcommands.join(', ') 
+          });
+      }
     }
   }
 
   async enable(ctx: Context) {
     const setting = ctx.args.get(1);
     const subcommands = ['automod', 'automod.dehoist', 'automod.invites', 'automod.spam', 'automod.mention', 'automod.raid', 'automod.swears',  'automod.badwords', 'logging', 'logging.events', 'logging.events.messageDeleted', 'logging.events.messageDelete', 'logging.events.messageUpdate', 'logging.events.messageUpdated'];
+
     switch (setting) {
       case 'automod': {
+
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.dehoist': true,
@@ -222,35 +310,45 @@ export default class SettingsCommand extends Command {
             'automod.badwords.enabled': true,
             'automod.badwords.wordlist': []
           }
-        }, (error) => error ? ctx.send('Unable to enable all automod features') : ctx.send('Enabled all automod features'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.automod.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.automod.success'));
       } break;
       case 'automod.dehoist': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.dehoist': true
           }
-        }, (error) => error ? ctx.send('Unable to enable the dehoisting automod feature') : ctx.send('Enabled the dehoisting automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.dehoist.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.dehoist.success'));
       } break;
       case 'automod.spam': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.spam': true
           }
-        }, (error) => error ? ctx.send('Unable to enable the spam automod feature') : ctx.send('Enabled the spam automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.spam.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.spam.success'));
       } break;
       case 'automod.raid': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.raid': true
           }
-        }, (error) => error ? ctx.send('Unable to enable the raid automod feature') : ctx.send('Enabled the raid automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.raid.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.raid.success'));
       } break;
       case 'automod.mention': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.mention': true
           }
-        }, (error) => error ? ctx.send('Unable to enable the mention automod feature') : ctx.send('Enabled the mention automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.mention.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.mention.success'));
       } break;
       case 'automod.swears':
       case 'automod.badwords': {
@@ -258,21 +356,27 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.badwords.enabled': true
           }
-        }, (error) => error ? ctx.send('Unable to enable the swearing automod feature') : ctx.send('Enabled the swearing automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.badwords.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.badwords.success'));
       } break;
       case 'automod.invites': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.invites': true
           }
-        }, (error) => error ? ctx.send('Unable to enable the invites automod feature') : ctx.send('Enabled the invites automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.invites.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.invites.success'));
       } break;
       case 'logging': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.enabled': true
           }
-        }, error => error ? ctx.send('Unable to enable the logging feature') : ctx.send('Enabled the logging feature, enable some or all events with `logging.events.[name]`! (example: `logging.events`: enable all events; `logging.events.messageDeleted`: enable just the message deleted event)'));
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.logging.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.logging.success'));
       } break;
       case 'logging.events': {
         await this.bot.settings.update(ctx.guild!.id, {
@@ -280,7 +384,9 @@ export default class SettingsCommand extends Command {
             'logging.events.messageDelete': true,
             'logging.events.messageUpdate': true
           }
-        }, error => error ? ctx.send('Unable to enable all events') : ctx.send('Enabled all logging events'));
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.logEvents.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.logEvents.success'));
       } break;
       case 'logging.events.messageDeleted':
       case 'logging.events.messageDelete': {
@@ -288,7 +394,9 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.events.messageDelete': true
           }
-        }, error => error ? ctx.send('Unable to enable the message deleted event') : ctx.send('Enabled the message deleted event')); 
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.messageDelete.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.messageDelete.success')); 
       } break;
       case 'logging.events.messageUpdated':
       case 'logging.events.messageUpdate': {
@@ -296,9 +404,18 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.events.messageUpdate': true
           }
-        }, error => error ? ctx.send('Unable to enable the message update event') : ctx.send('Enabled the message update event')); 
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.messageUpdate.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.messageUpdate.success')); 
       } break;
-      default: return ctx.send(setting === undefined ? `No subcommand was provided. (${subcommands.join(', ')})` : `Invalid subcommand "${setting}" (${subcommands.join(', ')})`);
+      default: {
+        return setting === undefined 
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
+            subcommand: setting, 
+            subcommands: subcommands.join(', ') 
+          });
+      }
     }
   }
 
@@ -316,35 +433,45 @@ export default class SettingsCommand extends Command {
             'automod.invites': false,
             'automod.badwords.enabled': false
           }
-        }, (error) => error ? ctx.send('Unable to disable all automod features') : ctx.send('Disabled all automod features'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.automod.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.automod.success'));
       } break;
       case 'automod.dehoist': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.dehoist': false
           }
-        }, (error) => error ? ctx.send('Unable to disable the dehoisting automod feature') : ctx.send('Disabled the dehoisting automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.dehoist.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.dehoist.success'));
       } break;
       case 'automod.spam': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.spam': false
           }
-        }, (error) => error ? ctx.send('Unable to disable the spam automod feature') : ctx.send('Disabled the spam automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.spam.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.spam.success'));
       } break;
       case 'automod.raid': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.raid': false
           }
-        }, (error) => error ? ctx.send('Unable to disable the raid automod feature') : ctx.send('Disabled the raid automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.raid.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.raid.success'));
       } break;
       case 'automod.mention': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.mention': false
           }
-        }, (error) => error ? ctx.send('Unable to disable the mention automod feature') : ctx.send('Disabled the mention automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.mention.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.mention.success'));
       } break;
       case 'automod.swears':
       case 'automod.badwords': {
@@ -353,21 +480,27 @@ export default class SettingsCommand extends Command {
             'automod.badwords.enabled': false,
             'automod.badwords.wordlist': []
           }
-        }, (error) => error ? ctx.send('Unable to disable the swearing automod feature') : ctx.send('Disabled the swearing automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.badwords.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.badwords.success'));
       } break;
       case 'automod.invites': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'automod.invites': false
           }
-        }, (error) => error ? ctx.send('Unable to disable the invites automod feature') : ctx.send('Disabled the invites automod feature'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.invites.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.invites.success'));
       } break;
       case 'logging': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.enabled': false
           }
-        }, error => error ? ctx.send('Unable to disable the logging feature') : ctx.send('Disabled the logging feature, enable some or all events with `logging.events.[name]`! (example: `logging.events`: enable all events; `logging.events.messageDeleted`: enable just the message deleted event)'));
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.logging.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.logging.success'));
       } break;
       case 'logging.events': {
         await this.bot.settings.update(ctx.guild!.id, {
@@ -375,7 +508,9 @@ export default class SettingsCommand extends Command {
             'logging.events.messageDelete': false,
             'logging.events.messageUpdate': false
           }
-        }, error => error ? ctx.send('Unable to disable all events') : ctx.send('Disabled all logging events'));
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.logEvents.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.logEvents.success'));
       } break;
       case 'logging.events.messageDeleted':
       case 'logging.events.messageDelete': {
@@ -383,7 +518,9 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.events.messageDelete': false
           }
-        }, error => error ? ctx.send('Unable to disable the message deleted event') : ctx.send('Disabled the message deleted event')); 
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.messageDelete.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.messageDelete.success')); 
       } break;
       case 'logging.events.messageUpdated':
       case 'logging.events.messageUpdate': {
@@ -391,215 +528,113 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.events.messageUpdate': false
           }
-        }, error => error ? ctx.send('Unable to disable the message update event') : ctx.send('Disabled the message update event')); 
+        }, error => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.messageUpdate.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.messageUpdate.success')); 
       } break;
-      default: return ctx.send(setting === undefined ? `No subcommand was provided. (${subcommands.join(', ')})` : `Invalid subcommand "${setting}" (${subcommands.join(', ')})`);
+      default: {
+        return setting === undefined
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') })
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
+            subcommand: setting, 
+            subcommands: subcommands.join(', ') 
+          });
+      }
     }
   }
 
   async reset(ctx: Context) {
     const subcommands = ['punishments', 'modlog', 'mutedrole', 'prefix'];
     const setting = ctx.args.get(1);
+
     switch (setting) {
       case 'punishments': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'punishments': []
           }
-        }, (error) => error ? ctx.send('Unable to reset permissions') : ctx.send('Resetted all permissions'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.reset.punishments.unable') 
+          : ctx.sendTranslate('commands.generic.settings.reset.punishments.success'));
       } break;
       case 'prefix': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'prefix': this.bot.config.discord.prefix
           }
-        }, (error) => error ? ctx.send(`Unable to reset the prefix to "${this.bot.config.discord.prefix}"`) : ctx.send(`The prefix is now \`${this.bot.config.discord.prefix}\`! Test it with \`${this.bot.config.discord.prefix}ping\``));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.reset.prefix.unable') 
+          : ctx.sendTranslate('commands.generic.settings.reset.prefix.success'));
       } break;
       case 'modlog': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'modlog': null
           }
-        }, (error) => error ? ctx.send('Resetted the mod log channel') : ctx.send('Resetted the mod log channel'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.reset.modlog.unable') 
+          : ctx.sendTranslate('commands.generic.settings.reset.modlog.success'));
       } break;
       case 'mutedrole': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'mutedRole': null
           }
-        }, (error) => error ? ctx.send('Resetted the muted role') : ctx.send('Resetted the muted role'));
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.reset.mutedRole.unable') 
+          : ctx.sendTranslate('commands.generic.settings.reset.mutedRole.success'));
       } break;
-      default: return ctx.send(setting === undefined ? `No subcommand was provided. (${subcommands.join(', ')})` : `Invalid subcommand "${setting}" (${subcommands.join(', ')})`);
+      default: {
+        return setting === undefined 
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
+            subcommand: setting, 
+            subcommands: subcommands.join(', ') 
+          });
+      }
     }
   }
 
   async view(ctx: Context, provided: boolean = false) {
-    const settings = await ctx.getSettings();
-    const punishments = settings!.punishments.length ? settings!.punishments.map((p, i) => `${i + 1}: ${p.type} with ${p.warnings} warnings${p.temp ? `, with time ${ms(p.temp)}` : p.soft ? ', soft' : p.roleid ? `, with role ${ctx.guild!.roles.get(p.roleid)}` : ''}`).join('\n') : 'None';
+    const settings = await ctx.getSettings()!;
+
+    const title = ctx.translate('commands.generic.settings.view.title', {
+      guild: ctx.guild!.name
+    });
+
+    const yes = ctx.translate('global.yes');
+    const no = ctx.translate('global.no');
+    const events: string[] = [];
+
+    if (settings.logging.events.messageUpdate) events.push('Message Updates');
+    if (settings.logging.events.messageDelete) events.push('Message Deletions');
+
+    const desc = ctx.translate('commands.generic.settings.view.description', {
+      prefix: settings.prefix,
+      mutedRole: ctx.guild!.roles.find(x => x.id === settings.mutedRole) ? ctx.guild!.roles.get(settings.mutedRole)!.name : 'None',
+      modlog: ctx.guild!.channels.find(x => x.id === settings.modlog) ? ctx.guild!.channels.get(settings.modlog)!.name : 'None',
+      logging: ctx.guild!.channels.find(x => x.id === settings.logging.channelID) ? ctx.guild!.channels.get(settings.logging.channelID)!.name : 'None',
+      events: events.join(', '),
+      punishments: settings.punishments.length ? settings.punishments.map((punishment, index) => 
+        `[${index + 1}] ${punishment.type} with ${punishment.warnings} warnings${punishment.temp ? ` with time ${ms(punishment.temp)}` : punishment.soft ? ' as a softban' : punishment.roleid ? ` with role ${ctx.guild!.roles.get(punishment.roleid)!.name}` : ''}`
+      ) : 'None',
+      'dehoist.enabled': settings.automod.dehoist ? yes : no,
+      'mention.enabled': settings.automod.mention ? yes : no,
+      'invites.enabled': settings.automod.invites ? yes : no,
+      'raid.enabled': settings.automod.raid ? yes : no,
+      'spam.enabled': settings.automod.spam ? yes : no,
+      'logging.enabled': settings.logging.enabled ? yes : no,
+      'badwords.enabled': settings.automod.badwords.enabled ? yes : no,
+      words: settings.automod.badwords.enabled ? settings.automod.badwords.wordlist.join(', ') : 'None'
+    });
+
+    const footer = ctx.translate('commands.generic.settings.view.footer');
 
     const embed = this.bot.getEmbed()
-      .setTitle(`Configuration for ${ctx.guild!.name}`)
-      .setDescription(stripIndents`
-        \`\`\`ini
-        [prefix]: ${settings!.prefix}
-        [mutedrole]: ${settings!.mutedRole ? ctx.guild!.roles.get(settings!.mutedRole)!.name : 'None'} 
-        [modlog]: ${settings!.modlog ? ctx.guild!.channels.get(settings!.modlog)!.name : 'None'}
-        [automod.dehoist]: ${settings!.automod.dehoist ? 'Enabled' : 'Disabled'}
-        [automod.mention]: ${settings!.automod.mention ? 'Enabled' : 'Disabled'}
-        [automod.invites]: ${settings!.automod.invites ? 'Enabled' : 'Disabled'}
-        [automod.raid]: ${settings!.automod.raid ? 'Enabled' : 'Disabled'}
-        [automod.spam]: ${settings!.automod.spam ? 'Enabled' : 'Disabled'}
-        [logging.enabled]: ${settings!.logging.enabled ? 'Enabled' : 'Disabled'}
-        [logging.channel]: ${settings!.logging.channelID ? ctx.guild!.channels.get(settings!.logging.channelID)!.name : 'None'}
-        [automod.swears]: ${settings!.automod.badwords.wordlist.length ? settings!.automod.badwords.wordlist.join(', ') : settings!.automod.badwords.enabled ? 'Enabled (without any words)' : 'Disabled'}
-        [logging.events.messageDelete]: ${settings!.logging.events.messageDelete ? 'Enabled' : 'Disabled'}
-        [logging.events.messageUpdate]: ${settings!.logging.events.messageUpdate ? 'Enabled' : 'Disabled'}
-        [punishments]: 
-        ${punishments}
-        \`\`\`
-      `);
+      .setTitle(title)
+      .setDescription(desc);
 
-    if (!provided) embed.setFooter('You\'re viewing this because you provided an invalid or no subcommand', this.bot.client.users.get(ctx.guild!.ownerID)!.avatarURL);
-    return ctx.embed(embed.build());
-  }
-
-  async response(ctx: Context) {
-    const subcommands = ['add', 'remove'];
-    const subcommand = ctx.args.get(1);
-    switch (subcommand) {
-      case 'add': {
-        const other = ctx.args.get(2);
-        const otherCmds = ['badwords', 'invite', 'mention', 'spam'];
-        switch (other) {
-          case 'badwords': {
-            if (!ctx.args.has(3)) return ctx.send('No message was provided');
-
-            const message = ctx.args.slice(3).join(' ');
-            const settings = await ctx.getSettings();
-            const doc = {
-              'responses.badwords.enabled': true,
-              'responses.badwords.message': message
-            };
-
-            if (!settings!.automod.badwords.enabled) doc['automod.badwords.enabled'] = true;
-            const setted = doc.hasOwnProperty('automod.badwords.enabled') ?
-              `All responses to the bad words automod feature will now be \`${message}\`\nExample: **${replaceMessage(message, ctx.sender)}**\nSince you didn't enable the automod feature, I've enabled it for you!` :
-              `All responses to the bad words automod feature will now be \`${message}\`\nExample: **${replaceMessage(message, ctx.sender)}**`;
-
-            await this.bot.settings.update(ctx.guild!.id, {
-              $set: doc
-            }, error => error ? ctx.send(`Unable to set the bad words automod feature response to: \`${message}\``) : ctx.send(setted));
-          } break;
-
-          case 'invites': {
-            if (!ctx.args.has(3)) return ctx.send('No message was provided');
-
-            const message = ctx.args.slice(3).join(' ');
-            const settings = await ctx.getSettings();
-            const doc = {
-              'responses.invites.enabled': true,
-              'responses.invites.message': message
-            };
-
-            if (!settings!.automod.invites) doc['automod.invites'] = true;
-            const setted = doc.hasOwnProperty('automod.invites') ?
-              `All responses to the invite automod feature will now be \`${message}\`\nExample: **${replaceMessage(message, ctx.sender)}**\nSince you didn't enable the automod feature, I've enabled it for you!` :
-              `All responses to the invite automod feature will now be \`${message}\`\nExample: **${replaceMessage(message, ctx.sender)}**`;
-
-            await this.bot.settings.update(ctx.guild!.id, {
-              $set: doc
-            }, error => error ? ctx.send(`Unable to set the invite automod feature response to: \`${message}\``) : ctx.send(setted));
-          } break;
-
-          case 'mention': {
-            if (!ctx.args.has(3)) return ctx.send('No message was provided');
-
-            const message = ctx.args.slice(3).join(' ');
-            const settings = await ctx.getSettings();
-            const doc = {
-              'responses.mention.enabled': true,
-              'responses.mention.message': message
-            };
-
-            if (!settings!.automod.mention) doc['automod.mention'] = true;
-            const setted = doc.hasOwnProperty('automod.mention') ?
-              `All responses to the mention automod feature will now be \`${message}\`\nExample: **${replaceMessage(message, ctx.sender)}**\nSince you didn't enable the automod feature, I've enabled it for you!` :
-              `All responses to the mention automod feature will now be \`${message}\`\nExample: **${replaceMessage(message, ctx.sender)}**`;
-
-            await this.bot.settings.update(ctx.guild!.id, {
-              $set: doc
-            }, error => error ? ctx.send(`Unable to set the mention automod feature response to: \`${message}\``) : ctx.send(setted));
-          } break;
-
-          case 'spam': {
-            if (!ctx.args.has(3)) return ctx.send('No message was provided');
-
-            const message = ctx.args.slice(3).join(' ');
-            const settings = await ctx.getSettings();
-            const doc = {
-              'responses.spam.enabled': true,
-              'responses.spam.message': message
-            };
-
-            if (!settings!.automod.spam) doc['automod.spam'] = true;
-            const setted = doc.hasOwnProperty('automod.spam') ?
-              `All responses to the spam automod feature will now be \`${message}\`\nExample: **${replaceMessage(message, ctx.sender)}**\nSince you didn't enable the automod feature, I've enabled it for you!` :
-              `All responses to the spam automod feature will now be \`${message}\`\nExample: **${replaceMessage(message, ctx.sender)}**`;
-
-            await this.bot.settings.update(ctx.guild!.id, {
-              $set: doc
-            }, error => error ? ctx.send(`Unable to set the spam automod feature response to: \`${message}\``) : ctx.send(setted));
-          } break;
-
-          default: return ctx.send(other === undefined ? `No automod feature subcommand was found (${otherCmds.join(', ')})` : `Invalid automod feature subcommand "${other}" (${otherCmds.join(', ')})`);
-        }
-      } break;
-
-      case 'add': {
-        const other = ctx.args.get(2);
-        const otherCmds = ['badwords', 'invite', 'mention', 'spam'];
-        switch (other) {
-          case 'badwords': {
-            await this.bot.settings.update(ctx.guild!.id, {
-              $set: {
-                'response.badwords.enabled': false,
-                'response.badwords.message': null
-              }
-            }, error => error ? ctx.send('Unable to disable the badwords automod\'s response message') : ctx.send('Disabled the response for the badwords automod feature'));
-          } break;
-
-          case 'invites': {
-            await this.bot.settings.update(ctx.guild!.id, {
-              $set: {
-                'response.invites.enabled': false,
-                'response.invites.message': null
-              }
-            }, error => error ? ctx.send('Unable to disable the invites automod\'s response message') : ctx.send('Disabled the response for the invites automod feature'));
-          } break;
-
-          case 'mention': {
-            await this.bot.settings.update(ctx.guild!.id, {
-              $set: {
-                'response.mention.enabled': false,
-                'response.mention.message': null
-              }
-            }, error => error ? ctx.send('Unable to disable the mention automod\'s response message') : ctx.send('Disabled the response for the mention automod feature'));
-          } break;
-
-          case 'spam': {
-            await this.bot.settings.update(ctx.guild!.id, {
-              $set: {
-                'response.spam.enabled': false,
-                'response.spam.message': null
-              }
-            }, error => error ? ctx.send('Unable to disable the spam automod\'s response message') : ctx.send('Disabled the response for the spam automod feature'));
-          } break;
-
-          default: return ctx.send(other === undefined ? `No automod feature subcommand was found (${otherCmds.join(', ')})` : `Invalid automod feature subcommand "${other}" (${otherCmds.join(', ')})`);
-        }
-      }
-
-      default: return ctx.send(subcommand === undefined ? `No subcommand was found (${subcommands.join(', ')})` : `Invalid subcommand "${subcommand}" (${subcommands.join(', ')})`);
-    }
+    if (!provided) embed.setFooter(footer);
+    return ctx.embed(embed);
   }
 }

@@ -1,0 +1,34 @@
+name: Check for any mistakes while in Pull Requests
+on:
+  pull_request:
+    branches:
+      # Only do it on Edge and Development branches
+      # so Master won't bleed into Edge/Development's branches
+      - edge
+      - 'development/**'
+    paths-ignore:
+      - '.github/**'
+      - '.vscode/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '**.md'
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 13.x, 14.x]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js v${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Installs global packages
+        run: npm i -g eslint jest
+      - name: Install dependencies
+        run: npm i
+      - name: Lints the repository
+        run: npm run lint
+      - name: Runs all tests with Jest
+        run: npm run test

@@ -1,5 +1,4 @@
 import { Message, TextChannel } from 'eris';
-import { replaceMessage } from '../../util';
 import PermissionUtil from '../../util/PermissionUtils';
 import Bot from '../Bot';
 
@@ -9,18 +8,20 @@ export default class AutoModMention {
     this.bot = client;
   }
 
-  async handle(m: Message): Promise<boolean> {
-    const channel = m.channel as TextChannel;
-    const nino = channel.guild.members.get(this.bot.client.user.id)!;
+  async handle(m: Message<TextChannel>): Promise<boolean> {
+    if (!m || m === null) return false;
+    if (!(m.channel instanceof TextChannel)) return false;
+
+    const me = m.channel.guild.members.get(this.bot.client.user.id)!;
 
     if (
-      !PermissionUtil.above(nino, m.member!) ||
-      (m.channel as TextChannel)
-        .permissionsOf(m.author.id)
-        .has('manageMessages')
+      !PermissionUtil.above(me, m.member!) ||
+      !m.channel.permissionsOf(me.id).has('manageMessages') ||
+      m.author.bot ||
+      m.channel.permissionsOf(m.author.id).has('manageMessages')
     ) return false;
 
-    const settings = await this.bot.settings.get(channel.guild.id);
+    const settings = await this.bot.settings.get(m.channel.guild.id);
     if (!settings || !settings.automod.mention) return false;
 
     if (m.mentions.length >= 4) {
@@ -28,13 +29,15 @@ export default class AutoModMention {
       for (let punish of punishments) await this.bot.punishments.punish(
         m.member!,
         punish,
-        'Automod (Mention Spam)'
+        '[Automod] Mention Spam'
       );
 
-      const response = !settings.responses.mention.enabled ?
-        replaceMessage('%author%, please don\'t mention more than 4 people at once!', m.author) :
-        replaceMessage(settings.responses.mention.message, m.author);
+      const user = await this.bot.userSettings.get(m.author.id);
+      const locale = user === null
+        ? this.bot.locales.get(settings.locale)!
+        : this.bot.locales.get(user.locale)!;
 
+      const response = locale.translate('automod.mentions', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });
       await m.channel.createMessage(response);
       return true;
     }

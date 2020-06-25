@@ -21,16 +21,17 @@ import TimeoutsManager from './structures/managers/TimeoutsManager';
 import GuildSettings from './structures/settings/GuildSettings';
 import BotListService from './structures/services/BotListService';
 import StatusManager from './structures/managers/StatusManager';
-import PrometheusManager from './structures/managers/PrometheusManager';
 import CommandStatisticsManager from './structures/managers/CommandStatisticsManager';
 import NinoCommand from './structures/Command';
 import HelpCommand from './commands/generic/Help';
 import InviteCommand from './commands/generic/Invite';
+import LocaleCommand from './commands/generic/Locale';
 import PingCommand from './commands/generic/Ping';
 import SettingsCommand from './commands/generic/Settings';
 import ShardInfoCommand from './commands/generic/ShardInfo';
 import StatisticsCommand from './commands/generic/Statistics';
 import UptimeCommand from './commands/generic/Uptime';
+import TimeCommand from './commands/generic/Time';
 import BanCommand from './commands/moderation/Ban';
 import KickCommand from './commands/moderation/Kick';
 import LockdownCommand from './commands/moderation/Lockdown';
@@ -44,6 +45,7 @@ import WarnCommand from './commands/moderation/Warn';
 import WarningsCommand from './commands/moderation/Warnings';
 import EvalCommand from './commands/system/Eval';
 import ShellCommand from './commands/system/Shell';
+import ProfilerCommand from './commands/system/Profiler';
 import NinoEvent from './structures/Event';
 import GuildBanAddEvent from './events/GuildBanAdd';
 import GuildBanRemoveEvent from './events/GuildBanRemove';
@@ -59,6 +61,7 @@ import ShardDisconnectedEvent from './events/ShardDisconnected';
 import ShardReadyEvent from './events/ShardReady';
 import ShardResumedEvent from './events/ShardResume';
 import UserUpdateEvent from './events/UserUpdate';
+import UserSettings from './structures/settings/UserSettings';
 
 let config: Config;
 try {
@@ -135,11 +138,6 @@ container
   .inSingletonScope();
 
 container
-  .bind<PrometheusManager>(TYPES.PrometheusManager)
-  .to(PrometheusManager)
-  .inSingletonScope();
-
-container
   .bind<CommandStatisticsManager>(TYPES.CommandStatisticsManager)
   .to(CommandStatisticsManager)
   .inSingletonScope();
@@ -152,6 +150,11 @@ container
 container
   .bind<GuildSettings>(TYPES.GuildSettings)
   .to(GuildSettings)
+  .inSingletonScope();
+
+container
+  .bind<UserSettings>(TYPES.UserSettings)
+  .to(UserSettings)
   .inSingletonScope();
 
 container
@@ -177,8 +180,14 @@ container
 
 container
   .bind<NinoCommand>(TYPES.Command)
+  .to(LocaleCommand)
+  .inSingletonScope();
+
+container
+  .bind<NinoCommand>(TYPES.Command)
   .to(PingCommand)
   .inSingletonScope();
+
 container
   .bind<NinoCommand>(TYPES.Command)
   .to(SettingsCommand)
@@ -197,6 +206,11 @@ container
 container
   .bind<NinoCommand>(TYPES.Command)
   .to(UptimeCommand)
+  .inSingletonScope();
+
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(TimeCommand)
   .inSingletonScope();
 
 // Moderation Commands
@@ -264,6 +278,11 @@ container
 container
   .bind<NinoCommand>(TYPES.Command)
   .to(ShellCommand)
+  .inSingletonScope();
+
+container
+  .bind<NinoCommand>(TYPES.Command)
+  .to(ProfilerCommand)
   .inSingletonScope();
 
 // Events

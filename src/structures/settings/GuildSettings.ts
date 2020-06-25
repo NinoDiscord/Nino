@@ -6,7 +6,7 @@ import Bot from '../Bot';
 
 @injectable()
 export default class GuildSettings implements Base<GuildModel> {
-  public client: any;
+  public client: Bot;
   public model = model;
 
   constructor(@inject(TYPES.Bot) bot: Bot) {
@@ -22,16 +22,16 @@ export default class GuildSettings implements Base<GuildModel> {
   async getOrCreate(id: string): Promise<GuildModel> {
     let settings = await this.get(id);
     if (!settings || settings === null)
-      settings = this.client.settings.create(id);
+      settings = await this.create(id);
     return settings!;
   }
 
-  create(id: string): GuildModel {
+  async create(id: string): Promise<GuildModel> {
     const query = new this.model({
       guildID: id,
       prefix: this.client.config.discord.prefix,
     });
-    query.save();
+    await query.save();
     return query;
   }
 

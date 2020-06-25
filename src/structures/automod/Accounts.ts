@@ -12,6 +12,8 @@ export default class AccountsAutomod {
   }
 
   async handle(m: Member) {
+    if (m === null) return false;
+
     const guild = m.guild;
     const me = guild.members.get(this.bot.client.user.id)!;
     if (!PermissionUtils.above(me, m) || m.bot || Date.now() - m.createdAt > 7 * 86400000) return false;
@@ -29,7 +31,7 @@ export default class AccountsAutomod {
         const old = Number.parseInt(await bucket.pop());
         if (Date.now() - old <= 1000) {
           do {
-            await this.bot.punishments.punish(m, new Punishment(PunishmentType.Ban, { moderator: me.user }), '[Automod] Raid detected');
+            await this.bot.punishments.punish(m, new Punishment(PunishmentType.Ban, { moderator: me.user }), '[Automod] Raiding');
           
             const id = (await bucket.pop()).split(':')[1];
             m = guild.members[id];

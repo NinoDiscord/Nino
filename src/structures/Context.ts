@@ -1,7 +1,10 @@
 import { Message, TextChannel, User, EmbedOptions } from 'eris';
 import ArgumentParser from './parsers/ArgumentParser';
+import { unembedify } from '../util';
+import { GuildModel } from '../models/GuildSchema';
 import FlagParser from './parsers/FlagParser';
 import Bot from './Bot';
+import Language from './Language';
 
 export interface DMOptions {
   user: User;
@@ -14,12 +17,16 @@ export default class CommandContext {
   public message: Message;
   public args: ArgumentParser;
   public flags: FlagParser;
+  public locale: Language | undefined;
+  public settings: GuildModel | undefined;
 
-  constructor(bot: Bot, m: Message, args: string[]) {
+  constructor(bot: Bot, m: Message, args: string[], locale: Language | undefined, settings: GuildModel | undefined) {
     this.bot = bot;
     this.message = m;
     this.args = new ArgumentParser(args);
     this.flags = new FlagParser(args);
+    this.locale = locale;
+    this.settings = settings;
   }
 
   send(content: string) {
@@ -27,9 +34,16 @@ export default class CommandContext {
   }
 
   embed(content: EmbedOptions) {
-    return this.message.channel.createMessage({
-      embed: content,
-    });
+    if (this.guild) {
+      if (!this.me.permission.has('embedLinks')) {
+        const message = unembedify(content);
+        return this.send(message);
+      } else {
+        return this.message.channel.createMessage({ embed: content });
+      }
+    } else {
+      return this.message.channel.createMessage({ embed: content });
+    }
   }
 
   code(lang: string, content: string) {
@@ -65,6 +79,14 @@ export default class CommandContext {
 
   getSettings() {
     return this.guild ? this.bot.settings.getOrCreate(this.guild.id) : null;
+  }
+
+  translate(key: string, args?: { [x: string]: any }): string {
+    return this.locale ? this.locale.translate(key, args) : 'Failed translation.';
+  }
+
+  async sendTranslate(key: string, args?: { [x: string]: any }) {
+    return this.send(this.translate(key, args));
   }
 
   get redis() {

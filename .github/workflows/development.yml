@@ -7,9 +7,21 @@ on:
   push:
     branches: 
       - 'development/**'
+    paths-ignore:
+      - '.github/**'
+      - '.vscode/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '**.md'
   pull_request:
     branches: 
       - 'development/**'
+    paths-ignore:
+      - '.github/**'
+      - '.vscode/**'
+      - '.gitignore'
+      - 'LICENSE'
+      - '**.md'
 
 jobs:
   build:

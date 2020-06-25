@@ -1,13 +1,9 @@
 import { humanize, formatSize } from '../../util';
-import { VERSION as version } from 'eris';
 import { injectable, inject } from 'inversify';
-import { stripIndents } from 'common-tags';
-import { execSync } from 'child_process';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
-import ts from 'typescript';
 
 const pkg = require('../../../package.json');
 
@@ -19,44 +15,37 @@ export default class StatisticsCommand extends Command {
     super(client, {
       name: 'statistics',
       description: 'Gives you the bot\'s statistics',
-      aliases: ['stats', 'info', 'bot', 'botinfo'],
-      category: 'Generic',
-      ownerOnly: false,
+      aliases: ['stats', 'info', 'bot', 'botinfo']
     });
   }
 
   async run(ctx: Context) {
-    const { command, size: uses } = this.bot.statistics.getCommandUsages();
-    const build = await this.bot.database.getBuild();
-    const commit = execSync('git rev-parse HEAD').toString().trim();
-    const users = this.bot.client.guilds.reduce((a, b) => a + b.memberCount, 0);
+    const { command, uses } = this.bot.statistics.getCommandUsages();
+    const users = this.bot.client.guilds.reduce((a, b) => a + b.memberCount, 0).toLocaleString();
     const channels = Object.keys(this.bot.client.channelGuildMap).length;
     const shardPing = this.bot.client.shards.reduce((a, b) => a + b.latency, 0);
     const connection = await this.bot.database.admin.ping();
-    const memoryUsage = formatSize(process.memoryUsage().heapUsed);
+    const memoryUsage = formatSize(process.memoryUsage().rss);
 
     const embed = this.bot.getEmbed()
-      .setTitle(`${this.bot.client.user.username}#${this.bot.client.user.discriminator} | Realtime Statistics`)
-      .setDescription(stripIndents`
-        \`\`\`prolog
-        Guilds              => ${this.bot.client.guilds.size.toLocaleString()}
-        Users               => ${users.toLocaleString()}
-        Channels            => ${channels.toLocaleString()}
-        Shards              => ${ctx.guild!.shard.id}/${this.bot.client.shards.size} (${shardPing}ms avg.)
-        Uptime              => ${humanize(Date.now() - this.bot.client.startTime)}
-        Total Commands      => ${this.bot.manager.commands.size}
-        Messages Seen       => ${this.bot.statistics.messagesSeen.toLocaleString()}
-        Commands Executed   => ${this.bot.statistics.commandsExecuted.toLocaleString()}
-        Most Used Command   => ${command} (${uses} executions)
-        MongoDB Version     => v${build.version}
-        TypeScript Version  => v${ts.version}
-        Node.js Version     => ${process.version}
-        Eris Version        => ${version}
-        Nino Version        => ${pkg.version} (${commit.slice(0, 7)})
-        Database Connection => ${connection.ok === 1 ? 'Online' : 'Offline'}
-        Memory Usage        => ${memoryUsage}
-        \`\`\`
-      `)
+      .setTitle(ctx.translate('commands.generic.statistics.title', { username: `${this.bot.client.user.username}#${this.bot.client.user.discriminator}` }))
+      .setDescription(ctx.translate('commands.generic.statistics.description', {
+        guilds: this.bot.client.guilds.size.toLocaleString(),
+        users,
+        channels,
+        current: ctx.guild ? ctx.guild.shard.id : 0,
+        total: this.bot.client.shards.size,
+        latency: shardPing,
+        uptime: humanize(Math.round(process.uptime()) * 1000),
+        commands: this.bot.manager.commands.size,
+        messages: this.bot.statistics.messagesSeen.toLocaleString(),
+        executed: this.bot.statistics.commandsExecuted.toLocaleString(),
+        name: command,
+        executions: uses,
+        connected: connection.ok === 1 ? ctx.translate('global.online') : ctx.translate('global.offline'),
+        memoryUsage,
+        version: pkg.version
+      }))
       .build();
 
     return ctx.embed(embed);

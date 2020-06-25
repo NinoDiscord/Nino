@@ -7,9 +7,7 @@ import Bot from '../../structures/Bot';
 
 @injectable()
 export default class HelpCommand extends Command {
-  constructor(
-    @inject(TYPES.Bot) client: Bot
-  ) {
+  constructor(@inject(TYPES.Bot) client: Bot) {
     super(client, {
       name: 'help',
       description: (bot) => `Gives a list of ${bot.client.user ? bot.client.user.username : 'Nino'}'s commands or shows documentation on a specific command`,
@@ -34,16 +32,27 @@ export default class HelpCommand extends Command {
     const categories = this.getAllCategories();
 
     if (!ctx.args.has(0)) {
+      const title = ctx.translate('commands.generic.help.embed.title', {
+        username: `${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator}`
+      });
+
+      const description = ctx.translate('commands.generic.help.embed.description', {
+        website: 'https://nino.augu.dev',
+        commands: this.bot.manager.commands.size
+      });
+
+      const footer = ctx.translate('commands.generic.help.embed.footer', {
+        prefix: settings ? settings.prefix : this.bot.config.discord.prefix
+      });
+
       const embed = ctx.bot.getEmbed()
-        .setTitle(`${ctx.bot.client.user.username}#${ctx.bot.client.user.discriminator} | Commands List`)
-        .setDescription(stripIndents`
-          More information is available on the [website](https://nino.augu.dev)!
-          There are currently **${ctx.bot.manager.commands.size}** commands available!
-        `)
-        .setFooter(`Use "${settings!.prefix}help <command name>" to get documentation on a specific command`);
+        .setTitle(title)
+        .setDescription(description)
+        .setFooter(footer);
 
       for (const category in categories) {
-        embed.addField(`${category} [${categories[category].length}]`, categories[category].map(s => `\`${s.name}\``).join(', '));
+        const localized = ctx.translate(`commands.generic.help.categories.${category.toLowerCase()}`);
+        embed.addField(`${localized} [${categories[category].length}]`, categories[category].map(s => `\`${s.name}\``).join(', '));
       }
 
       return ctx.embed(embed.build());
@@ -51,9 +60,13 @@ export default class HelpCommand extends Command {
       const arg = ctx.args.get(0);
       const command = ctx.bot.manager.getCommand(arg);
 
-      if (!command) return ctx.send(`Sorry, I was not able to find the command \`${arg}\``);
+      const notFound = ctx.translate('commands.generic.help.notFound', {
+        command: arg
+      });
+
+      if (!command) return ctx.send(notFound);
       else {
-        const embed = command.help();
+        const embed = await command.help(ctx);
         return ctx.embed(embed);
       }
     }

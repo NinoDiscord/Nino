@@ -30,6 +30,8 @@ export default class AutoModRaid {
    * @param m the message
    */
   async handle(m: Member): Promise<boolean> {
+    if (m === null) return false;
+
     const guild = m.guild;
     const me = guild.members.get(this.bot.client.user.id)!;
     if (
@@ -52,7 +54,7 @@ export default class AutoModRaid {
           await this.bot.punishments.punish(
             m,
             new Punishment(PunishmentType.Ban, { moderator: me.user }),
-            '[Automod] Raid detected'
+            '[Automod] Raiding'
           );
 
           const [, id] = (await queue.pop()).split('U');

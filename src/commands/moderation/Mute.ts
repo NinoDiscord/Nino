@@ -2,6 +2,7 @@ import { Punishment, PunishmentType } from '../../structures/managers/Punishment
 import { injectable, inject } from 'inversify';
 import { Constants, Member } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import findUser from '../../util/UserUtil'; 
 import Command from '../../structures/Command';
@@ -19,7 +20,7 @@ export default class MuteCommand extends Command {
       description: 'Mutes a member from this guild',
       usage: '<user> <reason> | [time]',
       aliases: ['slience'],
-      category: 'Moderation',
+      category: Module.Moderation,
       userPermissions: Constants.Permissions.manageRoles,
       botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
       guildOnly: true
@@ -27,16 +28,19 @@ export default class MuteCommand extends Command {
   }
 
   async run(ctx: Context) {
-    if (!ctx.args.has(0)) return ctx.send('No user has been specified');
+    if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const userID = ctx.args.get(0);
     const user = findUser(this.bot, userID);
-    if (!user || user === undefined) return ctx.send('Cannot find member in this guild');
+    if (!user || user === undefined) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(user.id);
-    if (!member) return ctx.send(`User **\`${user.username}#${user.discriminator}\`** isn't in the guild`);
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.send('The user is above or the same heirarchy as you');
+    if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
+      user: `${user.username}#${user.discriminator}`
+    });
 
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.heirarchy');
+    
     const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     let reason!: string;
     let time!: string;
@@ -58,9 +62,14 @@ export default class MuteCommand extends Command {
       await this.bot.punishments.punish(member!, punishment, reason);
 
       const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';
-      return ctx.send(`${prefix} was successfully muted`);
-    } catch (ex) {
-      return ctx.send(`Unable to mute user: \`${ex.message}\``);
+      return ctx.sendTranslate('commands.moderation.mute', {
+        type: prefix
+      });
+    } catch(e) {
+      return ctx.sendTranslate('commands.moderation.unable', {
+        type: member instanceof Member ? member.user.bot ? 'bot' : 'user' : 'user',
+        message: e.message
+      });
     }
   }
 }

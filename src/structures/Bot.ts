@@ -1,10 +1,9 @@
-import { Client as DiscordClient, Guild, AnyChannel, Role } from 'eris';
-import { collectDefaultMetrics } from 'prom-client';
+import { Client as DiscordClient } from 'eris';
 import CommandStatisticsManager from './managers/CommandStatisticsManager';
 import { inject, injectable } from 'inversify';
 import RedisClient, { Redis } from 'ioredis';
 import { captureException } from '@sentry/node';
-import PrometheusManager from './managers/PrometheusManager';
+import LocalizationManager from './managers/LocalizationManager';
 import PunishmentManager from './managers/PunishmentManager';
 import { setDefaults } from 'wumpfetch';
 import TimeoutsManager from './managers/TimeoutsManager';
@@ -15,6 +14,7 @@ import AutomodService from './services/AutomodService';
 import BotListService from './services/BotListService';
 import StatusManager from './managers/StatusManager';
 import GuildSettings from './settings/GuildSettings';
+import UserSettings from './settings/UserSettings';
 import CaseSettings from './settings/CaseSettings';
 import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
@@ -26,7 +26,7 @@ import 'reflect-metadata';
 const pkg = require('../../package.json');
 setDefaults({
   headers: {
-    'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/auguwu/Nino)`
+    'User-Agent': `Nino/DiscordBot (v${pkg.version}, https://github.com/NinoDiscord/Nino)`
   }
 });
 
@@ -51,6 +51,7 @@ export interface Config {
     port: number;
   };
   botlists: {
+    dservicestoken: string | undefined;
     dboatstoken: string | undefined;
     topggtoken: string | undefined;
     bfdtoken: string | undefined;
@@ -65,6 +66,7 @@ export interface Config {
 @injectable()
 export default class Bot {
   public warnings: Warnings;
+  public locales: LocalizationManager;
   public logger: Logger;
   public owners: string[];
   public client: DiscordClient;
@@ -77,9 +79,6 @@ export default class Bot {
 
   @lazyInject(TYPES.CommandManager)
   public manager!: CommandManager;
-
-  @lazyInject(TYPES.PrometheusManager)
-  public prometheus!: PrometheusManager;
 
   @lazyInject(TYPES.TimeoutsManager)
   public timeouts!: TimeoutsManager;
@@ -105,11 +104,15 @@ export default class Bot {
   @lazyInject(TYPES.PunishmentManager)
   public punishments!: PunishmentManager;
 
+  @lazyInject(TYPES.UserSettings)
+  public userSettings!: UserSettings;
+
   constructor(
     @inject(TYPES.Config) config: Config,
     @inject(TYPES.Client) client: DiscordClient 
   ) {
     this.warnings = new Warnings();
+    this.locales = new LocalizationManager(this);
     this.config = config;
     this.client = client;
     this.owners = config.owners || [];
@@ -120,22 +123,24 @@ export default class Bot {
       host: config.redis.host,
       db: config.redis.database
     });
-
-    this.addRedisEvents();
   }
 
   async build() {
-    collectDefaultMetrics();
-
     this.logger.info('Connecting to the database...');
     await this.database.connect();
 
     this.logger.info('Success! Connecting to the Redis pool...');
+
+    this.addRedisEvents();
+    this.addDebugMonitor();
     // eslint-disable-next-line
     await this.redis.connect().catch(() => {});
 
     this.logger.info('Success! Initializing events...');
     this.events.run();
+
+    this.logger.info('Success! Initializing locales...');
+    this.locales.run();
 
     this.logger.info('Success! Connecting to Discord...');
     await this.client.connect()
@@ -147,6 +152,8 @@ export default class Bot {
     this.database.dispose();
     this.redis.disconnect();
     this.client.disconnect({ reconnect: false });
+    this.botlists.stop();
+
     this.logger.warn('Bot connection was disposed');
   }
 
@@ -161,13 +168,23 @@ export default class Bot {
 
   private addRedisEvents() {
     this.redis.once('ready', () => this.logger.redis(`Created a Redis pool at ${this.config.redis.host}:${this.config.redis.port}${this.config.redis.database ? `, with database ID: ${this.config.redis.database}` : ''}`));
-    this.redis.on('wait', async () => {
-      this.logger.redis('Redis has disconnected and awaiting a new pool...');
-      if (this.config.webhook) {
-        await this.client.executeWebhook(this.config.webhook.id, this.config.webhook.token, {
-          content: ':pencil2: **| Redis connection is unstable, waiting for a new pool to be established...**'
+    this.redis.on('wait', () => this.logger.redis('Redis has disconnected and awaiting a new pool...'));
+  }
+
+  private addDebugMonitor() {
+    if (this.config.environment === 'development') {
+      this.logger.info('Environment is in development mode, adding monitoring with Redis...');
+      this.redis.monitor((error, monitor) => {
+        if (error) this.logger.error('Unable to initialize the debug monitor', error);
+
+        this.logger.info('Initialized monitoring!');
+        monitor.on('monitor', (time: number, args: string[]) => {
+          const date = new Date(Math.floor(time) * 1000);
+          const command = args.shift()!;
+
+          this.logger.redis(`At ${date.toDateString()}, we executed command ${command.toUpperCase()} with args "${args.join(':')}"`);
         });
-      }
-    });
+      });
+    }
   }
 }

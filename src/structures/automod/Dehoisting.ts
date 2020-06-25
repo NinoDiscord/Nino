@@ -23,6 +23,8 @@ export default class AutoModDehoist {
    * @param m the member
    */
   async handle(m: Member): Promise<void> {
+    if (m === null) return;
+
     const guild = m.guild;
     const me = guild.members.get(this.bot.client.user.id)!;
     const name = m.nick || m.username;
@@ -41,8 +43,8 @@ export default class AutoModDehoist {
     while (index < name.length && name[index] < '0') index++;
 
     const good = name.substring(index).trim();
-    if (good === '' && m.username >= '0') return m.edit({ nick: m.username }, '[Automod] Dehoisted to normal username');
-    else if (good === '') return m.edit({ nick: 'hoister' }, '[Automod] Dehoisted to "hoister"');
-    else return m.edit({ nick: good }, `[Automod] Dehoisted to "${good}"`);
+    if (good === '' && m.username >= '0') return m.edit({ nick: m.username }, '[Automod] Dehoisted');
+    else if (good === '') return m.edit({ nick: 'hoister' }, '[Automod] Dehoisted');
+    else return m.edit({ nick: good }, '[Automod] Dehoisted');
   }
 }

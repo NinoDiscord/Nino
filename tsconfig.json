@@ -1,4 +1,8 @@
 {
+  "globals": {
+    "_config": false,
+    "console": true
+  },
   "compilerOptions": {
     "target": "ESNext",
     "module": "CommonJS",
@@ -13,7 +17,8 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "sourceMap": true
   },
   "include": ["src/**/*"],
   "exclude": [

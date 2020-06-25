@@ -1,9 +1,9 @@
 import { Model, Document, Query } from 'mongoose';
 
 export interface SettingsBase<T extends Document> {
-  model: Model<T, {}>;
+  model: Model<T, object>;
   get(id: string): Promise<T | null>;
-  create(id: string): T;
+  create(id: string): Promise<T>;
   remove(id: string): void;
   update(
     id: string,
@@ -17,7 +17,7 @@ export interface SettingsBase<T extends Document> {
 // at the command palor (src/commands)
 // so we won't add `CaseSettingBase<T extends Document>#create` for simplistic sake
 export interface CaseSettingBase<T extends Document> {
-  model: Model<T, {}>;
+  model: Model<T, object>;
   get(guild: string, id: number): Promise<T | null>;
   getAll(guild: string): Promise<T[] | null>;
   create(
@@ -39,7 +39,7 @@ export interface CaseSettingBase<T extends Document> {
 // Why is this here?
 // The warning base is different from everything
 export interface WarningBase<T extends Document> {
-  model: Model<T, {}>;
+  model: Model<T, object>;
   get(guildId: string, userId: string): Promise<T | null>;
   create(guildId: string, userId: string): T;
   remove(guildId: string, userId: string): void;

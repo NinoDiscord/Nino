@@ -5,6 +5,7 @@ export interface GuildModel extends Document {
   prefix: string;
   mutedRole: string;
   modlog: string;
+  locale: string;
   automod: {
     dehoist: boolean;
     spam: boolean;
@@ -15,24 +16,6 @@ export interface GuildModel extends Document {
     };
     raid: boolean;
     mention: boolean;
-  };
-  responses: {
-    badwords: {
-      enabled: boolean;
-      message: string;
-    }
-    invite: {
-      enabled: boolean;
-      message: string
-    }
-    mention: {
-      enabled: boolean;
-      message: string;
-    }
-    spam: {
-      enabled: boolean;
-      message: string;
-    }
   };
   punishments: { 
     type: string; 
@@ -119,8 +102,11 @@ const schema = new Schema<GuildModel>({
         default: false
       }
     }
+  },
+  locale: {
+    type: String,
+    default: 'en_US'
   }
 });
 
-const _model = model<GuildModel>('guilds', schema, 'guilds');
-export default _model;
+export default model<GuildModel>('guilds', schema, 'guilds');

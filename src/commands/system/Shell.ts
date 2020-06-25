@@ -1,6 +1,7 @@
 import { injectable, inject } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { execSync } from 'child_process';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -14,7 +15,7 @@ export default class ShellCommand extends Command {
       description: 'Runs a command on the bot\'s host machine.',
       usage: '<script>',
       aliases: ['exec', 'sh'],
-      category: 'System Adminstration',
+      category: Module.System,
       ownerOnly: true,
       hidden: true
     });

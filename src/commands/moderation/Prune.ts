@@ -1,6 +1,7 @@
+import { Constants, Message, TextableChannel } from 'eris';
 import { injectable, inject } from 'inversify';
-import { Constants, Message } from 'eris';
 import { stripIndents } from 'common-tags';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -8,7 +9,7 @@ import Bot from '../../structures/Bot';
 
 @injectable()
 export default class PruneCommand extends Command {
-  public filters: string[] = ['new', 'bot', 'user', 'self'];
+  public filters: string[] = ['none', 'new', 'bot', 'user', 'self', 'image'];
   public weeks: number = Date.now() - (1000 * 60 * 60 * 24 * 14);
 
   constructor(@inject(TYPES.Bot) client: Bot) {
@@ -17,7 +18,7 @@ export default class PruneCommand extends Command {
       description: 'Prunes messages by a filter from the current or a different channel',
       usage: '<amount> [--filter="bot" | "user" | "new" | "self"]',
       aliases: ['purge', 'delmsg'],
-      category: 'Moderation',
+      category: Module.Moderation,
       userPermissions: Constants.Permissions.manageMessages,
       botPermissions: Constants.Permissions.manageMessages,
       guildOnly: true
@@ -25,31 +26,36 @@ export default class PruneCommand extends Command {
   }
 
   async run(ctx: Context) {
-    if (!ctx.args.has(0)) return ctx.send('You must provide an amount of messages to delete.');
+    if (!ctx.args.has(0)) return ctx.sendTranslate('commands.moderation.prune.noAmount');
 
     const arg = ctx.args.get(0);
     const amount = Number(arg);
 
-    if (isNaN(amount)) return ctx.send('You didn\'t provide a valid number.');
-    if (amount < 2) return ctx.send('The amount of messages has to be greater or equal to 2');
-    if (amount > 100) return ctx.send('The amount of messages has to be less than or equal to 2');
+    if (isNaN(amount)) return ctx.sendTranslate('global.nan');
+    if (amount < 2) return ctx.sendTranslate('commands.moderation.prune.tooLow');
+    if (amount > 100) return ctx.sendTranslate('commands.moderation.prune.tooHigh');
 
     const allMsgs = await ctx.message.channel.getMessages(amount);
     const filter = ctx.flags.get('filter') || ctx.flags.get('f');
 
-    if (typeof filter === 'boolean') return ctx.send(`You must append a value to the \`--filter\` flag. Example: **--filter=new** (Avaliable filters: ${this.filters.join(', ')})`);
-    if (filter && !this.filters.includes(filter)) return ctx.send(`Invalid filter (${this.filters.join(', ')})`);
-  
-    const shouldDelete = allMsgs.filter(x => 
-      (filter === 'user' ? !x.author.bot : true) &&
-      (filter === 'self' ? x.author.id === this.bot.client.user.id : true) &&
-      (filter === 'bot' ? x.author.bot : true) &&
-      (filter === 'new' ? x.timestamp > this.weeks : true)   
+    if (typeof filter === 'boolean') return ctx.sendTranslate('global.invalidFlag.boolean');
+    if (filter && !this.filters.includes(filter)) return ctx.sendTranslate('commands.moderation.prune.invalidFilter', {
+      filters: this.filters.join(', '),
+      filter
+    });
+
+    const shouldDelete = (allMsgs as Message<TextableChannel>[]).filter((x: Message<TextableChannel>) => 
+      !filter || filter === 'none' ||
+      (filter === 'user' ? !x.author.bot : false) ||
+      (filter === 'self' ? x.author.id === this.bot.client.user.id : false) ||
+      (filter === 'bot' ? x.author.bot : false) ||
+      (filter === 'new' ? x.timestamp > this.weeks : false) ||
+      (filter === 'image' ? x.attachments.length : false)
     );
 
-    if (!shouldDelete.length) return ctx.send(`Couldn't find any messages with filter: \`${filter}\``);
+    if (!shouldDelete.length) return ctx.sendTranslate('commands.moderation.prune.noMessages', { filter });
+    const message = await ctx.sendTranslate('commands.moderation.prune.nowDel', { messages: shouldDelete.length });
 
-    const message = await ctx.send(`Now deleting ${shouldDelete.length} messages...`);
     try {
       shouldDelete.map(async (msg) => await ctx.message.channel.deleteMessage(msg.id));
       const msgs: string[] = [];
@@ -62,13 +68,16 @@ export default class PruneCommand extends Command {
       const allUsers = msgs.map(x => {
         const author = this.bot.client.users.get(x)!;
         const messages = shouldDelete.filter(e => e.author.id === x).length;
-        return `${author.username}#${author.discriminator} with ${messages} messages`;
-      });
+        return ctx.translate('commands.moderation.prune.userEntry', {
+          messages,
+          suffix: messages > 1 ? 's' : '',
+          user: `${author.username}#${author.discriminator}`
+        });
+      }).join('\n');
 
       const embed = this.bot.getEmbed()
-        .setTitle('Results')
+        .setAuthor(ctx.translate('commands.moderation.prune.title'))
         .setDescription(stripIndents`
-          **Deleted ${shouldDelete.length} messages**
           \`\`\`prolog
           ${allUsers}
           \`\`\`
@@ -79,13 +88,13 @@ export default class PruneCommand extends Command {
     } catch(ex) {
       if (ex.message.includes(' is more then 2 weeks old.')) {
         const messages = shouldDelete.filter(x => x.timestamp < this.weeks);
-        return ctx.send(`Unable to delete ${messages.length} messages due to Discord's limitations.`);
+        return ctx.sendTranslate('commands.moderation.prune.twoWeeks', { messages: messages.length });
       } else {
         const embed = this.bot.getEmbed()
-          .setTitle('Unable to delete messages')
+          .setTitle(ctx.translate('commands.moderation.prune.error.title'))
           .setDescription(stripIndents`
             \`\`\`js
-            ${ex.stack ? ex.stack.split('\n')[0] : ex.message}
+            ${ex.stack ? ex.stack.split('\n').slice(0, 3).join('\n') : ex.message}
             \`\`\`
           `);
         

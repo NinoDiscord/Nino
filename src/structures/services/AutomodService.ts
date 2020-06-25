@@ -1,5 +1,5 @@
+import { Message, Member, TextChannel } from 'eris';
 import { inject, injectable } from 'inversify';
-import { Message, Member } from 'eris';
 import AutomodAccounts from '../automod/Accounts';
 import AutomodSwearing from '../automod/Badwords';
 import AutomodDehoist from '../automod/Dehoisting';
@@ -51,12 +51,15 @@ export default class AutomodService {
    *
    * @param m the message
    */
-  async handleMessage(m: Message): Promise<boolean> {
+  async handleMessage(m: Message<TextChannel>): Promise<boolean> {
+    if (!(m.channel instanceof TextChannel)) return false;
+
     return (
       await this.invites.handle(m) ||
       await this.swearing.handle(m) ||
       await this.spam.handle(m) ||
-      await this.mentions.handle(m)
+      await this.mentions.handle(m) || 
+      false
     );
   }
 

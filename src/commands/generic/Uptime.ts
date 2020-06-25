@@ -13,12 +13,17 @@ export default class UptimeCommand extends Command {
     super(client, {
       name: 'uptime',
       description: 'Gives you the uptime for the bot.',
-      aliases: ['up'],
-      category: 'Generic'
+      aliases: ['up']
     });
   }
 
   async run(ctx: Context) {
-    return ctx.send(`:gear: **${humanize(Date.now() - this.bot.client.startTime)}**`);
+    const pUptime = Math.round(process.uptime()) * 1000;
+    const bUptime = Date.now() - this.bot.client.startTime;
+
+    return ctx.sendTranslate('commands.generic.uptime', {
+      connection: humanize(bUptime),
+      process: humanize(pUptime)
+    });
   }
 }

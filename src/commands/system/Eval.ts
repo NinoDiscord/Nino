@@ -2,6 +2,7 @@ import { writeFileSync, unlinkSync } from 'fs';
 import { injectable, inject } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { inspect } from 'util';
+import { Module } from '../../util';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -24,9 +25,9 @@ export default class EvalCommand extends Command {
       description: 'Evaluates JavaScript code and return a clean output',
       usage: '<script>',
       aliases: ['js', 'evl'],
-      category: 'System Adminstration',
+      category: Module.System,
       ownerOnly: true,
-      hidden: true,
+      hidden: true
     });
   }
 
@@ -97,6 +98,8 @@ export default class EvalCommand extends Command {
         'lib.es2016.d.ts',
         'lib.es2017.d.ts',
         'lib.es2018.d.ts',
+        'lib.es2019.d.ts',
+        'lib.es2020.d.ts',
         'lib.esnext.d.ts',
       ],
       declaration: false,

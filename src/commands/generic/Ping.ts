@@ -11,16 +11,22 @@ export default class PingCommand extends Command {
       name: 'ping',
       description: 'Shows you the bot\'s ping.',
       aliases: ['pong', 'pang'],
-      category: 'Generic',
       guildOnly: true
     });
   }
 
   async run(ctx: Context) {
+
     const startedAt = Date.now();
-    const message = await ctx.send(':ping_pong: Uhm, I was wondering why you used this command?');
+    const message = await ctx.sendTranslate('commands.generic.ping.oldMessage');
     
     const ws = this.bot.client.shards.reduce((a, b) => a + b.latency, 0);
-    return message.edit(`:ping_pong: Pong! (**Shard #${ctx.guild ? ctx.guild.shard.id : 0}**: \`${ws}ms\` | **Message**: \`${Date.now() - startedAt}ms\`)`);
+    const m = ctx.translate('commands.generic.ping.message', {
+      id: ctx.guild ? ctx.guild.shard.id : 0,
+      shard: ws,
+      messageLatency: Date.now() - startedAt
+    });
+
+    return message.edit(m);
   }
 }
