@@ -1,0 +1,410 @@
+{
+    "contributors": [],
+    "translator": "jacob#5418",
+    "completion": "completed",
+    "code": "fr_FR",
+    "flag": ":flag_fr:",
+    "full": "Françias (FR)",
+    "strings": {
+        "global": {
+            "invalidFlag": {
+                "boolean": "Flag **${flag}** n'a pas de valeur, c'est juste `--${flag}`!",
+                "string": "Flag **${flag}** nécessite une valeur, ajoutez-la avec `=`! (Exemple: `--${flag}=potatoes)"
+            },
+            "yes": "Oui",
+            "no": "Non",
+            "nan": "Le nombre que vous avez spécifié n'est pas un nombre.",
+            "online": "En ligne",
+            "offline": "Hors ligne",
+            "invalidChannel": "Channel **${channel}** n'était pas valide",
+            "notText": "Channel **${channel}** n'est pas un channel de texte",
+            "noUser": "Aucun utilisateur n'a été spécifié.",
+            "heirarchy": "L'utilisateur est supérieur ou identieque à vous dans hierarchy.",
+            "notInGuild": "L'utilisateur n'est pad dans la guilde?",
+            "unableToPunish": "Je n'ai pas pu punir l'utilisateur",
+            "unableToFind": "Je n'ai pas pu trouver d'utilisateur",
+            "notInBanList": "L'utilisateur n'est pas banni de cette guilde.",
+            "unable": "Je n'ai pas pu faire cela. `${error}`",
+            "members": {
+                "bot": "Bot",
+                "user": "Utilisatueur"
+            }
+        },
+        "errors": {
+            "title": "Impossible d'exécter la commande ${command}!",
+            "guildOnly": "Désolé, mais la commande`${command}` doit être exécutée dans une guilde!",
+            "ownerOnly": "Désolé, mais la commande`${command}` est réservée aux développeurs, essayez.",
+            "disabled": "Désolé, mais la commande`${command}` est désactivée globalement",
+            "cooldown": "La commande `${command}` est en cooldown pendant **${seconds}**.",
+            "failed": "La commande ${command} hn'a pas pu être exécutée",
+            "permissions": {
+                "user": "Désolé, mais les autorisations suivantes vois manquent: ${perms}.",
+                "bot": "Désolé, mais il me manque les autorisations suivantes: ${perms}."
+            },
+            "unknown": [
+                "L'erreur qui s'est produite a été enregistrée dans nos systémes.",
+                "Si cela est répétifif, signalez-le à ${owners} sur ${server}."
+            ]
+        },
+        "commands": {
+            "generic": {
+                "help": {
+                    "notFound": "Impossible de trouver la commande ${command}.",
+                    "embed": {
+                        "title": "${username} | Liste des commandes",
+                        "footer": "Use ${prefix}help <command> pour obtenir plus de documentations sur une commande!",
+                        "description": [
+                            "Plus d'informantions sont disponibles sur le [website](${website})!",
+                            "Il existe acuellement **${commands}** disponibles."
+                        ]
+                    },
+                    "categories": {
+                        "generic": "Générique",
+                        "moderation": "Modération"
+                    },
+                    "command": {
+                        "title": "Commande ${command}",
+                        "name": "Nom",
+                        "syntax": "Syntax",
+                        "category": "Catégorie",
+                        "aliases": "Alias",
+                        "guildOnly": "Guild Only",
+                        "ownerOnly": "Owner Only",
+                        "cooldown": "Cooldown"
+                    }
+                },
+                "invite": {
+                    "title": "Invitez-moi",
+                    "description": [
+                        "> **Invitez-moi sur votre serveur dès aujourd'hui ou regoignez Discord de mon propiétaire pour obtenir des mises à jour et autres...**",
+                        "",
+                        ":link: **${invite}**",
+                        ":island: **${server}**"
+                    ]
+                },
+                "locale": {
+                    "invalidSubcommand": "Sous-commande non valide **${subcommand}**",
+                    "embed": {
+                        "title": "${username} | Localization",
+                        "description": [
+                            "__**Paramètres actuels**__",
+                            "```apache",
+                            "Guilde: ${server}",
+                            "Utilisateur: ${user}",
+                            "```",
+                            "",
+                            "Utilisez `${prefix}locale list` pour une liste de paramètres régionaux à définir",
+                            "Utilisez `${prefix}locale set [locale] [--guild]` pour définir une guilde ou votre locale",
+                            "Utilisez `${prefix}locale reset` pour le réinitaliser en anglais"
+                        ]
+                    },
+                    "list": {
+                        "locale": "${flag} **${full}** par **${translator}** (avec **${contributors}** contributors)",
+                        "title": "Langues"
+                    },
+                    "set": {
+                        "none": "Acun paramètre locale n'a été sélectionné, utilisez`${prefix}locale list` pour afficher une liste des paramétres locale.",
+                        "invalid": "Les parametrés locale ${locale} ne sont pas paramétres locale, utilisez `${prefix}locale list` pour afficher une liste des paramétres",
+                        "unable:guild": "Je n'ai pas pu définir les paramétres locale de la guilde",
+                        "success:guild": "Définir avec succés les paramétres locale de la guilde ${locale}",
+                        "unable:user": "Je n'ai pas pu définir vos paramètres locale",
+                        "success:user": "Définissez avec succés vos paramètres locale sur ${locale}"
+                    },
+                    "reset": {
+                        "unable:guild": "Je n'ai pas pu réinitaliser les paramétres locale de la guilde",
+                        "success:guild": "J'ai réinitaliser les parametres locale de la guilde sur en_US.",
+                        "unable:user": "Je n'ai pas pu réinitaliser vos paramétres locale.",
+                        "success:user": "J'ai réinitalisé vos paramétres locale à en_US."
+                    }
+                },
+                "ping": {
+                    "oldMessage": ":ping_pong: Pourquoi utilisez-vous cela?",
+                    "message": [
+                        ":ping_pong: Pong!",
+                        "",
+                        "**Shard #${id}**: ${shard}ms",
+                        "**Message**: ${messageLatency}ms"
+                    ]
+                },
+                "settings": {
+                    "invalidSubcommand": "La sous-commande **${subcommand}** n'est pas une sous-commande valide. (${subcommands})",
+                    "noSubcommand": "Aucune sous-commande n'a été fournie (${subcommands})",
+                    "noChannel": "Aucun ID, mention ou nom de chaîne n'a été spêcifié",
+                    "add": {
+                        "amountRequired": "Le nombre d'avertiseements pour enchaîner une punition! il doit s'agir d'un nombre compris entre 1 et 5.",
+                        "invalidPunishment": "Chaîtiment **${punishment}** n'est pas une punition valide à ajouter. (${punishments})",
+                        "missingRoleID": "Il vous manque actuellement un ID de rôle.",
+                        "invalidDays": "Nombre de jours incorrect. L'indicateur 'days' est le nombre de jours de messages à supprimer lors de l'interdiction.",
+                        "errored": "Je n'ai pas pu fixer la punition, réessayez plus tard.",
+                        "amountExceeded": "Les sanctions sont limitées à 15 par serveur, veuillez supprimer toutes les sanctions dont vous ne volez pas.",
+                        "success": "J'ai réussi à ajouter une punition à la base de données.",
+                        "invalidTime": "L'indicateur `--time` doit être une expression de temps currect, il peut de 0.5h, 30m, 0.5 heures ou 30 minutes.",
+                        "invalidRole": "Le rôle est introuvable ou il n'est pas valide"
+                    },
+                    "remove": {
+                        "invalidIndex": "L'index que vous avez fourni n'était pas un index valide. Vous pouvez afficher l'index de punition par `x!settings view`.",
+                        "noPunishments": "Aucune sanction n'a été trouvée",
+                        "success": "Suppression de la punition #**${id}**."
+                    },
+                    "set": {
+                        "modlog": {
+                            "unable": "Je n'ai pas pu définir le channel **${channel}** comme journal de mod.",
+                            "success": "Channel **${channel}** est maintenant où tous les journaux de mod seront.",
+                            "noPerms": "Je n'ai pas l'autorisation `Send Messages` ou `Embed Links` dans **${channel}**"
+                        },
+                        "prefix": {
+                            "none": "Vouz devez fournir un préfixe à définir",
+                            "already": "Le préfixe **${prefix}** est déjà le préfixe",
+                            "atEveryone": "Vous n'êtes pas autorisé à utiliser a tout everyone/here comme prèfixe, vouz avez également mis en colére vos membres.",
+                            "over20": "Le préfixe a dépassé la limite de 20 caractéres de ${chars}.",
+                            "unable": "Je n'ai pas pu définir le préfixe sur **${prefix}**, réessayez plus tard.",
+                            "success": "Le préfixe **${prefix}** est maintenant le préfixe de guilde Testez-le avec`${prefix}ping`."
+                        },
+                        "mutedRole": {
+                            "none": "Vous devez fournir un ID de rôle.",
+                            "invalid": "L'ID de rôle n'était pas valide.",
+                            "noneFound": "Le rôle par **${id}** est introuvable.",
+                            "unable": "Je n'ai pas pu définir le rôle désactivé sur **${role}**, réessayez plus tard.",
+                            "success": "Le rôle désactivé est désormais **${role}**."
+                        },
+                        "badwords": {
+                            "none": "Vouz devez fournir une liste de mots à la liste noire! Vouz pouvez ajouter plusieurs escapes, par exemple: `x!settings set automod.badwords bitch fuck`.",
+                            "added": {
+                                "notEnabled": "J'ai ajouté *${words}** mots à la liste noire. Comme vous ne l'avez pas activé, je l'ai pour vous.",
+                                "enabled": "J'ai ajouté **${words}** nouveaux mots à la liste noire."
+                            }
+                        },
+                        "ignored": {
+                            "none": "Vous devez fournir une liste d'ID de channel, de mention ou de noms. Vous pouvez ajouter un multiple avec un espace, par exemple: `x!settings set logging.ignore #abc abcd 92827492`",
+                            "invalid": "Ces chaînes ne sont pas valides à ignorer: ${channels}",
+                            "added": {
+                                "notEnabled": "J'ai ajoutè **${channels}** channels à la liste, puisque vous n'avez pas activè la fonction de Logging, je l'ai activée pour vous.",
+                                "enabled": "J'ai ajouté **${channels}** nouvelles chaînes à la liste."
+                            }
+                        },
+                        "logChannel": {
+                            "unable": "Je n'ai pas pu définir le channel **${channel}** comme journal de mod.",
+                            "success": "Channel **${channel}** est maintenant ou tous les journaux de mod seront.",
+                            "noPerms": "Je n'ai pas l'autorisation `Send Messages` ou `Embed Links` dans **${channel}**"
+                        }
+                    },
+                    "reset": {
+                        "modlog": {
+                            "unable": "Je n'ai pas pu réinitaliser le channel du journal de mod.",
+                            "success": "J'ai réinitalisé le channel du journal des mods."
+                        },
+                        "prefix": {
+                            "unable": "Je n'ai pas pu réinitaliser le préfixe.",
+                            "success": "Prefix a été redéfini sur `x!`."
+                        },
+                        "mutedRole": {
+                            "unable": "Je n'ai pas pu réinitaliser le rôle désactivé.",
+                            "success": "J'ai réinitalisé le rôle désactivé"
+                        },
+                        "ignored": {
+                            "unable": "Je n'ai pas pu rèinitaliser tous les channel ignorés",
+                            "success": "Les channels ignorés ont été réinitalisés."
+                        },
+                        "logChannel": {
+                            "unable": "Je n'ai pas pu réinitaliser la chaîne **${channel}**.",
+                            "success": "La chaîne a été rèinitalisee"
+                        },
+                        "punishments": {
+                            "unable": "Je n'ai pas pu réinitaliser toutes les sanctions",
+                            "success": "Les sanctions ont été remises à zèro."
+                        }
+                    },
+                    "enable": {
+                        "automod": {
+                            "unable": "Je n'ai pas pu activer toutes les fonctionnalités d'automod.",
+                            "success": "J'ai activé toutes les fonctionnalités d'automod."
+                        },
+                        "dehoist": {
+                            "unable": "Je n'ai pas pu acitver la fonction de Dehoisting automatique.",
+                            "success": "J'ai activé la fonction de mod automatiqueauto-mod  de dehoisting.."
+                        },
+                        "spam": {
+                            "unable": "Je n'ai pas pu activer la fonction de mod automatique de spam.",
+                            "success": "J'ai activé la fonction de mod automatique de spam."
+                        },
+                        "raid": {
+                            "unable": "Je n'ai pas pu acitver la fonction de mod automatique de raid",
+                            "success": "J'ai active la fonction de mod automatique de raid."
+                        },
+                        "mention": {
+                            "unable": "Je n'ai pas pu activer la fonction de mention de mod automatique.",
+                            "success": "J'ai activé la fonction de mod automatique de mentions."
+                        },
+                        "badwords": {
+                            "unable": "Je n'ai pas pu activer la fonction de swearing de mod automatique",
+                            "success": "J'ai activé la fonction de mod automatique de swearing."
+                        },
+                        "invites": {
+                            "unable": "Je n'ai pas pu active la fonction Invites automod.",
+                            "success": "J'ai active la fonction de mod automatique de invites"
+                        },
+                        "logging": {
+                            "unable": "Je n'ai pas pu activer la fonction de Logging.",
+                            "success": "J'ai active la fonction de Logging."
+                        },
+                        "logEvents": {
+                            "unable": "Je n'ai pas pu activer tous les événements de logging.",
+                            "success": "J'ai activé tous les événements de logging."
+                        },
+                        "messageDelete": {
+                            "unable": "Je n'ai pas pu activer l'événement de logging de la suppression des messages.",
+                            "success": "J'ai activé l'événement de logging de la suppression des messages.."
+                        },
+                        "messageUpdate": {
+                            "unable": "Je n'ai pas pu activer l'événement de logging de la mise à jour des messages.",
+                            "success": "J'ai activé l'événement de logging de la mise à jour des messages."
+                        }
+                    },
+                    "disable": {
+                        "automod": {
+                            "unable": "Je n'ai pas pu désactiver toutes les fonctionnalités d'automod.",
+                            "success": "J'ai désactivé toutes les fonctionnalités d'automod."
+                          },
+                          "dehoist": {
+                            "unable": "Je n'ai pas pu désactiver la fonction de démodulation automatique.",
+                            "success": "J'ai désactivé la fonction de désamorçage automod."
+                          },
+                          "spam": {
+                            "unable": "Je n'ai pas pu désactiver la fonction de mod automatique de spam.",
+                            "success": "J'ai désactivé la fonction de mod automatique de spam."
+                          },
+                          "raid": {
+                            "unable": "Je n'ai pas pu désactiver la fonction d'automod Raid.",
+                            "success": "J'ai désactivé la fonction d'automod Raid."
+                          },
+                          "mention": {
+                            "unable": "Je n'ai pas pu désactiver la fonction de mention de mode automatique.",
+                            "success": "J'ai désactivé la fonction d'automod Mention."
+                          },
+                          "badwords": {
+                            "unable": "Je n'ai pas pu désactiver la fonction Swearing automod.",
+                            "success": "J'ai désactivé la fonction Swoding automod."
+                          },
+                          "invitse": {
+                            "unable": "Je n'ai pas pu désactiver la fonction Invite automod.",
+                            "success": "J'ai désactivé la fonction Invite automod."
+                          },
+                          "logging": {
+                            "unable": "Je n'ai pas pu désactiver la fonction de journalisation.",
+                            "success": "J'ai désactivé la fonction de journalisation."
+                          },
+                          "logEvents": {
+                            "unable": "Je n'ai pas pu désactiver tous les événements de journalisation.",
+                            "success": "J'ai désactivé tous les événements de journalisation."
+                          },
+                          "messageDelete": {
+                            "unable": "Je n'ai pas pu désactiver l'événement de journalisation de la suppression des messages.",
+                            "success": "J'ai désactivé l'événement de journalisation de la suppression des messages."
+                          },
+                          "messageUpdate": {
+                            "unable": "Je n'ai pas pu désactiver l'événement de journalisation de la mise à jour des messages.",
+                            "success": "J'ai désactivé l'événement de journalisation de la mise à jour des messages."
+                          }
+                    },
+                    "view": {
+                        "title": "Configuration pour ${guild}",
+                        "description": [
+                            "` `` ini ",
+                            "[Prefix]: ${prefix}",
+                            "[Rôle muet]: ${mutedRole}",
+                            "[Mod Log]: ${modlog}",
+                            "[Dehoist Automod]: ${dehoist.enabled}",
+                            "[Mentionnez Automod]: ${mention.enabled}",
+                            "[Invite Automod]: ${invite.enabled}",
+                            "[Raid Automod]: ${raid.enabled}",
+                            "[Spam Automod]: ${spam.enabled}",
+                            "[Swear Automod]: ${badwords.enabled} (${words})",
+                            "[Journalisation]: ${logging.enabled}",
+                            "[Logging Channel]: ${logging}",
+                            "[Événements de journalisation activés]: ${events}",
+                            "[Sanctions]: \n${punishments}",
+                            "` `` "
+                          ],
+                        "footer": "Vous voyez cela parce que vous n'avez pas fourni de sous-commande ou que la sous-commande que vous avez fournie n'existait pas."
+                    }
+                },
+                "shardinfo": {
+                    "shard": "Shard # ${id} ${current} | G: ${guilds} | U: ${users} | L: ${latency} ms | M: ${memory}",
+                    "title": "Informations sur les fragments"
+                },
+                "statistics": {
+                    "title": "${username} | Statistiques en temps réel",
+                    "description": [
+                        "```prolog",
+                        "Guildes            => ${guilds}",
+                        "Utilisateurs       => ${users}",
+                        "Channels           => ${channels}",
+                        "Shards             => ${current} / ${total} (~ ${latency} ms)",
+                        "Uptime             => ${uptime}",
+                        "Commandes          => ${commands}",
+                        "Messages vus       => ${messages}",
+                        "Commande exécutée  => ${executed}",
+                        "Commande la plus utilisée => ${nom} (${executions} utilise)",
+                        "Connexion à la base de données => ${connected}",
+                        "Utilisation de la mémoire => ${memoryUsage}",
+                        "Version actuelle => ${version}",
+                        "` `` "
+                      ]
+                },
+                "time": "Il s'agit actuellement de ${day}/${month}/${year} à ${h}:${m}:${s}",
+                "uptime": ":gear: **Processus: ${process} / Connexion: ${connection}**"
+            },
+            "moderation": {
+                "ban": "${type} a été banni avec succès",
+                "kick": "${type} a été lancé avec succès",
+                "mute": "${type} a été mis en sourdine avec succès",
+                "unban": "L'utilisateur a été correctement banni.",
+                "unmute": "${type} a été correctement rétabli.",
+                "warned": "J'ai averti**${user}**, ils ont maintenant **${warnings}** averti ${suffix}.",
+                "unable": "Impossible de ${type}: `${message}`",
+                "invalidSnowflake": "L'utilisateur était déjà ${type}.",
+                "notInGuild": "L'utilisateur `${user}` n'est pas dans la guilde",
+                "lockdown": {
+                    "noRoles": "Vous devez d'abord spécifier les rôles pour modifier les autorisations d'utilisation de l'indicateur --roles!",
+                    "cantModify": "Je ne peux pas modifier ces rôles, la permission. Gérer les rôles `Manage Roles`?",
+                    "noChannels": "Aucun channels n'a été spécifié pour le verrouillage.",
+                    "backingUp": "Sauvegarde des autorisations de channels ..",
+                    "backedUp": "J'ai sauvegardé les autorisations de channel!",
+                    "unlocked": "Channel **${channel}** n'est maintenatn verrouillé",
+                    "locked": "Channel **${channel}** est maintenant verrouillé.",
+                    "cantModifyChannels": "Je ne peux modifier aucun channels."
+                },
+                "pardon": {
+                    "notSpecified": "Vous n'avez pas spécifié de quantité d'avertissements à supprimer",
+                    "noWarnings": "L'utilisateur **${user}** n'a désormais plus d'avertissement.",
+                    "warnings": "L'utilisateur **${user}** a désormais **${warnings}** d'avertissement."
+                },
+                "prune": {
+                    "noAmount": "Vous devrez spécifier un montant à supprimer",
+                    "tooLow": "Le nombre de messages est passé en dessous de 2, il doit être supérieur ou égal à 2",
+                    "tooHigh": "La quantité de messages a dépassé 100, elle doit être inférieure ou égale à 100",
+                    "invalidFilter": "Filtre non valide **${filter}**. (${filters})",
+                    "noMessages": "Impossible de trouver des messages avec le filtre **${filter}**.",
+                    "twoWeeks": "Je n'ai pas pu supprimer les messages ${messages} plus récents que 2 semaines en raison de la limitation de Discord.",
+                    "title": "Résultats de l'élagage",
+                    "userEntry": "${user} avec ${messages} message ${suffix}",
+                    "nowDel": "Suppression en cours des messages ${messages}...",
+                    "error": {
+                        "title": "Impossible de supprimer les messages"
+                    }
+                },
+                "reason": {
+                    "noCase": "L'ID de cas à modifier vous manque.",
+                    "noReason": "Vous n'avez pas fourni de raison",
+                    "invalid": "Le cas #**${id}** est introuvable",
+                    "edited": ":ok_hand: cas mis à jour #**${id}** avec raison **${reason}**",
+                    "error": "Je n'ai pas pu mettre à jour le cas #${id}."
+                },
+                "warnings": {
+                    "none": "L'utilisateur n'a aucun avertissement.",
+                    "message": "L'utilisateur a **${warnings}** avertissements."
+                }
+            }
+        }
+    }
+}
