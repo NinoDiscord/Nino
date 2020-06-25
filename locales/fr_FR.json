@@ -325,7 +325,7 @@
                             "[Sanctions]: \n${punishments}",
                             "` `` "
                           ],
-                        "footer": "You are seeing this because you didn't provide a subcommand or the subcommand you provided didn't exist."
+                        "footer": "Vous voyez cela parce que vous n'avez pas fourni de sous-commande ou que la sous-commande que vous avez fournie n'existait pas."
                     }
                 },
                 "shardinfo": {
