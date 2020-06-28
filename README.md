@@ -48,10 +48,12 @@ sentryDSN: 'Your Sentry DSN'
 discord:
   token: 'TOKEN'
   prefix: 'x!'
+
+# options from ioredis
+# read here: https://github.com/luin/ioredis/blob/master/API.md#new-redisport-host-options
 redis:
   host: 'localhost'
   port: 6379
-prometheus: 'URL'
 ```
 
 ## Cloning/Using Source Code

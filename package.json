@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "Moderation bot for Discord's hack week entry.",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": "https://github.com/NinoDiscord/Nino",
