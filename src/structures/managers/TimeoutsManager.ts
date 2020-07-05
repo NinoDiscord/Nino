@@ -44,8 +44,8 @@ export default class TimeoutsManager {
         const punishment = new Punishment(task as PunishmentType, {
           moderator: this.bot.client.user
         });
-
         await this.bot.punishments.punish({ id: member, guild }, punishment, '[Automod] Time\'s up!');
+        await this.bot.redis.del(key);
       }
     }, time);
   }
