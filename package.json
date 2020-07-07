@@ -28,7 +28,7 @@
   ],
   "dependencies": {
     "@augu/immutable": "0.2.5",
-    "@sentry/node": "5.18.1",
+    "@sentry/node": "5.19.1",
     "common-tags": "1.8.0",
     "eris": "0.13.3",
     "inversify": "5.0.1",
