@@ -106,7 +106,7 @@
                         ]
                     },
                     "list": {
-                        "locale": "${flag} **${full}** par **${translator}** (avec **${contributors}** contributors)",
+                        "locale": "${flag} **${full}** par **${translator}** (avec **${contributors}** contributors | `${prefix}locale set ${code}`)",
                         "title": "Langues"
                     },
                     "set": {
