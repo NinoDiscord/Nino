@@ -36,7 +36,7 @@
     "ioredis": "4.17.3",
     "js-yaml": "3.14.0",
     "leeks.js": "0.0.8",
-    "mongoose": "5.9.23",
+    "mongoose": "5.9.24",
     "ms": "2.1.2",
     "reflect-metadata": "0.1.13",
     "wumpfetch": "0.3.1"
