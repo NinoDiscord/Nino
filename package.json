@@ -27,7 +27,7 @@
     "ohlookitsderpy"
   ],
   "dependencies": {
-    "@augu/immutable": "0.3.0",
+    "@augu/immutable": "0.3.1",
     "@sentry/node": "5.19.2",
     "common-tags": "1.8.0",
     "eris": "0.13.3",
