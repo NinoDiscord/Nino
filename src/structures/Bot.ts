@@ -1,7 +1,7 @@
 import { Client as DiscordClient } from 'eris';
 import CommandStatisticsManager from './managers/CommandStatisticsManager';
 import { inject, injectable } from 'inversify';
-import RedisClient, { Redis } from 'ioredis';
+import RedisClient, { Redis, RedisOptions } from 'ioredis';
 import { captureException } from '@sentry/node';
 import LocalizationManager from './managers/LocalizationManager';
 import PunishmentManager from './managers/PunishmentManager';
@@ -45,11 +45,7 @@ export interface Config {
     prefix: string;
     token: string;
   };
-  redis: {
-    database: number | undefined;
-    host: string;
-    port: number;
-  };
+  redis: RedisOptions;
   botlists: {
     dservicestoken: string | undefined;
     dboatstoken: string | undefined;
@@ -118,11 +114,7 @@ export default class Bot {
     this.owners = config.owners || [];
     this.logger = new Logger();
     this.cases = new CaseSettings();
-    this.redis = new RedisClient({
-      port: config.redis.port,
-      host: config.redis.host,
-      db: config.redis.database
-    });
+    this.redis = new RedisClient(config.redis);
   }
 
   async build() {
@@ -167,7 +159,7 @@ export default class Bot {
   }
 
   private addRedisEvents() {
-    this.redis.once('ready', () => this.logger.redis(`Created a Redis pool at ${this.config.redis.host}:${this.config.redis.port}${this.config.redis.database ? `, with database ID: ${this.config.redis.database}` : ''}`));
+    this.redis.once('ready', () => this.logger.redis(`Created a Redis pool at ${this.config.redis.host}:${this.config.redis.port}${this.config.redis.db ? `, with database ID: ${this.config.redis.db}` : ''}`));
     this.redis.on('wait', () => this.logger.redis('Redis has disconnected and awaiting a new pool...'));
   }
 

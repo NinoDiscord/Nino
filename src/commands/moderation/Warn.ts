@@ -6,6 +6,7 @@ import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
+import PermissionUtils from '../../util/PermissionUtils';
 
 @injectable()
 export default class WarnCommand extends Command {
@@ -33,6 +34,9 @@ export default class WarnCommand extends Command {
     if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
       user: `${u.username}#${u.discriminator}`
     });
+
+    
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.heirarchy');
 
     const punishments = await this.bot.punishments.addWarning(member!);
     for (let i of punishments) {

@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "Moderation bot for Discord's hack week entry.",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": "https://github.com/NinoDiscord/Nino",
@@ -27,8 +27,8 @@
     "ohlookitsderpy"
   ],
   "dependencies": {
-    "@augu/immutable": "0.2.5",
-    "@sentry/node": "5.18.0",
+    "@augu/immutable": "0.3.1",
+    "@sentry/node": "5.19.2",
     "common-tags": "1.8.0",
     "eris": "0.13.3",
     "inversify": "5.0.1",
@@ -36,26 +36,26 @@
     "ioredis": "4.17.3",
     "js-yaml": "3.14.0",
     "leeks.js": "0.0.8",
-    "mongoose": "5.9.20",
+    "mongoose": "5.9.24",
     "ms": "2.1.2",
     "reflect-metadata": "0.1.13",
     "wumpfetch": "0.3.1"
   },
   "devDependencies": {
     "@types/common-tags": "1.8.0",
-    "@types/ioredis": "4.16.7",
-    "@types/jest": "26.0.3",
+    "@types/ioredis": "4.17.2",
+    "@types/jest": "26.0.4",
     "@types/js-yaml": "3.12.4",
-    "@types/mongoose": "5.7.27",
+    "@types/mongoose": "5.7.32",
     "@types/ms": "0.7.31",
     "@types/node": "13.13.5",
-    "@typescript-eslint/eslint-plugin": "3.4.0",
-    "@typescript-eslint/parser": "3.4.0",
-    "eslint": "7.3.1",
+    "@typescript-eslint/eslint-plugin": "3.6.1",
+    "@typescript-eslint/parser": "3.6.1",
+    "eslint": "7.4.0",
     "jest": "26.1.0",
     "jest-mock-extended": "1.0.9",
     "nodemon": "2.0.4",
-    "ts-jest": "26.1.1",
-    "typescript": "3.9.5"
+    "ts-jest": "26.1.2",
+    "typescript": "3.9.7"
   }
 }

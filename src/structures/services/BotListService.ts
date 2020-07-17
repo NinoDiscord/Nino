@@ -37,7 +37,7 @@ export default class BotListService {
     this.interval = setInterval(async() => {
       const guilds = await this.bot.redis.get('guilds');
       if (guilds) this.postCount(Number(guilds));
-    }, 60000);
+    }, 86400000);
   }
 
   /**

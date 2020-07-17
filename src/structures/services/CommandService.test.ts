@@ -23,7 +23,7 @@ describe('CommandService', () => {
     redis: {
       host: 'localhost',
       port: 6379,
-      database: undefined,
+      db: undefined,
     },
     sentryDSN: undefined,
     botlists: undefined,
