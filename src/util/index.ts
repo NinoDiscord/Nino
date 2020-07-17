@@ -1,5 +1,7 @@
 import { User, EmbedOptions } from 'eris';
+import { execSync } from 'child_process';
 
+export const commitHash = execSync('git rev-parse HEAD', { encoding: 'utf8' }).slice(0, 8);
 export function humanize(ms: number, long: boolean = false) {
   const weeks = Math.floor(ms / 1000 / 60 / 60 / 24 / 7);
   ms -= weeks * 1000 * 60 * 60 * 24 * 7;

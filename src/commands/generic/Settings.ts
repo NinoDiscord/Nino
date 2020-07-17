@@ -598,26 +598,31 @@ export default class SettingsCommand extends Command {
   async view(ctx: Context, provided: boolean = false) {
     const settings = await ctx.getSettings()!;
 
-    const title = ctx.translate('commands.generic.settings.view.title', {
-      guild: ctx.guild!.name
-    });
-
-    const yes = ctx.translate('global.yes');
-    const no = ctx.translate('global.no');
+    const yes = ':white_check_mark:';
+    const no = ':x:';
     const events: string[] = [];
 
-    if (settings.logging.events.messageUpdate) events.push('Message Updates');
-    if (settings.logging.events.messageDelete) events.push('Message Deletions');
+    if (settings.logging.events.messageUpdate) events.push(ctx.translate('global.events.messageUpdate'));
+    if (settings.logging.events.messageDelete) events.push(ctx.translate('global.events.messageDelete'));
 
-    const desc = ctx.translate('commands.generic.settings.view.description', {
+    const punishments = settings.punishments.length ? settings.punishments.map((value, index) => 
+      ctx.translate('commands.generic.settings.view.punishment', {
+        index: index + 1,
+        warnings: value.warnings,
+        temporary: value.temp ? ms(value.temp) : ctx.translate('global.none'),
+        type: value.type,
+        soft: value.soft ? ctx.translate('global.yes') : ctx.translate('global.none'),
+        role: value.role ? `**${ctx.guild!.roles.get(value.roleid)!.name}**` : ctx.translate('global.none')
+      })
+    ).join('\n') : ctx.translate('global.none');
+
+    const desc = ctx.translate('commands.generic.settings.view.message', {
       prefix: settings.prefix,
       mutedRole: ctx.guild!.roles.find(x => x.id === settings.mutedRole) ? ctx.guild!.roles.get(settings.mutedRole)!.name : 'None',
-      modlog: ctx.guild!.channels.find(x => x.id === settings.modlog) ? ctx.guild!.channels.get(settings.modlog)!.name : 'None',
+      modlog: ctx.guild!.channels.find(x => x.id === settings.modlog) ? ctx.guild!.channels.get(settings.modlog)!.id : 'None',
       logging: ctx.guild!.channels.find(x => x.id === settings.logging.channelID) ? ctx.guild!.channels.get(settings.logging.channelID)!.name : 'None',
-      events: events.join(', '),
-      punishments: settings.punishments.length ? settings.punishments.map((punishment, index) => 
-        `[${index + 1}] ${punishment.type} with ${punishment.warnings} warnings${punishment.temp ? ` with time ${ms(punishment.temp)}` : punishment.soft ? ' as a softban' : punishment.roleid ? ` with role ${ctx.guild!.roles.get(punishment.roleid)!.name}` : ''}`
-      ) : 'None',
+      events: events.map(s => `- ${s}`).join('\n') || ctx.translate('global.none'),
+      punishments,
       'dehoist.enabled': settings.automod.dehoist ? yes : no,
       'mention.enabled': settings.automod.mention ? yes : no,
       'invites.enabled': settings.automod.invites ? yes : no,
@@ -625,16 +630,9 @@ export default class SettingsCommand extends Command {
       'spam.enabled': settings.automod.spam ? yes : no,
       'logging.enabled': settings.logging.enabled ? yes : no,
       'badwords.enabled': settings.automod.badwords.enabled ? yes : no,
-      words: settings.automod.badwords.enabled ? settings.automod.badwords.wordlist.join(', ') : 'None'
+      words: settings.automod.badwords.enabled ? ` (${settings.automod.badwords.wordlist.join(', ')})` : ' (None)'
     });
 
-    const footer = ctx.translate('commands.generic.settings.view.footer');
-
-    const embed = this.bot.getEmbed()
-      .setTitle(title)
-      .setDescription(desc);
-
-    if (!provided) embed.setFooter(footer);
-    return ctx.embed(embed);
+    return ctx.send(desc);
   }
 }

@@ -1,9 +1,10 @@
-import { humanize, formatSize } from '../../util';
+import { humanize, formatSize, commitHash } from '../../util';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
+import sys from '@augu/sysinfo';
 
 const pkg = require('../../../package.json');
 
@@ -28,23 +29,30 @@ export default class StatisticsCommand extends Command {
     const memoryUsage = formatSize(process.memoryUsage().rss);
 
     const embed = this.bot.getEmbed()
-      .setTitle(ctx.translate('commands.generic.statistics.title', { username: `${this.bot.client.user.username}#${this.bot.client.user.discriminator}` }))
+      .setAuthor(ctx.translate('commands.generic.statistics.title', { 
+        username: `${this.bot.client.user.username}#${this.bot.client.user.discriminator}`,
+        version: `v${pkg.version} | ${commitHash}`
+      }), 'https://nino.augu.dev', this.bot.client.user.dynamicAvatarURL('png', 1024))
       .setDescription(ctx.translate('commands.generic.statistics.description', {
         guilds: this.bot.client.guilds.size.toLocaleString(),
         users,
         channels,
-        current: ctx.guild ? ctx.guild.shard.id : 0,
-        total: this.bot.client.shards.size,
-        latency: shardPing,
+        'shards.current': ctx.guild ? ctx.guild.shard.id : 0,
+        'shards.alive': this.bot.client.shards.filter(s => s.status === 'ready').length,
+        'shards.total': this.bot.client.shards.size,
+        'shards.dead': this.bot.client.shards.filter(s => s.status === 'disconnected').length,
+        'shards.latency': shardPing,
         uptime: humanize(Math.round(process.uptime()) * 1000),
         commands: this.bot.manager.commands.size,
-        messages: this.bot.statistics.messagesSeen.toLocaleString(),
-        executed: this.bot.statistics.commandsExecuted.toLocaleString(),
-        name: command,
-        executions: uses,
-        connected: connection.ok === 1 ? ctx.translate('global.online') : ctx.translate('global.offline'),
-        memoryUsage,
-        version: pkg.version
+        messagesSeen: this.bot.statistics.messagesSeen.toLocaleString(),
+        commandsExecuted: this.bot.statistics.commandsExecuted.toLocaleString(),
+        'mostUsed.command': command,
+        'mostUsed.executed': uses,
+        'memory.rss': memoryUsage,
+        'memory.heap': formatSize(process.memoryUsage().heapUsed),
+        'sys.os': sys.getPlatform(),
+        'sys.cpu': sys.getCPUUsage(),
+        connection
       }))
       .build();
 

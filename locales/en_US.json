@@ -26,9 +26,14 @@
       "unableToFind": "I was unable to find user.",
       "notInBanList": "User is not banned in this guild.",
       "unable": "I was unable to do this. `${error}`",
+      "none": "None",
       "members": {
         "bot": "Bot",
         "user": "User"
+      },
+      "events": {
+        "messageUpdate": "Message Updates",
+        "messageDelete": "Message Deletions"
       }
     },
     "errors": {
@@ -138,7 +143,7 @@
           "noSubcommand": "No subcommand was provided. (${subcommands})",
           "noChannel": "No channel ID, mention, or name were specified.",
           "add": {
-            "amountRequired": "The amount of warnings to chain a punishment! It needs to be a number between 1 and 5.",
+            "amountRequired": "Amount of warnings to chain a punishment is required, make it a number between 1 and 5.",
             "invalidPunishment": "Punishment **${punishment}** is not a valid punishment to add. (${punishments})",
             "missingRoleID": "You are currently missing a role ID.",
             "invalidDays": "Incorrect amount of days. The `days` flag is the amount of days of messages to delete when banning.",
@@ -314,25 +319,35 @@
             }
           },
           "view": {
-            "title": "Configuration for ${guild}",
-            "description": [
-              "```ini",
-              "[Prefix]: ${prefix}",
-              "[Muted Role]: ${mutedRole}",
-              "[Mod Log]: ${modlog}",
-              "[Dehoist Automod]: ${dehoist.enabled}",
-              "[Mention Automod]: ${mention.enabled}",
-              "[Invites Automod]: ${invites.enabled}",
-              "[Raid Automod]: ${raid.enabled}",
-              "[Spam Automod]: ${spam.enabled}",
-              "[Swear Automod]: ${badwords.enabled} (${words})",
-              "[Logging]: ${logging.enabled}",
-              "[Logging Channel]: ${logging}",
-              "[Enabled Logging Events]: ${events}",
-              "[Punishments]:\n${punishments}",
-              "```"
+            "title": "[ Configuration for ${guild} ]",
+            "punishment": [
+              "• #${index}. **${type} with ${warnings} warnings**",
+              "   • Role: ${roleId}",
+              "   • Time: ${time}",
+              "   • Soft: ${soft}"
             ],
-            "footer": "You are seeing this because you didn't provide a subcommand or the subcommand you provided didn't exist."
+            "message": [
+              "❯ **Miscellaneous**",
+              "Prefix: **${prefix}**",
+              "Mod Log: <#${modlog}>",
+              "Muted Role: **${mutedRole}**",
+              "",
+              "❯ **Automod**",
+              "${badwords.enabled} **Swearing**${words}",
+              "${dehoist.enabled} **Dehoisting**",
+              "${invites.enabled} **Invites**",
+              "${mention.enabled} **Mentions**",
+              "${raid.enabled} **Raid**",
+              "${spam.enabled} **Spam**",
+              "",
+              "❯ **Logging**",
+              "${logging.enabled} **Enabled**",
+              "❯ **Events**:",
+              "${events}",
+              "",
+              "❯ **Punishments**",
+              "${punishments}"
+            ]
           }
         },
         "shardinfo": {
@@ -340,22 +355,28 @@
           "title": "Shard Information"
         },
         "statistics": {
-          "title": "${username} | Realtime Statistics",
+          "title": "${username} [${version}]",
           "description": [
-            "```prolog",
-            "Guilds              => ${guilds}",
-            "Users               => ${users}",
-            "Channels            => ${channels}",
-            "Shards              => ${current}/${total} (~${latency}ms)",
-            "Uptime              => ${uptime}",
-            "Commands            => ${commands}",
-            "Messages Seen       => ${messages}",
-            "Command Executed    => ${executed}",
-            "Most Used Command   => ${name} (${executions} uses)",
-            "Database Connection => ${connected}",
-            "Memory Usage        => ${memoryUsage}",
-            "Current Version     => ${version}",
-            "```"
+            "❯ **Miscellaneous**",
+            "• Guilds: **${guilds}**",
+            "• Users: **${users}**",
+            "• Channels: **${channels}**",
+            "• Uptime: **${uptime}**",
+            "• Messages: **${messagesSeen}**",
+            "• Commands Executed: **${commandsExecuted}**",
+            "• Most Used Command: **${mostUsed.command} (${mostUsed.executed} executions)**",
+            "",
+            "❯ **System**",
+            "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
+            "• CPU Usage: **${sys.cpu}%**",
+            "• Operating System: **${sys.os}**",
+            "",
+            "❯ **Sharding**",
+            "• Current Shard: #**${shards.current}**",
+            "• Alive Shards: **${shards.alive}**",
+            "• Total Shards: **${shards.total}**",
+            "• Dead Shards: **${shards.dead}**",
+            "• Latency: **${shards.latency}ms**"
           ]
         },
         "time": "It is currently ${day}/${month}/${year} at ${h}:${m}:${s}",
