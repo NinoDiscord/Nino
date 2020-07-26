@@ -42,18 +42,18 @@ export default class BanCommand extends Command {
 
     const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     let reason!: string;
-    let time!: string;
+    let time!: string | null;
 
     if (baseReason) {
       const sliced = baseReason.split(' | ');
       reason = sliced[0];
-      time = sliced[1];
+      time = sliced[1] || null;
     }
 
     const days = ctx.flags.get('days') || ctx.flags.get('d');
     if (days && (typeof days === 'boolean' || !(/[0-9]+/).test(days))) return ctx.sendTranslate('global.invalidFlag.string');
 
-    const t = time ? ms(time) : undefined;
+    const t = time !== null ? ms(time) : undefined;
     const soft = ctx.flags.get('soft');
     if (soft && typeof soft === 'string') return ctx.sendTranslate('global.invalidFlag.boolean');
 

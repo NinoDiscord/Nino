@@ -37,10 +37,8 @@ export default class StatisticsCommand extends Command {
         guilds: this.bot.client.guilds.size.toLocaleString(),
         users,
         channels,
-        'shards.current': ctx.guild ? ctx.guild.shard.id : 0,
         'shards.alive': this.bot.client.shards.filter(s => s.status === 'ready').length,
         'shards.total': this.bot.client.shards.size,
-        'shards.dead': this.bot.client.shards.filter(s => s.status === 'disconnected').length,
         'shards.latency': shardPing,
         uptime: humanize(Math.round(process.uptime()) * 1000),
         commands: this.bot.manager.commands.size,
@@ -52,6 +50,8 @@ export default class StatisticsCommand extends Command {
         'memory.heap': formatSize(process.memoryUsage().heapUsed),
         'sys.os': sys.getPlatform(),
         'sys.cpu': sys.getCPUUsage(),
+        'sys.free': formatSize(sys.getFreeMemory()),
+        'sys.total': formatSize(sys.getTotalMemory()),
         connection
       }))
       .build();

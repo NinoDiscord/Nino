@@ -342,7 +342,6 @@
               "",
               "❯ **Logging**",
               "${logging.enabled} **Enabled**",
-              "❯ **Events**:",
               "${events}",
               "",
               "❯ **Punishments**",
@@ -365,18 +364,13 @@
             "• Messages: **${messagesSeen}**",
             "• Commands Executed: **${commandsExecuted}**",
             "• Most Used Command: **${mostUsed.command} (${mostUsed.executed} executions)**",
+            "• Shards: **${shards.alive}/${shards.total}** (~${shards.latency}ms)",
             "",
             "❯ **System**",
             "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
             "• CPU Usage: **${sys.cpu}%**",
             "• Operating System: **${sys.os}**",
-            "",
-            "❯ **Sharding**",
-            "• Current Shard: #**${shards.current}**",
-            "• Alive Shards: **${shards.alive}**",
-            "• Total Shards: **${shards.total}**",
-            "• Dead Shards: **${shards.dead}**",
-            "• Latency: **${shards.latency}ms**"
+            "• Free/Total Memory: **${sys.free}/${sys.total}**"
           ]
         },
         "time": "It is currently ${day}/${month}/${year} at ${h}:${m}:${s}",
@@ -392,6 +386,8 @@
         "unable": "Unable to ${type}: `${message}`",
         "invalidSnowflake": "User was already ${type}.",
         "notInGuild": "User `${user}` is not in the guild.",
+        "hasRole": "User is currently muted.",
+        "hasNoRole": "User is already unmuted.",
         "lockdown": {
           "noRoles": "You must first specify the roles to change permissions to using the --roles flag!",
           "cantModify": "I cannot modify those roles, am I missing the `Manage Roles` permission?",
