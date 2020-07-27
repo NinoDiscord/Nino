@@ -114,10 +114,11 @@ export default class CommandService {
     const settings = await this.bot.settings.getOrCreate(guild.id);
     const prefixes = [
       settings!.prefix,
-      this.bot.config.discord.prefix,
-      'nino '
+      this.bot.config.discord.prefix
     ].filter(Boolean);
+
     if (mention !== null) prefixes.push(`${mention}`);
+    if (this.bot.client.user.id === '531613242473054229') prefixes.push('nino ');
 
     const user = await this.bot.userSettings.get(m.author.id);
     const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
