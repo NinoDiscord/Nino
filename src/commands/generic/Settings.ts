@@ -612,7 +612,7 @@ export default class SettingsCommand extends Command {
         temporary: value.temp ? ms(value.temp) : ctx.translate('global.none'),
         type: value.type,
         soft: value.soft ? ctx.translate('global.yes') : ctx.translate('global.none'),
-        role: value.role ? `**${ctx.guild!.roles.get(value.roleid)!.name}**` : ctx.translate('global.none')
+        roleId: value.role ? `**${ctx.guild!.roles.get(value.roleid)!.name}**` : ctx.translate('global.none')
       })
     ).join('\n') : ctx.translate('global.none');
 

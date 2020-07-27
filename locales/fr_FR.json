@@ -1,7 +1,7 @@
 {
     "contributors": [],
     "translator": "jacob#5418",
-    "completion": "completed",
+    "completion": "incomplete",
     "aliases": ["french", "francias", "françias", "fr"],
     "code": "fr_FR",
     "flag": ":flag_fr:",
@@ -29,6 +29,12 @@
             "members": {
                 "bot": "Bot",
                 "user": "Utilisatueur"
+            },
+            "none": "None",
+            "missingAccess": "I am missing access in the channel you linked.",
+            "events": {
+              "messageUpdate": "Message Updates",
+              "messageDelete": "Message Deletions"
             }
         },
         "errors": {
@@ -314,25 +320,33 @@
                           }
                     },
                     "view": {
-                        "title": "Configuration pour ${guild}",
-                        "description": [
-                            "` `` ini ",
-                            "[Prefix]: ${prefix}",
-                            "[Rôle muet]: ${mutedRole}",
-                            "[Mod Log]: ${modlog}",
-                            "[Dehoist Automod]: ${dehoist.enabled}",
-                            "[Mentionnez Automod]: ${mention.enabled}",
-                            "[Invite Automod]: ${invite.enabled}",
-                            "[Raid Automod]: ${raid.enabled}",
-                            "[Spam Automod]: ${spam.enabled}",
-                            "[Swear Automod]: ${badwords.enabled} (${words})",
-                            "[Journalisation]: ${logging.enabled}",
-                            "[Logging Channel]: ${logging}",
-                            "[Événements de journalisation activés]: ${events}",
-                            "[Sanctions]: \n${punishments}",
-                            "` `` "
-                          ],
-                        "footer": "Vous voyez cela parce que vous n'avez pas fourni de sous-commande ou que la sous-commande que vous avez fournie n'existait pas."
+                      "punishment": [
+                        "• #${index}. **${type} with ${warnings} warnings**",
+                        "   • Role: ${roleId}",
+                        "   • Time: ${time}",
+                        "   • Soft: ${soft}"
+                      ],
+                      "message": [
+                        "❯ **Miscellaneous**",
+                        "Prefix: **${prefix}**",
+                        "Mod Log: <#${modlog}>",
+                        "Muted Role: **${mutedRole}**",
+                        "",
+                        "❯ **Automod**",
+                        "${badwords.enabled} **Swearing**${words}",
+                        "${dehoist.enabled} **Dehoisting**",
+                        "${invites.enabled} **Invites**",
+                        "${mention.enabled} **Mentions**",
+                        "${raid.enabled} **Raid**",
+                        "${spam.enabled} **Spam**",
+                        "",
+                        "❯ **Logging**",
+                        "${logging.enabled} **Enabled**",
+                        "${events}",
+                        "",
+                        "❯ **Punishments**",
+                        "${punishments}"
+                      ]
                     }
                 },
                 "shardinfo": {
@@ -340,23 +354,24 @@
                     "title": "Informations sur les fragments"
                 },
                 "statistics": {
-                    "title": "${username} | Statistiques en temps réel",
-                    "description": [
-                        "```prolog",
-                        "Guildes            => ${guilds}",
-                        "Utilisateurs       => ${users}",
-                        "Channels           => ${channels}",
-                        "Shards             => ${current} / ${total} (~ ${latency} ms)",
-                        "Uptime             => ${uptime}",
-                        "Commandes          => ${commands}",
-                        "Messages vus       => ${messages}",
-                        "Commande exécutée  => ${executed}",
-                        "Commande la plus utilisée => ${name} (${executions} utilise)",
-                        "Connexion à la base de données => ${connected}",
-                        "Utilisation de la mémoire => ${memoryUsage}",
-                        "Version actuelle => ${version}",
-                        "```"
-                      ]
+                  "title": "${username} [${version}]",
+                  "description": [
+                    "❯ **Miscellaneous**",
+                    "• Guilds: **${guilds}**",
+                    "• Users: **${users}**",
+                    "• Channels: **${channels}**",
+                    "• Uptime: **${uptime}**",
+                    "• Messages: **${messagesSeen}**",
+                    "• Commands Executed: **${commandsExecuted}**",
+                    "• Most Used Command: **${mostUsed.command} (${mostUsed.executed} executions)**",
+                    "• Shards: **${shards.alive}/${shards.total}** (~${shards.latency}ms)",
+                    "",
+                    "❯ **System**",
+                    "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
+                    "• CPU Usage: **${sys.cpu}%**",
+                    "• Operating System: **${sys.os}**",
+                    "• Free/Total Memory: **${sys.free}/${sys.total}**"
+                  ]
                 },
                 "time": "Il s'agit actuellement de ${day}/${month}/${year} à ${h}:${m}:${s}",
                 "uptime": ":gear: **Processus: ${process} / Connexion: ${connection}**"

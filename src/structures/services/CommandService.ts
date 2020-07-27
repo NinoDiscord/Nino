@@ -1,12 +1,11 @@
 import { Message, TextChannel, Member } from 'eris';
 import { inject, injectable } from 'inversify';
-import { stripIndents } from 'common-tags';
 import RatelimitBucket from '../bucket/RatelimitBucket';
 import PermissionUtils from '../../util/PermissionUtils';
+import { Translation } from '../Language';
 import CommandContext from '../Context';
 import NinoCommand from '../Command';
 import { TYPES } from '../../types';
-import Language, { Translation } from '../Language';
 import Bot from '../Bot';
 import 'reflect-metadata';
 
@@ -155,6 +154,8 @@ export default class CommandService {
         this.bot.statistics.increment(invoked.command);
         this.bot.logger.info(`Ran command "${prefix}${invoked.command.name}" for ${ctx.sender.username}#${ctx.sender.discriminator} in ${ctx.guild ? `guild ${ctx.guild.name}` : 'DMs'}, now at ${this.bot.statistics.commandsExecuted.toLocaleString()} commands executed!`);
       } catch(ex) {
+        if (ex.message.includes('Missing Access')) return ctx.send(locale.translate('global.missingAccess'));
+
         const embed = this.bot.getEmbed();
         const owners = this.bot.owners.map(userID => {
           const user = this.bot.client.users.get(userID)!;
@@ -166,7 +167,7 @@ export default class CommandService {
           .setTitle(locale.translate('errors.failed', { command: invoked.command.name }))
           .setDescription(locale.translate('errors.unknown', {
             owners: `${owners} `,
-            server: 'https://discord.gg/7TtMP2n'
+            server: 'https://discord.gg/yDnbEDH'
           }));
 
         this.bot.logger.error(`Unable to run the '${invoked.command.name}' command!`, ex.stack ? ex.stack : ex.message);

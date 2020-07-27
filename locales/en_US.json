@@ -27,6 +27,7 @@
       "notInBanList": "User is not banned in this guild.",
       "unable": "I was unable to do this. `${error}`",
       "none": "None",
+      "missingAccess": "I am missing access in the channel you linked.",
       "members": {
         "bot": "Bot",
         "user": "User"
@@ -319,7 +320,6 @@
             }
           },
           "view": {
-            "title": "[ Configuration for ${guild} ]",
             "punishment": [
               "• #${index}. **${type} with ${warnings} warnings**",
               "   • Role: ${roleId}",
