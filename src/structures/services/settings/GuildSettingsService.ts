@@ -1,12 +1,12 @@
-import model, { UserModel } from '../../models/UserSchema';
+import model, { GuildModel } from '../../../models/GuildSchema';
 import { SettingsBase as Base } from './SettingsBase';
 import { injectable, inject } from 'inversify';
-import { TYPES } from '../../types';
-import Bot from '../Bot';
+import { TYPES } from '../../../types';
+import Bot from '../../Bot';
 
 @injectable()
-export default class UserSettings implements Base<UserModel> {
-  public client: any;
+export default class GuildSettingsService implements Base<GuildModel> {
+  public client: Bot;
   public model = model;
 
   constructor(@inject(TYPES.Bot) bot: Bot) {
@@ -14,22 +14,22 @@ export default class UserSettings implements Base<UserModel> {
   }
 
   async get(id: string) {
-    const document = await this.model.findOne({ userID: id }).exec();
+    const document = await this.model.findOne({ guildID: id }).exec();
     if (!document || document === null) return null;
     return document;
   }
 
-  async getOrCreate(id: string) {
+  async getOrCreate(id: string): Promise<GuildModel> {
     let settings = await this.get(id);
     if (!settings || settings === null)
       settings = await this.create(id);
     return settings!;
   }
 
-  async create(id: string) {
+  async create(id: string): Promise<GuildModel> {
     const query = new this.model({
-      userID: id,
-      locale: 'en_US'
+      guildID: id,
+      prefix: this.client.config.discord.prefix,
     });
     await query.save();
     return query;
@@ -37,7 +37,7 @@ export default class UserSettings implements Base<UserModel> {
 
   remove(id: string) {
     return this.model
-      .findOne({ userID: id })
+      .findOne({ guildID: id })
       .remove()
       .exec();
   }
@@ -47,6 +47,9 @@ export default class UserSettings implements Base<UserModel> {
     doc: { [x: string]: any },
     cb: (error: any, raw: any) => void
   ) {
-    return this.model.updateOne({ userID: id }, doc, cb);
+    const search = { guildID: id };
+    // eslint-disable-next-line
+    if (!!doc.$push) search['punishments'] = { $not: { $size: 15 }};
+    return this.model.updateOne(search, doc, cb);
   }
 }

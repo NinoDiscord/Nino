@@ -1,7 +1,7 @@
 import model, { WarningModel } from '../../models/WarningSchema';
-import { WarningBase as Base } from './SettingsBase';
+import { WarningBase as Base } from './settings/SettingsBase';
 
-export default class Warning implements Base<WarningModel> {
+export default class WarningService implements Base<WarningModel> {
   public model = model;
 
   async get(guildId: string, userId: string) {

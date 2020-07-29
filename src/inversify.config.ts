@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Container } from 'inversify';
+import { Container, decorate, injectable } from 'inversify';
 import getDecorators from 'inversify-inject-decorators';
 
 let container = new Container();
@@ -18,7 +18,7 @@ import DatabaseManager from './structures/managers/DatabaseManager';
 import EventManager from './structures/managers/EventManager';
 import PunishmentManager from './structures/managers/PunishmentManager';
 import TimeoutsManager from './structures/managers/TimeoutsManager';
-import GuildSettings from './structures/settings/GuildSettings';
+import GuildSettingsService from './structures/services/settings/GuildSettingsService';
 import BotListService from './structures/services/BotListService';
 import StatusManager from './structures/managers/StatusManager';
 import CommandStatisticsManager from './structures/managers/CommandStatisticsManager';
@@ -61,7 +61,9 @@ import ShardDisconnectedEvent from './events/ShardDisconnected';
 import ShardReadyEvent from './events/ShardReady';
 import ShardResumedEvent from './events/ShardResume';
 import UserUpdateEvent from './events/UserUpdate';
-import UserSettings from './structures/settings/UserSettings';
+import UserSettingsService from './structures/services/settings/UserSettingsService';
+import LocalizationManager from './structures/managers/LocalizationManager';
+import { Collection } from '@augu/immutable';
 
 let config: Config;
 try {
@@ -91,6 +93,8 @@ try {
     ksoft: undefined
   };
 }
+
+decorate(injectable(), Collection);
 
 container.bind<Client>(TYPES.Client).toConstantValue(
   new Client(config.discord.token, {
@@ -148,13 +152,13 @@ container
   .inSingletonScope();
 
 container
-  .bind<GuildSettings>(TYPES.GuildSettings)
-  .to(GuildSettings)
+  .bind<GuildSettingsService>(TYPES.GuildSettingsService)
+  .to(GuildSettingsService)
   .inSingletonScope();
 
 container
-  .bind<UserSettings>(TYPES.UserSettings)
-  .to(UserSettings)
+  .bind<UserSettingsService>(TYPES.UserSettingsService)
+  .to(UserSettingsService)
   .inSingletonScope();
 
 container
@@ -165,6 +169,11 @@ container
 container
   .bind<StatusManager>(TYPES.StatusManager)
   .to(StatusManager)
+  .inSingletonScope();
+
+container
+  .bind<LocalizationManager>(TYPES.LocalizationManager)
+  .to(LocalizationManager)
   .inSingletonScope();
 
 // Generic Commands

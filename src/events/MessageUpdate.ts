@@ -4,6 +4,7 @@ import { stripIndents } from 'common-tags';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
+import { createEmptyEmbed } from '../util/EmbedUtils';
 
 interface OldMessage {
   editedTimestamp: number;
@@ -87,7 +88,7 @@ export default class MessageUpdatedEvent extends Event {
     const channel = (<TextChannel> guild.channels.get(settings.logging.channelID)!);
     const timestamp = new Date(m.createdAt);
     const oldDate = old ? old.editedTimestamp !== undefined ? `(${new Date(old.editedTimestamp).toLocaleString()})` : '(Unknown)' : '(Unknown)';
-    const embed = this.bot.getEmbed()
+    const embed = createEmptyEmbed()
       .setAuthor(`${m.author.username}#${m.author.discriminator} in #${(m.channel as TextChannel).name}`, undefined, m.author.dynamicAvatarURL('png', 1024))
       .setTimestamp(timestamp)
       .addField(`Old Content ${oldDate}`, stripIndents`

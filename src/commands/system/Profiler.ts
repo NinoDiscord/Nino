@@ -6,6 +6,7 @@ import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
 import v8 from 'v8';
+import { createEmptyEmbed } from '../../util/EmbedUtils';
 
 @injectable()
 export default class ProfilerCommand extends Command {
@@ -22,7 +23,7 @@ export default class ProfilerCommand extends Command {
 
   async run(ctx: Context) {
     const stats = v8.getHeapStatistics();
-    const embed = this.bot.getEmbed()
+    const embed = createEmptyEmbed()
       .setTitle('[ Heap Statistics ]')
       .setDescription(stripIndents`
         \`\`\`apache

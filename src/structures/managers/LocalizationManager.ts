@@ -4,10 +4,13 @@ import Language from '../Language';
 import { sep } from 'path';
 import Bot from '../Bot';
 import 'reflect-metadata';
+import { injectable, inject } from 'inversify';
+import { TYPES } from '../../types';
 
+@injectable()
 export default class LocalizationManager extends Collection<Language> {
   public bot: Bot;
-  constructor(bot: Bot) {
+  constructor(@inject(TYPES.Bot) bot: Bot) {
     super();
 
     this.bot = bot;

@@ -15,7 +15,9 @@
     "main": "node dist/index.js",
     "lint": "eslint src --ext .ts --fix",
     "test": "jest --config jest.config.js --forceExit",
-    "dev": "nodemon dist/index.js"
+    "dev": "nodemon dist/index.js",
+    "docker": "docker build -t nino:latest .",
+    "main:docker": "docker create --name Nino nino"
   },
   "maintainers": [
     "August (Chris)",

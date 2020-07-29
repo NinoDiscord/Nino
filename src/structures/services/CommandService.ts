@@ -8,6 +8,7 @@ import NinoCommand from '../Command';
 import { TYPES } from '../../types';
 import Bot from '../Bot';
 import 'reflect-metadata';
+import { createEmptyEmbed } from '../../util/EmbedUtils';
 
 export class CommandInvocation {
   public command: NinoCommand;
@@ -134,7 +135,7 @@ export default class CommandService {
     if (invoked) {
       const message = invoked.canInvoke();
       if (message) {
-        const embed = this.bot.getEmbed()
+        const embed = createEmptyEmbed()
           .setTitle(locale.translate('errors.title', { command: invoked.command.name }))
           .setDescription(locale.lazyTranslate(message));
 
@@ -157,7 +158,7 @@ export default class CommandService {
       } catch(ex) {
         if (ex.message.includes('Missing Access')) return ctx.send(locale.translate('global.missingAccess'));
 
-        const embed = this.bot.getEmbed();
+        const embed = createEmptyEmbed();
         const owners = this.bot.owners.map(userID => {
           const user = this.bot.client.users.get(userID)!;
           if (user) return `${user.username}#${user.discriminator}`;

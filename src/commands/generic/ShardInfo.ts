@@ -4,24 +4,32 @@ import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
+import { Client } from 'eris';
+import { createEmptyEmbed } from '../../util/EmbedUtils';
 
 @injectable()
 export default class ShardInfoCommand extends Command {
-  constructor(@inject(TYPES.Bot) client: Bot) {
-    super(client, {
+  private client: Client;
+
+  constructor(
+    @inject(TYPES.Bot) bot: Bot,
+    @inject(TYPES.Client) client: Client
+  ) {
+    super(bot, {
       name: 'shardinfo',
       description: 'Gives you the bot shard info.',
       aliases: ['si', 'shards'],
       guildOnly: true
     });
+    this.client = client;
   }
 
   async run(ctx: Context) {
     let info = '';
 
-    for (const shard of ctx.bot.client.shards.values()) {
+    for (const shard of this.client.shards.values()) {
       const current = ctx.guild!.shard.id === shard.id ? '(current)' : '';
-      const guilds = ctx.bot.client.guilds.filter(g => g.shard.id === shard.id);
+      const guilds = this.client.guilds.filter(g => g.shard.id === shard.id);
       const members = guilds.reduce((a, b) => a + b.memberCount, 0);
       const memory = formatSize(process.memoryUsage().rss);
       const translated = ctx.translate('commands.generic.shardinfo.shard', {
@@ -37,7 +45,7 @@ export default class ShardInfoCommand extends Command {
       info += `${prefix} | ${translated}`;
     }
 
-    const embed = ctx.bot.getEmbed()
+    const embed = createEmptyEmbed()
       .setTitle(ctx.translate('commands.generic.shardinfo.title'))
       .setDescription(`\`\`\`diff\n${info}\n\`\`\``);
 

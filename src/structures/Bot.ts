@@ -13,13 +13,13 @@ import { lazyInject } from '../inversify.config';
 import AutomodService from './services/AutomodService';
 import BotListService from './services/BotListService';
 import StatusManager from './managers/StatusManager';
-import GuildSettings from './settings/GuildSettings';
-import UserSettings from './settings/UserSettings';
-import CaseSettings from './settings/CaseSettings';
+import GuildSettingsService from './services/settings/GuildSettingsService';
+import UserSettingsService from './services/settings/UserSettingsService';
+import CaseSettingsService from './services/settings/CaseSettingsService';
 import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
 import { TYPES } from '../types';
-import Warnings from './settings/Warning';
+import Warnings from './services/WarningService';
 import Logger from './Logger';
 import 'reflect-metadata';
 
@@ -62,13 +62,15 @@ export interface Config {
 @injectable()
 export default class Bot {
   public warnings: Warnings;
-  public locales: LocalizationManager;
   public logger: Logger;
   public owners: string[];
   public client: DiscordClient;
   public config: Config;
   public redis: Redis;
-  public cases: CaseSettings;
+  public cases: CaseSettingsService;
+
+  @lazyInject(TYPES.LocalizationManager)
+  public locales!: LocalizationManager;
 
   @lazyInject(TYPES.DatabaseManager)
   public database!: DatabaseManager;
@@ -88,8 +90,8 @@ export default class Bot {
   @lazyInject(TYPES.BotListService)
   public botlists!: BotListService;
 
-  @lazyInject(TYPES.GuildSettings)
-  public settings!: GuildSettings;
+  @lazyInject(TYPES.GuildSettingsService)
+  public settings!: GuildSettingsService;
 
   @lazyInject(TYPES.StatusManager)
   public status!: StatusManager;
@@ -100,20 +102,19 @@ export default class Bot {
   @lazyInject(TYPES.PunishmentManager)
   public punishments!: PunishmentManager;
 
-  @lazyInject(TYPES.UserSettings)
-  public userSettings!: UserSettings;
+  @lazyInject(TYPES.UserSettingsService)
+  public userSettings!: UserSettingsService;
 
   constructor(
     @inject(TYPES.Config) config: Config,
     @inject(TYPES.Client) client: DiscordClient 
   ) {
     this.warnings = new Warnings();
-    this.locales = new LocalizationManager(this);
     this.config = config;
     this.client = client;
     this.owners = config.owners || [];
     this.logger = new Logger();
-    this.cases = new CaseSettings();
+    this.cases = new CaseSettingsService();
     this.redis = new RedisClient(config.redis);
   }
 
@@ -147,11 +148,6 @@ export default class Bot {
     this.botlists.stop();
 
     this.logger.warn('Bot connection was disposed');
-  }
-
-  getEmbed() {
-    return new EmbedBuilder()
-      .setColor(0x6D6D99);
   }
 
   report(ex: any) {

@@ -7,6 +7,8 @@ import Command from '../../structures/Command';
 import Bot from '../../structures/Bot';
 import ms = require('ms');
 
+const MAX_PUNISHMENTS = 15;
+
 @injectable()
 export default class SettingsCommand extends Command {
   constructor(
@@ -37,12 +39,28 @@ export default class SettingsCommand extends Command {
     }
   }
 
+  private isBoolean(str: string | boolean) {
+    return typeof str === 'boolean';
+  }
+
+  private isString(str: string | boolean) {
+    return typeof str === 'string';
+  }
+
+  private isInteger(str: string) {
+    return (/^[0-9]$/).test(str);
+  }
+
+  private isInRange(num: Number, lowerBound: Number, upperBound: Number) {
+    return num >= lowerBound && num <= upperBound;
+  }
+
   async add(ctx: Context) {
     const warnings = ctx.args.get(1);
     const punishment = ctx.args.get(2);
     const punishments = ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'];
 
-    if (!warnings || !(/^[0-9]$/).test(warnings) || Number(warnings) < 1 || Number(warnings) > 5) {
+    if (!warnings || !this.isInteger(warnings) || !this.isInRange(Number(warnings), 1, 5)) {
       return ctx.sendTranslate('commands.generic.settings.add.amountRequired');
     }
 
@@ -54,7 +72,7 @@ export default class SettingsCommand extends Command {
     }
   
     const temp = ctx.flags.get('time');
-    if (temp && (typeof temp === 'boolean') || (typeof temp === 'string') && (!ms(temp as string) || ms(temp as string) < 1000)) {
+    if (temp && (this.isBoolean(temp) || (this.isString(temp) && (!ms(temp as string) || ms(temp as string) < 1000)))) {
       return ctx.sendTranslate('commands.generic.settings.add.invalidTime');
     }
 
@@ -68,12 +86,12 @@ export default class SettingsCommand extends Command {
       return ctx.sendTranslate('commands.generic.settings.add.missingRoleID');
     }
 
-    if (roleID && !((/^[0-9]+$/).test(roleID) || !ctx.guild!.roles.has(roleID))) {
+    if (roleID && (!this.isInteger(roleID) || !ctx.guild!.roles.has(roleID))) {
       return ctx.sendTranslate('commands.generic.settings.add.invalidRole');
     }
 
     const days = ctx.flags.get('days');
-    if (days && (typeof days === 'boolean' || (typeof days === 'string') && !(/^[0-9]{1,2}$/).test(days))) {
+    if (days && (this.isBoolean(days) || this.isString(days) && !(/^[0-9]{1,2}$/).test(days as string))) {
       return ctx.sendTranslate('commands.generic.settings.add.invalidDays');
     }
 
@@ -98,19 +116,18 @@ export default class SettingsCommand extends Command {
   async remove(ctx: Context) {
     const index = ctx.args.get(1);
 
-    if (!index || !/^[0-9]+$/.test(index) || Number(index) < 1) {
-      return ctx.sendTranslate('commands.generic.settings.remove.invalidIndex');
-    }
-
     const settings = await ctx.getSettings();
     if (!settings || !settings.punishments.length) {
       return ctx.sendTranslate('commands.generic.settings.remove.noPunishments');
     }
 
-    if (Number(index) <= settings!.punishments.length) {
-      const i = Math.round(Number(index)) - 1;
-      settings!.punishments.splice(i, 1);
+    if (!index || !this.isInteger(index) || !this.isInRange(Number(index), 1, settings.punishments.length)) {
+      return ctx.sendTranslate('commands.generic.settings.remove.invalidIndex');
     }
+
+    
+    const i = Math.round(Number(index)) - 1;
+    settings!.punishments.splice(i, 1);
     settings!.save();
     return ctx.sendTranslate('commands.generic.settings.remove.success', { index });
   }
@@ -126,7 +143,7 @@ export default class SettingsCommand extends Command {
           return ctx.sendTranslate('commands.generic.settings.noChannel');
         }
 
-        const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
+        const id = this.extractChannelId(channelID);
         if (id === null) {
           return ctx.sendTranslate('global.invalidChannel', { channel: channelID });
         }
@@ -141,7 +158,7 @@ export default class SettingsCommand extends Command {
           return ctx.sendTranslate('commands.generic.settings.set.modlog.noPerms', { channel: channel.name });
         }
 
-        await ctx.bot.settings.update(ctx.guild!.id, {
+        return ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             modlog: channel.id
           }
@@ -150,7 +167,7 @@ export default class SettingsCommand extends Command {
             ? ctx.sendTranslate('commands.generic.settings.set.modlog.unable', { channel: channel.name })
             : ctx.sendTranslate('commands.generic.settings.set.modlog.success', { channel: channel.name });
         });
-      } break;
+      }
       case 'prefix': {
         const prefix = ctx.args.slice(2).join(' ');
         const settings = await ctx.getSettings()!;
@@ -291,6 +308,16 @@ export default class SettingsCommand extends Command {
           });
       }
     }
+  }
+
+  private extractChannelId(str: string): string | null {
+    if (str.startsWith('<#') && str.endsWith('>')) {
+      return str.substring(2, str.length - 1);
+    }
+    if (this.isInteger(str)) {
+      return str;
+    } 
+    return null;
   }
 
   async enable(ctx: Context) {
