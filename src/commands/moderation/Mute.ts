@@ -73,7 +73,7 @@ export default class MuteCommand extends Command {
       });
     } catch(e) {
       return ctx.sendTranslate('commands.moderation.unable', {
-        type: member instanceof Member ? member.user.bot ? 'bot' : 'user' : 'user',
+        type: 'mute',
         message: e.message
       });
     }

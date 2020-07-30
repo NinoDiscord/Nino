@@ -162,10 +162,10 @@ export default class PunishmentManager {
       case PunishmentType.Mute: {
         if (!(member instanceof Member)) return;
         const temp = punishment.options.temp;
-        let mutedRole: string | Role = settings!.mutedRole;
+        let mutedRole: string | Role | undefined = settings!.mutedRole;
         if (!mutedRole) {
-          const role = guild.roles.find(x => x.name === 'Muted');
-          if (!role) {
+          mutedRole = guild.roles.find(x => x.name === 'Muted');
+          if (!mutedRole) {
             mutedRole = await guild.createRole({
               name: 'Muted',
               permissions: 0,
@@ -181,13 +181,13 @@ export default class PunishmentManager {
               if (permissions.has('manageChannels')) 
                 await channel.editPermission(mutedRole.id, 0, Constants.Permissions.sendMessages, 'role', '[Automod] Override permissions for new Muted role.');
             }
-
-            settings!.mutedRole = mutedRole.id;
-            await settings!.save();
           }
+
+          settings!.mutedRole = mutedRole.id;
+          await settings!.save();
         }
 
-        const id = mutedRole instanceof Role ? mutedRole.id : mutedRole;
+        const id = mutedRole! instanceof Role ? mutedRole.id : mutedRole;
         if (!audit) 
           await member.addRole(id, reason);
         if (temp) 
@@ -265,7 +265,7 @@ export default class PunishmentManager {
       const c = await this.bot.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
       try {
         let description = stripIndents`
-          **User**: ${member.username}#${member.discriminator}
+          **User**: ${member.username}#${member.discriminator} (${member.id})
           **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}
           **Reason**: ${reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${c.id} <reason>\`*)`}
         `;

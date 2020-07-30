@@ -77,7 +77,7 @@ export default class BanCommand extends Command {
       });
 
       return ctx.sendTranslate('commands.moderation.unable', {
-        type: member instanceof Member ? member.user.bot ? 'bot' : 'user' : 'user',
+        type: 'ban',
         message: e.message
       });
     }
