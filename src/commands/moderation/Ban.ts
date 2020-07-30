@@ -53,7 +53,7 @@ export default class BanCommand extends Command {
     const days = ctx.flags.get('days') || ctx.flags.get('d');
     if (days && (typeof days === 'boolean' || !(/[0-9]+/).test(days))) return ctx.sendTranslate('global.invalidFlag.string');
 
-    const t = time !== null ? ms(time) : undefined;
+    const t = time ? ms(time) : undefined;
     const soft = ctx.flags.get('soft');
     if (soft && typeof soft === 'string') return ctx.sendTranslate('global.invalidFlag.boolean');
 
