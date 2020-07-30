@@ -3,6 +3,7 @@ import { Punishment, PunishmentType } from './PunishmentManager';
 import { Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
+import { bigTimeout } from '../../util';
 
 /**
  * This class makes timeouts resilent, automatic unmutes and unbans will be supported even on an event of a crash.
@@ -19,16 +20,6 @@ export default class TimeoutsManager {
   }
 
   /**
-   * The setTimeout function for big time values.
-   * @param func the function to execute
-   * @param time the time to excute it after
-   */
-  bigTimeout(func: (...args: any[]) => void, time: number) {
-    if (time > 0x7fffffff) setTimeout(() => this.bigTimeout(func, time - 0x7fffffff), 0x7fffffff);
-    else setTimeout(func, time);
-  }
-
-  /**
    * Create a timeout
    * @param member the member
    * @param guild the guild
@@ -38,7 +29,7 @@ export default class TimeoutsManager {
   async addTimeout(member: string, guild: Guild, task: 'unban' | 'unmute', time: number) {
     const key = `timeout:${task}:${guild.id}:${member}`;
     await this.bot.redis.set(key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
-    this.bigTimeout(async () => {
+    bigTimeout(async () => {
       const exists = await this.bot.redis.exists(key);
       if (exists) {
         const punishment = new Punishment(task as PunishmentType, {
@@ -47,7 +38,7 @@ export default class TimeoutsManager {
         await this.bot.punishments.punish({ id: member, guild }, punishment, '[Automod] Time\'s up!');
         await this.bot.redis.del(key);
       }
-    }, time);
+    }, BigInt(time));
   }
 
   /**
@@ -75,7 +66,7 @@ export default class TimeoutsManager {
       const task = value!.split(':')[4];
       if (!guild) continue;
 
-      this.bigTimeout(async () => {
+      bigTimeout(async () => {
         if (await this.bot.redis.exists(timedate)) {
           try {
             await this.bot.punishments.punish(
@@ -89,7 +80,7 @@ export default class TimeoutsManager {
             await this.bot.redis.del(timedate);
           }
         }
-      }, start - Date.now() + amount);
+      }, BigInt(start - Date.now() + amount));
     }
   }
 }

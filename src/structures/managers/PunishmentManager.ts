@@ -265,7 +265,7 @@ export default class PunishmentManager {
       const c = await this.bot.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
       try {
         let description = stripIndents`
-          **User**: ${member.username}#${member.discriminator}
+          **User**: ${member.username}#${member.discriminator} (${member.id})
           **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}
           **Reason**: ${reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${c.id} <reason>\`*)`}
         `;
