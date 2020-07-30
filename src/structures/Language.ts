@@ -122,6 +122,9 @@ export default class Language {
 
   private _translate(translated: string, args?: { [x: string]: string }) {
     const KEY_REGEX = /[$]\{([\w\.]+)\}/g;
-    return translated.replace(KEY_REGEX, (_, key) => args?.[key] || '?').trim();
+    return translated.replace(KEY_REGEX, (_, key) => {
+      if (args) return args[key] || '?';
+      else return '?';
+    }).trim();
   }
 }
