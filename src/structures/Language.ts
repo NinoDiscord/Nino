@@ -122,9 +122,6 @@ export default class Language {
 
   private _translate(translated: string, args?: { [x: string]: string }) {
     const KEY_REGEX = /[$]\{([\w\.]+)\}/g;
-    return translated.replace(KEY_REGEX, (_, key) => {
-      // TODO: Find a way to not do this, seems inefficent but whitespace is replaced for some reason?
-      return args ? args.hasOwnProperty(key) ? args[key] : '?' : '?';
-    });
+    return translated.replace(KEY_REGEX, (_, key) => args?.[key] || '?').trim();
   }
 }

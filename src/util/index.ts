@@ -101,3 +101,8 @@ export function bigTimeout(func: (...args: any[]) => void, time: number) {
     setTimeout(func, time);
   }
 }
+
+export function firstUpper(text: string) {
+  const arr = text.split(' ');
+  return arr.map((t) => `${t.charAt(0).toUpperCase()}${t.slice(1)}`).join(' ');
+}

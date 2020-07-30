@@ -1,6 +1,7 @@
 import { Constants, TextChannel } from 'eris';
 import { injectable, inject } from 'inversify';
-import { replaceMessage } from '../../util';
+import { createEmptyEmbed } from '../../util/EmbedUtils';
+import { firstUpper } from '../../util';
 import { TYPES } from '../../types';
 import Context from '../../structures/Context';
 import Command from '../../structures/Command';
@@ -30,12 +31,12 @@ export default class SettingsCommand extends Command {
     switch (subcommand) {
       case 'set': return this.set(ctx);
       case 'reset': return this.reset(ctx);
-      case 'view': return this.view(ctx, true);
+      case 'view': return this.view(ctx);
       case 'add': return this.add(ctx);
       case 'remove': return this.remove(ctx);
       case 'disable': return this.disable(ctx);
       case 'enable': return this.enable(ctx);
-      default: return this.view(ctx, false);
+      default: return this.view(ctx);
     }
   }
 
@@ -290,14 +291,13 @@ export default class SettingsCommand extends Command {
           return ctx.sendTranslate('commands.generic.settings.set.logChannel.noPerms', { channel: channel.name });
         }
 
-        let error!: any;
         ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.channelID': channel.id
           }
         }, (error) => error 
           ? ctx.sendTranslate('commands.generic.settings.set.logChannel.unable', { channel: channel.name }) 
-          : ctx.sendTranslate('commands.generic.settings.enable.automod.success', { channel: channel.name }));
+          : ctx.sendTranslate('commands.generic.settings.set.logChannel.success', { channel: channel.name }));
       } break;
       default: {
         return setting === undefined 
@@ -622,7 +622,7 @@ export default class SettingsCommand extends Command {
     }
   }
 
-  async view(ctx: Context, provided: boolean = false) {
+  async view(ctx: Context) {
     const settings = await ctx.getSettings()!;
 
     const yes = ':white_check_mark:';
@@ -636,8 +636,8 @@ export default class SettingsCommand extends Command {
       ctx.translate('commands.generic.settings.view.punishment', {
         index: index + 1,
         warnings: value.warnings,
-        temporary: value.temp ? ms(value.temp) : ctx.translate('global.none'),
-        type: value.type,
+        time: value.temp ? ms(value.temp) : ctx.translate('global.none'),
+        type: firstUpper(value.type),
         soft: value.soft ? ctx.translate('global.yes') : ctx.translate('global.none'),
         roleId: value.role ? `**${ctx.guild!.roles.get(value.roleid)!.name}**` : ctx.translate('global.none')
       })
@@ -660,6 +660,10 @@ export default class SettingsCommand extends Command {
       words: settings.automod.badwords.enabled ? ` (${settings.automod.badwords.wordlist.join(', ')})` : ' (None)'
     });
 
-    return ctx.send(desc);
+    const embed = createEmptyEmbed()
+      .setDescription(desc)
+      .build();
+
+    return ctx.embed(embed);
   }
 }

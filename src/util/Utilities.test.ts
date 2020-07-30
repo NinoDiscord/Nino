@@ -93,4 +93,8 @@ describe('Utilities', () => {
     expect(callback).toBeCalled();
     expect(callback).toHaveBeenCalledTimes(1);
   });
+
+  it('should return "Ban" when converting to "ban"', () =>
+    expect(util.firstUpper('ban')).toBe('Ban')
+  );
 });
