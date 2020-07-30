@@ -54,7 +54,7 @@ export default class UnmuteCommand extends Command {
     } catch (e) {
       return ctx.sendTranslate('commands.moderation.unable', {
         message: e.message,
-        type: member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User'
+        type: 'unmute'
       });
     }
   }

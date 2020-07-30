@@ -1,9 +1,15 @@
 import * as util from '.';
 
-// Use fake timers
-jest.useFakeTimers();
 
 describe('Utilities', () => {
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  beforeEach(() => {
+    jest.clearAllTimers();
+  });
+
   it('should return "5s" as the time', () => {
     const time = util.humanize(5000);
     
@@ -54,7 +60,7 @@ describe('Utilities', () => {
   });
 
   it('should test bigTimeout with a 1 minute timeout', () => {
-    const MINUTE = BigInt(60000);
+    const MINUTE = 60000;
     const callback = jest.fn(); // Creates a mock function
 
     util.bigTimeout(callback, MINUTE);
@@ -65,16 +71,26 @@ describe('Utilities', () => {
     expect(callback).toHaveBeenCalledTimes(1);
   });
 
-  // TODO: pls fix this oded
-  //it('should test bigTimeout with a 1 month timeout', () => {
-  //  const MONTH = BigInt('2592000000');
-  //  const callback = jest.fn();
+  it('should test bigTimeout with a 1 year timeout', () => {
+    const YEAR = 31557600000;
+    let temp = YEAR;
+    const callback = jest.fn();
   
-  //  util.bigTimeout(callback, MONTH);
-  //  expect(callback).not.toBeCalled();
-  
-  //  jest.advanceTimersByTime(0x7fffffff);
-  //  expect(callback).toBeCalled();
-  //  expect(callback).toHaveBeenCalledTimes(1);
-  //});
+    util.bigTimeout(callback, YEAR);
+    expect(callback).not.toBeCalled();
+
+    let i = 0;
+    while (temp > 0x7fffffff) {
+      jest.advanceTimersByTime(0x7fffffff);
+      temp -= 0x7fffffff;
+      i++;
+    }
+    jest.runOnlyPendingTimers();
+
+    expect(i).toBe(Math.floor(YEAR / 0x7fffffff));
+    expect(jest.getTimerCount()).toBe(0);
+    expect(0x7fffffff*i + temp).toBe(YEAR);
+    expect(callback).toBeCalled();
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
 });

@@ -94,7 +94,10 @@ export function unembedify(embed: EmbedOptions) {
  * @param func the function to execute
  * @param time the time to excute it after
  */
-export function bigTimeout(func: (...args: any[]) => void, time: bigint) {
-  if (time > BigInt(0x7fffffff)) setTimeout(() => bigTimeout(func, time - BigInt(0x7fffffff)), 0x7fffffff);
-  else setTimeout(func, Number(time));
+export function bigTimeout(func: (...args: any[]) => void, time: number) {
+  if (time > 0x7fffffff) {
+    setTimeout(() => bigTimeout(func, time - 0x7fffffff), 0x7fffffff);
+  } else {
+    setTimeout(func, time);
+  }
 }
