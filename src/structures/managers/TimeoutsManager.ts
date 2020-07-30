@@ -4,6 +4,7 @@ import { Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
 import { bigTimeout } from '../../util';
+import ms from 'ms';
 
 /**
  * This class makes timeouts resilent, automatic unmutes and unbans will be supported even on an event of a crash.
@@ -45,6 +46,7 @@ export default class TimeoutsManager {
    * @param time the amount of time before executing
    */
   async addTimeout(member: string, guild: Guild, task: 'unban' | 'unmute', time: number) {
+    this.bot.logger.info(`Added timeout: to ${task} in ${ms(time)}`);
     const key = `timeout:${task}:${guild.id}:${member}`;
     await this.bot.redis.hset('timeouts', key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
     this.createTimeout(key, task, member, guild, time);
