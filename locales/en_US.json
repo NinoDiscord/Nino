@@ -28,6 +28,8 @@
       "unable": "I was unable to do this. `${error}`",
       "none": "None",
       "missingAccess": "I am missing access in the channel you linked.",
+      "alreadyBanned": "The user you tried to ban was already banned from this guild.",
+      "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
       "members": {
         "bot": "Bot",
         "user": "User"
@@ -350,7 +352,7 @@
           }
         },
         "shardinfo": {
-          "shard": "Shard #${id} ${current} | G: ${guilds} | U: ${users} | L: ${latency}ms | M: ${memory}",
+          "shard": "Shard #${shard.id} ${current} | G: ${guilds} | U: ${users} | L: ${latency}ms | M: ${memory}",
           "title": "Shard Information"
         },
         "statistics": {

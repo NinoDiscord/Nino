@@ -19,12 +19,12 @@ export default class TimeCommand extends Command {
     const date = new Date();
     const convert = (t: any) => `0${t}`.slice(-2);
     return ctx.sendTranslate('commands.generic.time', {
-      days: date.getDate(),
+      day: date.getDate(),
       month: date.getMonth(),
       year: date.getFullYear(),
-      hours: convert(date.getHours()),
-      minutes: convert(date.getMinutes()),
-      seconds: convert(date.getSeconds())
+      h: convert(date.getHours()),
+      m: convert(date.getMinutes()),
+      s: convert(date.getSeconds())
     });
   }
 }

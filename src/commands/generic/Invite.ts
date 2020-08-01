@@ -21,6 +21,7 @@ export default class InviteCommand extends Command {
       aliases: ['inv'],
       ownerOnly: false,
     });
+    
     this.client = client;
   }
 

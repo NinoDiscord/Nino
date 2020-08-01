@@ -37,12 +37,12 @@ export default class ShardInfoCommand extends Command {
         latency: shard.latency,
         guilds: guilds.length,
         users: members,
-        id: shard.id,
+        'shard.id': shard.id,
         memory
       });
 
       const prefix = shard.status === 'disconnected' ? '-' : shard.status === 'connecting' || shard.status === 'handshaking' ? '*' : '+';
-      info += `${prefix} | ${translated}`;
+      info += `${prefix} ${translated}`;
     }
 
     const embed = createEmptyEmbed()

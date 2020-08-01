@@ -22,6 +22,8 @@ export default class ShellCommand extends Command {
   }
 
   async run(ctx: Context) {
+    if (!ctx.args.get(0)) return ctx.send('What am I supposed to execute?');
+
     const message = await ctx.send('Evaluating script...');
     const script = ctx.args.join(' ');
     let result: string;

@@ -40,6 +40,15 @@ export default class BanCommand extends Command {
       if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.heirarchy');
     }
 
+    try {
+      const bans = await ctx.guild!.getBans();
+      const hasBan = bans.some(ban => ban.user.id === user);
+
+      if (hasBan) return ctx.sendTranslate('global.alreadyBanned');
+    } catch {
+      return ctx.sendTranslate('global.noPerms');
+    }
+
     const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     let reason!: string;
     let time!: string | null;

@@ -5,7 +5,7 @@ import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
 import UserSettingsService from '../../structures/services/settings/UserSettingsService';
 import { createEmptyEmbed } from '../../util/EmbedUtils';
-import Eris, { Guild } from 'eris';
+import Eris from 'eris';
 import { GuildModel } from '../../models/GuildSchema';
 import LocalizationManager from '../../structures/managers/LocalizationManager';
 import { UserModel } from '../../models/UserSchema';
@@ -32,6 +32,7 @@ export default class ShardInfoCommand extends Command {
       guildOnly: true,
       usage: 'locale / locale list / locale reset [--guild] / locale set <locale> [--guild]'
     });
+
     this.userSettings = userSettings;
     this.guildSettings = guildSettings;
     this.client = client;
@@ -54,7 +55,6 @@ export default class ShardInfoCommand extends Command {
         if (!ctx.args.has(1)) return ctx.sendTranslate('commands.generic.locale.set.none', { prefix: settings.prefix });
 
         return this.setLocale(ctx, settings);
-        
       } 
 
       default: return ctx.sendTranslate('commands.generic.locale.invalidSubcommand', {

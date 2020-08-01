@@ -52,7 +52,7 @@ export default class StatisticsCommand extends Command {
     const embed = createEmptyEmbed()
       .setAuthor(ctx.translate('commands.generic.statistics.title', { 
         username: `${botUser.username}#${botUser.discriminator}`,
-        version: `v${pkg.version} | ${commitHash}`
+        version: `v${pkg.version} / ${commitHash}`
       }), 'https://nino.augu.dev', botUser.dynamicAvatarURL('png', 1024))
       .setDescription(ctx.translate('commands.generic.statistics.description', {
         guilds: guilds.size.toLocaleString(),
