@@ -13,17 +13,12 @@ import GuildSettingsService from '../../structures/services/settings/GuildSettin
 
 @injectable()
 export default class ShardInfoCommand extends Command {
-  private userSettings: UserSettingsService;
-  private guildSettings: GuildSettingsService;
-  private client: Eris.Client;
-  private localizationManager: LocalizationManager;
-
   constructor(
     @inject(TYPES.Bot) bot: Bot,
-    @inject(TYPES.GuildSettingsService) guildSettings: GuildSettingsService,
-    @inject(TYPES.UserSettingsService) userSettings: UserSettingsService,
-    @inject(TYPES.Client) client: Eris.Client,
-    @inject(TYPES.LocalizationManager) localizationManager: LocalizationManager
+    @inject(TYPES.GuildSettingsService) private guildSettings: GuildSettingsService,
+    @inject(TYPES.UserSettingsService) private userSettings: UserSettingsService,
+    @inject(TYPES.Client) private client: Eris.Client,
+    @inject(TYPES.LocalizationManager) private localizationManager: LocalizationManager
   ) {
     super(bot, {
       name: 'locale',
@@ -32,11 +27,6 @@ export default class ShardInfoCommand extends Command {
       guildOnly: true,
       usage: 'locale / locale list / locale reset [--guild] / locale set <locale> [--guild]'
     });
-
-    this.userSettings = userSettings;
-    this.guildSettings = guildSettings;
-    this.client = client;
-    this.localizationManager = localizationManager;
   }
 
   async run(ctx: Context) {

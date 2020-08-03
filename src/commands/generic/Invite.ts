@@ -9,11 +9,9 @@ import Eris from 'eris';
 
 @injectable()
 export default class InviteCommand extends Command {
-  private client: Eris.Client;
-
   constructor(
     @inject(TYPES.Bot) bot: Bot,
-    @inject(TYPES.Client) client: Eris.Client
+    @inject(TYPES.Client) private client: Eris.Client
   ) {
     super(bot, {
       name: 'invite',
@@ -21,8 +19,6 @@ export default class InviteCommand extends Command {
       aliases: ['inv'],
       ownerOnly: false,
     });
-    
-    this.client = client;
   }
 
   async run(ctx: Context) {

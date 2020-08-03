@@ -16,26 +16,20 @@ const pkg = require('../../../package.json');
 
 @injectable()
 export default class StatisticsCommand extends Command {
-  private client: Client;
-  private commandStatisticsManager: CommandStatisticsManager;
-  private databaseManager: DatabaseManager;
   @lazyInject(TYPES.CommandManager)
   private commandManager!: CommandManager;
 
   constructor(
     @inject(TYPES.Bot) bot: Bot,
-    @inject(TYPES.Client) client: Client,
-    @inject(TYPES.CommandStatisticsManager) commandStatisticsManager: CommandStatisticsManager,
-    @inject(TYPES.DatabaseManager) databaseManager: DatabaseManager
+    @inject(TYPES.Client) private client: Client,
+    @inject(TYPES.CommandStatisticsManager) private commandStatisticsManager: CommandStatisticsManager,
+    @inject(TYPES.DatabaseManager) private databaseManager: DatabaseManager
   ) {
     super(bot, {
       name: 'statistics',
       description: 'Gives you the bot\'s statistics',
       aliases: ['stats', 'info', 'bot', 'botinfo']
     });
-    this.client = client;
-    this.commandStatisticsManager = commandStatisticsManager;
-    this.databaseManager = databaseManager;
   }
 
   async run(ctx: Context) {

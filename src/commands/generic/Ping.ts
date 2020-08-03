@@ -7,11 +7,9 @@ import Eris, { Client } from 'eris';
 
 @injectable()
 export default class PingCommand extends Command {
-  private client: Client;
-
   constructor(
     @inject(TYPES.Bot) bot: Bot,
-    @inject(TYPES.Client) client: Client
+    @inject(TYPES.Client) private client: Client
   ) {
     super(bot, {
       name: 'ping',
@@ -19,7 +17,6 @@ export default class PingCommand extends Command {
       aliases: ['pong', 'pang'],
       guildOnly: true
     });
-    this.client = client;
   }
 
   async run(ctx: Context) {

@@ -13,13 +13,11 @@ import { lazyInject } from '../../inversify.config';
 export default class HelpCommand extends Command {
   @lazyInject(TYPES.CommandManager)
   private commandManager!: CommandManager;
-  private client: Eris.Client;
-  private config: Config;
 
   constructor(
     @inject(TYPES.Bot) bot: Bot, 
-    @inject(TYPES.Client) client: Eris.Client,
-    @inject(TYPES.Config) config: Config
+    @inject(TYPES.Client) private client: Eris.Client,
+    @inject(TYPES.Config) private config: Config
   ) {
     super(bot, {
       name: 'help',
@@ -27,8 +25,6 @@ export default class HelpCommand extends Command {
       usage: '[command]',
       aliases: ['cmds', 'commands']
     });
-    this.client = client;
-    this.config = config;
   }
 
   private getAllCategories() {
