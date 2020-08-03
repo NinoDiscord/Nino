@@ -56,10 +56,10 @@
       ]
     },
     "automod": {
-      "badwords": "Please don't swear in this server, ${member}.",
-      "invite": "Please don't advertise on this server, ${member}.",
-      "mentions": "Please don't mention more then 4 users, ${member}.",
-      "spam": "Please don't spam here, ${member}."
+      "badwords": "Please don't swear in this server, ${user}.",
+      "invite": "Please don't advertise on this server, ${user}.",
+      "mentions": "Please don't mention more then 4 users, ${user}.",
+      "spam": "Please don't spam here, ${user}."
     },
     "commands": {
       "generic": {
@@ -217,8 +217,9 @@
               "success": "I resetted the muted role."
             },
             "ignored": {
-              "unable": "I was unable to reset all of the ignored channels.",
-              "success": "Ignored channels has been resetted."
+              "unable": "I was unable to remove channel **${channel}**.",
+              "success": "I have removed channel **${channel}** from not received updates.",
+              "invalid": "I was unable to find channel **${channel}** in this guild?"
             },
             "logChannel": {
               "unable": "I was unable to reset channel **${channel}**.",
@@ -227,6 +228,12 @@
             "punishments": {
               "unable": "I was unable to reset all punishments.",
               "success": "Punishments have been resetted."
+            },
+            "swears": {
+              "unable": "I was unable to remove the word **${word}** from the list.",
+              "success": "Word **${word}** has been removed from the blacklisted words.",
+              "notEnabled": "The **Swearing** automod feature must be enabled to remove a word.",
+              "unableToFind": "Word **${word}** isn't blacklisted?"
             }
           },
           "enable": {

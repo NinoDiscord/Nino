@@ -316,7 +316,7 @@ export default class SettingsCommand extends Command {
     }
     if (this.isInteger(str)) {
       return str;
-    } 
+    }
     return null;
   }
 
@@ -571,7 +571,7 @@ export default class SettingsCommand extends Command {
   }
 
   async reset(ctx: Context) {
-    const subcommands = ['punishments', 'modlog', 'mutedrole', 'prefix'];
+    const subcommands = ['punishments', 'modlog', 'mutedrole', 'prefix', 'mutedRole', 'logging.ignore', 'automod.swears', 'automod.badwords'];
     const setting = ctx.args.get(1);
 
     switch (setting) {
@@ -602,7 +602,8 @@ export default class SettingsCommand extends Command {
           ? ctx.sendTranslate('commands.generic.settings.reset.modlog.unable') 
           : ctx.sendTranslate('commands.generic.settings.reset.modlog.success'));
       } break;
-      case 'mutedrole': {
+      case 'mutedrole':
+      case 'mutedRole': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'mutedRole': null
@@ -610,6 +611,37 @@ export default class SettingsCommand extends Command {
         }, (error) => error 
           ? ctx.sendTranslate('commands.generic.settings.reset.mutedRole.unable') 
           : ctx.sendTranslate('commands.generic.settings.reset.mutedRole.success'));
+      } break;
+      case 'logging.ignore':
+      case 'logging.ignored': {
+        const channel = ctx.args.get(2);
+        if (!channel) return ctx.sendTranslate('commands.generic.settings.reset.ignored.none');
+
+        const heck = [channel].filter(channelID => channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null);
+        if (heck.some(s => s === null)) return ctx.sendTranslate('commands.generic.settings.reset.ignored.invalid', { channel });
+
+        await this.bot.settings.update(ctx.guild!.id, {
+          $pull: { 'logging.ignore': this.extractChannelId(channel)! }
+        }, (error) => {
+          const key = error ? 'unable' : 'success';
+          return ctx.sendTranslate(`commands.generic.settings.reset.ignored.${key}`, { channel });
+        });
+      } break;
+      case 'automod.swears':
+      case 'automod.badwords': {
+        const word = ctx.args.get(2);
+        if (!word) return ctx.sendTranslate('commands.generic.settings.reset.swears.none');
+
+        const settings = await ctx.getSettings()!;
+        if (!settings.automod.badwords.enabled) return ctx.sendTranslate('commands.generic.settings.reset.swears.notEnabled');
+        if (!settings.automod.badwords.wordlist.find(w => w === word)) return ctx.sendTranslate('commands.generic.settings.reset.swears.unableToFind', { word });
+
+        await this.bot.settings.update(ctx.guild!.id, {
+          $pull: { 'automod.badwords.wordlist': word }
+        }, (error) => {
+          const key = error ? 'unable' : 'success';
+          return ctx.sendTranslate(`commands.generic.settings.reset.swears.${key}`, { word });
+        });
       } break;
       default: {
         return setting === undefined 

@@ -9,11 +9,9 @@ import { createEmptyEmbed } from '../../util/EmbedUtils';
 
 @injectable()
 export default class ShardInfoCommand extends Command {
-  private client: Client;
-
   constructor(
     @inject(TYPES.Bot) bot: Bot,
-    @inject(TYPES.Client) client: Client
+    @inject(TYPES.Client) private client: Client
   ) {
     super(bot, {
       name: 'shardinfo',
@@ -21,7 +19,6 @@ export default class ShardInfoCommand extends Command {
       aliases: ['si', 'shards'],
       guildOnly: true
     });
-    this.client = client;
   }
 
   async run(ctx: Context) {

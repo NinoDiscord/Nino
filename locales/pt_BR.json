@@ -55,6 +55,12 @@
         "Se ele for repetidido, reporte-o para ${owners} em ${server}."
       ]
     },
+    "automod": {
+      "badwords": "Please don't swear in this server, ${user}.",
+      "invite": "Please don't advertise on this server, ${user}.",
+      "mentions": "Please don't mention more then 4 users, ${user}.",
+      "spam": "Please don't spam here, ${user}."
+    },
     "commands": {
       "generic": {
         "help": {

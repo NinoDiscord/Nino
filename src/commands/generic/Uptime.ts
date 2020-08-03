@@ -8,18 +8,15 @@ import { Client } from 'eris';
 
 @injectable()
 export default class UptimeCommand extends Command {
-  private client: Client;
-
   constructor(
     @inject(TYPES.Bot) bot: Bot,
-    @inject(TYPES.Client) client: Client
+    @inject(TYPES.Client) private client: Client
   ) {
     super(bot, {
       name: 'uptime',
       description: 'Gives you the uptime for the bot.',
       aliases: ['up']
     });
-    this.client = client;
   }
 
   async run(ctx: Context) {
