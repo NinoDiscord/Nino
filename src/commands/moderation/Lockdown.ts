@@ -1,4 +1,4 @@
-import { Constants, TextChannel } from 'eris';
+import { Constants, TextChannel, Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import PermissionUtils from '../../util/PermissionUtils';
 import CommandContext from '../../structures/Context';
@@ -24,19 +24,19 @@ export default class LockdownCommand extends Command {
     });
   }
 
-  getChannel(s: string, ctx: CommandContext) {
+  getChannel(s: string, guild: Guild) {
     if (/^[0-9]+$/.test(s)) {
-      const channel = ctx.guild!.channels.get(s);
+      const channel = guild.channels.get(s);
       if (!channel || [1, 2, 3, 4].includes(channel.type)) return;
       return (channel as TextChannel);
     } else if (/^<#[0-9]+>$/.test(s)) {
       const id = s.substring(2, s.length - 1);
-      const channel = ctx.guild!.channels.get(id);
+      const channel = guild.channels.get(id);
       if (!channel || [1, 2, 3, 4].includes(channel.type)) return;
       return (channel as TextChannel);
     }
 
-    return ctx.guild!.channels.find(x => x.type === 0 && x.name.toLowerCase() === s) as TextChannel | undefined;
+    return guild.channels.find(x => x.type === 0 && x.name.toLowerCase() === s) as TextChannel | undefined;
   }
 
   getRole(s: string, ctx: CommandContext) {
@@ -47,6 +47,13 @@ export default class LockdownCommand extends Command {
     }
 
     return ctx.guild!.roles.find(x => x.name.toLowerCase() === s);
+  }
+
+  getChannels(args: string[], guild: Guild) {
+    if (args.includes('all')) {
+      return guild.channels.filter(c => c.type === Constants.ChannelTypes.GUILD_TEXT).map(c => c as TextChannel);
+    }
+    return args.map(x => this.getChannel(x, guild)).filter(x => x).map(x => x!);
   }
 
   async run(ctx: CommandContext) {
@@ -70,9 +77,7 @@ export default class LockdownCommand extends Command {
 
     if (!roles.length) return ctx.sendTranslate('commands.moderation.lockdown.cantModify');
 
-    const channels = ctx.args.args.findIndex(x => x === 'all') === -1 ?
-      ctx.guild!.channels.filter(c => c.type === 0).map(c => c as TextChannel) :
-      ctx.args.args.map(x => this.getChannel(x, ctx)).filter(x => x).map(tc => tc!);
+    const channels = this.getChannels(ctx.args.args, ctx.guild!);
 
     if (!channels.length) return ctx.sendTranslate('commands.moderation.lockdown.cantModifyChannels');
     if (!release) {
@@ -97,15 +102,20 @@ export default class LockdownCommand extends Command {
       if (((ctx.me.permission.allow | me.allow) & Constants.Permissions.manageChannels) !== 0) {
         if (release as boolean) {
           const former = await this.bot.redis.get(`lockdown:${channel.id}`);
+          console.log(former);
           if (former) {
             for (const pos of JSON.parse(former)) await channel.editPermission(pos.role, pos.allow, pos.deny, 'role', '[Lockdown] Lockdown is over');
             for (const role of allRoles.filter(r => !JSON.parse(former).find(role => r.role!.id === role.id))) await channel.deletePermission(role.role!.id, '[Lockdown] Lockdown is over');
-            return ctx.sendTranslate('commands.moderation.lockdown.unlock', {
+            await this.bot.redis.del(`lockdown:${channel.id}`);
+            await ctx.sendTranslate('commands.moderation.lockdown.unlocked', {
+              channel: channel.mention
+            });
+          } else {
+            await ctx.sendTranslate('commands.moderation.lockdown.alreadyUnlocked', {
               channel: channel.mention
             });
           }
 
-          await this.bot.redis.del(`lockdown:${channel.id}`);
         } else {
           for (const role of allRoles) {
             let allow = channel.permissionOverwrites.has(role.role!.id) ? channel.permissionOverwrites.get(role.role!.id)!.allow : 0;

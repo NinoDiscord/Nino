@@ -395,6 +395,7 @@
                     "backingUp": "Sauvegarde des autorisations de channels ..",
                     "backedUp": "J'ai sauvegardé les autorisations de channel!",
                     "unlocked": "Channel **${channel}** n'est maintenatn verrouillé",
+                    "alreadyUnlocked": "Channel **${channel}** is already unlocked.",
                     "locked": "Channel **${channel}** est maintenant verrouillé.",
                     "cantModifyChannels": "Je ne peux modifier aucun channels."
                 },
