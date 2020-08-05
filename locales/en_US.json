@@ -20,7 +20,7 @@
       "invalidChannel": "Channel **${channel}** was invalid.",
       "notText": "Channel **${channel}** is not a text channel.",
       "noUser": "No user was specified.",
-      "heirarchy": "User is above or the same as you in heirarchy.",
+      "hierarchy": "User is above or the same as you in hierarchy.",
       "notInGuild": "User is not in guild?",
       "unableToPunish": "I was unable to punish the user.",
       "unableToFind": "I was unable to find user.",

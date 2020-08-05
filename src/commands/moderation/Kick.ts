@@ -38,7 +38,7 @@ export default class KickCommand extends Command {
       user: `${user.username}#${user.discriminator}`
     });
 
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.heirarchy');
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.hierarchy');
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     const punishment = new Punishment(PunishmentType.Kick, {

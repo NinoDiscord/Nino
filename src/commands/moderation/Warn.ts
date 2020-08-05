@@ -36,7 +36,7 @@ export default class WarnCommand extends Command {
     });
 
     
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.heirarchy');
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.hierarchy');
 
     const punishments = await this.bot.punishments.addWarning(member!);
     for (let i of punishments) {
