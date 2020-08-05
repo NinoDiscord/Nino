@@ -6,6 +6,7 @@ import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
+import { createEmptyEmbed } from '../../util/EmbedUtils';
 
 @injectable()
 export default class PruneCommand extends Command {
@@ -75,7 +76,7 @@ export default class PruneCommand extends Command {
         });
       }).join('\n');
 
-      const embed = this.bot.getEmbed()
+      const embed = createEmptyEmbed()
         .setAuthor(ctx.translate('commands.moderation.prune.title'))
         .setDescription(stripIndents`
           \`\`\`prolog
@@ -90,7 +91,7 @@ export default class PruneCommand extends Command {
         const messages = shouldDelete.filter(x => x.timestamp < this.weeks);
         return ctx.sendTranslate('commands.moderation.prune.twoWeeks', { messages: messages.length });
       } else {
-        const embed = this.bot.getEmbed()
+        const embed = createEmptyEmbed()
           .setTitle(ctx.translate('commands.moderation.prune.error.title'))
           .setDescription(stripIndents`
             \`\`\`js

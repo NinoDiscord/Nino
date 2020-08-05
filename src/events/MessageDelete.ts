@@ -4,6 +4,7 @@ import { stripIndents } from 'common-tags';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
+import { createEmptyEmbed } from '../util/EmbedUtils';
 
 @injectable()
 export default class MessageDeleteEvent extends Event {
@@ -36,7 +37,7 @@ export default class MessageDeleteEvent extends Event {
 
     // Create an embed and get the message content
     const timestamp = new Date(message.createdAt);
-    const embed = this.bot.getEmbed()
+    const embed = createEmptyEmbed()
       .setAuthor(`${message.author.username}#${message.author.discriminator} in #${(message.channel as TextChannel).name}`, undefined, message.author.dynamicAvatarURL('png', 1024))
       .setTimestamp(timestamp);
 

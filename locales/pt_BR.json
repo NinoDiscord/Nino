@@ -1,7 +1,7 @@
 {
   "contributors": [],
   "translator": "deprilula28#3609",
-  "completion": "completed",
+  "completion": "incomplete",
   "aliases": ["port", "portuges", "português"],
   "code": "pt_BR",
   "flag": ":flag_br:",
@@ -29,6 +29,14 @@
       "members": {
         "bot": "Bot",
         "user": "Usuário"
+      },
+      "none": "None",
+      "missingAccess": "I am missing access in the channel you linked.",
+      "alreadyBanned": "The user you tried to ban was already banned from this guild.",
+      "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
+      "events": {
+        "messageUpdate": "Message Updates",
+        "messageDelete": "Message Deletions"
       }
     },
     "errors": {
@@ -46,6 +54,12 @@
         "O erro ocorrido foi registrado nos nossos sistemas.",
         "Se ele for repetidido, reporte-o para ${owners} em ${server}."
       ]
+    },
+    "automod": {
+      "badwords": "Please don't swear in this server, ${user}.",
+      "invite": "Please don't advertise on this server, ${user}.",
+      "mentions": "Please don't mention more then 4 users, ${user}.",
+      "spam": "Please don't spam here, ${user}."
     },
     "commands": {
       "generic": {
@@ -308,25 +322,33 @@
             }
           },
           "view": {
-            "title": "Congigurações para ${guild}",
-            "description": [
-              "```ini",
-              "[Prefixo]: ${prefix}",
-              "[Cargo de Mutado]: ${mutedRole}",
-              "[Registro de Mods]: ${modlog}",
-              "[Anti-Hoisting]: ${dehoist.enabled}",
-              "[Menções]: ${mention.enabled}",
-              "[Anti-Convites]: ${invites.enabled}",
-              "[Anti-Invasão]: ${raid.enabled}",
-              "[Anti-Spam]: ${spam.enabled}",
-              "[Anti-Palavrão]: ${badwords.enabled} (${words})",
-              "[Registro]: ${logging.enabled}",
-              "[Canal de Registros]: ${logging}",
-              "[Eventos Ativados para Registro]: ${events}",
-              "[Punições]:\n${punishments}",
-              "```"
+            "punishment": [
+              "• #${index}. **${type} with ${warnings} warnings**",
+              "   • Role: ${roleId}",
+              "   • Time: ${time}",
+              "   • Soft: ${soft}"
             ],
-            "footer": "Você está vendo isso pois não proveu um subcomando ou ele não existe."
+            "message": [
+              "❯ **Miscellaneous**",
+              "Prefix: **${prefix}**",
+              "Mod Log: <#${modlog}>",
+              "Muted Role: **${mutedRole}**",
+              "",
+              "❯ **Automod**",
+              "${badwords.enabled} **Swearing**${words}",
+              "${dehoist.enabled} **Dehoisting**",
+              "${invites.enabled} **Invites**",
+              "${mention.enabled} **Mentions**",
+              "${raid.enabled} **Raid**",
+              "${spam.enabled} **Spam**",
+              "",
+              "❯ **Logging**",
+              "${logging.enabled} **Enabled**",
+              "${events}",
+              "",
+              "❯ **Punishments**",
+              "${punishments}"
+            ]
           }
         },
         "shardinfo": {
@@ -334,22 +356,23 @@
           "title": "Informações das Shards"
         },
         "statistics": {
-          "title": "${username} | Estatísticas em Tempo Real",
+          "title": "${username} [${version}]",
           "description": [
-            "```prolog",
-            "Servidores                => ${guilds}",
-            "Usuários                  => ${users}",
-            "Canais                    => ${channels}",
-            "Shards                    => ${current}/${total} (~${latency}ms)",
-            "Tempo Ativo               => ${uptime}",
-            "Comandos                  => ${commands}",
-            "Mensagens Vistas          => ${messages}",
-            "Comando Executado         => ${executed}",
-            "Comando Mais Executado    => ${name} (${executions} usos)",
-            "Conexão ao Banco de Dados => ${connected}",
-            "Uso de Memória            => ${memoryUsage}",
-            "Versão Atual              => ${version}",
-            "```"
+            "❯ **Miscellaneous**",
+            "• Guilds: **${guilds}**",
+            "• Users: **${users}**",
+            "• Channels: **${channels}**",
+            "• Uptime: **${uptime}**",
+            "• Messages: **${messagesSeen}**",
+            "• Commands Executed: **${commandsExecuted}**",
+            "• Most Used Command: **${mostUsed.command} (${mostUsed.executed} executions)**",
+            "• Shards: **${shards.alive}/${shards.total}** (~${shards.latency}ms)",
+            "",
+            "❯ **System**",
+            "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
+            "• CPU Usage: **${sys.cpu}%**",
+            "• Operating System: **${sys.os}**",
+            "• Free/Total Memory: **${sys.free}/${sys.total}**"
           ]
         },
         "time": "Atualmente, é ${day}/${month}/${year} às ${h}:${m}:${s}",

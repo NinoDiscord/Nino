@@ -11,10 +11,11 @@ export const TYPES = {
   EventManager: Symbol.for('EventManager'),
   PunishmentManager: Symbol.for('PunishmentManager'),
   TimeoutsManager: Symbol.for('TimeoutsManager'),
-  GuildSettings: Symbol.for('GuildSettings'),
+  GuildSettingsService: Symbol.for('GuildSettings'),
   BotListService: Symbol.for('BotListService'),
   StatusManager: Symbol.for('StatusManager'),
   CommandStatisticsManager: Symbol.for('CommandStatisticsManager'),
-  UserSettings: Symbol.for('UserSettings'),
-  GuildCounterManager: Symbol.for('GuildCounterManager')
+  UserSettingsService: Symbol.for('UserSettings'),
+  GuildCounterManager: Symbol.for('GuildCounterManager'),
+  LocalizationManager: Symbol.for('LocalizationManager')
 };

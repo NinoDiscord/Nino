@@ -37,17 +37,26 @@ export default class BanCommand extends Command {
     let member: Member | { id: string; guild: Guild } | undefined = ctx.guild!.members.get(user);
     if (!member || !(member instanceof Member)) member = { id: userID, guild: ctx.guild! };
     else {
-      if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.heirarchy');
+      if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
+    }
+
+    try {
+      const bans = await ctx.guild!.getBans();
+      const hasBan = bans.some(ban => ban.user.id === user);
+
+      if (hasBan) return ctx.sendTranslate('global.alreadyBanned');
+    } catch {
+      return ctx.sendTranslate('global.noPerms');
     }
 
     const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     let reason!: string;
-    let time!: string;
+    let time!: string | null;
 
     if (baseReason) {
       const sliced = baseReason.split(' | ');
       reason = sliced[0];
-      time = sliced[1];
+      time = sliced[1] || null;
     }
 
     const days = ctx.flags.get('days') || ctx.flags.get('d');
@@ -77,7 +86,7 @@ export default class BanCommand extends Command {
       });
 
       return ctx.sendTranslate('commands.moderation.unable', {
-        type: member instanceof Member ? member.user.bot ? 'bot' : 'user' : 'user',
+        type: 'ban',
         message: e.message
       });
     }

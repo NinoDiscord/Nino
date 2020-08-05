@@ -4,6 +4,7 @@ import { stripIndents } from 'common-tags';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
+import { createEmptyEmbed } from '../util/EmbedUtils';
 
 interface OldMessage {
   editedTimestamp: number;
@@ -29,6 +30,9 @@ export default class MessageUpdatedEvent extends Event {
   async emit(m: Message<TextChannel>, old: OldMessage | null) {
     // Do the automod service first
     await this.bot.automod.handleMessage(m);
+
+    // If it's null, let's not do anything
+    if (old === null) return;
 
     // Retrive the guild settings
     const guild = (m.channel as TextChannel).guild;
@@ -58,20 +62,33 @@ export default class MessageUpdatedEvent extends Event {
     // Don't log any bot-related data
     if (m.author.bot) return;
 
+    // Check if attachments and content is the same
+    if (
+      (old.content === m.content) ||
+      (old.attachments.length === m.attachments.length)
+    ) return;
+
+    // Don't do anything if the guild is unavaliable
+    const server = m.guildID ? this.bot.client.guilds.get(m.guildID) : null;
+    if (server != null && server.unavailable) return;
+
     // Don't log http/https links
     const HTTPS_REGEX = /^https?:\/\/(.*)/;
 
     // `old` can be represented as null (according to Eris' docs), so we check for if `old` is null and if `old.content` exists
-    const ternary = old ? old.content && HTTPS_REGEX.test(old.content) : false;
-    if (HTTPS_REGEX.test(m.content) || ternary) return;
+    const oldHasIt = old.content && HTTPS_REGEX.test(old.content);
+    if (HTTPS_REGEX.test(m.content) || oldHasIt) return;
 
     // Embeds are considered as "updated"?
-    if (old && old.embeds.length) return;
+    if (old.embeds.length) return;
+
+    // Check if it's pinned (bc discord is literally shit)
+    if (!old.pinned && m.pinned) return;
 
     const channel = (<TextChannel> guild.channels.get(settings.logging.channelID)!);
     const timestamp = new Date(m.createdAt);
     const oldDate = old ? old.editedTimestamp !== undefined ? `(${new Date(old.editedTimestamp).toLocaleString()})` : '(Unknown)' : '(Unknown)';
-    const embed = this.bot.getEmbed()
+    const embed = createEmptyEmbed()
       .setAuthor(`${m.author.username}#${m.author.discriminator} in #${(m.channel as TextChannel).name}`, undefined, m.author.dynamicAvatarURL('png', 1024))
       .setTimestamp(timestamp)
       .addField(`Old Content ${oldDate}`, stripIndents`

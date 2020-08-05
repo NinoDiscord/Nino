@@ -1,7 +1,7 @@
 import { CaseSettingBase as Base } from './SettingsBase';
-import model, { CaseModel } from '../../models/CaseSchema';
+import model, { CaseModel } from '../../../models/CaseSchema';
 
-export default class CaseSettings implements Base<CaseModel> {
+export default class CaseSettingsService implements Base<CaseModel> {
   public model = model;
 
   async get(guild: string, id: number) {

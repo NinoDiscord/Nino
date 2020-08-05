@@ -6,6 +6,7 @@ import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
 import v8 from 'v8';
+import { createEmptyEmbed } from '../../util/EmbedUtils';
 
 @injectable()
 export default class ProfilerCommand extends Command {
@@ -22,8 +23,8 @@ export default class ProfilerCommand extends Command {
 
   async run(ctx: Context) {
     const stats = v8.getHeapStatistics();
-    const embed = this.bot.getEmbed()
-      .setTitle('[ Heap Statistics ]')
+    const embed = createEmptyEmbed()
+      .setTitle('[ v8 Statistics ]')
       .setDescription(stripIndents`
         \`\`\`apache
           Allocated Memory: ${formatSize(stats.malloced_memory)} 
@@ -31,7 +32,8 @@ export default class ProfilerCommand extends Command {
           Used Heap Size  : ${formatSize(stats.used_heap_size)}/${formatSize(stats.total_heap_size)}
           Physical Size   : ${formatSize(stats.total_physical_size)}
         \`\`\`
-      `);
+      `)
+      .setFooter('v8 is the runtime engine Node.js uses, so this is basic "memory" statistics of the heap v8 caches');
 
     return ctx.embed(embed);
   }

@@ -4,6 +4,7 @@ import { Module } from '../util';
 import Context from './Context';
 import Client from './Bot';
 import 'reflect-metadata';
+import { createEmptyEmbed } from '../util/EmbedUtils';
 
 export interface CommandInfo {
   name: string;
@@ -75,8 +76,7 @@ export default abstract class NinoCommand {
 
     const getGlobalPart = (type: 'yes' | 'no') => ctx.translate(`global.${type}`);
 
-    const embed = this.bot
-      .getEmbed()
+    const embed = createEmptyEmbed()
       .setTitle(ctx.translate('commands.generic.help.command.title', { command: this.name }))
       .setDescription(stripIndents`
         **${this.description}**

@@ -1,14 +1,14 @@
 import { Message, TextChannel, Member } from 'eris';
 import { inject, injectable } from 'inversify';
-import { stripIndents } from 'common-tags';
 import RatelimitBucket from '../bucket/RatelimitBucket';
 import PermissionUtils from '../../util/PermissionUtils';
+import { Translation } from '../Language';
 import CommandContext from '../Context';
 import NinoCommand from '../Command';
 import { TYPES } from '../../types';
-import Language, { Translation } from '../Language';
 import Bot from '../Bot';
 import 'reflect-metadata';
+import { createEmptyEmbed } from '../../util/EmbedUtils';
 
 export class CommandInvocation {
   public command: NinoCommand;
@@ -115,10 +115,11 @@ export default class CommandService {
     const settings = await this.bot.settings.getOrCreate(guild.id);
     const prefixes = [
       settings!.prefix,
-      this.bot.config.discord.prefix,
-      'nino '
+      this.bot.config.discord.prefix
     ].filter(Boolean);
+
     if (mention !== null) prefixes.push(`${mention}`);
+    if (this.bot.client.user.id === '531613242473054229') prefixes.push('nino ');
 
     const user = await this.bot.userSettings.get(m.author.id);
     const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
@@ -134,7 +135,7 @@ export default class CommandService {
     if (invoked) {
       const message = invoked.canInvoke();
       if (message) {
-        const embed = this.bot.getEmbed()
+        const embed = createEmptyEmbed()
           .setTitle(locale.translate('errors.title', { command: invoked.command.name }))
           .setDescription(locale.lazyTranslate(message));
 
@@ -155,7 +156,9 @@ export default class CommandService {
         this.bot.statistics.increment(invoked.command);
         this.bot.logger.info(`Ran command "${prefix}${invoked.command.name}" for ${ctx.sender.username}#${ctx.sender.discriminator} in ${ctx.guild ? `guild ${ctx.guild.name}` : 'DMs'}, now at ${this.bot.statistics.commandsExecuted.toLocaleString()} commands executed!`);
       } catch(ex) {
-        const embed = this.bot.getEmbed();
+        if (ex.message.includes('Missing Access')) return ctx.send(locale.translate('global.missingAccess'));
+
+        const embed = createEmptyEmbed();
         const owners = this.bot.owners.map(userID => {
           const user = this.bot.client.users.get(userID)!;
           if (user) return `${user.username}#${user.discriminator}`;
@@ -166,7 +169,7 @@ export default class CommandService {
           .setTitle(locale.translate('errors.failed', { command: invoked.command.name }))
           .setDescription(locale.translate('errors.unknown', {
             owners: `${owners} `,
-            server: 'https://discord.gg/7TtMP2n'
+            server: 'https://discord.gg/yDnbEDH'
           }));
 
         this.bot.logger.error(`Unable to run the '${invoked.command.name}' command!`, ex.stack ? ex.stack : ex.message);

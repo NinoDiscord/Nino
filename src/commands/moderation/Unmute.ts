@@ -34,6 +34,12 @@ export default class UnmuteCommand extends Command {
       user: `${u.username}#${u.discriminator}`
     });
 
+    const settings = await ctx.getSettings();
+    const hasRole = member.roles.filter(role => role === settings!.mutedRole).length;
+    if (!hasRole) return ctx.sendTranslate('commands.moderation.hasNoRole', { 
+      role: ctx.guild!.roles.has(settings!.mutedRole) ? ctx.guild!.roles.get(settings!.mutedRole)!.name : '[deleted role]'
+    });
+
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     await this.bot.timeouts.cancelTimeout(member.id, ctx.guild!, 'unmute');
     const punishment = new Punishment(PunishmentType.Unmute, {
@@ -48,7 +54,7 @@ export default class UnmuteCommand extends Command {
     } catch (e) {
       return ctx.sendTranslate('commands.moderation.unable', {
         message: e.message,
-        type: member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User'
+        type: 'unmute'
       });
     }
   }

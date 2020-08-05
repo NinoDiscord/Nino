@@ -20,15 +20,23 @@
       "invalidChannel": "Channel **${channel}** was invalid.",
       "notText": "Channel **${channel}** is not a text channel.",
       "noUser": "No user was specified.",
-      "heirarchy": "User is above or the same as you in heirarchy.",
+      "hierarchy": "User is above or the same as you in hierarchy.",
       "notInGuild": "User is not in guild?",
       "unableToPunish": "I was unable to punish the user.",
       "unableToFind": "I was unable to find user.",
       "notInBanList": "User is not banned in this guild.",
       "unable": "I was unable to do this. `${error}`",
+      "none": "None",
+      "missingAccess": "I am missing access in the channel you linked.",
+      "alreadyBanned": "The user you tried to ban was already banned from this guild.",
+      "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
       "members": {
         "bot": "Bot",
         "user": "User"
+      },
+      "events": {
+        "messageUpdate": "Message Updates",
+        "messageDelete": "Message Deletions"
       }
     },
     "errors": {
@@ -48,10 +56,10 @@
       ]
     },
     "automod": {
-      "badwords": "Please don't swear in this server, ${member}.",
-      "invite": "Please don't advertise on this server, ${member}.",
-      "mentions": "Please don't mention more then 4 users, ${member}.",
-      "spam": "Please don't spam here, ${member}."
+      "badwords": "Please don't swear in this server, ${user}.",
+      "invite": "Please don't advertise on this server, ${user}.",
+      "mentions": "Please don't mention more then 4 users, ${user}.",
+      "spam": "Please don't spam here, ${user}."
     },
     "commands": {
       "generic": {
@@ -138,7 +146,7 @@
           "noSubcommand": "No subcommand was provided. (${subcommands})",
           "noChannel": "No channel ID, mention, or name were specified.",
           "add": {
-            "amountRequired": "The amount of warnings to chain a punishment! It needs to be a number between 1 and 5.",
+            "amountRequired": "Amount of warnings to chain a punishment is required, make it a number between 1 and 5.",
             "invalidPunishment": "Punishment **${punishment}** is not a valid punishment to add. (${punishments})",
             "missingRoleID": "You are currently missing a role ID.",
             "invalidDays": "Incorrect amount of days. The `days` flag is the amount of days of messages to delete when banning.",
@@ -209,8 +217,9 @@
               "success": "I resetted the muted role."
             },
             "ignored": {
-              "unable": "I was unable to reset all of the ignored channels.",
-              "success": "Ignored channels has been resetted."
+              "unable": "I was unable to remove channel **${channel}**.",
+              "success": "I have removed channel **${channel}** from not received updates.",
+              "invalid": "I was unable to find channel **${channel}** in this guild?"
             },
             "logChannel": {
               "unable": "I was unable to reset channel **${channel}**.",
@@ -219,6 +228,12 @@
             "punishments": {
               "unable": "I was unable to reset all punishments.",
               "success": "Punishments have been resetted."
+            },
+            "swears": {
+              "unable": "I was unable to remove the word **${word}** from the list.",
+              "success": "Word **${word}** has been removed from the blacklisted words.",
+              "notEnabled": "The **Swearing** automod feature must be enabled to remove a word.",
+              "unableToFind": "Word **${word}** isn't blacklisted?"
             }
           },
           "enable": {
@@ -314,48 +329,57 @@
             }
           },
           "view": {
-            "title": "Configuration for ${guild}",
-            "description": [
-              "```ini",
-              "[Prefix]: ${prefix}",
-              "[Muted Role]: ${mutedRole}",
-              "[Mod Log]: ${modlog}",
-              "[Dehoist Automod]: ${dehoist.enabled}",
-              "[Mention Automod]: ${mention.enabled}",
-              "[Invites Automod]: ${invites.enabled}",
-              "[Raid Automod]: ${raid.enabled}",
-              "[Spam Automod]: ${spam.enabled}",
-              "[Swear Automod]: ${badwords.enabled} (${words})",
-              "[Logging]: ${logging.enabled}",
-              "[Logging Channel]: ${logging}",
-              "[Enabled Logging Events]: ${events}",
-              "[Punishments]:\n${punishments}",
-              "```"
+            "punishment": [
+              "• #${index}. **${type} with ${warnings} warnings**",
+              "   • Role: ${roleId}",
+              "   • Time: ${time}",
+              "   • Soft: ${soft}"
             ],
-            "footer": "You are seeing this because you didn't provide a subcommand or the subcommand you provided didn't exist."
+            "message": [
+              "❯ **Miscellaneous**",
+              "Prefix: **${prefix}**",
+              "Mod Log: <#${modlog}>",
+              "Muted Role: **${mutedRole}**",
+              "",
+              "❯ **Automod**",
+              "${badwords.enabled} **Swearing**${words}",
+              "${dehoist.enabled} **Dehoisting**",
+              "${invites.enabled} **Invites**",
+              "${mention.enabled} **Mentions**",
+              "${raid.enabled} **Raid**",
+              "${spam.enabled} **Spam**",
+              "",
+              "❯ **Logging**",
+              "${logging.enabled} **Enabled**",
+              "${events}",
+              "",
+              "❯ **Punishments**",
+              "${punishments}"
+            ]
           }
         },
         "shardinfo": {
-          "shard": "Shard #${id} ${current} | G: ${guilds} | U: ${users} | L: ${latency}ms | M: ${memory}",
+          "shard": "Shard #${shard.id} ${current} | G: ${guilds} | U: ${users} | L: ${latency}ms | M: ${memory}",
           "title": "Shard Information"
         },
         "statistics": {
-          "title": "${username} | Realtime Statistics",
+          "title": "${username} [${version}]",
           "description": [
-            "```prolog",
-            "Guilds              => ${guilds}",
-            "Users               => ${users}",
-            "Channels            => ${channels}",
-            "Shards              => ${current}/${total} (~${latency}ms)",
-            "Uptime              => ${uptime}",
-            "Commands            => ${commands}",
-            "Messages Seen       => ${messages}",
-            "Command Executed    => ${executed}",
-            "Most Used Command   => ${name} (${executions} uses)",
-            "Database Connection => ${connected}",
-            "Memory Usage        => ${memoryUsage}",
-            "Current Version     => ${version}",
-            "```"
+            "❯ **Miscellaneous**",
+            "• Guilds: **${guilds}**",
+            "• Users: **${users}**",
+            "• Channels: **${channels}**",
+            "• Uptime: **${uptime}**",
+            "• Messages: **${messagesSeen}**",
+            "• Commands Executed: **${commandsExecuted}**",
+            "• Most Used Command: **${mostUsed.command} (${mostUsed.executed} executions)**",
+            "• Shards: **${shards.alive}/${shards.total}** (~${shards.latency}ms)",
+            "",
+            "❯ **System**",
+            "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
+            "• CPU Usage: **${sys.cpu}%**",
+            "• Operating System: **${sys.os}**",
+            "• Free/Total Memory: **${sys.free}/${sys.total}**"
           ]
         },
         "time": "It is currently ${day}/${month}/${year} at ${h}:${m}:${s}",
@@ -371,6 +395,8 @@
         "unable": "Unable to ${type}: `${message}`",
         "invalidSnowflake": "User was already ${type}.",
         "notInGuild": "User `${user}` is not in the guild.",
+        "hasRole": "User is currently muted.",
+        "hasNoRole": "User is already unmuted.",
         "lockdown": {
           "noRoles": "You must first specify the roles to change permissions to using the --roles flag!",
           "cantModify": "I cannot modify those roles, am I missing the `Manage Roles` permission?",

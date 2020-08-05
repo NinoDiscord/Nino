@@ -43,7 +43,7 @@ export default class UnbanCommand extends Command {
       return ctx.sendTranslate('commands.moderation.unban');
     } catch (e) {
       return ctx.sendTranslate('commands.moderation.unable', {
-        type: 'User',
+        type: 'unban',
         message: e.message
       });
     }

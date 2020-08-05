@@ -1,11 +1,14 @@
 import { Constants, TextChannel } from 'eris';
 import { injectable, inject } from 'inversify';
-import { replaceMessage } from '../../util';
+import { createEmptyEmbed } from '../../util/EmbedUtils';
+import { firstUpper } from '../../util';
 import { TYPES } from '../../types';
 import Context from '../../structures/Context';
 import Command from '../../structures/Command';
 import Bot from '../../structures/Bot';
 import ms = require('ms');
+
+const MAX_PUNISHMENTS = 15;
 
 @injectable()
 export default class SettingsCommand extends Command {
@@ -28,13 +31,29 @@ export default class SettingsCommand extends Command {
     switch (subcommand) {
       case 'set': return this.set(ctx);
       case 'reset': return this.reset(ctx);
-      case 'view': return this.view(ctx, true);
+      case 'view': return this.view(ctx);
       case 'add': return this.add(ctx);
       case 'remove': return this.remove(ctx);
       case 'disable': return this.disable(ctx);
       case 'enable': return this.enable(ctx);
-      default: return this.view(ctx, false);
+      default: return this.view(ctx);
     }
+  }
+
+  private isBoolean(str: string | boolean) {
+    return typeof str === 'boolean';
+  }
+
+  private isString(str: string | boolean) {
+    return typeof str === 'string';
+  }
+
+  private isInteger(str: string) {
+    return (/^[0-9]$/).test(str);
+  }
+
+  private isInRange(num: Number, lowerBound: Number, upperBound: Number) {
+    return num >= lowerBound && num <= upperBound;
   }
 
   async add(ctx: Context) {
@@ -42,7 +61,7 @@ export default class SettingsCommand extends Command {
     const punishment = ctx.args.get(2);
     const punishments = ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'];
 
-    if (!warnings || !(/^[0-9]$/).test(warnings) || Number(warnings) < 1 || Number(warnings) > 5) {
+    if (!warnings || !this.isInteger(warnings) || !this.isInRange(Number(warnings), 1, 5)) {
       return ctx.sendTranslate('commands.generic.settings.add.amountRequired');
     }
 
@@ -54,7 +73,7 @@ export default class SettingsCommand extends Command {
     }
   
     const temp = ctx.flags.get('time');
-    if (temp && (typeof temp === 'boolean') || (typeof temp === 'string') && (!ms(temp as string) || ms(temp as string) < 1000)) {
+    if (temp && (this.isBoolean(temp) || (this.isString(temp) && (!ms(temp as string) || ms(temp as string) < 1000)))) {
       return ctx.sendTranslate('commands.generic.settings.add.invalidTime');
     }
 
@@ -68,12 +87,12 @@ export default class SettingsCommand extends Command {
       return ctx.sendTranslate('commands.generic.settings.add.missingRoleID');
     }
 
-    if (roleID && !((/^[0-9]+$/).test(roleID) || !ctx.guild!.roles.has(roleID))) {
+    if (roleID && (!this.isInteger(roleID) || !ctx.guild!.roles.has(roleID))) {
       return ctx.sendTranslate('commands.generic.settings.add.invalidRole');
     }
 
     const days = ctx.flags.get('days');
-    if (days && (typeof days === 'boolean' || (typeof days === 'string') && !(/^[0-9]{1,2}$/).test(days))) {
+    if (days && (this.isBoolean(days) || this.isString(days) && !(/^[0-9]{1,2}$/).test(days as string))) {
       return ctx.sendTranslate('commands.generic.settings.add.invalidDays');
     }
 
@@ -98,19 +117,18 @@ export default class SettingsCommand extends Command {
   async remove(ctx: Context) {
     const index = ctx.args.get(1);
 
-    if (!index || !/^[0-9]+$/.test(index) || Number(index) < 1) {
-      return ctx.sendTranslate('commands.generic.settings.remove.invalidIndex');
-    }
-
     const settings = await ctx.getSettings();
     if (!settings || !settings.punishments.length) {
       return ctx.sendTranslate('commands.generic.settings.remove.noPunishments');
     }
 
-    if (Number(index) <= settings!.punishments.length) {
-      const i = Math.round(Number(index)) - 1;
-      settings!.punishments.splice(i, 1);
+    if (!index || !this.isInteger(index) || !this.isInRange(Number(index), 1, settings.punishments.length)) {
+      return ctx.sendTranslate('commands.generic.settings.remove.invalidIndex');
     }
+
+    
+    const i = Math.round(Number(index)) - 1;
+    settings!.punishments.splice(i, 1);
     settings!.save();
     return ctx.sendTranslate('commands.generic.settings.remove.success', { index });
   }
@@ -126,7 +144,7 @@ export default class SettingsCommand extends Command {
           return ctx.sendTranslate('commands.generic.settings.noChannel');
         }
 
-        const id = channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null;
+        const id = this.extractChannelId(channelID);
         if (id === null) {
           return ctx.sendTranslate('global.invalidChannel', { channel: channelID });
         }
@@ -141,7 +159,7 @@ export default class SettingsCommand extends Command {
           return ctx.sendTranslate('commands.generic.settings.set.modlog.noPerms', { channel: channel.name });
         }
 
-        await ctx.bot.settings.update(ctx.guild!.id, {
+        return ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             modlog: channel.id
           }
@@ -150,7 +168,7 @@ export default class SettingsCommand extends Command {
             ? ctx.sendTranslate('commands.generic.settings.set.modlog.unable', { channel: channel.name })
             : ctx.sendTranslate('commands.generic.settings.set.modlog.success', { channel: channel.name });
         });
-      } break;
+      }
       case 'prefix': {
         const prefix = ctx.args.slice(2).join(' ');
         const settings = await ctx.getSettings()!;
@@ -273,14 +291,13 @@ export default class SettingsCommand extends Command {
           return ctx.sendTranslate('commands.generic.settings.set.logChannel.noPerms', { channel: channel.name });
         }
 
-        let error!: any;
         ctx.bot.settings.update(ctx.guild!.id, {
           $set: {
             'logging.channelID': channel.id
           }
         }, (error) => error 
           ? ctx.sendTranslate('commands.generic.settings.set.logChannel.unable', { channel: channel.name }) 
-          : ctx.sendTranslate('commands.generic.settings.enable.automod.success', { channel: channel.name }));
+          : ctx.sendTranslate('commands.generic.settings.set.logChannel.success', { channel: channel.name }));
       } break;
       default: {
         return setting === undefined 
@@ -291,6 +308,16 @@ export default class SettingsCommand extends Command {
           });
       }
     }
+  }
+
+  private extractChannelId(str: string): string | null {
+    if (str.startsWith('<#') && str.endsWith('>')) {
+      return str.substring(2, str.length - 1);
+    }
+    if (this.isInteger(str)) {
+      return str;
+    }
+    return null;
   }
 
   async enable(ctx: Context) {
@@ -544,7 +571,7 @@ export default class SettingsCommand extends Command {
   }
 
   async reset(ctx: Context) {
-    const subcommands = ['punishments', 'modlog', 'mutedrole', 'prefix'];
+    const subcommands = ['punishments', 'modlog', 'mutedrole', 'prefix', 'mutedRole', 'logging.ignore', 'automod.swears', 'automod.badwords'];
     const setting = ctx.args.get(1);
 
     switch (setting) {
@@ -575,7 +602,8 @@ export default class SettingsCommand extends Command {
           ? ctx.sendTranslate('commands.generic.settings.reset.modlog.unable') 
           : ctx.sendTranslate('commands.generic.settings.reset.modlog.success'));
       } break;
-      case 'mutedrole': {
+      case 'mutedrole':
+      case 'mutedRole': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
             'mutedRole': null
@@ -583,6 +611,37 @@ export default class SettingsCommand extends Command {
         }, (error) => error 
           ? ctx.sendTranslate('commands.generic.settings.reset.mutedRole.unable') 
           : ctx.sendTranslate('commands.generic.settings.reset.mutedRole.success'));
+      } break;
+      case 'logging.ignore':
+      case 'logging.ignored': {
+        const channel = ctx.args.get(2);
+        if (!channel) return ctx.sendTranslate('commands.generic.settings.reset.ignored.none');
+
+        const heck = [channel].filter(channelID => channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null);
+        if (heck.some(s => s === null)) return ctx.sendTranslate('commands.generic.settings.reset.ignored.invalid', { channel });
+
+        await this.bot.settings.update(ctx.guild!.id, {
+          $pull: { 'logging.ignore': this.extractChannelId(channel)! }
+        }, (error) => {
+          const key = error ? 'unable' : 'success';
+          return ctx.sendTranslate(`commands.generic.settings.reset.ignored.${key}`, { channel });
+        });
+      } break;
+      case 'automod.swears':
+      case 'automod.badwords': {
+        const word = ctx.args.get(2);
+        if (!word) return ctx.sendTranslate('commands.generic.settings.reset.swears.none');
+
+        const settings = await ctx.getSettings()!;
+        if (!settings.automod.badwords.enabled) return ctx.sendTranslate('commands.generic.settings.reset.swears.notEnabled');
+        if (!settings.automod.badwords.wordlist.find(w => w === word)) return ctx.sendTranslate('commands.generic.settings.reset.swears.unableToFind', { word });
+
+        await this.bot.settings.update(ctx.guild!.id, {
+          $pull: { 'automod.badwords.wordlist': word }
+        }, (error) => {
+          const key = error ? 'unable' : 'success';
+          return ctx.sendTranslate(`commands.generic.settings.reset.swears.${key}`, { word });
+        });
       } break;
       default: {
         return setting === undefined 
@@ -595,29 +654,34 @@ export default class SettingsCommand extends Command {
     }
   }
 
-  async view(ctx: Context, provided: boolean = false) {
+  async view(ctx: Context) {
     const settings = await ctx.getSettings()!;
 
-    const title = ctx.translate('commands.generic.settings.view.title', {
-      guild: ctx.guild!.name
-    });
-
-    const yes = ctx.translate('global.yes');
-    const no = ctx.translate('global.no');
+    const yes = ':white_check_mark:';
+    const no = ':x:';
     const events: string[] = [];
 
-    if (settings.logging.events.messageUpdate) events.push('Message Updates');
-    if (settings.logging.events.messageDelete) events.push('Message Deletions');
+    if (settings.logging.events.messageUpdate) events.push(ctx.translate('global.events.messageUpdate'));
+    if (settings.logging.events.messageDelete) events.push(ctx.translate('global.events.messageDelete'));
 
-    const desc = ctx.translate('commands.generic.settings.view.description', {
+    const punishments = settings.punishments.length ? settings.punishments.map((value, index) => 
+      ctx.translate('commands.generic.settings.view.punishment', {
+        index: index + 1,
+        warnings: value.warnings,
+        time: value.temp ? ms(value.temp) : ctx.translate('global.none'),
+        type: firstUpper(value.type),
+        soft: value.soft ? ctx.translate('global.yes') : ctx.translate('global.none'),
+        roleId: value.role ? `**${ctx.guild!.roles.get(value.roleid)!.name}**` : ctx.translate('global.none')
+      })
+    ).join('\n') : ctx.translate('global.none');
+
+    const desc = ctx.translate('commands.generic.settings.view.message', {
       prefix: settings.prefix,
       mutedRole: ctx.guild!.roles.find(x => x.id === settings.mutedRole) ? ctx.guild!.roles.get(settings.mutedRole)!.name : 'None',
-      modlog: ctx.guild!.channels.find(x => x.id === settings.modlog) ? ctx.guild!.channels.get(settings.modlog)!.name : 'None',
+      modlog: ctx.guild!.channels.find(x => x.id === settings.modlog) ? ctx.guild!.channels.get(settings.modlog)!.id : 'None',
       logging: ctx.guild!.channels.find(x => x.id === settings.logging.channelID) ? ctx.guild!.channels.get(settings.logging.channelID)!.name : 'None',
-      events: events.join(', '),
-      punishments: settings.punishments.length ? settings.punishments.map((punishment, index) => 
-        `[${index + 1}] ${punishment.type} with ${punishment.warnings} warnings${punishment.temp ? ` with time ${ms(punishment.temp)}` : punishment.soft ? ' as a softban' : punishment.roleid ? ` with role ${ctx.guild!.roles.get(punishment.roleid)!.name}` : ''}`
-      ) : 'None',
+      events: events.map(s => `- ${s}`).join('\n') || ctx.translate('global.none'),
+      punishments,
       'dehoist.enabled': settings.automod.dehoist ? yes : no,
       'mention.enabled': settings.automod.mention ? yes : no,
       'invites.enabled': settings.automod.invites ? yes : no,
@@ -625,16 +689,13 @@ export default class SettingsCommand extends Command {
       'spam.enabled': settings.automod.spam ? yes : no,
       'logging.enabled': settings.logging.enabled ? yes : no,
       'badwords.enabled': settings.automod.badwords.enabled ? yes : no,
-      words: settings.automod.badwords.enabled ? settings.automod.badwords.wordlist.join(', ') : 'None'
+      words: settings.automod.badwords.enabled ? ` (${settings.automod.badwords.wordlist.join(', ')})` : ' (None)'
     });
 
-    const footer = ctx.translate('commands.generic.settings.view.footer');
+    const embed = createEmptyEmbed()
+      .setDescription(desc)
+      .build();
 
-    const embed = this.bot.getEmbed()
-      .setTitle(title)
-      .setDescription(desc);
-
-    if (!provided) embed.setFooter(footer);
     return ctx.embed(embed);
   }
 }

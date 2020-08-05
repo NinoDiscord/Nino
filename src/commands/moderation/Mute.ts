@@ -39,7 +39,13 @@ export default class MuteCommand extends Command {
       user: `${user.username}#${user.discriminator}`
     });
 
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.heirarchy');
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.hierarchy');
+
+    const settings = await ctx.getSettings();
+    const hasRole = member.roles.filter(role => role === settings!.mutedRole).length > 0;
+    if (hasRole) return ctx.sendTranslate('commands.moderation.hasRole', { 
+      role: ctx.guild!.roles.has(settings!.mutedRole) ? ctx.guild!.roles.get(settings!.mutedRole)!.name : '[deleted role]'
+    });
     
     const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     let reason!: string;
@@ -67,7 +73,7 @@ export default class MuteCommand extends Command {
       });
     } catch(e) {
       return ctx.sendTranslate('commands.moderation.unable', {
-        type: member instanceof Member ? member.user.bot ? 'bot' : 'user' : 'user',
+        type: 'mute',
         message: e.message
       });
     }

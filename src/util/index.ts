@@ -1,5 +1,7 @@
 import { User, EmbedOptions } from 'eris';
+import { execSync } from 'child_process';
 
+export const commitHash = execSync('git rev-parse HEAD', { encoding: 'utf8' }).slice(0, 8);
 export function humanize(ms: number, long: boolean = false) {
   const weeks = Math.floor(ms / 1000 / 60 / 60 / 24 / 7);
   ms -= weeks * 1000 * 60 * 60 * 24 * 7;
@@ -85,4 +87,22 @@ export function unembedify(embed: EmbedOptions) {
   }
 
   return text;
+}
+
+/**
+ * The setTimeout function for big time values.
+ * @param func the function to execute
+ * @param time the time to excute it after
+ */
+export function bigTimeout(func: (...args: any[]) => void, time: number) {
+  if (time > 0x7fffffff) {
+    setTimeout(() => bigTimeout(func, time - 0x7fffffff), 0x7fffffff);
+  } else {
+    setTimeout(func, time);
+  }
+}
+
+export function firstUpper(text: string) {
+  const arr = text.split(' ');
+  return arr.map((t) => `${t.charAt(0).toUpperCase()}${t.slice(1)}`).join(' ');
 }

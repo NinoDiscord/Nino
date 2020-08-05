@@ -30,7 +30,14 @@ export default class CommandContext {
   }
 
   send(content: string) {
-    return this.message.channel.createMessage(content);
+    return this.message.channel.createMessage({
+      content, 
+      allowedMentions: {
+        everyone: false,
+        roles: false,
+        users: false
+      }
+    });
   }
 
   embed(content: EmbedOptions) {
