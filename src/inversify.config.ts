@@ -100,7 +100,7 @@ container.bind<Client>(TYPES.Client).toConstantValue(
   new Client(config.discord.token, {
     maxShards: 'auto',
     getAllUsers: true,
-    restMode: true,
+    restMode: true
   })
 );
 
