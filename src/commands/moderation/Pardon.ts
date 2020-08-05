@@ -39,7 +39,7 @@ export default class PardonCommand extends Command {
       user: `${user.username}#${user.discriminator}`
     });
 
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.heirarchy');
+    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.hierarchy');
 
     await this.bot.punishments.pardon(member!, amount);
     const warns = await this.bot.warnings.get(ctx.guild!.id, member.id);
