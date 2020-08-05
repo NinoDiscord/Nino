@@ -395,6 +395,7 @@
           "backingUp": "Backing up channel permissions...",
           "backedUp": "I have backed up the channel permissions!",
           "unlocked": "Channel **${channel}** is now unlocked.",
+          "alreadyUnlocked": "Channel **${channel}** is already unlocked.",
           "locked": "Channel **${channel}** is now locked.",
           "cantModifyChannels": "I can't modify any channels."
         },

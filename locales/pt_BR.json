@@ -387,6 +387,7 @@
           "backingUp": "Criando back-up das permissões...",
           "backedUp": "Criei o back-up das permissões!",
           "unlocked": "O canal **${channel}** está aberto novamente.",
+          "alreadyUnlocked": "Channel **${channel}** is already unlocked.",
           "locked": "O canal **${channel}** foi restringido.",
           "cantModifyChannels": "Não posso modificar canais."
         },
