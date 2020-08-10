@@ -89,19 +89,6 @@ export function unembedify(embed: EmbedOptions) {
   return text;
 }
 
-/**
- * The setTimeout function for big time values.
- * @param func the function to execute
- * @param time the time to excute it after
- */
-export function bigTimeout(func: (...args: any[]) => void, time: number) {
-  if (time > 0x7fffffff) {
-    setTimeout(() => bigTimeout(func, time - 0x7fffffff), 0x7fffffff);
-  } else {
-    setTimeout(func, time);
-  }
-}
-
 export function firstUpper(text: string) {
   const arr = text.split(' ');
   return arr.map((t) => `${t.charAt(0).toUpperCase()}${t.slice(1)}`).join(' ');

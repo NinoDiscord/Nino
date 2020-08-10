@@ -3,7 +3,7 @@ import { Punishment, PunishmentType } from './PunishmentManager';
 import { Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
-import { bigTimeout } from '../../util';
+import { setTimeout } from 'long-timeout';
 import ms from 'ms';
 
 /**
@@ -21,7 +21,7 @@ export default class TimeoutsManager {
   }
 
   private createTimeout(key: string, task: string, member: string, guild: Guild, time: number) {
-    return bigTimeout(async () => {
+    return setTimeout(async () => {
       if (await this.bot.redis.hexists('timeouts', key)) {
         try {
           await this.bot.punishments.punish(
