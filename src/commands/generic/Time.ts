@@ -20,7 +20,7 @@ export default class TimeCommand extends Command {
     const convert = (t: any) => `0${t}`.slice(-2);
     return ctx.sendTranslate('commands.generic.time', {
       day: date.getDate(),
-      month: date.getMonth(),
+      month: date.getMonth() + 1,
       year: date.getFullYear(),
       h: convert(date.getHours()),
       m: convert(date.getMinutes()),

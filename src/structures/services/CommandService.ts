@@ -50,18 +50,16 @@ export class CommandInvocation {
     }
 
     if (this.bot instanceof Member && !PermissionUtils.overlaps(this.bot.permission.allow, this.command.botPermissions)) {
-      const bytecode = this.command.userPermissions & ~this.bot.permission.allow;
       return new Translation('errors.permissions.bot', {
         command: this.command.name,
-        perms: PermissionUtils.toString(bytecode)
+        perms: PermissionUtils.toString(this.command.botPermissions & ~this.bot.permission.allow)
       });
     }
 
     if (this.user instanceof Member && !PermissionUtils.overlaps(this.user.permission.allow, this.command.userPermissions)) {
-      const bytecode = this.command.userPermissions & ~this.user.permission.allow;
       return new Translation('errors.permissions.user', {
         command: this.command.name,
-        perms: PermissionUtils.toString(bytecode)
+        perms: PermissionUtils.toString(this.command.userPermissions & ~this.user.permission.allow)
       });
     }
 
