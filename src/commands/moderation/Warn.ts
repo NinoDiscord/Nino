@@ -17,8 +17,8 @@ export default class WarnCommand extends Command {
       usage: '<user>',
       aliases: ['addwarn'],
       category: Module.Moderation,
-      userPermissions: Constants.Permissions.manageRoles,
-      botPermissions: Constants.Permissions.manageRoles,
+      userPermissions: Constants.Permissions.kickMembers,
+      botPermissions: Constants.Permissions.kickMembers,
       guildOnly: true
     });
   }
