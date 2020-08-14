@@ -17,5 +17,6 @@ export const TYPES = {
   CommandStatisticsManager: Symbol.for('CommandStatisticsManager'),
   UserSettingsService: Symbol.for('UserSettings'),
   GuildCounterManager: Symbol.for('GuildCounterManager'),
-  LocalizationManager: Symbol.for('LocalizationManager')
+  LocalizationManager: Symbol.for('LocalizationManager'),
+  CaseSettingsService: Symbol.for('CaseSettingsService')
 };

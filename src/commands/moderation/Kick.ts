@@ -1,4 +1,4 @@
-import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
+import { Punishment, PunishmentType } from '../../structures/services/PunishmentService';
 import { injectable, inject } from 'inversify';
 import { Constants, Member } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';

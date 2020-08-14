@@ -1,4 +1,4 @@
-import { Punishment, PunishmentType } from '../structures/managers/PunishmentManager';
+import { Punishment, PunishmentType } from '../structures/services/PunishmentService';
 import { injectable, inject } from 'inversify';
 import { Guild, Member } from 'eris';
 import { TYPES } from '../types';

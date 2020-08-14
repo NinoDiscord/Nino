@@ -1,5 +1,5 @@
 import Bot from '../Bot';
-import { Punishment, PunishmentType } from './PunishmentManager';
+import { Punishment, PunishmentType } from '../services/PunishmentService';
 import { Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';

@@ -8,6 +8,7 @@ import { TYPES } from '../../types';
 import Bot from '../Bot';
 import ms = require('ms');
 import 'reflect-metadata';
+import CaseSettingsService from './settings/CaseSettingsService';
 
 /**
  * Punishment types
@@ -58,11 +59,9 @@ export class Punishment {
  * This class will automate the process of warning and punishing users.
  */
 @injectable()
-export default class PunishmentManager {
-  private bot: Bot;
+export default class PunishmentService {
 
-  constructor(@inject(TYPES.Bot) bot: Bot) {
-    this.bot = bot;
+  constructor(@inject(TYPES.Bot) private bot: Bot, @inject(TYPES.CaseSettingsService)private caseSettingsService: CaseSettingsService) {
   }
 
   /**
@@ -230,15 +229,21 @@ export default class PunishmentManager {
     }
 
     if (punishment.type === PunishmentType.AddRole || punishment.type === PunishmentType.RemoveRole) return undefined;
-    else {
-      const user = await this.bot.client.getRESTUser(member.id);
-      return this.postToModLog({
-        username: user.username,
-        discriminator: user.discriminator,
-        guild: member.guild,
-        id: member.id
-      }, punishment, reason);
-    }
+    
+
+    const user = await this.bot.client.getRESTUser(member.id);
+    const newCase = await this.createCase({
+      username: user.username,
+      discriminator: user.discriminator,
+      guild: member.guild,
+      id: member.id
+    }, punishment, reason);
+    
+    return this.postToModLog(newCase);
+  }
+
+  async createCase(member: Member  | { guild: Guild; id: string; username: string; discriminator: string }, punishment: Punishment, reason?: string): Promise<CaseModel> {
+    return this.caseSettingsService.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
   }
 
   /**
@@ -251,7 +256,8 @@ export default class PunishmentManager {
    * @param punishment the punishment
    * @param reason the reason
    */
-  async postToModLog(member: Member | { guild: Guild; id: string; username: string; discriminator: string }, punishment: Punishment, reason?: string) {
+  async postToModLog(case: CaseModel) : string | undefined {
+    const member = case.victim;
     const settings = await this.bot.settings.get(member.guild.id);
     if (!settings || !settings!.modlog) return;
 
@@ -262,7 +268,6 @@ export default class PunishmentManager {
       modlog!.permissionsOf(this.bot.client.user.id).has('embedLinks')
     ) {
       const action = this.determineType(punishment.type);
-      const c = await this.bot.cases.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
       try {
         let description = stripIndents`
           **User**: ${member.username}#${member.discriminator} (${member.id})

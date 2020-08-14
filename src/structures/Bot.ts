@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify';
 import RedisClient, { Redis, RedisOptions } from 'ioredis';
 import { captureException } from '@sentry/node';
 import LocalizationManager from './managers/LocalizationManager';
-import PunishmentManager from './managers/PunishmentManager';
+import PunishmentService from './services/PunishmentService';
 import { setDefaults } from 'wumpfetch';
 import TimeoutsManager from './managers/TimeoutsManager';
 import DatabaseManager from './managers/DatabaseManager';
@@ -100,7 +100,7 @@ export default class Bot {
   public statistics!: CommandStatisticsManager;
 
   @lazyInject(TYPES.PunishmentManager)
-  public punishments!: PunishmentManager;
+  public punishments!: PunishmentService;
 
   @lazyInject(TYPES.UserSettingsService)
   public userSettings!: UserSettingsService;

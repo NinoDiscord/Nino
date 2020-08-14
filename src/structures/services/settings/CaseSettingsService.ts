@@ -1,6 +1,8 @@
 import { CaseSettingBase as Base } from './SettingsBase';
 import model, { CaseModel } from '../../../models/CaseSchema';
+import { injectable } from 'inversify';
 
+@injectable()
 export default class CaseSettingsService implements Base<CaseModel> {
   public model = model;
 
