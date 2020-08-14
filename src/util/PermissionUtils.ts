@@ -1,4 +1,4 @@
-import { Role, Member, Permission, GuildChannel, Constants } from 'eris';
+import { Constants, GuildChannel, Member, Permission, Role } from 'eris';
 
 const PermissionNames = {
   'createInstantInvite': 'Create Instant Invite',
@@ -49,26 +49,38 @@ export default class PermissionUtils {
   public static topRole(member: Member): Role | undefined {
     if (
       member === null ||
-      !member.roles.length
+        !member.roles.length
     ) return undefined;
-    
+
     return member.roles
       .map(r => member.guild.roles.get(r))
       .sort((a, b) => b!.position - a!.position)[0];
   }
 
   /**
-   * Returns true if a is above b in the heirarchy, otherwise false.
+   * Returns whether role a is above role b in the hierarchy.
+   * @param a the role that should be higher
+   * @param b the role that should be lower
+   */
+  public static roleAbove(a?: Role, b?: Role) {
+    if (a === undefined) return false;
+    if (b === undefined) return true;
+    return a.position > b.position;
+  }
+
+  /**
+   * Returns whether member a is above member b in the hierarchy.
+   * @param a the member that should be higher
+   * @param b the member that should be lower
    */
   public static above(a: Member, b: Member) {
-    if (this.topRole(a) === undefined) return false;
-    if (this.topRole(b) === undefined) return true;
-    return this.topRole(a)!.position > this.topRole(b)!.position;
+    return this.roleAbove(this.topRole(a), this.topRole(b));
   }
 
   /**
    * Calculates permissions of a role in a channel.
    * @param role
+   * @param channel
    */
   public static permissionsOf(role: Role, channel: GuildChannel) {
     let permission = role.permissions.allow;

@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { Module } from '../../util';
 import { TYPES } from '../../types';
 import Bot from '../Bot';
@@ -36,7 +36,7 @@ export default class BotListService {
     this.postCount(this.bot.client.guilds.size);
     this.interval = setInterval(async() => {
       const guilds = await this.bot.redis.get('guilds');
-      if (guilds) this.postCount(Number(guilds));
+      if (guilds) await this.postCount(Number(guilds));
     }, 86400000);
   }
 

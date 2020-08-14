@@ -1,4 +1,4 @@
-import { Punishment, PunishmentType } from '../../structures/managers/PunishmentManager';
+import { Punishment, PunishmentType } from '../../structures/services/PunishmentService';
 import { injectable, inject } from 'inversify';
 import { Constants, Member } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
@@ -38,7 +38,8 @@ export default class KickCommand extends Command {
       user: `${user.username}#${user.discriminator}`
     });
 
-    if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.hierarchy');
+    if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
+    else if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     const punishment = new Punishment(PunishmentType.Kick, {

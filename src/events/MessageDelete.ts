@@ -1,5 +1,5 @@
 import { Message, TextChannel } from 'eris';
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
@@ -9,7 +9,7 @@ import { createEmptyEmbed } from '../util/EmbedUtils';
 @injectable()
 export default class MessageDeleteEvent extends Event {
   constructor(
-    @inject(TYPES.Bot) bot: Client
+      @inject(TYPES.Bot) bot: Client
   ) {
     super(bot, 'messageDelete');
   }
@@ -58,7 +58,7 @@ export default class MessageDeleteEvent extends Event {
     `);
 
     // TODO: Add customizable messages to this
-    channel.createMessage({
+    await channel.createMessage({
       content: ':wastebasket: **| Message was deleted**',
       embed: embed.build()
     });

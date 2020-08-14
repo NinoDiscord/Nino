@@ -1,4 +1,4 @@
-import { Punishment, PunishmentType } from '../managers/PunishmentManager';
+import { Punishment, PunishmentType } from '../services/PunishmentService';
 import PermissionUtils from '../../util/PermissionUtils';
 import { Member } from 'eris';
 import RedisQueue from '../../util/RedisQueue';
