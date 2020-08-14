@@ -1,4 +1,4 @@
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
@@ -6,7 +6,7 @@ import Event from '../structures/Event';
 @injectable()
 export default class ReadyEvent extends Event {
   constructor(
-    @inject(TYPES.Bot) client: Client
+      @inject(TYPES.Bot) client: Client
   ) {
     super(client, 'ready');
   }
@@ -21,6 +21,6 @@ export default class ReadyEvent extends Event {
     if (this.bot.client.user.id === '531613242473054229') this.bot.botlists.start();
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
     this.bot.statistics.guildCount = this.bot.client.guilds.size;
-    this.bot.timeouts.reapplyTimeouts();
+    await this.bot.timeouts.reapplyTimeouts();
   }
 }

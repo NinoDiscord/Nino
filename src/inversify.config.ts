@@ -1,11 +1,6 @@
 import 'reflect-metadata';
 import { Container, decorate, injectable } from 'inversify';
 import getDecorators from 'inversify-inject-decorators';
-
-let container = new Container();
-const { lazyInject } = getDecorators(container);
-export { lazyInject };
-
 import { TYPES } from './types';
 import { readFileSync } from 'fs';
 import Bot, { Config } from './structures/Bot';
@@ -65,6 +60,11 @@ import UserSettingsService from './structures/services/settings/UserSettingsServ
 import LocalizationManager from './structures/managers/LocalizationManager';
 import { Collection } from '@augu/immutable';
 import CaseSettingsService from './structures/services/settings/CaseSettingsService';
+import WarningService from './structures/services/WarningService';
+
+let container = new Container();
+const { lazyInject } = getDecorators(container);
+export { lazyInject };
 
 let config: Config;
 try {
@@ -133,7 +133,7 @@ container
   .inSingletonScope();
 
 container
-  .bind<PunishmentService>(TYPES.PunishmentManager)
+  .bind<PunishmentService>(TYPES.PunishmentService)
   .to(PunishmentService)
   .inSingletonScope();
 
@@ -160,6 +160,11 @@ container
 container
   .bind<CaseSettingsService>(TYPES.CaseSettingsService)
   .to(CaseSettingsService)
+  .inSingletonScope();
+
+container
+  .bind<WarningService>(TYPES.WarningService)
+  .to(WarningService)
   .inSingletonScope();
 
 container

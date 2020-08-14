@@ -1,19 +1,23 @@
-import { injectable, inject } from 'inversify';
+import { inject, injectable } from 'inversify';
 import { Message, TextChannel } from 'eris';
 import { TYPES } from '../types';
-import Client from '../structures/Bot';
+import Bot from '../structures/Bot';
 import Event from '../structures/Event';
+import CommandService from '../structures/services/CommandService';
+import AutomodService from '../structures/services/AutomodService';
 
 @injectable()
 export default class MessageReceivedEvent extends Event {
   constructor(
-    @inject(TYPES.Bot) client: Client
+      @inject(TYPES.Bot) bot: Bot,
+      @inject(TYPES.CommandService) private commandService: CommandService,
+      @inject(TYPES.AutoModService) private automodService: AutomodService
   ) {
-    super(client, 'messageCreate');
+    super(bot, 'messageCreate');
   }
 
   async emit(m: Message<TextChannel>) {
-    this.bot.manager.service.handle(m);
-    this.bot.automod.handleMessage(m);
+    await this.commandService.handle(m);
+    await this.automodService.handleMessage(m);
   }
 }

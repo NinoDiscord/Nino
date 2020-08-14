@@ -1,4 +1,4 @@
-import { Schema, Document, model } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
 export interface CaseModel extends Document {
   id: number;
@@ -7,7 +7,9 @@ export interface CaseModel extends Document {
   type: string;
   victim: string;
   reason: string;
-  message: string;
+  message?: string;
+  soft?: boolean;
+  time?: number;
 }
 
 const schema = new Schema<CaseModel>({

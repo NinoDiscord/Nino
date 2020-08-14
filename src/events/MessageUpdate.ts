@@ -1,5 +1,5 @@
-import { Message, TextChannel, Attachment, EmbedOptions } from 'eris';
-import { injectable, inject } from 'inversify';
+import { Attachment, EmbedOptions, Message, TextChannel } from 'eris';
+import { inject, injectable } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
@@ -104,7 +104,7 @@ export default class MessageUpdatedEvent extends Event {
       `);
   
     // TODO: Add customizable messages to this
-    channel.createMessage({
+    await channel.createMessage({
       content: ':pencil2: **| Message was updated**',
       embed: embed.build()
     });

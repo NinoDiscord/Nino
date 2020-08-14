@@ -1,4 +1,4 @@
-import { TextChannel, Constants, Member, Message, Guild, User, Role } from 'eris';
+import { Client, Constants, Guild, Member, Message, Role, TextChannel, User } from 'eris';
 import { inject, injectable } from 'inversify';
 import { stripIndents } from 'common-tags';
 import PermissionUtils from '../../util/PermissionUtils';
@@ -6,9 +6,13 @@ import { CaseModel } from '../../models/CaseSchema';
 import EmbedBuilder from '../EmbedBuilder';
 import { TYPES } from '../../types';
 import Bot from '../Bot';
-import ms = require('ms');
 import 'reflect-metadata';
 import CaseSettingsService from './settings/CaseSettingsService';
+import WarningService from './WarningService';
+import GuildSettingsService from './settings/GuildSettingsService';
+import { GuildModel } from '../../models/GuildSchema';
+import TimeoutsManager from '../managers/TimeoutsManager';
+import ms = require('ms');
 
 /**
  * Punishment types
@@ -61,7 +65,12 @@ export class Punishment {
 @injectable()
 export default class PunishmentService {
 
-  constructor(@inject(TYPES.Bot) private bot: Bot, @inject(TYPES.CaseSettingsService)private caseSettingsService: CaseSettingsService) {
+  constructor(@inject(TYPES.Bot) private bot: Bot,
+              @inject(TYPES.CaseSettingsService) private caseSettingsService: CaseSettingsService,
+              @inject(TYPES.Client) private client: Client,
+              @inject(TYPES.WarningService) private warningService: WarningService,
+              @inject(TYPES.GuildSettingsService) private guildSettingsService: GuildSettingsService,
+              @inject(TYPES.TimeoutsManager) private timeoutsManager: TimeoutsManager) {
   }
 
   /**
@@ -82,21 +91,19 @@ export default class PunishmentService {
    * @param member the member to warn
    */
   async addWarning(member: Member): Promise<Punishment[]> {
-    const me = member.guild.members.get(this.bot.client.user.id)!;
-    const settings = await this.bot.settings.get(member.guild.id);
+    const me = member.guild.members.get(this.client.user.id)!;
+    const settings = await this.guildSettingsService.get(member.guild.id);
     if (!settings) return [];
 
-    let warnings = await this.bot.warnings.get(member.guild.id, member.id);
-    if (!warnings) warnings = this.bot.warnings.create(member.guild.id, member.id);
-    else {
-      await this.bot.warnings.update(member.guild.id, member.id, {
-        amount: Math.min(warnings.amount + 1, 5)
-      });
-    }
+    const warnings = await this.warningService.getOrCreate(member.guild.id, member.id);
+    const newWarningCount = warnings.amount + 1;
 
-    const warns = Math.min(warnings ? warnings!.amount + 1 : 1, 5);
+    await this.warningService.update(member.guild.id, member.id, {
+      amount: newWarningCount
+    });
+
     const result: Punishment[] = [];
-    for (let options of settings.punishments.filter(x => x.warnings === warns)) {
+    for (let options of settings.punishments.filter(x => x.warnings === newWarningCount)) {
       const punishment = new Punishment(options.type as PunishmentType, Object.assign({ moderator: me.user }, options));
       result.push(punishment);
     }
@@ -114,10 +121,24 @@ export default class PunishmentService {
    * @param amount the amount of warnings to remove
    */
   async pardon(member: Member, amount: number) {
-    let warnings = await this.bot.warnings.get(member.guild.id, member.id);
-    if (!!warnings && amount > 0) await this.bot.warnings.update(member.guild.id, member.id, {
-      amount: Math.max(0, warnings.amount - amount),
-    });
+    let warnings = await this.warningService.get(member.guild.id, member.id);
+    if (!!warnings && amount > 0) {
+      await this.warningService.update(member.guild.id, member.id, {
+        amount: Math.max(0, warnings.amount - amount),
+      });
+    }
+  }
+
+  private resolveToMember(member: Member | { id: string; guild: Guild }): Member {
+    let mem: Member;
+    let guild = member.guild;
+
+    if (member instanceof Member)
+      mem = member;
+    else
+      mem = guild.members.get(member.id)!;
+
+    return mem;
   }
 
   /**
@@ -129,11 +150,12 @@ export default class PunishmentService {
    * @param member the member
    * @param punishment the punishment
    * @param reason the reason
+   * @param audit whether to audit the punishment or not
    */
   async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string, audit: boolean = false) {
-    const me = member.guild.members.get(this.bot.client.user.id)!;
+    const me = member.guild.members.get(this.client.user.id)!;
     const guild = member.guild;
-    const settings = await this.bot.settings.getOrCreate(guild.id);
+    const settings = await this.guildSettingsService.getOrCreate(guild.id);
 
     if (
       (member instanceof Member && !PermissionUtils.above(me, member)) ||
@@ -142,181 +164,232 @@ export default class PunishmentService {
 
     switch (punishment.type) {
       case PunishmentType.Ban: {
-        const days = punishment.options.days ? punishment.options.days : 7;
-        const time = punishment.options.temp;
-        const soft = !!punishment.options.soft;
-
-        await guild.banMember(member.id, days, reason);
-        if (soft) await guild.unbanMember(member.id, reason);
-        else if (time !== undefined && time > 0) {
-          await this.bot.timeouts.addTimeout(member.id, member.guild, 'unban', time!);
-        }
+        await this.applyBanPunishment(punishment, guild, member, reason);
       } break;
 
       case PunishmentType.Kick: {
-        if (!(member instanceof Member)) return;
-        await member.kick(reason);
+        let mem = this.resolveToMember(member);
+
+        await mem.kick(reason);
       } break;
 
       case PunishmentType.Mute: {
-        if (!(member instanceof Member)) return;
-        const temp = punishment.options.temp;
-        let mutedRole: string | Role | undefined = settings!.mutedRole;
-        if (!mutedRole) {
-          mutedRole = guild.roles.find(x => x.name === 'Muted');
-          if (!mutedRole) {
-            mutedRole = await guild.createRole({
-              name: 'Muted',
-              permissions: 0,
-              mentionable: false,
-              hoist: false
-            }, '[Automod] Created "Muted" role');
+        let mem = this.resolveToMember(member);
 
-            const topRole = PermissionUtils.topRole(me)!;
-            await mutedRole.editPosition(topRole.position - 1);
-
-            for (let [, channel] of guild.channels) {
-              const permissions = channel.permissionsOf(me.id);
-              if (permissions.has('manageChannels')) 
-                await channel.editPermission(mutedRole.id, 0, Constants.Permissions.sendMessages, 'role', '[Automod] Override permissions for new Muted role.');
-            }
-          }
-
-          settings!.mutedRole = mutedRole.id;
-          await settings!.save();
-        }
-
-        const id = mutedRole! instanceof Role ? mutedRole.id : mutedRole;
-        if (!audit) 
-          await member.addRole(id, reason);
-        if (temp) 
-          await this.bot.timeouts.addTimeout(member.id, guild, 'unmute', temp!);
+        await this.applyMutePunishment(punishment, settings, guild, me, mem, reason);
       } break;
 
       case PunishmentType.AddRole: {
-        if (!(member instanceof Member)) return;
+        if (!punishment.options.roleid) return;
+        if (!guild.roles.has(punishment.options.roleid)) return;
 
-        const role = member.guild.roles.get(punishment.options.roleid!);
-        if (!!role && !!PermissionUtils.topRole(me) && PermissionUtils.topRole(me)!.position > role.position) 
-          await member.addRole(role.id, reason);
+        let mem = this.resolveToMember(member);
+
+        await this.applyAddRolePunishment(mem, punishment, me, reason);
       } break;
 
       case PunishmentType.Unmute: {
-        let mem: Member | { id: string; guild: Guild; } | undefined = member;
-        if (!(member instanceof Member)) 
-          mem = guild.members.get(mem.id);
-        if (!mem) 
-          return;
+        if (!guild.members.has(member.id)) return;
 
-        const muted = guild.roles.get(settings!.mutedRole)!;
-        if (!audit && (mem as Member).roles.find(x => x === muted.id)) 
-          await (mem! as Member).removeRole(muted.id, reason);
+        await this.applyUnmutePunishment(member, guild, settings, reason);
       } break;
 
       case PunishmentType.Unban: {
-        if (!guild.members.find(x => x.id === member.id)) await guild.unbanMember(member.id, reason);
+        const bans = await guild.getBans();
+
+        if (bans.some(ban => ban.user.id === member.id)) {
+          await guild.unbanMember(member.id, reason);
+        }
       } break;
 
       case PunishmentType.RemoveRole: {
-        const role = member.guild.roles.get(punishment.options.roleid!);
-        if (
-          member instanceof Member &&
-          !!role &&
-          !!PermissionUtils.topRole(me) &&
-          PermissionUtils.topRole(me)!.position > role.position
-        ) await member.removeRole(role.id, reason);
+        let mem = this.resolveToMember(member);
+
+        if (punishment.options.roleid === undefined) return;
+        if (!mem.guild.roles.has(punishment.options.roleid)) return;
+
+        await this.applyRemoveRolePunishment(mem, punishment, me, reason);
       } break;
     }
 
     if (punishment.type === PunishmentType.AddRole || punishment.type === PunishmentType.RemoveRole) return undefined;
-    
 
-    const user = await this.bot.client.getRESTUser(member.id);
+
+    const user = await this.client.getRESTUser(member.id);
     const newCase = await this.createCase({
       username: user.username,
       discriminator: user.discriminator,
       guild: member.guild,
       id: member.id
     }, punishment, reason);
-    
+
     return this.postToModLog(newCase);
   }
 
-  async createCase(member: Member  | { guild: Guild; id: string; username: string; discriminator: string }, punishment: Punishment, reason?: string): Promise<CaseModel> {
+  private async applyRemoveRolePunishment(mem: Member, punishment: Punishment, me: Member, reason: string | undefined) {
+    const roleToRemove = mem.guild.roles.get(punishment.options.roleid!)!;
+
+    if (PermissionUtils.above(me, mem) && PermissionUtils.roleAbove(PermissionUtils.topRole(me)!, roleToRemove)) {
+      await mem.removeRole(roleToRemove.id, reason);
+    }
+  }
+
+  private async applyUnmutePunishment(member: { id: string; guild: Guild } | Member, guild: Guild, settings: GuildModel, reason: string | undefined) {
+    let mem = this.resolveToMember(member);
+
+    const muted = guild.roles.get(settings!.mutedRole)!;
+    if (mem.roles.find(x => x === muted.id))
+      await mem.removeRole(muted.id, reason);
+  }
+
+  private async applyAddRolePunishment(member: Member, punishment: Punishment, me: Member, reason: string | undefined) {
+    const role = member.guild.roles.get(punishment.options.roleid!)!;
+    if (PermissionUtils.topRole(me) !== undefined && PermissionUtils.topRole(me)!.position > role.position)
+      await member.addRole(role.id, reason);
+  }
+
+  private async applyMutePunishment(punishment: Punishment, settings: GuildModel, guild: Guild, me: Member, member: Member, reason: string | undefined) {
+    const temp = punishment.options.temp;
+    let mutedRole = await this.getOrCreateMutedRole(settings, guild, me);
+
+    const id = mutedRole! instanceof Role ? mutedRole.id : mutedRole;
+    if (!member.roles.includes(id))
+      await member.addRole(id, reason);
+    if (temp)
+      await this.timeoutsManager.addTimeout(member.id, guild, 'unmute', temp!);
+  }
+
+  private async getOrCreateMutedRole(settings: GuildModel, guild: Guild, me: Member) {
+    let mutedRole: string | Role | undefined = settings!.mutedRole;
+    if (mutedRole) return mutedRole;
+
+    mutedRole = guild.roles.find(x => x.name === 'Muted');
+    if (!mutedRole) {
+      mutedRole = await guild.createRole({
+        name: 'Muted',
+        permissions: 0,
+        mentionable: false,
+        hoist: false
+      }, '[Automod] Created "Muted" role');
+
+      await this.addMutedRolePermissions(me, mutedRole, guild);
+    }
+
+    settings!.mutedRole = mutedRole.id;
+    await settings!.save();
+
+    return mutedRole;
+  }
+
+  private async addMutedRolePermissions(me: Member, mutedRole: Role, guild: Guild) {
+    const topRole = PermissionUtils.topRole(me)!;
+    await mutedRole.editPosition(topRole.position - 1);
+
+    for (let [, channel] of guild.channels) {
+      const permissions = channel.permissionsOf(me.id);
+      if (permissions.has('manageChannels'))
+        await channel.editPermission(mutedRole.id, 0, Constants.Permissions.sendMessages, 'role', '[Automod] Override permissions for new Muted role.');
+    }
+  }
+
+  private async applyBanPunishment(punishment: Punishment, guild: Guild, member: { id: string; guild: Guild }, reason: string | undefined) {
+    const days = punishment.options.days ? punishment.options.days : 7;
+    const time = punishment.options.temp;
+    const soft = !!punishment.options.soft;
+
+    await guild.banMember(member.id, days, reason);
+    if (soft) await guild.unbanMember(member.id, reason);
+    else if (typeof time === 'number' && time > 0) {
+      await this.timeoutsManager.addTimeout(member.id, member.guild, 'unban', time!);
+    }
+  }
+
+  async createCase(member: Member | { guild: Guild; id: string; username: string; discriminator: string }, punishment: Punishment, reason?: string): Promise<CaseModel> {
     return this.caseSettingsService.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
   }
 
   /**
-   * Posts a punishment to the mod-log
+   * Posts a case to the mod-log
    *
    * @remarks
    *
    *
-   * @param member the member
-   * @param punishment the punishment
-   * @param reason the reason
+   * @param caseModel the case
    */
-  async postToModLog(case: CaseModel) : string | undefined {
-    const member = case.victim;
-    const settings = await this.bot.settings.get(member.guild.id);
+  async postToModLog(caseModel: CaseModel): Promise<string | undefined> {
+    if (!this.client.guilds.has(caseModel.guild)) return;
+
+    const settings = await this.guildSettingsService.get(caseModel.guild);
+    const guild = this.client.guilds[caseModel.guild];
+    const member = this.resolveToMember({ id: caseModel.victim, guild: guild });
+    const moderator = this.resolveToMember({ id: caseModel.moderator, guild: guild });
+    const selfUser = this.client.user;
+    const punishmentType = caseModel.type;
+
     if (!settings || !settings!.modlog) return;
 
-    const modlog = member.guild.channels.get(settings!.modlog) as TextChannel;
-    if (
-      !!modlog &&
-      modlog!.permissionsOf(this.bot.client.user.id).has('sendMessages') &&
-      modlog!.permissionsOf(this.bot.client.user.id).has('embedLinks')
-    ) {
-      const action = this.determineType(punishment.type);
-      try {
-        let description = stripIndents`
-          **User**: ${member.username}#${member.discriminator} (${member.id})
-          **Moderator**: ${punishment.options.moderator.username}#${punishment.options.moderator.discriminator}
-          **Reason**: ${reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${c.id} <reason>\`*)`}
-        `;
+    const modlog = guild.channels.get(settings!.modlog) as TextChannel;
+    if (!modlog) return 'Mod-log channel has not been found';
 
-        if (punishment.options.soft) description += '\n**Type**: Soft Ban';
-        if (!punishment.options.soft && punishment.options.temp) {
-          const time = ms(punishment.options.temp, { long: true });
-          description += `\n**Time**: ${time}`;
-        }
+    if (caseModel.message && modlog.messages.has(caseModel.message)) {
+      await this.editModlog(caseModel, modlog.messages[caseModel.message]);
+      return;
+    }
 
-        const message = await modlog.createMessage({
-          embed: new EmbedBuilder()
-            .setTitle(`Case #${c.id} | ${member.username} has been ${punishment.type + action.suffix}`)
-            .setColor(action.color)
-            .setDescription(description)
-            .build()
-        });
-
-        await this.bot.cases.update(member.guild.id, c.id, {
-          message: message.id
-        }, error => error ? this.bot.logger.error(`Unable to update case:\n${error}`) : null);
-        return undefined;
-      } catch(ex) {
-        this.bot.logger.error(`Unable to post to modlog:\n${ex}`);
-        return `Sorry ${punishment.options.moderator.username}, I was unable to publish case #${c.id} to the mod log`;
-      }
-    } else {
+    if (!modlog.permissionsOf(selfUser.id).has('sendMessages') || !modlog.permissionsOf(selfUser.id).has('embedLinks')) {
       this.bot.logger.error('Nino doesn\'t have permissions to publish to the mod log');
-      return `Sorry ${punishment.options.moderator.username}, I was unable to post to the mod log due to me not having any permissions (\`Send Messages\`, \`Embed Links\`)`;
+      return `Sorry ${moderator.username}, I was unable to post to the mod log due to me not having any permissions (\`Send Messages\`, \`Embed Links\`)`;
+    }
+
+    try {
+      let embed = this.createModLogEmbed(member, moderator, settings, caseModel, punishmentType);
+
+      const message = await modlog.createMessage({
+        embed: embed
+      });
+
+      await this.caseSettingsService.update(member.guild.id, caseModel.id, {
+        message: message.id
+      }, error => error ? this.bot.logger.error(`Unable to update case:\n${error}`) : null);
+      return undefined;
+    } catch (ex) {
+      this.bot.logger.error(`Unable to post to modlog:\n${ex}`);
+      return `Sorry ${moderator.username}, I was unable to publish case #${caseModel.id} to the mod log`;
     }
   }
 
-  async editModlog(_case: CaseModel, m: Message) {
-    const action = this.determineType(_case.type);
-    const member = await this.bot.client.getRESTUser(_case.victim)!;
-    const moderator = await this.bot.client.getRESTUser(_case.moderator)!;
-    await m.edit({
-      embed: new EmbedBuilder()
-        .setTitle(`Case #${_case.id} | ${member.username} has been ${_case.type + action.suffix}`)
-        .setColor(action.color)
-        .setDescription(stripIndents`
-          **User**: ${member.username}#${member.discriminator} (ID: ${member.id})
-          **Moderator**: ${moderator.username}#${moderator.discriminator} (ID: ${moderator.id})
-          **Reason**: ${_case.reason}
-        `).build()
+  async editModlog(caseModel: CaseModel, m: Message) {
+    if (!this.client.guilds.has(caseModel.guild)) return;
+
+    const guild = this.client.guilds[caseModel.guild];
+    const member = this.resolveToMember({ id: caseModel.victim, guild: guild });
+    const moderator = this.resolveToMember({ id: caseModel.moderator, guild: guild });
+    const settings = await this.guildSettingsService.getOrCreate(caseModel.guild);
+
+    return m.edit({
+      embed: this.createModLogEmbed(member, moderator, settings, caseModel, caseModel.type)
     });
+  }
+
+  private createModLogEmbed(member: Member, moderator: Member, settings: GuildModel, caseModel: CaseModel, punishmentType: string) {
+    const action = this.determineType(punishmentType);
+    let description = stripIndents`
+        **User**: ${member.username}#${member.discriminator} (${member.id})
+        **Moderator**: ${moderator.username}#${moderator.discriminator}
+        **Reason**: ${caseModel.reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${caseModel.id} <reason>\`*)`}
+      `;
+
+    if (caseModel.soft) description += '\n**Type**: Soft Ban';
+    if (!caseModel.soft && caseModel.time) {
+      const time = ms(caseModel.time, { long: true });
+      description += `\n**Time**: ${time}`;
+    }
+
+    return new EmbedBuilder()
+      .setTitle(`Case #${caseModel.id} | ${member.username} has been ${punishmentType + action.suffix}`)
+      .setColor(action.color)
+      .setDescription(description)
+      .build();
   }
 
   determineType(type: string): { color: number; suffix: string } {

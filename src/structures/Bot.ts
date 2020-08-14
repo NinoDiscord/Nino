@@ -16,7 +16,6 @@ import StatusManager from './managers/StatusManager';
 import GuildSettingsService from './services/settings/GuildSettingsService';
 import UserSettingsService from './services/settings/UserSettingsService';
 import CaseSettingsService from './services/settings/CaseSettingsService';
-import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
 import { TYPES } from '../types';
 import Warnings from './services/WarningService';
@@ -99,7 +98,7 @@ export default class Bot {
   @lazyInject(TYPES.CommandStatisticsManager)
   public statistics!: CommandStatisticsManager;
 
-  @lazyInject(TYPES.PunishmentManager)
+  @lazyInject(TYPES.PunishmentService)
   public punishments!: PunishmentService;
 
   @lazyInject(TYPES.UserSettingsService)

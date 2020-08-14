@@ -9,7 +9,7 @@ export const TYPES = {
   AutoModService: Symbol.for('AutoModService'),
   DatabaseManager: Symbol.for('DatabaseManager'),
   EventManager: Symbol.for('EventManager'),
-  PunishmentManager: Symbol.for('PunishmentManager'),
+  PunishmentService: Symbol.for('PunishmentService'),
   TimeoutsManager: Symbol.for('TimeoutsManager'),
   GuildSettingsService: Symbol.for('GuildSettings'),
   BotListService: Symbol.for('BotListService'),
@@ -18,5 +18,6 @@ export const TYPES = {
   UserSettingsService: Symbol.for('UserSettings'),
   GuildCounterManager: Symbol.for('GuildCounterManager'),
   LocalizationManager: Symbol.for('LocalizationManager'),
-  CaseSettingsService: Symbol.for('CaseSettingsService')
+  CaseSettingsService: Symbol.for('CaseSettingsService'),
+  WarningService: Symbol.for('WarningService')
 };
