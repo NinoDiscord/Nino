@@ -27,7 +27,7 @@ export default class UnmuteCommand extends Command {
 
     const userID = ctx.args.get(0);
     const u = findUser(this.bot, userID);
-    if (!u || u === undefined) return ctx.sendTranslate('global.unableToFind');
+    if (!u) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(u.id);
     if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {

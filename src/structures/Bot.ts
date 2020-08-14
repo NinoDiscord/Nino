@@ -60,13 +60,14 @@ export interface Config {
 
 @injectable()
 export default class Bot {
-  public warnings: Warnings;
   public logger: Logger;
   public owners: string[];
   public client: DiscordClient;
   public config: Config;
   public redis: Redis;
-  public cases: CaseSettingsService;
+
+  @lazyInject(CaseSettingsService)
+  public cases!: CaseSettingsService;
 
   @lazyInject(TYPES.LocalizationManager)
   public locales!: LocalizationManager;
@@ -108,12 +109,10 @@ export default class Bot {
     @inject(TYPES.Config) config: Config,
     @inject(TYPES.Client) client: DiscordClient 
   ) {
-    this.warnings = new Warnings();
     this.config = config;
     this.client = client;
     this.owners = config.owners || [];
     this.logger = new Logger();
-    this.cases = new CaseSettingsService();
     this.redis = new RedisClient(config.redis);
   }
 

@@ -21,6 +21,7 @@
       "notText": "Channel **${channel}** is not a text channel.",
       "noUser": "No user was specified.",
       "hierarchy": "User is above or the same as you in hierarchy.",
+      "botHierarchy": "User is above or the same as me in hierarchy.",
       "notInGuild": "User is not in guild?",
       "unableToPunish": "I was unable to punish the user.",
       "unableToFind": "I was unable to find user.",

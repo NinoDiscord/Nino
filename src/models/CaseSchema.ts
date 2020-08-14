@@ -30,6 +30,14 @@ const schema = new Schema<CaseModel>({
     required: false,
     default: null,
   },
+  soft: {
+    type: Boolean,
+    default: false
+  },
+  time: {
+    type: Number,
+    required: false
+  }
 });
 
 export default model<CaseModel>('cases', schema, 'cases');

@@ -13,6 +13,7 @@ import GuildSettingsService from './settings/GuildSettingsService';
 import { GuildModel } from '../../models/GuildSchema';
 import TimeoutsManager from '../managers/TimeoutsManager';
 import ms = require('ms');
+import { fetchGuild } from '../../util/DiscordUtils';
 
 /**
  * Punishment types
@@ -152,7 +153,7 @@ export default class PunishmentService {
    * @param reason the reason
    * @param audit whether to audit the punishment or not
    */
-  async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string, audit: boolean = false) {
+  async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string) {
     const me = member.guild.members.get(this.client.user.id)!;
     const guild = member.guild;
     const settings = await this.guildSettingsService.getOrCreate(guild.id);
@@ -220,8 +221,8 @@ export default class PunishmentService {
       username: user.username,
       discriminator: user.discriminator,
       guild: member.guild,
-      id: member.id
-    }, punishment, reason);
+      id: member.id,
+    }, punishment, reason, punishment.options.soft, punishment.options.temp);
 
     return this.postToModLog(newCase);
   }
@@ -304,8 +305,8 @@ export default class PunishmentService {
     }
   }
 
-  async createCase(member: Member | { guild: Guild; id: string; username: string; discriminator: string }, punishment: Punishment, reason?: string): Promise<CaseModel> {
-    return this.caseSettingsService.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason);
+  async createCase(member: Member | { guild: Guild; id: string; username: string; discriminator: string }, punishment: Punishment, reason?: string, soft?: boolean, time?: number): Promise<CaseModel> {
+    return this.caseSettingsService.create(member.guild.id, punishment.options.moderator.id, punishment.type, member.id, reason, soft, time);
   }
 
   /**
@@ -320,8 +321,8 @@ export default class PunishmentService {
     if (!this.client.guilds.has(caseModel.guild)) return;
 
     const settings = await this.guildSettingsService.get(caseModel.guild);
-    const guild = this.client.guilds[caseModel.guild];
-    const member = this.resolveToMember({ id: caseModel.victim, guild: guild });
+    const guild = await fetchGuild(this.client, caseModel.guild);
+    const member = await this.client.getRESTUser(caseModel.victim);
     const moderator = this.resolveToMember({ id: caseModel.moderator, guild: guild });
     const selfUser = this.client.user;
     const punishmentType = caseModel.type;
@@ -348,7 +349,7 @@ export default class PunishmentService {
         embed: embed
       });
 
-      await this.caseSettingsService.update(member.guild.id, caseModel.id, {
+      await this.caseSettingsService.update(guild.id, caseModel.id, {
         message: message.id
       }, error => error ? this.bot.logger.error(`Unable to update case:\n${error}`) : null);
       return undefined;
@@ -361,8 +362,8 @@ export default class PunishmentService {
   async editModlog(caseModel: CaseModel, m: Message) {
     if (!this.client.guilds.has(caseModel.guild)) return;
 
-    const guild = this.client.guilds[caseModel.guild];
-    const member = this.resolveToMember({ id: caseModel.victim, guild: guild });
+    const guild = await fetchGuild(this.client, caseModel.guild);
+    const member = await this.client.getRESTUser(caseModel.victim);
     const moderator = this.resolveToMember({ id: caseModel.moderator, guild: guild });
     const settings = await this.guildSettingsService.getOrCreate(caseModel.guild);
 
@@ -371,7 +372,7 @@ export default class PunishmentService {
     });
   }
 
-  private createModLogEmbed(member: Member, moderator: Member, settings: GuildModel, caseModel: CaseModel, punishmentType: string) {
+  private createModLogEmbed(member: User | Member, moderator: Member, settings: GuildModel, caseModel: CaseModel, punishmentType: string) {
     const action = this.determineType(punishmentType);
     let description = stripIndents`
         **User**: ${member.username}#${member.discriminator} (${member.id})
@@ -380,7 +381,7 @@ export default class PunishmentService {
       `;
 
     if (caseModel.soft) description += '\n**Type**: Soft Ban';
-    if (!caseModel.soft && caseModel.time) {
+    else if (caseModel.time) {
       const time = ms(caseModel.time, { long: true });
       description += `\n**Time**: ${time}`;
     }

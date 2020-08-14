@@ -1,6 +1,12 @@
 import 'reflect-metadata';
 import { Container, decorate, injectable } from 'inversify';
 import getDecorators from 'inversify-inject-decorators';
+
+
+let container = new Container();
+const { lazyInject , lazyMultiInject } = getDecorators(container);
+export { lazyInject, lazyMultiInject };
+
 import { TYPES } from './types';
 import { readFileSync } from 'fs';
 import Bot, { Config } from './structures/Bot';
@@ -61,11 +67,6 @@ import LocalizationManager from './structures/managers/LocalizationManager';
 import { Collection } from '@augu/immutable';
 import CaseSettingsService from './structures/services/settings/CaseSettingsService';
 import WarningService from './structures/services/WarningService';
-
-let container = new Container();
-const { lazyInject } = getDecorators(container);
-export { lazyInject };
-
 let config: Config;
 try {
   config = safeLoad(readFileSync('application.yml', 'utf8'));

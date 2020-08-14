@@ -171,6 +171,7 @@ export default class CommandService {
           }));
 
         this.bot.logger.error(`Unable to run the '${invoked.command.name}' command!`, ex.stack ? ex.stack : ex.message);
+        console.error(ex);
         this.bot.report(ex);
         return ctx.embed(embed.build());
       }
