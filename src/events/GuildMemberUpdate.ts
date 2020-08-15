@@ -41,12 +41,14 @@ export default class GuildMemberUpdateEvent extends Event {
 
     // Muted role was taken away
     if (!member.roles.includes(settings.mutedRole) && old.roles.includes(settings.mutedRole)) {
-      const entry = logs.entries.find(entry =>
+      const entries = logs.entries.filter(entry =>
       // Find the removal of the mute without it being by the bot
-        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.client.user.id && entry.targetID === member.id
-      );
+        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.targetID === member.id
+      ).sort((a, b) => b.createdAt - a.createdAt);
 
-      if (!entry) return;
+      const entry = entries[0];
+
+      if (!entry || entry.user.id === this.client.user.id) return;
 
       const punishment = new Punishment(PunishmentType.Unmute, {
         moderator: entry.user
@@ -59,14 +61,16 @@ export default class GuildMemberUpdateEvent extends Event {
 
     // Muted role was added
     if (member.roles.includes(settings.mutedRole) && !old.roles.includes(settings.mutedRole)) {
-      const entry = logs.entries.find(entry =>
-      // Find the removal of the mute without it being by the bot
-        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.user.id !== this.client.user.id && entry.targetID === member.id
-      );
+      const entries = logs.entries.filter(entry =>
+        // Find the removal of the mute without it being by the bot
+        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.targetID === member.id
+      ).sort((a, b) => b.createdAt - a.createdAt);
 
-      if (!entry) return;
+      const entry = entries[0];
 
-      const punishment = new Punishment(PunishmentType.Unmute, {
+      if (!entry || entry.user.id === this.client.user.id) return;
+
+      const punishment = new Punishment(PunishmentType.Mute, {
         moderator: entry.user
       });
 
