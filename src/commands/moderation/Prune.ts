@@ -58,7 +58,9 @@ export default class PruneCommand extends Command {
     const message = await ctx.sendTranslate('commands.moderation.prune.nowDel', { messages: shouldDelete.length });
 
     try {
-      shouldDelete.map(async (msg) => await ctx.message.channel.deleteMessage(msg.id));
+      shouldDelete.map(m => (m as any).purged = true);
+
+      await this.bot.client.deleteMessages(ctx.channel.id, shouldDelete.map(s => s.id), `User ${ctx.sender.username}#${ctx.sender.discriminator} requested it`);
       const msgs: string[] = [];
 
       // This looks ugly but it's gonna have to do I guess?
