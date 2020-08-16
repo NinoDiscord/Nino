@@ -14,12 +14,13 @@ export default class MessageDeleteEvent extends Event {
     super(bot, 'messageDelete');
   }
 
-  async emit(message: Message) {
+  async emit(message: Message<TextChannel> & { purged?: boolean }) {
     if (!message.author || ![0, 5, 6].includes(message.channel.type)) return;
+    if (message.hasOwnProperty('purged') && message.purged) return;
 
     // TODO: Get a threat severity level from Automod
     // Send the message to the channel if they have the apporiate settings
-    const guild = (message.channel as TextChannel).guild;
+    const guild = message.channel.guild;
     const settings = await this.bot.settings.getOrCreate(guild.id);
 
     // Don't do anything about this if they don't want it enabled
