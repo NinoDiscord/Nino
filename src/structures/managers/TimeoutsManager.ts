@@ -21,20 +21,20 @@ export default class TimeoutsManager {
   }
 
   private createTimeout(key: string, task: string, member: string, guild: Guild, time: number) {
-    return setTimeout(async () => {
-      if (await this.bot.redis.hexists('timeouts', key)) {
-        try {
-          await this.bot.punishments.punish(
-            { id: member, guild },
-            new Punishment(task as PunishmentType, {
-              moderator: this.bot.client.user,
-            }),
-            '[Automod] Time\'s up!'
-          );
-        } finally {
-          await this.bot.redis.hdel('timeouts', key);
-        }
-      }
+    // Look, I know it's horrendous but I think setTimeouts bleed into multiple executions 
+    // when using it asynchronously, but who knows O_o
+    setTimeout(() => {
+      this.bot.redis.hexists('timeouts', key)
+        .then((exists) => {
+          if (exists) {
+            this.bot.punishments.punish(
+              { id: member, guild }, 
+              new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
+              '[Automod] Time\'s up!'
+            ).finally(() => this.bot.redis.hdel('timeouts', key));
+          }
+        })
+        .catch(this.bot.logger.error);
     }, time);
   }
 
