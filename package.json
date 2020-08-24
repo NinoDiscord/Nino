@@ -60,7 +60,7 @@
     "jest-mock-extended": "1.0.9",
     "nodemon": "2.0.4",
     "ps-list": "7.2.0",
-    "ts-jest": "26.1.4",
+    "ts-jest": "26.2.0",
     "typescript": "3.9.7"
   }
 }
