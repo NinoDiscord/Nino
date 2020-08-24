@@ -45,7 +45,10 @@ export default class AutoModBadWords {
     const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
 
     for (let word of settings.automod.badwords.wordlist) {
-      if (m.content.toLowerCase().indexOf(word.toLowerCase()) !== -1) {
+      const content = m.content.toLowerCase().split(' ');
+      const includes = content.filter(c => c === word).length > 0;
+
+      if (includes) {
         const punishments = await this.bot.punishments.addWarning(m.member!);
         const response = locale.translate('automod.badwords', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });
 
