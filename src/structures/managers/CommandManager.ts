@@ -12,10 +12,6 @@ export default class CommandManager {
   public service: CommandService;
   public commands: Collection<Command> = new Collection();
 
-  /**
-   * Creates a new instance of the `CommandManager`
-   * @param bot The client instance
-   */
   constructor(@inject(TYPES.Bot) bot: Bot, @inject(TYPES.CommandService) service: CommandService, @multiInject(TYPES.Command) commands: Command[]) {
     this.bot = bot;
     this.service = service;

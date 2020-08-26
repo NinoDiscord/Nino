@@ -1,4 +1,4 @@
-import { Model, Document, Query } from 'mongoose';
+import { Document, Model, Query } from 'mongoose';
 
 export interface SettingsBase<T extends Document> {
   model: Model<T, object>;
@@ -40,12 +40,16 @@ export interface CaseSettingBase<T extends Document> {
 // The warning base is different from everything
 export interface WarningBase<T extends Document> {
   model: Model<T, object>;
+
   get(guildId: string, userId: string): Promise<T | null>;
-  create(guildId: string, userId: string): T;
+
+  create(guildId: string, userId: string): Promise<T>;
+
   remove(guildId: string, userId: string): void;
+
   update(
-    guildId: string,
-    userId: string,
-    doc: { [x: string]: any }
+      guildId: string,
+      userId: string,
+      doc: { [x: string]: any }
   ): Promise<any>;
 }

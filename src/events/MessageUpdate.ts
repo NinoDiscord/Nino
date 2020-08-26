@@ -1,5 +1,5 @@
-import { Message, TextChannel, Attachment, EmbedOptions } from 'eris';
-import { injectable, inject } from 'inversify';
+import { Attachment, EmbedOptions, Message, TextChannel } from 'eris';
+import { inject, injectable } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { TYPES } from '../types';
 import Client from '../structures/Bot';
@@ -62,11 +62,9 @@ export default class MessageUpdatedEvent extends Event {
     // Don't log any bot-related data
     if (m.author.bot) return;
 
-    // Check if attachments and content is the same
-    if (
-      (old.content === m.content) ||
-      (old.attachments.length === m.attachments.length)
-    ) return;
+    // Check if content is the same
+    // root cause of published messages
+    if (old.content === m.content) return;
 
     // Don't do anything if the guild is unavaliable
     const server = m.guildID ? this.bot.client.guilds.get(m.guildID) : null;
@@ -85,27 +83,20 @@ export default class MessageUpdatedEvent extends Event {
     // Check if it's pinned (bc discord is literally shit)
     if (!old.pinned && m.pinned) return;
 
+    const author = m.author.system 
+      ? 'System'
+      : `${m.author.username}#${m.author.discriminator}`;
+
+    const jumpUrl = `https://discord.com/channels/${m.guildID}/${m.channel.id}/${m.id}`;
     const channel = (<TextChannel> guild.channels.get(settings.logging.channelID)!);
-    const timestamp = new Date(m.createdAt);
-    const oldDate = old ? old.editedTimestamp !== undefined ? `(${new Date(old.editedTimestamp).toLocaleString()})` : '(Unknown)' : '(Unknown)';
     const embed = createEmptyEmbed()
-      .setAuthor(`${m.author.username}#${m.author.discriminator} in #${(m.channel as TextChannel).name}`, undefined, m.author.dynamicAvatarURL('png', 1024))
-      .setTimestamp(timestamp)
-      .addField(`Old Content ${oldDate}`, stripIndents`
-        \`\`\`prolog
-        ${old ? old.content : 'None?'}
-        ${old ? old.attachments.length ? old.attachments.slice(0, 3).map(x => x.url).join('\n') : '' : ''}
-        \`\`\`
-      `)
-      .addField(`New Content (${timestamp.toLocaleString()})`, stripIndents`
-        \`\`\`prolog
-        ${m.content}
-        \`\`\`
-      `);
-  
+      .setAuthor(`Message was updated by ${author} in #${m.channel.name}`, '', m.author.avatarURL)
+      .setDescription(`[[Jump Here]](${jumpUrl})`)
+      .addField('Old Content', old.content.length > 1993 ? `${old.content.slice(0, 1993)}...` : old.content)
+      .addField('New Content', m.content.length > 1993 ? `${m.content.slice(0, 1993)}...` : m.content);
+
     // TODO: Add customizable messages to this
-    channel.createMessage({
-      content: ':pencil2: **| Message was updated**',
+    await channel.createMessage({
       embed: embed.build()
     });
   }

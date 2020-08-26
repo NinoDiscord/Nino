@@ -58,7 +58,7 @@ export default class PruneCommand extends Command {
     const message = await ctx.sendTranslate('commands.moderation.prune.nowDel', { messages: shouldDelete.length });
 
     try {
-      shouldDelete.map(async (msg) => await ctx.message.channel.deleteMessage(msg.id));
+      await this.bot.client.deleteMessages(ctx.channel.id, shouldDelete.map(s => s.id), `User ${ctx.sender.username}#${ctx.sender.discriminator} requested it`);
       const msgs: string[] = [];
 
       // This looks ugly but it's gonna have to do I guess?
@@ -78,11 +78,7 @@ export default class PruneCommand extends Command {
 
       const embed = createEmptyEmbed()
         .setAuthor(ctx.translate('commands.moderation.prune.title'))
-        .setDescription(stripIndents`
-          \`\`\`prolog
-          ${allUsers}
-          \`\`\`
-        `);
+        .setDescription(allUsers);
 
       await message.delete();
       return ctx.embed(embed.build());

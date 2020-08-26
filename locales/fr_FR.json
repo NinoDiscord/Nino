@@ -412,7 +412,7 @@
                     "noMessages": "Impossible de trouver des messages avec le filtre **${filter}**.",
                     "twoWeeks": "Je n'ai pas pu supprimer les messages ${messages} plus récents que 2 semaines en raison de la limitation de Discord.",
                     "title": "Résultats de l'élagage",
-                    "userEntry": "${user} avec ${messages} message ${suffix}",
+                    "userEntry": "• **${user}** avec **${messages}** message ${suffix}",
                     "nowDel": "Suppression en cours des messages ${messages}...",
                     "error": {
                         "title": "Impossible de supprimer les messages"

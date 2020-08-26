@@ -21,6 +21,7 @@
       "notText": "Channel **${channel}** is not a text channel.",
       "noUser": "No user was specified.",
       "hierarchy": "User is above or the same as you in hierarchy.",
+      "botHierarchy": "User is above or the same as me in hierarchy.",
       "notInGuild": "User is not in guild?",
       "unableToPunish": "I was unable to punish the user.",
       "unableToFind": "I was unable to find user.",
@@ -419,9 +420,9 @@
           "tooHigh": "The amount of messages went over 100, it must be lower or equal to 100",
           "invalidFilter": "Invalid filter **${filter}**. (${filters})",
           "noMessages": "Couldn't find any messages with filter **${filter}**.",
-          "twoWeeks": "I was unable to delete ${messages} messages newer then 2 weeks due to Discord's limitation.",
+          "twoWeeks": "I was unable to delete ${messages} messages older then 2 weeks due to Discord's limitation.",
           "title": "Pruning Results",
-          "userEntry": "${user} with ${messages} message${suffix}",
+          "userEntry": "• **${user}** with **${messages}** message${suffix}",
           "nowDel": "Now deleting ${messages} messages...",
           "error": {
             "title": "Unable to delete messages"

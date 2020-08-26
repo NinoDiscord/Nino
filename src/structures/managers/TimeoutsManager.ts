@@ -1,5 +1,5 @@
 import Bot from '../Bot';
-import { Punishment, PunishmentType } from './PunishmentManager';
+import { Punishment, PunishmentType } from '../services/PunishmentService';
 import { Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
@@ -21,20 +21,24 @@ export default class TimeoutsManager {
   }
 
   private createTimeout(key: string, task: string, member: string, guild: Guild, time: number) {
-    return setTimeout(async () => {
-      if (await this.bot.redis.hexists('timeouts', key)) {
-        try {
-          await this.bot.punishments.punish(
-            { id: member, guild },
-            new Punishment(task as PunishmentType, {
-              moderator: this.bot.client.user,
-            }),
-            '[Automod] Time\'s up!'
-          );
-        } finally {
-          await this.bot.redis.hdel('timeouts', key);
-        }
-      }
+    // Look, I know it's horrendous but I think setTimeouts bleed into multiple executions 
+    // when using it asynchronously, but who knows O_o
+    //
+    // 2 days later -- I standed correctly, it does bleed into a lot of executions
+    // i.e: the bigger the timeout, the more spam it'll cause, so this is a patch for now
+    
+    setTimeout(() => {
+      this.bot.redis.hexists('timeouts', key)
+        .then((exists) => {
+          if (exists) {
+            this.bot.punishments.punish(
+              { id: member, guild }, 
+              new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
+              '[Automod] Time\'s up!'
+            ).finally(() => this.bot.redis.hdel('timeouts', key));
+          }
+        })
+        .catch(this.bot.logger.error);
     }, time);
   }
 

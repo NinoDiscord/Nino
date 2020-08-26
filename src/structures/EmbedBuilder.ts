@@ -110,8 +110,8 @@ export default class EmbedBuilder {
   }
 
   addField(name: string, value: string, inline: boolean = false) {
-    if (!name) throw new Error('You d-didn\'t set a name to the field you baka!!');
-    if (!value) throw new Error('You d-didn\'t set a value to the field you baka!!');
+    if (!name) throw new Error('Embed field doesn\'t have a name');
+    if (!value) throw new Error('Embed field doesn\'t include a value');
     if (this.fields!.length > 25) throw new Error('Unable to add anymore fields. (FIELD_LIMIT_THRESHOLD)');
 
     this.fields!.push({ name, value: toString(value), inline });

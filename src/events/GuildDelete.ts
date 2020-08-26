@@ -1,34 +1,41 @@
-import { injectable, inject } from 'inversify';
-import { Guild, TextChannel } from 'eris';
+import { inject, injectable } from 'inversify';
+import { Client, Guild, TextChannel } from 'eris';
 import { TYPES } from '../types';
-import Client from '../structures/Bot';
+import Bot from '../structures/Bot';
 import Event from '../structures/Event';
 import { createEmptyEmbed } from '../util/EmbedUtils';
+import GuildSettingsService from '../structures/services/settings/GuildSettingsService';
+import StatusManager from '../structures/managers/StatusManager';
+import CommandStatisticsManager from '../structures/managers/CommandStatisticsManager';
 
 @injectable()
 export default class GuildLeftEvent extends Event {
   constructor(
-    @inject(TYPES.Bot) client: Client
+      @inject(TYPES.Bot) bot: Bot,
+      @inject(TYPES.Client) private client: Client,
+      @inject(TYPES.GuildSettingsService) private guildSettingsService: GuildSettingsService,
+      @inject(TYPES.StatusManager) private statusManager: StatusManager,
+      @inject(TYPES.CommandStatisticsManager) private commandStatisticsManager: CommandStatisticsManager
   ) {
-    super(client, 'guildDelete');
+    super(bot, 'guildDelete');
   }
 
   async emit(guild: Guild) {
-    this.bot.settings.remove(guild.id);
+    await this.guildSettingsService.remove(guild.id);
     this.bot.logger.warn(`Left guild ${guild.name} (${guild.id})`);
 
-    this.bot.status.updateStatus();
-    this.bot.statistics.guildCount--;
-    await this.bot.redis.set('guilds', this.bot.client.guilds.size);
-    const channel = await this.bot.client.getRESTChannel('529593466729267200');
+    this.statusManager.updateStatus();
+    this.commandStatisticsManager.guildCount--;
+    await this.bot.redis.set('guilds', this.client.guilds.size);
+    const channel = this.client.getChannel('529593466729267200');
     if (channel.type === 0) {
       const chan = (channel as TextChannel);
       const embed = createEmptyEmbed()
-        .setAuthor(`| Left ${guild.name} (${guild.id})`, undefined, this.bot.client.user.dynamicAvatarURL('png', 1024))
-        .setFooter(`Now at ${this.bot.client.guilds.size} Guilds`)
+        .setAuthor(`| Left ${guild.name} (${guild.id})`, undefined, this.client.user.dynamicAvatarURL('png', 1024))
+        .setFooter(`Now at ${this.client.guilds.size} Guilds`)
         .build();
 
-      chan.createMessage({ embed });
+      await chan.createMessage({ embed });
     }
   }
 }

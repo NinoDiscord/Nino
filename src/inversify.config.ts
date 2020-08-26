@@ -2,9 +2,10 @@ import 'reflect-metadata';
 import { Container, decorate, injectable } from 'inversify';
 import getDecorators from 'inversify-inject-decorators';
 
+
 let container = new Container();
-const { lazyInject } = getDecorators(container);
-export { lazyInject };
+const { lazyInject , lazyMultiInject } = getDecorators(container);
+export { lazyInject, lazyMultiInject };
 
 import { TYPES } from './types';
 import { readFileSync } from 'fs';
@@ -16,7 +17,7 @@ import CommandManager from './structures/managers/CommandManager';
 import AutomodService from './structures/services/AutomodService';
 import DatabaseManager from './structures/managers/DatabaseManager';
 import EventManager from './structures/managers/EventManager';
-import PunishmentManager from './structures/managers/PunishmentManager';
+import PunishmentService from './structures/services/PunishmentService';
 import TimeoutsManager from './structures/managers/TimeoutsManager';
 import GuildSettingsService from './structures/services/settings/GuildSettingsService';
 import BotListService from './structures/services/BotListService';
@@ -64,7 +65,8 @@ import UserUpdateEvent from './events/UserUpdate';
 import UserSettingsService from './structures/services/settings/UserSettingsService';
 import LocalizationManager from './structures/managers/LocalizationManager';
 import { Collection } from '@augu/immutable';
-
+import CaseSettingsService from './structures/services/settings/CaseSettingsService';
+import WarningService from './structures/services/WarningService';
 let config: Config;
 try {
   config = safeLoad(readFileSync('application.yml', 'utf8'));
@@ -132,8 +134,8 @@ container
   .inSingletonScope();
 
 container
-  .bind<PunishmentManager>(TYPES.PunishmentManager)
-  .to(PunishmentManager)
+  .bind<PunishmentService>(TYPES.PunishmentService)
+  .to(PunishmentService)
   .inSingletonScope();
 
 container
@@ -154,6 +156,16 @@ container
 container
   .bind<GuildSettingsService>(TYPES.GuildSettingsService)
   .to(GuildSettingsService)
+  .inSingletonScope();
+
+container
+  .bind<CaseSettingsService>(TYPES.CaseSettingsService)
+  .to(CaseSettingsService)
+  .inSingletonScope();
+
+container
+  .bind<WarningService>(TYPES.WarningService)
+  .to(WarningService)
   .inSingletonScope();
 
 container

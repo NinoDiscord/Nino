@@ -1,38 +1,48 @@
-import { Punishment, PunishmentType } from '../structures/managers/PunishmentManager';
+import PunishmentService, { Punishment, PunishmentType } from '../structures/services/PunishmentService';
 import { inject, injectable } from 'inversify';
-import { Guild, User } from 'eris';
+import { Client, Constants, Guild, User } from 'eris';
 import { TYPES } from '../types';
 import Event from '../structures/Event';
 import Bot from '../structures/Bot';
+import CaseSettingsService from '../structures/services/settings/CaseSettingsService';
 
 @injectable()
 export default class GuildBanAddEvent extends Event {
   constructor(
-    @inject(TYPES.Bot) bot: Bot
+      @inject(TYPES.Bot) bot: Bot,
+      @inject(TYPES.Client) private client: Client,
+      @inject(TYPES.CaseSettingsService) private caseSettingsService: CaseSettingsService,
+      @inject(TYPES.PunishmentService) private punishmentService: PunishmentService
   ) {
     super(bot, 'guildBanAdd');
   }
 
   async emit(guild: Guild, user: User) {
-    if (!guild.members.get(this.bot.client.user.id)!.permission.has('viewAuditLogs')) {
+    if (!guild.members.get(this.client.user.id)!.permission.has('viewAuditLogs')) {
       return;
     }
     const logs = await guild.getAuditLogs(10);
-    const botLogs = logs.entries.filter(entry =>
-      // Check if the action was ban and if Nino didn't do it
-      entry.actionType === 22 && entry.user.id !== this.bot.client.user.id
+
+    const logEntry = logs.entries.find(entry =>
+    // Check if the action was ban and if Nino didn't do it
+      entry.actionType === Constants.AuditLogActions.MEMBER_BAN_ADD && entry.user.id !== this.client.user.id && entry.targetID === user.id
     );
 
-    // Don't do anything if no logs were found 
-    if (!botLogs.length) return;
+    if (!logEntry) return;
 
-    const log = botLogs[0];
-    const mod = this.bot.client.users.get(log.user.id)!;
+    const mod = this.client.users.get(logEntry.user.id)!;
+
     const punishment = new Punishment(PunishmentType.Ban, {
       moderator: mod
     });
 
-    const member = guild.members.get(user.id) || { id: user.id, guild };
-    await this.bot.punishments.punish(member, punishment, log.reason);
+    const member = guild.members.get(user.id) || {
+      id: user.id,
+      guild,
+      username: user.username,
+      discriminator: user.discriminator
+    };
+    const caseModel = await this.punishmentService.createCase(member, punishment, logEntry.reason);
+    return this.punishmentService.postToModLog(caseModel);
   }
 }

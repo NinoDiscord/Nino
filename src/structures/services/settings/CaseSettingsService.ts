@@ -1,12 +1,14 @@
 import { CaseSettingBase as Base } from './SettingsBase';
 import model, { CaseModel } from '../../../models/CaseSchema';
+import { injectable } from 'inversify';
 
+@injectable()
 export default class CaseSettingsService implements Base<CaseModel> {
   public model = model;
 
   async get(guild: string, id: number) {
     const document = await this.model.findOne({ guild, id }).exec();
-    if (!document || document === null) return null;
+    if (!document) return null;
     return document;
   }
 
@@ -15,7 +17,9 @@ export default class CaseSettingsService implements Base<CaseModel> {
     moderator: string,
     type: string,
     user: string,
-    reason?: string
+    reason?: string,
+    soft?: boolean,
+    time?: number
   ) {
     const newest = await this.model
       .find({ guild })
@@ -28,13 +32,15 @@ export default class CaseSettingsService implements Base<CaseModel> {
       victim: user,
       reason,
       id: newest[0] ? newest[0].id + 1 : 1,
+      soft,
+      time
     });
-    query.save();
+    await query.save();
     return query;
   }
 
   async getAll(guild: string) {
-    return await this.model.find({ guild });
+    return this.model.find({ guild });
   }
 
   remove(guild: string, id: number) {

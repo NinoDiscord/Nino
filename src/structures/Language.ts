@@ -123,8 +123,15 @@ export default class Language {
   private _translate(translated: string, args?: { [x: string]: string }) {
     const KEY_REGEX = /[$]\{([\w\.]+)\}/g;
     return translated.replace(KEY_REGEX, (_, key) => {
-      if (args) return args[key] || '?';
-      else return '?';
+      if (args) {
+        const value = String(args[key]);
+
+        // Ignore empty strings
+        if (value === '') return '';
+        else return value || '?';
+      } else {
+        return '?';
+      }
     }).trim();
   }
 }

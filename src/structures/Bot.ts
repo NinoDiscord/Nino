@@ -4,7 +4,7 @@ import { inject, injectable } from 'inversify';
 import RedisClient, { Redis, RedisOptions } from 'ioredis';
 import { captureException } from '@sentry/node';
 import LocalizationManager from './managers/LocalizationManager';
-import PunishmentManager from './managers/PunishmentManager';
+import PunishmentService from './services/PunishmentService';
 import { setDefaults } from 'wumpfetch';
 import TimeoutsManager from './managers/TimeoutsManager';
 import DatabaseManager from './managers/DatabaseManager';
@@ -16,7 +16,6 @@ import StatusManager from './managers/StatusManager';
 import GuildSettingsService from './services/settings/GuildSettingsService';
 import UserSettingsService from './services/settings/UserSettingsService';
 import CaseSettingsService from './services/settings/CaseSettingsService';
-import EmbedBuilder from './EmbedBuilder';
 import EventManager from './managers/EventManager';
 import { TYPES } from '../types';
 import Warnings from './services/WarningService';
@@ -61,13 +60,14 @@ export interface Config {
 
 @injectable()
 export default class Bot {
-  public warnings: Warnings;
   public logger: Logger;
   public owners: string[];
   public client: DiscordClient;
   public config: Config;
   public redis: Redis;
-  public cases: CaseSettingsService;
+
+  @lazyInject(CaseSettingsService)
+  public cases!: CaseSettingsService;
 
   @lazyInject(TYPES.LocalizationManager)
   public locales!: LocalizationManager;
@@ -99,8 +99,8 @@ export default class Bot {
   @lazyInject(TYPES.CommandStatisticsManager)
   public statistics!: CommandStatisticsManager;
 
-  @lazyInject(TYPES.PunishmentManager)
-  public punishments!: PunishmentManager;
+  @lazyInject(TYPES.PunishmentService)
+  public punishments!: PunishmentService;
 
   @lazyInject(TYPES.UserSettingsService)
   public userSettings!: UserSettingsService;
@@ -109,12 +109,10 @@ export default class Bot {
     @inject(TYPES.Config) config: Config,
     @inject(TYPES.Client) client: DiscordClient 
   ) {
-    this.warnings = new Warnings();
     this.config = config;
     this.client = client;
     this.owners = config.owners || [];
     this.logger = new Logger();
-    this.cases = new CaseSettingsService();
     this.redis = new RedisClient(config.redis);
   }
 

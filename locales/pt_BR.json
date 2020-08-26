@@ -412,7 +412,7 @@
           "noMessages": "Não foi possível encontrar mais mensagens com filtro **${filter}**.",
           "twoWeeks": "Não consegui deletar ${messages} mensagens mais velhas que 2 semanas por limites do Discord.",
           "title": "Resultados da Limpeza",
-          "userEntry": "${user} com ${messages} mensagens${suffix}",
+          "userEntry": "• **${user}** com **${messages}** mensagens${suffix}",
           "nowDel": "Deletando ${messages} mensagens...",
           "error": {
             "title": "Não foi possível deletar mensagens"

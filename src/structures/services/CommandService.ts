@@ -166,11 +166,12 @@ export default class CommandService {
         embed
           .setTitle(locale.translate('errors.failed', { command: invoked.command.name }))
           .setDescription(locale.translate('errors.unknown', {
-            owners: `${owners} `,
+            owners,
             server: 'https://discord.gg/yDnbEDH'
           }));
 
         this.bot.logger.error(`Unable to run the '${invoked.command.name}' command!`, ex.stack ? ex.stack : ex.message);
+        console.error(ex);
         this.bot.report(ex);
         return ctx.embed(embed.build());
       }
