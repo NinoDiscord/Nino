@@ -14,9 +14,8 @@ export default class MessageDeleteEvent extends Event {
     super(bot, 'messageDelete');
   }
 
-  async emit(message: Message<TextChannel> & { purged?: boolean }) {
+  async emit(message: Message<TextChannel>) {
     if (!message.author || ![0, 5, 6].includes(message.channel.type)) return;
-    if (message.hasOwnProperty('purged') && message.purged) return;
 
     // TODO: Get a threat severity level from Automod
     // Send the message to the channel if they have the apporiate settings
@@ -37,30 +36,33 @@ export default class MessageDeleteEvent extends Event {
     const channel = guild.channels.get(settings.logging.channelID)! as TextChannel;
 
     // Create an embed and get the message content
+    const author = message.author.system 
+      ? 'System'
+      : `${message.author.username}#${message.author.discriminator}`;
     const timestamp = new Date(message.createdAt);
     const embed = createEmptyEmbed()
-      .setAuthor(`${message.author.username}#${message.author.discriminator} in #${(message.channel as TextChannel).name}`, undefined, message.author.dynamicAvatarURL('png', 1024))
+      .setAuthor(`Message was deleted by ${author} in #${message.channel.name}`, '', message.author.avatarURL)
       .setTimestamp(timestamp);
 
-    let content!: string;
-    if (message.embeds.length) {
+    if (message.embeds.length > 0) {
       const em = message.embeds[0];
-      content = `[Embed]\n${em.title ? em.title : 'None'}\n${em.description ? em.description : '...'}${em.timestamp instanceof Date ? `\n(${em.timestamp.toISOString()})` : ''}`;
+
+      if (em.author) embed.setAuthor(em.author.name, em.author.url, em.author.icon_url);
+      if (em.description) embed.setDescription(em.description.length > 2000 ? `${em.description.slice(0, 1993)}...` : em.description);
+      if (em.fields && em.fields.length > 0) {
+        for (const field of em.fields) embed.addField(field.name, field.value, field.inline || false);
+      }
+
+      if (em.image && em.image.hasOwnProperty('url')) embed.setImage(em.image.url!);
+      if (em.thumbnail && em.thumbnail.hasOwnProperty('url')) embed.setThumbnail(em.thumbnail.url!);
+      if (em.title) embed.setTitle(em.title);
+      if (em.url) embed.setURL(em.url);
     } else {
-      content = message.content;
+      embed.setDescription(message.content.length > 1997 ? `${message.content.slice(0, 1995)}...` : message.content);
     }
-
-    embed.addField('Content', stripIndents`
-      \`\`\`prolog
-      ${content}
-
-      ${message.attachments.length ? message.attachments.slice(0, 3).map(x => x.url).join('\n') : ''}
-      \`\`\`
-    `);
 
     // TODO: Add customizable messages to this
     await channel.createMessage({
-      content: ':wastebasket: **| Message was deleted**',
       embed: embed.build()
     });
   }
