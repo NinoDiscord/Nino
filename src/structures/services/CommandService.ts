@@ -166,7 +166,7 @@ export default class CommandService {
         embed
           .setTitle(locale.translate('errors.failed', { command: invoked.command.name }))
           .setDescription(locale.translate('errors.unknown', {
-            owners: `${owners} `,
+            owners,
             server: 'https://discord.gg/yDnbEDH'
           }));
 

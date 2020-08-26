@@ -22,8 +22,8 @@ export default class WarnCommand extends Command {
       usage: '<user>',
       aliases: ['addwarn'],
       category: Module.Moderation,
-      userPermissions: Constants.Permissions.kickMembers,
-      botPermissions: Constants.Permissions.kickMembers,
+      userPermissions: Constants.Permissions.banMembers,
+      botPermissions: Constants.Permissions.banMembers,
       guildOnly: true
     });
   }
@@ -39,7 +39,6 @@ export default class WarnCommand extends Command {
     if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
       user: `${u.username}#${u.discriminator}`
     });
-
     
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
     else if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
