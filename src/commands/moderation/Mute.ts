@@ -40,7 +40,7 @@ export default class MuteCommand extends Command {
     });
 
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
-    else if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
+    if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
 
     const settings = await ctx.getSettings();
     const hasRole = member.roles.filter(role => role === settings!.mutedRole).length > 0;

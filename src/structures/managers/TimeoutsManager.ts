@@ -31,11 +31,18 @@ export default class TimeoutsManager {
       this.bot.redis.hexists('timeouts', key)
         .then((exists) => {
           if (exists) {
+            this.bot.logger.info(`Timeouts: Exists for key "${key}", now doing task ${task}...`);
             this.bot.punishments.punish(
               { id: member, guild }, 
               new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
               '[Automod] Time\'s up!'
-            ).finally(() => this.bot.redis.hdel('timeouts', key));
+            )
+              .then(() => this.bot.logger.info(`Timeouts: Did task "${task}" on member ${member}`))
+              .catch(this.bot.logger.error)
+              .finally(async () => {
+                this.bot.logger.info('Timeouts: Done everything for timeout');
+                await this.bot.redis.hdel('timeouts', key);
+              });
           }
         })
         .catch(this.bot.logger.error);
