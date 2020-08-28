@@ -19,7 +19,7 @@ export default class MuteCommand extends Command {
       name: 'mute',
       description: 'Mutes a member from this guild',
       usage: '<user> <reason> | [time]',
-      aliases: ['slience'],
+      aliases: ['silence', 'stfu'],
       category: Module.Moderation,
       userPermissions: Constants.Permissions.manageRoles,
       botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels,
@@ -53,7 +53,7 @@ export default class MuteCommand extends Command {
     let time!: string;
   
     if (baseReason) {
-      const sliced = baseReason.split(' | ');
+      const sliced = baseReason.split(' / ');
       reason = sliced[0];
       time = sliced[1];
     }

@@ -380,7 +380,7 @@
             "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
             "• CPU Usage: **${sys.cpu}%**",
             "• Operating System: **${sys.os}**",
-            "• Free/Total Memory: **${sys.free}/${sys.total}**"
+            "• Used/Total Memory: **${sys.free}/${sys.total}**"
           ]
         },
         "time": "It is currently ${day}/${month}/${year} at ${h}:${m}:${s}",
@@ -433,7 +433,8 @@
           "noReason": "You didn't provide a reason.",
           "invalid": "Case #**${id}** was not found.",
           "edited": ":ok_hand: Updated case #**${id}** with reason **${reason}**",
-          "error": "I was unable to update case #${id}."
+          "error": "I was unable to update case #${id}.",
+          "notMute": "Case #**${id}** was not a mute."
         },
         "warnings": {
           "none": "User has no warnings.",

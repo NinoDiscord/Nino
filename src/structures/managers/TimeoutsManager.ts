@@ -1,10 +1,16 @@
 import Bot from '../Bot';
 import { Punishment, PunishmentType } from '../services/PunishmentService';
+import { Collection } from '@augu/immutable';
 import { Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
-import { setTimeout } from 'long-timeout';
+import { setTimeout, Timeout } from 'long-timeout';
 import ms from 'ms';
+
+interface NinoTimeout {
+  timeout: Timeout;
+  index: number;
+}
 
 /**
  * This class makes timeouts resilent, automatic unmutes and unbans will be supported even on an event of a crash.
@@ -14,10 +20,12 @@ import ms from 'ms';
  */
 @injectable()
 export default class TimeoutsManager {
+  private timeouts: Collection<NinoTimeout>;
   private bot: Bot;
 
   constructor(@inject(TYPES.Bot) bot: Bot) {
-    this.bot = bot;
+    this.timeouts = new Collection();
+    this.bot      = bot;
   }
 
   private createTimeout(key: string, task: string, member: string, guild: Guild, time: number) {
@@ -27,26 +35,37 @@ export default class TimeoutsManager {
     // 2 days later -- I standed correctly, it does bleed into a lot of executions
     // i.e: the bigger the timeout, the more spam it'll cause, so this is a patch for now
     
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       this.bot.redis.hexists('timeouts', key)
         .then((exists) => {
           if (exists) {
-            this.bot.logger.info(`Timeouts: Exists for key "${key}", now doing task ${task}...`);
-            this.bot.punishments.punish(
-              { id: member, guild }, 
-              new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
-              '[Automod] Time\'s up!'
-            )
-              .then(() => this.bot.logger.info(`Timeouts: Did task "${task}" on member ${member}`))
-              .catch(this.bot.logger.error)
-              .finally(async () => {
-                this.bot.logger.info('Timeouts: Done everything for timeout');
-                await this.bot.redis.hdel('timeouts', key);
-              });
+            const timeout = this.timeouts.get(key)!;
+            if (timeout.index === 1) return;
+            else {
+              this.timeouts.set(key, { timeout: timeout.timeout, index: 1 });
+              this.bot.logger.info(`Timeouts: Exists for key "${key}", now doing task ${task}...`);
+              
+              this.bot.punishments.punish(
+                { id: member, guild }, 
+                new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
+                '[Automod] Time\'s up!'
+              )
+                .then(() => this.bot.logger.info(`Timeouts: Did task "${task}" on member ${member}`))
+                .catch(this.bot.logger.error)
+                .finally(async () => {
+                  this.bot.logger.info('Timeouts: Done everything for timeout');
+
+                  await this.bot.redis.hdel('timeouts', key);
+                  timeout.timeout.close();
+                  this.timeouts.delete(key);
+                });
+            }
           }
         })
         .catch(this.bot.logger.error);
     }, time);
+
+    this.timeouts.set(key, { timeout, index: 0 });
   }
 
   /**
@@ -64,6 +83,16 @@ export default class TimeoutsManager {
   }
 
   /**
+   * Checks if a timeout is existant
+   * @param member The member
+   * @param guild The guild
+   * @param task The task
+   */
+  hasTimeout(member: string, guild: Guild, task: 'unban' | 'unmute') {
+    return this.bot.redis.hexists('timeouts', `timeout:${task}:${guild.id}:${member}`);
+  }
+
+  /**
    * Cancel a timeout
    * @param member the member
    * @param guild the guild
@@ -71,6 +100,13 @@ export default class TimeoutsManager {
    */
   async cancelTimeout(member: string, guild: Guild, task: string) {
     const key = `timeout:${task}:${guild.id}:${member}`;
+    if (this.timeouts.has(key)) {
+      const timeout = this.timeouts.get(key)!;
+      timeout.timeout.close();
+
+      this.timeouts.delete(key);
+    }
+
     return this.bot.redis.hdel('timeouts', key);
   }
 

@@ -372,7 +372,7 @@
                     "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
                     "• CPU Usage: **${sys.cpu}%**",
                     "• Operating System: **${sys.os}**",
-                    "• Free/Total Memory: **${sys.free}/${sys.total}**"
+                    "• Used/Total Memory: **${sys.free}/${sys.total}**"
                   ]
                 },
                 "time": "Il s'agit actuellement de ${day}/${month}/${year} à ${h}:${m}:${s}",
@@ -423,7 +423,8 @@
                     "noReason": "Vous n'avez pas fourni de raison",
                     "invalid": "Le cas #**${id}** est introuvable",
                     "edited": ":ok_hand: cas mis à jour #**${id}** avec raison **${reason}**",
-                    "error": "Je n'ai pas pu mettre à jour le cas #${id}."
+                    "error": "Je n'ai pas pu mettre à jour le cas #${id}.",
+                    "notMute": "Case #**${id}** was not a mute."
                 },
                 "warnings": {
                     "none": "L'utilisateur n'a aucun avertissement.",
