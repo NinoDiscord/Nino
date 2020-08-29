@@ -29,7 +29,7 @@
     "ohlookitsderpy"
   ],
   "dependencies": {
-    "@augu/immutable": "0.4.1",
+    "@augu/immutable": "0.4.2",
     "@augu/sysinfo": "0.2.1",
     "@sentry/node": "5.21.4",
     "common-tags": "1.8.0",
