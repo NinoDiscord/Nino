@@ -156,12 +156,13 @@
             "amountExceeded": "Punishments are limited to 15 per server, please remove any punishment you don't want.",
             "success": "I have added the punishment to the database.",
             "invalidTime": "The `--time` flag must be a currect time expression, it can be from 0.5h, 30m, 0.5 hours, or 30 minutes.",
-            "invalidRole": "The role wasn't found or it was invalid"
+            "invalidRole": "The role wasn't found or it was invalid",
+            "noPunishment": "You didn't provide a punishment to do! Please view the list here: ${punishments}."
           },
           "remove": {
-            "invalidIndex": "The index you provided was not a valid index. You can view the punishment index by `x!settings view`.",
+            "invalidIndex": "The index you provided was not a valid index, you can view the punishment index by `x!settings view`.",
             "noPunishments": "No punishments were found in the database.",
-            "success": "Removed punishment #**${id}**."
+            "success": "Removed punishment #**${index}**."
           },
           "set": {
             "modlog": {

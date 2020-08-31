@@ -66,10 +66,14 @@ export default class SettingsCommand extends Command {
       return ctx.sendTranslate('commands.generic.settings.add.amountRequired');
     }
 
+    if (!punishment) return ctx.sendTranslate('commands.generic.settings.add.noPunishment', {
+      punishments: punishments.join(', ')
+    });
+
     if (!punishments.includes(punishment)) {
       return ctx.sendTranslate('commands.generic.settings.add.invalidPunishment', {
         punishments: punishments.join(', '),
-        punishment
+        punishment: punishment || '(none provided)'
       });
     }
   
@@ -127,11 +131,10 @@ export default class SettingsCommand extends Command {
       return ctx.sendTranslate('commands.generic.settings.remove.invalidIndex');
     }
 
-    
     const i = Math.round(Number(index)) - 1;
     settings!.punishments.splice(i, 1);
     settings!.save();
-    return ctx.sendTranslate('commands.generic.settings.remove.success', { index });
+    return ctx.sendTranslate('commands.generic.settings.remove.success', { index: i });
   }
 
   async set(ctx: Context) {
