@@ -356,7 +356,7 @@
             "message": [
               "❯ **Miscellaneous**",
               "Prefix: **${prefix}**",
-              "Mod Log: ${modlog}",
+              "Mod Log: <#${modlog}>",
               "Muted Role: **${mutedRole}**",
               "",
               "❯ **Automod**",
