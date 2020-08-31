@@ -2,6 +2,7 @@ import { Constants, TextChannel } from 'eris';
 import { injectable, inject } from 'inversify';
 import { createEmptyEmbed } from '../../util/EmbedUtils';
 import { firstUpper } from '../../util';
+import { findId } from '../../util/UserUtil';
 import { TYPES } from '../../types';
 import Context from '../../structures/Context';
 import Command from '../../structures/Command';
@@ -135,7 +136,7 @@ export default class SettingsCommand extends Command {
 
   async set(ctx: Context) {
     const setting = ctx.args.get(1);
-    const subcommands = ['modlog', 'prefix', 'mutedrole', 'mutedRole', 'automod.swears', 'logging.channelID', 'logging.ignore'];
+    const subcommands = ['modlog', 'prefix', 'mutedrole', 'mutedRole', 'automod.swears', 'logging.channelID', 'logging.ignore', 'logging.ignoreUsers'];
     
     switch (setting) {
       case 'modlog': {
@@ -249,9 +250,7 @@ export default class SettingsCommand extends Command {
 
         const settings = await ctx.getSettings();
         const channels = ctx.args.slice(2);
-        const errors = channels.filter(channelID =>
-          channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null
-        );
+        const errors = channels.filter(this.extractChannelId);
 
         if (errors.some(e => e === null)) {
           const invalid = errors
@@ -262,6 +261,15 @@ export default class SettingsCommand extends Command {
           return ctx.sendTranslate('commands.generic.settings.set.ignored.invalid', { channels: invalid });
         }
 
+        if (errors.some(e => settings!.logging.ignore.includes(e))) {
+          const invalid = errors
+            .filter(e => settings!.logging.ignore.includes(e))
+            .map(s => `**${s}**`)
+            .join(', ');
+
+          return ctx.sendTranslate('commands.generic.settings.set.ignored.alreadyIgnored', { channels: invalid });
+        }
+
         if (!settings!.logging.enabled) settings!.logging.enabled = true;
         settings!.logging.ignore.push(...errors);
         await settings!.save();
@@ -270,6 +278,52 @@ export default class SettingsCommand extends Command {
           ctx.sendTranslate('commands.generic.settings.set.ignored.added.notEnabled', { channels: errors.length }) :
           ctx.sendTranslate('commands.generic.settings.set.ignored.added.enabled', { channels: errors.length });
       }
+      case 'logging.ignoreUsers': {
+        const userID = ctx.args.get(2);
+        const settings = await ctx.getSettings()!;
+
+        if (!userID) return ctx.sendTranslate('global.noUser');
+        if (userID === 'bots') {
+          const bots = ctx.guild!.members.filter(m => m.user.bot).map(member => member.id);
+          if (bots.some(bot => settings.logging.ignoreUsers.includes(bot))) {
+            const invalid = bots
+              .filter(bot => settings.logging.ignoreUsers.includes(bot))
+              .map(async (bot) => {
+                const user = await this.bot.client.getRESTUser(bot);
+                if (!user.bot) return;
+
+                return `${user.username}#${user.discriminator}`;
+              }).slice(0, 5).join(', ');
+
+            return ctx.sendTranslate('commands.generic.settings.set.ignoreUsers.alreadyIgnored', { members: invalid });
+          }
+
+          return this.bot.settings.update(ctx.guild!.id, {
+            $push: {
+              'logging.ignoreUsers': bots
+            }
+          }, (error) => {
+            const key = error ? 'unable' : 'success';
+            return ctx.sendTranslate(`commands.generic.settings.set.ignoreUsers.${key}`, { members: bots.length });
+          });
+        } else {
+          const id = findId(userID);
+          if (id === undefined) return ctx.sendTranslate('global.invalidUser', { user: userID });
+
+          const user = await this.bot.client.getRESTUser(id);
+          const settings = await ctx.getSettings()!;
+          if (settings.logging.ignoreUsers.includes(user.id)) return ctx.sendTranslate('commands.generic.settings.set.ignoreUsers.alreadyIgnored', { members: [`${user.username}#${user.discriminator}`].join(', ') });  
+
+          this.bot.settings.update(ctx.guild!.id, {
+            $push: {
+              'logging.ignoreUsers': user.id
+            }
+          }, (error) => {
+            const key = error ? 'unable' : 'success';
+            return ctx.sendTranslate(`commands.generic.settings.set.ignoreUsers.${key}`, { members: [`${user.username}#${user.discriminator}`].join(', ') });
+          });
+        }
+      } break;
       case 'logging.channelID': {
         const channelID = ctx.args.get(2);
         if (!channelID) {
@@ -282,7 +336,7 @@ export default class SettingsCommand extends Command {
         }
 
         const channel = await this.bot.client.getRESTChannel(id);
-        if (!(channel instanceof TextChannel)) {
+        if (channel.type !== 0) {
           return ctx.sendTranslate('global.notText', { channel: channel.id });
         }
 
@@ -326,10 +380,9 @@ export default class SettingsCommand extends Command {
 
     switch (setting) {
       case 'automod': {
-
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
-            'automod.dehoist': true,
+            'automod.dehoist': false, // disabled
             'automod.spam': true,
             'automod.mention': true,
             'automod.raid': true,
@@ -342,14 +395,15 @@ export default class SettingsCommand extends Command {
           : ctx.sendTranslate('commands.generic.settings.enable.automod.success'));
       } break;
       case 'automod.dehoist': {
-        await this.bot.settings.update(ctx.guild!.id, {
-          $set: {
-            'automod.dehoist': true
-          }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.dehoist.unable') 
-          : ctx.sendTranslate('commands.generic.settings.enable.dehoist.success'));
-      } break;
+        return ctx.sendTranslate('global.disabled', { setting: 'automod.dehoist' });
+        //await this.bot.settings.update(ctx.guild!.id, {
+        //$set: {
+        //'automod.dehoist': true
+        //}
+        //}, (error) => error 
+        //? ctx.sendTranslate('commands.generic.settings.enable.dehoist.unable') 
+        //: ctx.sendTranslate('commands.generic.settings.enable.dehoist.success'));
+      }
       case 'automod.spam': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
@@ -465,14 +519,15 @@ export default class SettingsCommand extends Command {
           : ctx.sendTranslate('commands.generic.settings.disable.automod.success'));
       } break;
       case 'automod.dehoist': {
-        await this.bot.settings.update(ctx.guild!.id, {
-          $set: {
-            'automod.dehoist': false
-          }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.dehoist.unable') 
-          : ctx.sendTranslate('commands.generic.settings.disable.dehoist.success'));
-      } break;
+        return ctx.sendTranslate('global.disabled', { setting: 'automod.dehoist' });
+      //await this.bot.settings.update(ctx.guild!.id, {
+        //$set: {
+        //'automod.dehoist': false
+        //}
+      //}, (error) => error 
+        //? ctx.sendTranslate('commands.generic.settings.disable.dehoist.unable') 
+        //: ctx.sendTranslate('commands.generic.settings.disable.dehoist.success'));
+      }
       case 'automod.spam': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
@@ -617,14 +672,35 @@ export default class SettingsCommand extends Command {
         const channel = ctx.args.get(2);
         if (!channel) return ctx.sendTranslate('commands.generic.settings.reset.ignored.none');
 
-        const heck = [channel].filter(channelID => channelID.endsWith('>') ? channelID.includes('<#') ? channelID.substring(2, channelID.length - 1) : channelID : /^[0-9]+/.test(channelID) ? channelID : null);
+        const heck = [channel].filter(this.extractChannelId);
         if (heck.some(s => s === null)) return ctx.sendTranslate('commands.generic.settings.reset.ignored.invalid', { channel });
+
+        const settings = await ctx.getSettings()!;
+        if (!settings.logging.ignore.includes(channel)) return ctx.sendTranslate('commands.generic.settings.reset.ignored.alreadyIgnored', { channel });
 
         await this.bot.settings.update(ctx.guild!.id, {
           $pull: { 'logging.ignore': this.extractChannelId(channel)! }
         }, (error) => {
           const key = error ? 'unable' : 'success';
           return ctx.sendTranslate(`commands.generic.settings.reset.ignored.${key}`, { channel });
+        });
+      } break;
+      case 'logging.ignoreUsers': {
+        const user = ctx.args.get(2);
+        if (!user) return ctx.sendTranslate('commands.generic.settings.reset.ignoreUsers.none');
+
+        const heck = [user].filter(findId);
+        if (heck.some(user => user === undefined)) return ctx.sendTranslate('commands.generic.settings.reset.ignoreUsers.invalid', { user });
+
+        const settings = await ctx.getSettings()!;
+        const u = await this.bot.client.getRESTUser(findId(user)!);
+        if (!settings.logging.ignoreUsers.includes(u.id)) return ctx.sendTranslate('commands.generic.settings.reset.ignoreUsers.alreadyIgnored', { user });
+
+        await this.bot.settings.update(ctx.guild!.id, {
+          $pull: { 'logging.ignoreUsers': findId(user)! }
+        }, (error) => {
+          const key = error ? 'unable' : 'success';
+          return ctx.sendTranslate(`commands.generic.settings.reset.ignoreUsers.${key}`, { user });
         });
       } break;
       case 'automod.swears':

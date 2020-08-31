@@ -26,6 +26,7 @@ export interface GuildModel extends Document {
     enabled: boolean;
     channelID: string;
     ignore: string[];
+    ignoreUsers: string[];
     events: {
       messageDelete: boolean;
       messageUpdate: boolean;
@@ -101,6 +102,10 @@ const schema = new Schema<GuildModel>({
         type: Boolean,
         default: false
       }
+    },
+    ignoreUsers: {
+      type: Array,
+      default: []
     }
   },
   locale: {

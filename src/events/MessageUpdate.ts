@@ -50,6 +50,12 @@ export default class MessageUpdatedEvent extends Event {
       settings.logging.ignore.includes(m.channel.id)
     ) return;
 
+    // Check if they have users ignored and check if the user is included in the array
+    if (
+      settings.logging.ignoreUsers.length && 
+      settings.logging.ignoreUsers.includes(m.author.id)
+    ) return;
+
     // Check if the channel doesn't exists or Nino doesn't have permission to shoot messages in that channel
     if (
       !guild.channels.has(settings.logging.channelID) ||

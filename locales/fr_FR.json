@@ -26,6 +26,7 @@
             "unableToFind": "Je n'ai pas pu trouver d'utilisateur",
             "notInBanList": "L'utilisateur n'est pas banni de cette guilde.",
             "unable": "Je n'ai pas pu faire cela. `${error}`",
+            "disabled": "Setting **${setting}** is disabled until further notice.",
             "members": {
                 "bot": "Bot",
                 "user": "Utilisatueur"
@@ -201,6 +202,12 @@
                             "unable": "Je n'ai pas pu définir le channel **${channel}** comme journal de mod.",
                             "success": "Channel **${channel}** est maintenant ou tous les journaux de mod seront.",
                             "noPerms": "Je n'ai pas l'autorisation `Send Messages` ou `Embed Links` dans **${channel}**"
+                        },
+                        "ignoreUsers": {
+                          "none": "You must provide a user ID or mention, you can explicit ignore bots using the `bots` keyword or give a list with a space, example: `x!settings set logging.ignoredUsers <@280158289667555328> 321242389106786314`",
+                          "alreadyIgnored": "These users are already ignored: ${members}",
+                          "unable": "I was unable to add **${members}** members to the ignore list",
+                          "success": ":white_check_mark: Added **${members}** members to the ignore list"
                         }
                     },
                     "reset": {
@@ -227,6 +234,13 @@
                         "punishments": {
                             "unable": "Je n'ai pas pu réinitaliser toutes les sanctions",
                             "success": "Les sanctions ont été remises à zèro."
+                        },
+                        "ignoreUsers": {
+                          "none": "No user ID was supplied.",
+                          "unable": "I was unable to remove user **${user}** from the ignore list.",
+                          "success": "I have removed user **${user}** from the ignore list.",
+                          "invalid": "I was unable to find user **${user}** in this guild?",
+                          "alreadyIgnored": "User **${user}** is not being ignored already."
                         }
                     },
                     "enable": {

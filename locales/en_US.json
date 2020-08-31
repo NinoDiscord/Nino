@@ -26,11 +26,12 @@
       "unableToPunish": "I was unable to punish the user.",
       "unableToFind": "I was unable to find user.",
       "notInBanList": "User is not banned in this guild.",
-      "unable": "I was unable to do this. `${error}`",
+      "unable": "I was unable to do this action. `${error}`",
       "none": "None",
       "missingAccess": "I am missing access in the channel you linked.",
       "alreadyBanned": "The user you tried to ban was already banned from this guild.",
       "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
+      "disabled": "Setting **${setting}** is disabled until further notice.",
       "members": {
         "bot": "Bot",
         "user": "User"
@@ -191,8 +192,9 @@
               }
             },
             "ignored": {
-              "none": "You must provide a list of channel ID, mention, or names. You can add mutpile with a space, example: `x!settings set logging.ignore #abc abcd 92827492`",
+              "none": "You must provide a list of channel ID, mention, or names. You can add mutiple with a space, example: `x!settings set logging.ignore #abc abcd 92827492`",
               "invalid": "These channels are invalid to ignore: ${channels}",
+              "alreadyIgnored": "These channels are already ignored: ${channels}",
               "added": {
                 "notEnabled": "I have added **${channels}** channels to the list, since you didn't enable the Logging feature, I enabled it for you.",
                 "enabled": "I have added **${channels}** new channels to the list."
@@ -202,6 +204,12 @@
               "unable": "I was unable to set channel **${channel}** as the mod log.",
               "success": "Channel **${channel}** is now where all mod logs will be at.",
               "noPerms": "I don't have `Send Messages` or `Embed Links` permission in **${channel}**"
+            },
+            "ignoreUsers": {
+              "none": "You must provide a user ID or mention, you can explicit ignore bots using the `bots` keyword or give a list with a space, example: `x!settings set logging.ignoredUsers <@280158289667555328> 321242389106786314`",
+              "alreadyIgnored": "These users are already ignored: ${members}",
+              "unable": "I was unable to add **${members}** members to the ignore list",
+              "success": ":white_check_mark: Added **${members}** members to the ignore list"
             }
           },
           "reset": {
@@ -218,9 +226,11 @@
               "success": "I resetted the muted role."
             },
             "ignored": {
-              "unable": "I was unable to remove channel **${channel}**.",
-              "success": "I have removed channel **${channel}** from not received updates.",
-              "invalid": "I was unable to find channel **${channel}** in this guild?"
+              "none": "No channel ID was supplied.",
+              "unable": "I was unable to remove channel **${channel}** from the ignore list.",
+              "success": "I have removed channel **${channel}** from the ignore list.",
+              "invalid": "I was unable to find channel **${channel}** in this guild?",
+              "alreadyIgnored": "Channel **${channel}** is not being ignored already."
             },
             "logChannel": {
               "unable": "I was unable to reset channel **${channel}**.",
@@ -235,6 +245,13 @@
               "success": "Word **${word}** has been removed from the blacklisted words.",
               "notEnabled": "The **Swearing** automod feature must be enabled to remove a word.",
               "unableToFind": "Word **${word}** isn't blacklisted?"
+            },
+            "ignoreUsers": {
+              "none": "No user ID was supplied.",
+              "unable": "I was unable to remove user **${user}** from the ignore list.",
+              "success": "I have removed user **${user}** from the ignore list.",
+              "invalid": "I was unable to find user **${user}** in this guild?",
+              "alreadyIgnored": "User **${user}** is not being ignored already."
             }
           },
           "enable": {
@@ -339,7 +356,7 @@
             "message": [
               "❯ **Miscellaneous**",
               "Prefix: **${prefix}**",
-              "Mod Log: <#${modlog}>",
+              "Mod Log: ${modlog}",
               "Muted Role: **${mutedRole}**",
               "",
               "❯ **Automod**",

@@ -26,6 +26,7 @@
       "unableToFind": "Não consegui achar o usuário.",
       "notInBanList": "O usuário está banido nesse servidor.",
       "unable": "Não consegui fazer isso. `${error}`",
+      "disabled": "Setting **${setting}** is disabled until further notice.",
       "members": {
         "bot": "Bot",
         "user": "Usuário"
@@ -201,6 +202,12 @@
               "unable": "Não foi possível utilizar o canal **${channel}** para registro de mods.",
               "success": "O canal **${channel}** é onde todos os registros de mods estarão.",
               "noPerms": "Eu não tenho permissões de `Enviar Mensagens` ou `Colocar Links` em **${channel}**"
+            },
+            "ignoreUsers": {
+              "none": "You must provide a user ID or mention, you can explicit ignore bots using the `bots` keyword or give a list with a space, example: `x!settings set logging.ignoredUsers <@280158289667555328> 321242389106786314`",
+              "alreadyIgnored": "These users are already ignored: ${members}",
+              "unable": "I was unable to add **${members}** members to the ignore list",
+              "success": ":white_check_mark: Added **${members}** members to the ignore list"
             }
           },
           "reset": {
@@ -227,6 +234,12 @@
             "punishments": {
               "unable": "Não consegui resetar todas punições.",
               "success": "Punições foram resetadas."
+            },
+            "ignoreUsers": {
+              "none": "You must provide a user ID or mention, you can explicit ignore bots using the `bots` keyword or give a list with a space, example: `x!settings set logging.ignoredUsers <@280158289667555328> 321242389106786314`",
+              "alreadyIgnored": "These users are already ignored: ${members}",
+              "unable": "I was unable to add **${members}** members to the ignore list",
+              "success": ":white_check_mark: Added **${members}** members to the ignore list"
             }
           },
           "enable": {

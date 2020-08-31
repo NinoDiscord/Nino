@@ -1,5 +1,5 @@
 import PermissionUtils from '../../util/PermissionUtils';
-import { Member } from 'eris';
+import { Member, Constants } from 'eris';
 import Bot from '../Bot';
 
 /**
