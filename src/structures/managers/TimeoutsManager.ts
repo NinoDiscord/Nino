@@ -7,11 +7,6 @@ import { TYPES } from '../../types';
 import { setTimeout, Timeout } from 'long-timeout';
 import ms from 'ms';
 
-interface NinoTimeout {
-  timeout: Timeout;
-  index: number;
-}
-
 /**
  * This class makes timeouts resilent, automatic unmutes and unbans will be supported even on an event of a crash.
  *
@@ -20,7 +15,7 @@ interface NinoTimeout {
  */
 @injectable()
 export default class TimeoutsManager {
-  private timeouts: Collection<NinoTimeout>;
+  private timeouts: Collection<Timeout>;
   private bot: Bot;
 
   constructor(@inject(TYPES.Bot) bot: Bot) {
@@ -29,43 +24,34 @@ export default class TimeoutsManager {
   }
 
   private createTimeout(key: string, task: string, member: string, guild: Guild, time: number) {
-    // Look, I know it's horrendous but I think setTimeouts bleed into multiple executions 
-    // when using it asynchronously, but who knows O_o
-    //
-    // 2 days later -- I standed correctly, it does bleed into a lot of executions
-    // i.e: the bigger the timeout, the more spam it'll cause, so this is a patch for now
-    
     const timeout = setTimeout(() => {
       this.bot.redis.hexists('timeouts', key)
         .then((exists) => {
-          if (exists) {
-            const timeout = this.timeouts.get(key)!;
-            if (timeout.index === 1) return;
-            else {
-              this.timeouts.set(key, { timeout: timeout.timeout, index: 1 });
-              this.bot.logger.info(`Timeouts: Exists for key "${key}", now doing task ${task}...`);
+          if (exists && this.timeouts.has(key)) {
+            this.bot.logger.info(`Timeouts: Exists for key "${key}", now doing task ${task}...`);
               
-              this.bot.punishments.punish(
-                { id: member, guild }, 
-                new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
-                '[Automod] Time\'s up!'
-              )
-                .then(() => this.bot.logger.info(`Timeouts: Did task "${task}" on member ${member}`))
-                .catch(this.bot.logger.error)
-                .finally(async () => {
-                  this.bot.logger.info('Timeouts: Done everything for timeout');
+            this.bot.punishments.punish(
+              { id: member, guild }, 
+              new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
+              '[Automod] Time\'s up!'
+            )
+              .then(() => this.bot.logger.info(`Timeouts: Did task "${task}" on member ${member}`))
+              .catch(this.bot.logger.error)
+              .finally(async () => {
+                this.bot.logger.info('Timeouts: Done everything for timeout');
 
-                  await this.bot.redis.hdel('timeouts', key);
-                  timeout.timeout.close();
-                  this.timeouts.delete(key);
-                });
-            }
+                await this.bot.redis.hdel('timeouts', key);
+                timeout.close();
+                this.timeouts.delete(key);
+              });
+          } else {
+            return;
           }
         })
         .catch(this.bot.logger.error);
     }, time);
 
-    this.timeouts.set(key, { timeout, index: 0 });
+    this.timeouts.set(key, timeout);
   }
 
   /**
@@ -102,7 +88,7 @@ export default class TimeoutsManager {
     const key = `timeout:${task}:${guild.id}:${member}`;
     if (this.timeouts.has(key)) {
       const timeout = this.timeouts.get(key)!;
-      timeout.timeout.close();
+      timeout.close();
 
       this.timeouts.delete(key);
     }
