@@ -155,7 +155,8 @@
                         "amountExceeded": "Les sanctions sont limitées à 15 par serveur, veuillez supprimer toutes les sanctions dont vous ne volez pas.",
                         "success": "J'ai réussi à ajouter une punition à la base de données.",
                         "invalidTime": "L'indicateur `--time` doit être une expression de temps currect, il peut de 0.5h, 30m, 0.5 heures ou 30 minutes.",
-                        "invalidRole": "Le rôle est introuvable ou il n'est pas valide"
+                        "invalidRole": "Le rôle est introuvable ou il n'est pas valide",
+                        "noPunishment": "You didn't provide a punishment to do! Please view the list here: ${punishments}."
                     },
                     "remove": {
                         "invalidIndex": "L'index que vous avez fourni n'était pas un index valide. Vous pouvez afficher l'index de punition par `x!settings view`.",

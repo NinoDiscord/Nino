@@ -155,7 +155,8 @@
             "amountExceeded": "Punições limitadas a 15 por servidor, por favor remova as punições que não quer.",
             "success": "Punição adicionada ao banco de dados.",
             "invalidTime": "A flag `--time` deve ser uma expressão de tempo correta, exemplos válidos são 0.5h, 30m, 0.5 horas, ou 30 minutos.",
-            "invalidRole": "Cargo inválido ou não encontrado."
+            "invalidRole": "Cargo inválido ou não encontrado.",
+            "noPunishment": "You didn't provide a punishment to do! Please view the list here: ${punishments}."
           },
           "remove": {
             "invalidIndex": "Índice provido inválido. Veja o rótulo utilizando `x!settings view`.",
