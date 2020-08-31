@@ -53,7 +53,7 @@ export default class MuteCommand extends Command {
     let time!: string;
   
     if (baseReason) {
-      const sliced = baseReason.split(' / ');
+      const sliced = baseReason.split(' | ');
       reason = sliced[0];
       time = sliced[1];
     }

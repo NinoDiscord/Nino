@@ -53,7 +53,7 @@ export default class BanCommand extends Command {
     let time!: string | null;
 
     if (baseReason) {
-      const sliced = baseReason.split(' / ');
+      const sliced = baseReason.split(' | ');
       reason = sliced[0];
       time = sliced[1] || null;
     }
