@@ -8,6 +8,7 @@ import Bot from '../../structures/Bot';
 import CaseSettingsService from '../../structures/services/settings/CaseSettingsService';
 import GuildSettingsService from '../../structures/services/settings/GuildSettingsService';
 import PunishmentService from '../../structures/services/PunishmentService';
+import ms from 'ms';
 
 @injectable()
 export default class ReasonCommand extends Command {
@@ -40,13 +41,34 @@ export default class ReasonCommand extends Command {
 
     const caseModel = await this.caseSettingsService.get(guild.id, parseInt(id));
     const settings = await this.guildSettingsService.get(guild.id);
+    let time: number | null = null;
 
     if (!caseModel || !caseModel.message) return ctx.sendTranslate('commands.moderation.reason.invalid', { id });
+    if (ctx.flags.has('time') || ctx.flags.has('t')) {
+      if (caseModel.type !== 'mute') return ctx.sendTranslate('commands.moderation.reason.notMute', { id });
+
+      const t = ctx.flags.get('time') || ctx.flags.get('t');
+      if (typeof t === 'boolean') return ctx.sendTranslate('global.invalidFlag.string');
+
+      time = ms(t);
+    }
+
     caseModel.reason = reason;
+    if (time !== null) {
+      caseModel.time = time;
+
+      const hasTimeout = await this.bot.timeouts.hasTimeout(caseModel.victim, ctx.guild!, 'unmute');
+      if (!hasTimeout) await this.bot.timeouts.addTimeout(caseModel.victim, ctx.guild!, 'unmute', time);
+      else {
+        await this.bot.timeouts.cancelTimeout(caseModel.victim, ctx.guild!, 'unmute');
+        await this.bot.timeouts.addTimeout(caseModel.victim, ctx.guild!, 'unmute', time);
+      }
+    }
 
     await this.caseSettingsService.update(ctx.guild!.id, parseInt(id), {
       $set: {
-        'reason': reason
+        'reason': reason,
+        'time': time
       }
     }, async (error) => {
       if (error) return ctx.sendTranslate('commands.moderation.reason.error', { id });

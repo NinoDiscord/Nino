@@ -31,7 +31,6 @@ export default class GuildMemberUpdateEvent extends Event {
 
     if (!settings || !settings.mutedRole) return; // Muted role doesn't exist, don't do anything
 
-
     // Fetch audit logs
     if (!guild.members.get(this.client.user.id)!.permission.has('viewAuditLogs')) return;
 

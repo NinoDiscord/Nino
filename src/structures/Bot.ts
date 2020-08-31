@@ -121,11 +121,9 @@ export default class Bot {
     await this.database.connect();
 
     this.logger.info('Success! Connecting to the Redis pool...');
-
     this.addRedisEvents();
     this.addDebugMonitor();
-    // eslint-disable-next-line
-    await this.redis.connect().catch(() => {});
+    await this.redis.connect().catch(() => {}); // eslint-disable-line
 
     this.logger.info('Success! Initializing events...');
     this.events.run();

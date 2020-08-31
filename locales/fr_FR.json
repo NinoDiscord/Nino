@@ -26,6 +26,7 @@
             "unableToFind": "Je n'ai pas pu trouver d'utilisateur",
             "notInBanList": "L'utilisateur n'est pas banni de cette guilde.",
             "unable": "Je n'ai pas pu faire cela. `${error}`",
+            "disabled": "Setting **${setting}** is disabled until further notice.",
             "members": {
                 "bot": "Bot",
                 "user": "Utilisatueur"
@@ -154,12 +155,13 @@
                         "amountExceeded": "Les sanctions sont limitées à 15 par serveur, veuillez supprimer toutes les sanctions dont vous ne volez pas.",
                         "success": "J'ai réussi à ajouter une punition à la base de données.",
                         "invalidTime": "L'indicateur `--time` doit être une expression de temps currect, il peut de 0.5h, 30m, 0.5 heures ou 30 minutes.",
-                        "invalidRole": "Le rôle est introuvable ou il n'est pas valide"
+                        "invalidRole": "Le rôle est introuvable ou il n'est pas valide",
+                        "noPunishment": "You didn't provide a punishment to do! Please view the list here: ${punishments}."
                     },
                     "remove": {
                         "invalidIndex": "L'index que vous avez fourni n'était pas un index valide. Vous pouvez afficher l'index de punition par `x!settings view`.",
                         "noPunishments": "Aucune sanction n'a été trouvée",
-                        "success": "Suppression de la punition #**${id}**."
+                        "success": "Suppression de la punition #**${index}**."
                     },
                     "set": {
                         "modlog": {
@@ -201,6 +203,12 @@
                             "unable": "Je n'ai pas pu définir le channel **${channel}** comme journal de mod.",
                             "success": "Channel **${channel}** est maintenant ou tous les journaux de mod seront.",
                             "noPerms": "Je n'ai pas l'autorisation `Send Messages` ou `Embed Links` dans **${channel}**"
+                        },
+                        "ignoreUsers": {
+                          "none": "You must provide a user ID or mention, you can explicit ignore bots using the `bots` keyword or give a list with a space, example: `x!settings set logging.ignoredUsers <@280158289667555328> 321242389106786314`",
+                          "alreadyIgnored": "These users are already ignored: ${members}",
+                          "unable": "I was unable to add **${members}** members to the ignore list",
+                          "success": ":white_check_mark: Added **${members}** members to the ignore list"
                         }
                     },
                     "reset": {
@@ -227,6 +235,13 @@
                         "punishments": {
                             "unable": "Je n'ai pas pu réinitaliser toutes les sanctions",
                             "success": "Les sanctions ont été remises à zèro."
+                        },
+                        "ignoreUsers": {
+                          "none": "No user ID was supplied.",
+                          "unable": "I was unable to remove user **${user}** from the ignore list.",
+                          "success": "I have removed user **${user}** from the ignore list.",
+                          "invalid": "I was unable to find user **${user}** in this guild?",
+                          "alreadyIgnored": "User **${user}** is not being ignored already."
                         }
                     },
                     "enable": {
@@ -372,7 +387,7 @@
                     "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
                     "• CPU Usage: **${sys.cpu}%**",
                     "• Operating System: **${sys.os}**",
-                    "• Free/Total Memory: **${sys.free}/${sys.total}**"
+                    "• Used/Total Memory: **${sys.free}/${sys.total}**"
                   ]
                 },
                 "time": "Il s'agit actuellement de ${day}/${month}/${year} à ${h}:${m}:${s}",
@@ -423,7 +438,8 @@
                     "noReason": "Vous n'avez pas fourni de raison",
                     "invalid": "Le cas #**${id}** est introuvable",
                     "edited": ":ok_hand: cas mis à jour #**${id}** avec raison **${reason}**",
-                    "error": "Je n'ai pas pu mettre à jour le cas #${id}."
+                    "error": "Je n'ai pas pu mettre à jour le cas #${id}.",
+                    "notMute": "Case #**${id}** was not a mute."
                 },
                 "warnings": {
                     "none": "L'utilisateur n'a aucun avertissement.",

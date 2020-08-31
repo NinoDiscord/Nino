@@ -1,9 +1,10 @@
 import Bot from '../Bot';
 import { Punishment, PunishmentType } from '../services/PunishmentService';
+import { Collection } from '@augu/immutable';
 import { Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
-import { setTimeout } from 'long-timeout';
+import { setTimeout, Timeout } from 'long-timeout';
 import ms from 'ms';
 
 /**
@@ -14,32 +15,43 @@ import ms from 'ms';
  */
 @injectable()
 export default class TimeoutsManager {
+  private timeouts: Collection<Timeout>;
   private bot: Bot;
 
   constructor(@inject(TYPES.Bot) bot: Bot) {
-    this.bot = bot;
+    this.timeouts = new Collection();
+    this.bot      = bot;
   }
 
   private createTimeout(key: string, task: string, member: string, guild: Guild, time: number) {
-    // Look, I know it's horrendous but I think setTimeouts bleed into multiple executions 
-    // when using it asynchronously, but who knows O_o
-    //
-    // 2 days later -- I standed correctly, it does bleed into a lot of executions
-    // i.e: the bigger the timeout, the more spam it'll cause, so this is a patch for now
-    
-    setTimeout(() => {
+    const timeout = setTimeout(() => {
       this.bot.redis.hexists('timeouts', key)
         .then((exists) => {
-          if (exists) {
+          if (exists && this.timeouts.has(key)) {
+            this.bot.logger.info(`Timeouts: Exists for key "${key}", now doing task ${task}...`);
+              
             this.bot.punishments.punish(
               { id: member, guild }, 
               new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
               '[Automod] Time\'s up!'
-            ).finally(() => this.bot.redis.hdel('timeouts', key));
+            )
+              .then(() => this.bot.logger.info(`Timeouts: Did task "${task}" on member ${member}`))
+              .catch(this.bot.logger.error)
+              .finally(async () => {
+                this.bot.logger.info('Timeouts: Done everything for timeout');
+
+                await this.bot.redis.hdel('timeouts', key);
+                timeout.close();
+                this.timeouts.delete(key);
+              });
+          } else {
+            return;
           }
         })
         .catch(this.bot.logger.error);
     }, time);
+
+    this.timeouts.set(key, timeout);
   }
 
   /**
@@ -57,6 +69,16 @@ export default class TimeoutsManager {
   }
 
   /**
+   * Checks if a timeout is existant
+   * @param member The member
+   * @param guild The guild
+   * @param task The task
+   */
+  hasTimeout(member: string, guild: Guild, task: 'unban' | 'unmute') {
+    return this.bot.redis.hexists('timeouts', `timeout:${task}:${guild.id}:${member}`);
+  }
+
+  /**
    * Cancel a timeout
    * @param member the member
    * @param guild the guild
@@ -64,6 +86,13 @@ export default class TimeoutsManager {
    */
   async cancelTimeout(member: string, guild: Guild, task: string) {
     const key = `timeout:${task}:${guild.id}:${member}`;
+    if (this.timeouts.has(key)) {
+      const timeout = this.timeouts.get(key)!;
+      timeout.close();
+
+      this.timeouts.delete(key);
+    }
+
     return this.bot.redis.hdel('timeouts', key);
   }
 

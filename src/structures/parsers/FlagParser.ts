@@ -39,4 +39,13 @@ export default class FlagParser {
     const flags = this.parse();
     return flags[flag];
   }
+
+  /**
+   * Check if a flag is supplied
+   * @param flag The flag
+   */
+  has(flag: string) {
+    const flags = this.parse();
+    return flags.hasOwnProperty(flag);
+  }
 }

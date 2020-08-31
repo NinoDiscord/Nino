@@ -25,6 +25,7 @@ export default class MessageDeleteEvent extends Event {
     // Don't do anything about this if they don't want it enabled
     if (!settings.logging.enabled || !settings.logging.events.messageDelete) return;
     if (settings.logging.ignore.length && settings.logging.ignore.includes(message.channel.id)) return;
+    if (settings.logging.ignoreUsers.length && settings.logging.ignoreUsers.includes(message.author.id)) return;
 
     // Don't do anything if the bot doesn't have sendMessages perm or the channel doesn't exist
     if (

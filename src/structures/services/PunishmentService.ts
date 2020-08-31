@@ -14,6 +14,7 @@ import { GuildModel } from '../../models/GuildSchema';
 import TimeoutsManager from '../managers/TimeoutsManager';
 import ms = require('ms');
 import { fetchGuild } from '../../util/DiscordUtils';
+import { firstUpper } from '../../util';
 
 /**
  * Punishment types
@@ -375,19 +376,19 @@ export default class PunishmentService {
   private createModLogEmbed(member: User | Member, moderator: Member, settings: GuildModel, caseModel: CaseModel, punishmentType: string) {
     const action = this.determineType(punishmentType);
     let description = stripIndents`
-        **User**: ${member.username}#${member.discriminator} (${member.id})
-        **Moderator**: ${moderator.username}#${moderator.discriminator}
-        **Reason**: ${caseModel.reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${caseModel.id} <reason>\`*)`}
+        • **Victim**: ${member.username}#${member.discriminator} (${member.id})
+        • **Moderator**: ${moderator.username}#${moderator.discriminator}
+        • **Reason**: ${caseModel.reason || `Unknown (*edit the case with \`${settings!.prefix}reason ${caseModel.id} <reason>\`*)`}
       `;
 
-    if (caseModel.soft) description += '\n**Type**: Soft Ban';
+    if (caseModel.soft) description += '\n• **Type**: Soft Ban';
     else if (caseModel.time) {
       const time = ms(caseModel.time, { long: true });
-      description += `\n**Time**: ${time}`;
+      description += `\n• **Time**: ${time}`;
     }
 
     return new EmbedBuilder()
-      .setTitle(`Case #${caseModel.id} | ${member.username} has been ${punishmentType + action.suffix}`)
+      .setAuthor(`${firstUpper(punishmentType)} | Case #${caseModel.id}`, undefined, member.avatarURL)
       .setColor(action.color)
       .setDescription(description)
       .build();
@@ -395,11 +396,11 @@ export default class PunishmentService {
 
   determineType(type: string): { color: number; suffix: string } {
     const action = {
-      ban: 0xff0000,
-      kick: 0xfff000,
-      mute: 0xfff000,
-      unban: 0xfff00,
-      unmute: 0xfff00,
+      ban: 0xCC5151,
+      kick: 0xFFFF7F,
+      mute: 0xFFFF7F,
+      unban: 0x66B266,
+      unmute: 0x66B266,
     }[type];
     let suffix!: string;
     if (type === 'ban' || type === 'unban') suffix = 'ned';
