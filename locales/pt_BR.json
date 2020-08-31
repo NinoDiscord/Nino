@@ -160,7 +160,7 @@
           "remove": {
             "invalidIndex": "Índice provido inválido. Veja o rótulo utilizando `x!settings view`.",
             "noPunishments": "Nenhuma punição encontrada.",
-            "success": "Removida punição #**${id}**."
+            "success": "Removida punição #**${index}**."
           },
           "set": {
             "modlog": {

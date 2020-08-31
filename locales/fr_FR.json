@@ -160,7 +160,7 @@
                     "remove": {
                         "invalidIndex": "L'index que vous avez fourni n'était pas un index valide. Vous pouvez afficher l'index de punition par `x!settings view`.",
                         "noPunishments": "Aucune sanction n'a été trouvée",
-                        "success": "Suppression de la punition #**${id}**."
+                        "success": "Suppression de la punition #**${index}**."
                     },
                     "set": {
                         "modlog": {

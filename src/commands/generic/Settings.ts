@@ -134,7 +134,7 @@ export default class SettingsCommand extends Command {
     const i = Math.round(Number(index)) - 1;
     settings!.punishments.splice(i, 1);
     settings!.save();
-    return ctx.sendTranslate('commands.generic.settings.remove.success', { index: i });
+    return ctx.sendTranslate('commands.generic.settings.remove.success', { index });
   }
 
   async set(ctx: Context) {
