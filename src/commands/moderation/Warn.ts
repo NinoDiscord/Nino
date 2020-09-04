@@ -42,6 +42,7 @@ export default class WarnCommand extends Command {
     
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
     else if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
+    else if (member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
 
     const punishments = await this.punishmentService.addWarning(member!);
     for (let i of punishments) {

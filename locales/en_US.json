@@ -32,6 +32,7 @@
       "alreadyBanned": "The user you tried to ban was already banned from this guild.",
       "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
       "disabled": "Setting **${setting}** is disabled until further notice.",
+      "banMods": "Nice try... you aren't allowed to perform this action on a Moderator.",
       "members": {
         "bot": "Bot",
         "user": "User"

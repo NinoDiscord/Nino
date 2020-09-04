@@ -35,6 +35,7 @@
             "missingAccess": "I am missing access in the channel you linked.",
             "alreadyBanned": "The user you tried to ban was already banned from this guild.",
             "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
+            "banMods": "Nice try... you aren't allowed to perform this action on a Moderator.",
             "events": {
               "messageUpdate": "Message Updates",
               "messageDelete": "Message Deletions"

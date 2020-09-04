@@ -38,7 +38,8 @@
       "events": {
         "messageUpdate": "Message Updates",
         "messageDelete": "Message Deletions"
-      }
+      },
+      "banMods": "Nice try... you aren't allowed to perform this action on a Moderator."
     },
     "errors": {
       "title": "Não foi possível usar comando ${command}!",

@@ -40,6 +40,7 @@ export default class KickCommand extends Command {
 
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
     else if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
+    else if (member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     const punishment = new Punishment(PunishmentType.Kick, {

@@ -38,6 +38,7 @@ export default class BanCommand extends Command {
     if (!member || !(member instanceof Member)) member = { id: userID, guild: ctx.guild! };
     else if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
     else if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
+    else if (member instanceof Member && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
 
     try {
       const bans = await ctx.guild!.getBans();
