@@ -64,7 +64,10 @@ export default class TimeoutsManager {
   async addTimeout(member: string, guild: Guild, task: 'unban' | 'unmute', time: number) {
     this.bot.logger.info(`Added timeout: to ${task} in ${ms(time)}`);
     const key = `timeout:${task}:${guild.id}:${member}`;
-    await this.bot.redis.hset('timeouts', key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
+
+    if (!(await this.hasTimeout(member, guild, task)))
+      await this.bot.redis.hset('timeouts', key, `${Date.now()}:${time}:${member}:${guild.id}:${task}`);
+
     this.createTimeout(key, task, member, guild, time);
   }
 
@@ -86,7 +89,7 @@ export default class TimeoutsManager {
    */
   async cancelTimeout(member: string, guild: Guild, task: string) {
     const key = `timeout:${task}:${guild.id}:${member}`;
-    if (this.timeouts.has(key)) {
+    if ((await this.hasTimeout(member, guild, <any> task)) && this.timeouts.has(key)) {
       const timeout = this.timeouts.get(key)!;
       timeout.close();
 

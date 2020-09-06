@@ -62,6 +62,7 @@ export default class AutoModSpam {
     if (!(m.channel instanceof TextChannel)) return false;
 
     const me = m.channel.guild.members.get(this.bot.client.user.id)!;
+    const self = m.channel.guild.members.get(m.author.id)!;
 
     if (
       !PermissionUtils.above(me, m.member!) ||
@@ -69,6 +70,8 @@ export default class AutoModSpam {
       m.author.bot ||
       m.channel.permissionsOf(m.author.id).has('manageMessages')
     ) return false;
+
+    if (self && self.permission.has('banMembers')) return false;
 
     const settings = await this.bot.settings.get(m.channel.guild.id);
     if (!settings || !settings.automod.spam) return false;
@@ -91,7 +94,7 @@ export default class AutoModSpam {
         const user = await this.bot.userSettings.get(m.author.id);
         const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
   
-        const response = locale.translate('automod.invites', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });  
+        const response = locale.translate('automod.spam', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });  
         await m.channel.createMessage(response);
         return true;
       }
