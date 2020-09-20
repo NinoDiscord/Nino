@@ -39,7 +39,10 @@ export default class ReasonCommand extends Command {
     const reason = ctx.args.slice(1).join(' ');
     const guild = ctx.guild!;
 
-    const caseModel = await this.caseSettingsService.get(guild.id, parseInt(id));
+    const caseID = Number(id);
+    if (isNaN(caseID)) return ctx.sendTranslate('global.nan');
+
+    const caseModel = await this.caseSettingsService.get(guild.id, caseID);
     const settings = await this.guildSettingsService.get(guild.id);
     let time: number | null = null;
 

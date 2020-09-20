@@ -40,7 +40,7 @@ export default class MuteCommand extends Command {
     });
 
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
-    if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
+    if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
     if (member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
 
     const settings = await ctx.getSettings();

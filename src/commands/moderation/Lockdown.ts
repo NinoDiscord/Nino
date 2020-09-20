@@ -72,7 +72,7 @@ export default class LockdownCommand extends Command {
       } : {
         role: this.getRole(role, ctx)
       }).filter(({ role }) => 
-        role && PermissionUtils.topRole(ctx.me) && PermissionUtils.topRole(ctx.me)!.position > role.position
+        role && PermissionUtils.topRole(ctx.me!) && PermissionUtils.topRole(ctx.me!)!.position > role.position
       ).map(role => role!);
 
     if (!roles.length) return ctx.sendTranslate('commands.moderation.lockdown.cantModify');
@@ -98,8 +98,8 @@ export default class LockdownCommand extends Command {
     }
 
     for (const channel of channels) {
-      const me = channel.permissionsOf(ctx.me.id);
-      if (((ctx.me.permission.allow | me.allow) & Constants.Permissions.manageChannels) !== 0) {
+      const me = channel.permissionsOf(ctx.me!.id);
+      if (((ctx.me!.permission.allow | me.allow) & Constants.Permissions.manageChannels) !== 0) {
         if (release as boolean) {
           const former = await this.bot.redis.get(`lockdown:${channel.id}`);
           console.log(former);

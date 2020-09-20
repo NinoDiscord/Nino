@@ -20,7 +20,7 @@ export default class CommandContext {
   public locale: Language | undefined;
   public settings: GuildModel | undefined;
 
-  constructor(bot: Bot, m: Message, args: string[], locale: Language | undefined, settings: GuildModel | undefined) {
+  constructor(bot: Bot, m: Message<TextChannel>, args: string[], locale: Language | undefined, settings: GuildModel | undefined) {
     this.bot = bot;
     this.message = m;
     this.args = new ArgumentParser(args);
@@ -42,11 +42,10 @@ export default class CommandContext {
 
   embed(content: EmbedOptions) {
     if (this.guild) {
-      if (!this.me.permission.has('embedLinks')) {
-        const message = unembedify(content);
-        return this.send(message);
-      } else {
+      if (this.me!.permission.has('embedLinks')) {
         return this.message.channel.createMessage({ embed: content });
+      } else {
+        return this.send(unembedify(content));
       }
     } else {
       return this.message.channel.createMessage({ embed: content });
@@ -63,9 +62,7 @@ export default class CommandContext {
   }
 
   get guild() {
-    return (this.message.channel instanceof TextChannel) ? 
-      (this.message.channel as TextChannel).guild : 
-      undefined;
+    return this.message.channel.type === 0 ? this.message.channel.guild : undefined;
   }
 
   get channel() {
@@ -81,7 +78,7 @@ export default class CommandContext {
   }
 
   get me() {
-    return this.guild!.members.get(this.bot.client.user.id)!;
+    return this.guild ? this.guild.members.get(this.client.user.id) : undefined;
   }
 
   getSettings() {
