@@ -20,7 +20,7 @@ export default class CommandContext {
   public locale: Language | undefined;
   public settings: GuildModel | undefined;
 
-  constructor(bot: Bot, m: Message<TextChannel>, args: string[], locale: Language | undefined, settings: GuildModel | undefined) {
+  constructor(bot: Bot, m: Message, args: string[], locale: Language | undefined, settings: GuildModel | undefined) {
     this.bot = bot;
     this.message = m;
     this.args = new ArgumentParser(args);
@@ -62,7 +62,9 @@ export default class CommandContext {
   }
 
   get guild() {
-    return this.message.channel.type === 0 ? this.message.channel.guild : undefined;
+    return (this.message.channel instanceof TextChannel) ? 
+      (this.message.channel as TextChannel).guild : 
+      undefined;
   }
 
   get channel() {
