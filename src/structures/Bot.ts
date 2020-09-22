@@ -59,6 +59,7 @@ export interface Config {
   dbAuth: {
     username: string;
     password: string;
+    source: string;
   } | undefined;
 }
 

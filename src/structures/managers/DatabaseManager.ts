@@ -8,7 +8,7 @@ import 'reflect-metadata';
 
 @injectable()
 export default class DatabaseManager {
-  public auth?: { username: string; password: string; };
+  public auth?: { username: string; password: string; source: string; };
   public admin!: Admin;
   public logger: Logger = new Logger();
   public uri: string;
@@ -26,6 +26,7 @@ export default class DatabaseManager {
       useNewUrlParser: true,
       useUnifiedTopology: true,
       autoIndex: false,
+      authSource: this.auth ? this.auth.source : undefined,
       auth: this.auth ? {
         user: this.auth.username,
         password: this.auth.password
