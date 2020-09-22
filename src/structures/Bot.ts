@@ -56,6 +56,11 @@ export interface Config {
     token: string;
     id: string;
   } | undefined;
+  dbAuth: {
+    username: string;
+    password: string;
+    source: string;
+  } | undefined;
 }
 
 @injectable()
