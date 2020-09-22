@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": "https://github.com/NinoDiscord/Nino",
@@ -29,9 +29,9 @@
     "ohlookitsderpy"
   ],
   "dependencies": {
-    "@augu/immutable": "0.4.2",
+    "@augu/immutable": "0.5.0",
     "@augu/sysinfo": "0.2.1",
-    "@sentry/node": "5.22.3",
+    "@sentry/node": "5.24.2",
     "common-tags": "1.8.0",
     "eris": "0.13.3",
     "inversify": "5.0.1",
@@ -40,27 +40,27 @@
     "js-yaml": "3.14.0",
     "leeks.js": "0.0.9",
     "long-timeout": "0.1.1",
-    "mongoose": "5.10.2",
+    "mongoose": "5.10.6",
     "ms": "2.1.2",
     "reflect-metadata": "0.1.13",
     "wumpfetch": "0.3.1"
   },
   "devDependencies": {
     "@types/common-tags": "1.8.0",
-    "@types/ioredis": "4.17.3",
-    "@types/jest": "26.0.10",
+    "@types/ioredis": "4.17.4",
+    "@types/jest": "26.0.14",
     "@types/js-yaml": "3.12.4",
     "@types/mongoose": "5.7.36",
     "@types/ms": "0.7.31",
     "@types/node": "13.13.5",
-    "@typescript-eslint/eslint-plugin": "4.0.1",
-    "@typescript-eslint/parser": "4.0.1",
-    "eslint": "7.7.0",
+    "@typescript-eslint/eslint-plugin": "4.1.1",
+    "@typescript-eslint/parser": "4.1.1",
+    "eslint": "7.9.0",
     "jest": "26.4.2",
     "jest-mock-extended": "1.0.10",
     "nodemon": "2.0.4",
     "ps-list": "7.2.0",
-    "ts-jest": "26.3.0",
-    "typescript": "4.0.2"
+    "ts-jest": "26.4.0",
+    "typescript": "4.0.3"
   }
 }

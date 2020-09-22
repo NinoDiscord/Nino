@@ -42,11 +42,10 @@ export default class CommandContext {
 
   embed(content: EmbedOptions) {
     if (this.guild) {
-      if (!this.me.permission.has('embedLinks')) {
-        const message = unembedify(content);
-        return this.send(message);
-      } else {
+      if (this.me!.permission.has('embedLinks')) {
         return this.message.channel.createMessage({ embed: content });
+      } else {
+        return this.send(unembedify(content));
       }
     } else {
       return this.message.channel.createMessage({ embed: content });
@@ -81,7 +80,7 @@ export default class CommandContext {
   }
 
   get me() {
-    return this.guild!.members.get(this.bot.client.user.id)!;
+    return this.guild ? this.guild.members.get(this.client.user.id) : undefined;
   }
 
   getSettings() {

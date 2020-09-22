@@ -92,7 +92,8 @@ try {
     sentryDSN: undefined,
     botlists: undefined,
     webhook: undefined,
-    ksoft: undefined
+    ksoft: undefined,
+    dbAuth: undefined
   };
 }
 

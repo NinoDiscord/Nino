@@ -1,7 +1,7 @@
 {
     "contributors": [],
     "translator": "jacob#5418",
-    "completion": "incomplete",
+    "completion": "completed",
     "aliases": ["french", "francias", "françias", "fr"],
     "code": "fr_FR",
     "flag": ":flag_fr:",
@@ -26,18 +26,19 @@
             "unableToFind": "Je n'ai pas pu trouver d'utilisateur",
             "notInBanList": "L'utilisateur n'est pas banni de cette guilde.",
             "unable": "Je n'ai pas pu faire cela. `${error}`",
-            "disabled": "Setting **${setting}** is disabled until further notice.",
+            "disabled": "Le réglagef **${setting}** est désactivé jusqu'à nouvel ordre.",
             "members": {
                 "bot": "Bot",
                 "user": "Utilisatueur"
             },
-            "none": "None",
-            "missingAccess": "I am missing access in the channel you linked.",
-            "alreadyBanned": "The user you tried to ban was already banned from this guild.",
-            "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
+            "none": "Non",
+            "missingAccess": "Je n'ai pas accés à la chaîne que vous avez associeé.",
+            "alreadyBanned": "L'utilisateur que vous avez essayé d'exclure a déjà été banni de cette guilde.",
+            "noPerms": "Je ne suis pas autorisé à consulter la liste des bannissements, veuillez vous assurer que j'ai cette autorisation!",
+            "banMods": "Bien essayé... vous n'êtes pas autorisé à effectuer cette action sur un modérateur.",
             "events": {
-              "messageUpdate": "Message Updates",
-              "messageDelete": "Message Deletions"
+              "messageUpdate": "Mises à jour des messages",
+              "messageDelete": "Suppression de messages"
             }
         },
         "errors": {
@@ -205,10 +206,10 @@
                             "noPerms": "Je n'ai pas l'autorisation `Send Messages` ou `Embed Links` dans **${channel}**"
                         },
                         "ignoreUsers": {
-                          "none": "You must provide a user ID or mention, you can explicit ignore bots using the `bots` keyword or give a list with a space, example: `x!settings set logging.ignoredUsers <@280158289667555328> 321242389106786314`",
-                          "alreadyIgnored": "These users are already ignored: ${members}",
-                          "unable": "I was unable to add **${members}** members to the ignore list",
-                          "success": ":white_check_mark: Added **${members}** members to the ignore list"
+                          "none": "Vous devez fournir un UserID ou une mention, vous pouvez ignorer explicitement les bots en utilisant le mot-clé `bots` ou donner une liste avec un espace, exemple:  `x!settings set logging.ignoredUsers <@280158289667555328> 321242389106786314`",
+                          "alreadyIgnored": "Ces utilisateurs sont déjà ignorés: ${members}",
+                          "unable": "Je n'ai pas pu ajouter **${members}** membres à la liste des ignorés",
+                          "success": ":white_check_mark: Ajout de **${members}** membres à la liste des ignorés"
                         }
                     },
                     "reset": {
@@ -237,11 +238,11 @@
                             "success": "Les sanctions ont été remises à zèro."
                         },
                         "ignoreUsers": {
-                          "none": "No user ID was supplied.",
-                          "unable": "I was unable to remove user **${user}** from the ignore list.",
-                          "success": "I have removed user **${user}** from the ignore list.",
-                          "invalid": "I was unable to find user **${user}** in this guild?",
-                          "alreadyIgnored": "User **${user}** is not being ignored already."
+                          "none": "Aucun ID utilisateur n'a été fourni.",
+                          "unable": "Je n'ai pas pu supprimer l'utilisateur **${user}** de la liste des ignorés.",
+                          "success": "J'ai supprimé l'utilisateur **${user}** de la liste des ignorés.",
+                          "invalid": "Je n'ai pas pu trouver l'utilisateur **${user}** dans cette guilde?",
+                          "alreadyIgnored": "L'utilisateur **${user}** n'est pas déjà ignoré"
                         }
                     },
                     "enable": {
@@ -338,19 +339,19 @@
                     },
                     "view": {
                       "punishment": [
-                        "• #${index}. **${type} with ${warnings} warnings**",
-                        "   • Role: ${roleId}",
-                        "   • Time: ${time}",
-                        "   • Soft: ${soft}"
+                        "• #${index}. **${type} avec ${warnings} sanctions**",
+                        "   • Rôle: ${roleId}",
+                        "   • Temps: ${time}",
+                        "   • Doux: ${soft}"
                       ],
                       "message": [
-                        "❯ **Miscellaneous**",
-                        "Prefix: **${prefix}**",
-                        "Mod Log: <#${modlog}>",
-                        "Muted Role: **${mutedRole}**",
+                        "❯ **Divers**",
+                        "Prefixe: **${prefix}**",
+                        "Mod journals: <#${modlog}>",
+                        "Muet Rôle: **${mutedRole}**",
                         "",
                         "❯ **Automod**",
-                        "${badwords.enabled} **Swearing**${words}",
+                        "${badwords.enabled} **Jurant**${words}",
                         "${dehoist.enabled} **Dehoisting**",
                         "${invites.enabled} **Invites**",
                         "${mention.enabled} **Mentions**",
@@ -358,10 +359,10 @@
                         "${spam.enabled} **Spam**",
                         "",
                         "❯ **Logging**",
-                        "${logging.enabled} **Enabled**",
+                        "${logging.enabled} **Activée**",
                         "${events}",
                         "",
-                        "❯ **Punishments**",
+                        "❯ **Sanctions**",
                         "${punishments}"
                       ]
                     }
@@ -373,21 +374,21 @@
                 "statistics": {
                   "title": "${username} [${version}]",
                   "description": [
-                    "❯ **Miscellaneous**",
+                    "❯ **Divers**",
                     "• Guilds: **${guilds}**",
-                    "• Users: **${users}**",
-                    "• Channels: **${channels}**",
-                    "• Uptime: **${uptime}**",
+                    "• L'utilisateurs: **${users}**",
+                    "• Chaînes: **${channels}**",
+                    "• Disponibilité: **${uptime}**",
                     "• Messages: **${messagesSeen}**",
-                    "• Commands Executed: **${commandsExecuted}**",
-                    "• Most Used Command: **${mostUsed.command} (${mostUsed.executed} executions)**",
+                    "• commandes exécutées: **${commandsExecuted}**",
+                    "• Commande la plus utilisée: **${mostUsed.command} (${mostUsed.executed} executions)**",
                     "• Shards: **${shards.alive}/${shards.total}** (~${shards.latency}ms)",
                     "",
                     "❯ **System**",
-                    "• Memory Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
+                    "• Utilisation de la mémoire Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
                     "• CPU Usage: **${sys.cpu}%**",
-                    "• Operating System: **${sys.os}**",
-                    "• Used/Total Memory: **${sys.free}/${sys.total}**"
+                    "• Systéme opérateur: **${sys.os}**",
+                    "• Mémoire utlisée / totale: **${sys.free}/${sys.total}**"
                   ]
                 },
                 "time": "Il s'agit actuellement de ${day}/${month}/${year} à ${h}:${m}:${s}",

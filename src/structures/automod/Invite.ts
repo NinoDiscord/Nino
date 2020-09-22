@@ -37,6 +37,7 @@ export default class AutoModInvite {
     if (!(m.channel instanceof TextChannel)) return false;
 
     const me = m.channel.guild.members.get(this.bot.client.user.id)!;
+    const self = m.channel.guild.members.get(m.author.id)!;
 
     if (
       !PermissionUtils.above(me, m.member!) ||
@@ -45,6 +46,8 @@ export default class AutoModInvite {
       m.channel.permissionsOf(m.author.id).has('manageMessages')
     ) return false;
 
+    if (self && self.permission.has('banMembers')) return false;
+
     if (m.content.match(this.regex)) {
       const settings = await this.bot.settings.get(m.channel.guild.id);
       if (!settings || !settings.automod.invites) return false;
@@ -52,7 +55,7 @@ export default class AutoModInvite {
       const user = await this.bot.userSettings.get(m.author.id);
       const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
 
-      const response = locale.translate('automod.invites', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });
+      const response = locale.translate('automod.invite', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });
       await m.channel.createMessage(response);
       await m.delete();
 
@@ -60,7 +63,7 @@ export default class AutoModInvite {
       for (let punishment of punishments) await this.bot.punishments.punish(
         m.member!,
         punishment,
-        'Automod (Advertising)'
+        '[Automod] Advertising'
       );
 
       return true;

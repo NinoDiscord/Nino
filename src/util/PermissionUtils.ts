@@ -47,10 +47,7 @@ export default class PermissionUtils {
    * @param member the member
    */
   public static topRole(member: Member): Role | undefined {
-    if (
-      member === null ||
-        !member.roles.length
-    ) return undefined;
+    if (member === null || member === undefined || !member.roles.length) return undefined;
 
     return member.roles
       .map(r => member.guild.roles.get(r))

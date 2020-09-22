@@ -102,7 +102,7 @@ export default class CommandService {
     return undefined;
   }
 
-  async handle(m: Message) {
+  async handle(m: Message<TextChannel>) {
     this.bot.statistics.messagesSeen++;
     if (m.author.bot) return;
 

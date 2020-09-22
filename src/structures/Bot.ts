@@ -56,6 +56,11 @@ export interface Config {
     token: string;
     id: string;
   } | undefined;
+  dbAuth: {
+    username: string;
+    password: string;
+    source: string;
+  } | undefined;
 }
 
 @injectable()
@@ -153,6 +158,7 @@ export default class Bot {
   private addRedisEvents() {
     this.redis.once('ready', () => this.logger.redis(`Created a Redis pool at ${this.config.redis.host}:${this.config.redis.port}${this.config.redis.db ? `, with database ID: ${this.config.redis.db}` : ''}`));
     this.redis.on('wait', () => this.logger.redis('Redis has disconnected and awaiting a new pool...'));
+    this.redis.on('error', error => this.logger.redis('Unable to establish a connection with Redis', error));
   }
 
   private addDebugMonitor() {

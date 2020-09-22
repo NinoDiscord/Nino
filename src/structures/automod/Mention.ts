@@ -13,6 +13,7 @@ export default class AutoModMention {
     if (!(m.channel instanceof TextChannel)) return false;
 
     const me = m.channel.guild.members.get(this.bot.client.user.id)!;
+    const self = m.channel.guild.members.get(m.author.id)!;
 
     if (
       !PermissionUtil.above(me, m.member!) ||
@@ -20,6 +21,8 @@ export default class AutoModMention {
       m.author.bot ||
       m.channel.permissionsOf(m.author.id).has('manageMessages')
     ) return false;
+
+    if (self && self.permission.has('banMembers')) return false;
 
     const settings = await this.bot.settings.get(m.channel.guild.id);
     if (!settings || !settings.automod.mention) return false;

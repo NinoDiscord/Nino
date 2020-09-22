@@ -44,7 +44,7 @@ export default class PardonCommand extends Command {
     });
 
     if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.hierarchy');
-    else if (!PermissionUtils.above(ctx.me, member)) return ctx.sendTranslate('global.botHierarchy');
+    else if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
 
     await this.punishmentService.pardon(member!, amount);
     const warns = await this.warningService.get(ctx.guild!.id, member.id);

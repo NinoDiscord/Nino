@@ -28,7 +28,8 @@ describe('CommandService', () => {
     sentryDSN: undefined,
     botlists: undefined,
     webhook: undefined,
-    ksoft: undefined
+    ksoft: undefined,
+    dbAuth: undefined
   });
   const bot = container.get<Bot>(TYPES.Bot);
   const commandService = bot.manager.service;
