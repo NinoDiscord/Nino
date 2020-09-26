@@ -28,9 +28,7 @@ export default class ShellCommand extends Command {
     const script = ctx.args.join(' ');
     let result: string;
     try {
-      result = execSync(script)
-        .toString()
-        .trim();
+      result = execSync(script, { encoding: 'utf-8' });
 
       await message.edit(stripIndents`
         > :pencil2: **Script was evaluated successfully, here is the result:**
