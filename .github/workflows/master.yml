@@ -43,4 +43,4 @@ jobs:
             rm yarn.lock
             yarn
             yarn build
-            pm2 restart nino
+            pm2 restart nino-prod
