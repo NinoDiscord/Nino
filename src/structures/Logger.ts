@@ -9,6 +9,7 @@ enum LogLevel {
   WARN,
   ERROR,
   REDIS,
+  DEBUG,
   DATABASE
 }
 
@@ -67,16 +68,20 @@ export default class Logger {
         lvlText = leeks.hex('#D82C20', `[REDIS/${process.pid}]`);
       } break;
 
+      case LogLevel.DEBUG: {
+        lvlText = leeks.hex('#987DC5', `[DEBUG/${process.pid}]`);
+      } break;
+
       case LogLevel.DATABASE: {
         lvlText = leeks.rgb([88, 150, 54], `[MONGODB/${process.pid}]`);
       } break;
     }
 
-    const msg = message.map(m => m instanceof Array ? `[${(m as any[]).join(', ')}]` : m instanceof Object ? inspect(m) : m as string).join('\n');
+    const msg = message.map(m => m instanceof Array ? `[${m.join(', ')}]` : m instanceof Object ? inspect(m) : m as string).join('\n');
     appendFileSync(`${this.logPath}${sep}Nino.log`, `${this.getDate()} ${this.strip(lvlText)} -> ${this.strip(msg)}\n`);
     
     const output = severity === LogSeverity.ERROR ? process.stderr : process.stdout;
-    output.write(`${this.colors.gray(this.getDate())} ${lvlText} -> ${msg}\n`);
+    output.write(`${this.colors.gray(this.getDate())} ${lvlText} <=> ${msg}\n`);
   }
 
   info(...message: LogMessage) {
@@ -93,6 +98,10 @@ export default class Logger {
 
   redis(...message: LogMessage) {
     this.write(LogLevel.REDIS, LogSeverity.NONE, ...message);
+  }
+
+  debug(...message: LogMessage) {
+    this.write(LogLevel.DEBUG, LogSeverity.NONE, ...message);
   }
 
   database(...message: LogMessage) {
