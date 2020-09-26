@@ -62,6 +62,7 @@ import ShardDisconnectedEvent from './events/ShardDisconnected';
 import ShardReadyEvent from './events/ShardReady';
 import ShardResumedEvent from './events/ShardResume';
 import UserUpdateEvent from './events/UserUpdate';
+import DebugEvent from './events/Debug';
 import UserSettingsService from './structures/services/settings/UserSettingsService';
 import LocalizationManager from './structures/managers/LocalizationManager';
 import { Collection } from '@augu/immutable';
@@ -103,7 +104,13 @@ container.bind<Client>(TYPES.Client).toConstantValue(
   new Client(config.discord.token, {
     maxShards: 'auto',
     getAllUsers: true,
-    restMode: true
+    restMode: true,
+    intents: [
+      'guildBans',
+      'guildMembers',
+      'guildMessages',
+      'guilds'
+    ]
   })
 );
 
@@ -376,6 +383,11 @@ container
 container
   .bind<NinoEvent>(TYPES.Event)
   .to(UserUpdateEvent)
+  .inSingletonScope();
+
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(DebugEvent)
   .inSingletonScope();
 
 export default container;

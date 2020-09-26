@@ -51,6 +51,7 @@ export interface Config {
     topggtoken: string | undefined;
     bfdtoken: string | undefined;
     blstoken: string | undefined;
+    deltoken: string | undefined;
   } | undefined;
   webhook: {
     token: string;

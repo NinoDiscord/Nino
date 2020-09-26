@@ -170,9 +170,25 @@ export default class BotListService {
         }).send();
 
         const func = res.statusCode === 200 ? 'info' : 'warn';
-        this.bot.logger[func](`Posted statistics to botlist.space (${res.statusCode}): ${res.body}`);
+        this.bot.logger[func](`Posted command statistics to Discord Services (${res.statusCode}): ${res.body}`);
         this.hasPostedCmds = true;
       }
+    }
+
+    if (this.bot.config.botlists.hasOwnProperty('deltoken')) {
+      this.bot.logger.info('Now posting statistics to Discord Extreme List'); // btw ice is a cutie - augu
+
+      const res = await w({
+        method: 'POST',
+        url: `https://api.discordextremelist.xyz/v2/bot/${this.bot.client.user.id}/stats`,
+        data: {
+          guildCount: this.bot.client.guilds.size,
+          shardCount: this.bot.client.shards.size
+        }
+      }).send();
+
+      const func = res.statusCode === 200 ? 'info' : 'warn';
+      this.bot.logger[func](`Posted statistics to Discord Extreme List (${res.statusCode}): ${res.body}`);
     }
   }
 }

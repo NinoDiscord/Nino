@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": "https://github.com/NinoDiscord/Nino",
@@ -40,7 +40,7 @@
     "js-yaml": "3.14.0",
     "leeks.js": "0.0.9",
     "long-timeout": "0.1.1",
-    "mongoose": "5.10.6",
+    "mongoose": "5.10.7",
     "ms": "2.1.2",
     "reflect-metadata": "0.1.13",
     "wumpfetch": "0.3.1"
@@ -53,8 +53,8 @@
     "@types/mongoose": "5.7.36",
     "@types/ms": "0.7.31",
     "@types/node": "13.13.5",
-    "@typescript-eslint/eslint-plugin": "4.1.1",
-    "@typescript-eslint/parser": "4.1.1",
+    "@typescript-eslint/eslint-plugin": "4.2.0",
+    "@typescript-eslint/parser": "4.2.0",
     "eslint": "7.9.0",
     "jest": "26.4.2",
     "jest-mock-extended": "1.0.10",
