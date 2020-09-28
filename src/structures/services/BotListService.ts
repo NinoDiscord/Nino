@@ -140,7 +140,7 @@ export default class BotListService {
       })
         .header({
           'Content-Type': 'application/json',
-          Authorization: this.bot.config.botlists.bfdtoken!
+          Authorization: this.bot.config.botlists.dservicestoken!
         })
         .send();
 
@@ -185,7 +185,12 @@ export default class BotListService {
           guildCount: this.bot.client.guilds.size,
           shardCount: this.bot.client.shards.size
         }
-      }).send();
+      })
+        .header({
+          'Content-Type': 'application/json',
+          Authorization: this.bot.config.botlists.deltoken!
+        })
+        .send();
 
       const func = res.statusCode === 200 ? 'info' : 'warn';
       this.bot.logger[func](`Posted statistics to Discord Extreme List (${res.statusCode}): ${res.body}`);
