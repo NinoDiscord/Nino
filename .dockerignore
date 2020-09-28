@@ -1,0 +1,8 @@
+node_modules/
+.github/
+.vscode/
+dist/
+
+package-*.json
+*.lock
+*.log
