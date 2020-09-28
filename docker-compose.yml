@@ -1,0 +1,29 @@
+version: '3.8'
+services:
+  bot:
+    build: .
+    networks:
+      - 'nino'
+      - 'default'
+  redis:
+    image: 'redis:latest'
+    ports:
+      - '6379:6379'
+    networks:
+      - 'nino'
+    volumes:
+      - 'redis:/data'
+  database:
+    image: 'mongo:latest'
+    ports:
+      - '27017:27017'
+    networks:
+      - 'nino'
+    volumes:
+      - 'mongo:/data/db'
+volumes:
+  mongo:
+  redis:
+networks:
+  nino:
+    internal: true
