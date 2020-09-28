@@ -4,6 +4,7 @@ on:
     branches:
       - master
     paths-ignore:
+      - '.dockerignore'
       - '.github/**'
       - '.vscode/**'
       - '.gitignore'

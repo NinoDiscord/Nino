@@ -4,6 +4,7 @@ on:
     branches:
       - edge
     paths-ignore:
+      - '.dockerignore'
       - '.github/**'
       - '.vscode/**'
       - '.gitignore'
