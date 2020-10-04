@@ -54,6 +54,7 @@ import GuildJoinedEvent from './events/GuildCreate';
 import GuildLeftEvent from './events/GuildDelete';
 import GuildMemberJoinedEvent from './events/GuildMemberAdd';
 import GuildMemberUpdateEvent from './events/GuildMemberUpdate';
+import GuildMemberLeftEvent from './events/GuildMemberLeave';
 import MessageReceivedEvent from './events/Message';
 import MessageUpdatedEvent from './events/MessageUpdate';
 import MessageDeletedEvent from './events/MessageDelete';
@@ -68,6 +69,7 @@ import LocalizationManager from './structures/managers/LocalizationManager';
 import { Collection } from '@augu/immutable';
 import CaseSettingsService from './structures/services/settings/CaseSettingsService';
 import WarningService from './structures/services/WarningService';
+
 let config: Config;
 try {
   config = safeLoad(readFileSync('application.yml', 'utf8'));
@@ -343,6 +345,11 @@ container
 container
   .bind<NinoEvent>(TYPES.Event)
   .to(GuildMemberUpdateEvent)
+  .inSingletonScope();
+
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(GuildMemberLeftEvent)
   .inSingletonScope();
 
 container
