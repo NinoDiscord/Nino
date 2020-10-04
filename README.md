@@ -26,8 +26,9 @@ First, check our [contributing guidelines](https://github.com/NinoDiscord/Nino/b
 * [MongoDB](https://www.mongodb.com)
 * [Redis](https://redis.io)
 * [Sentry](https://sentry.io) (optional)
+* [Docker](https://docker.com) (optional)
 
-### Setting up the bot
+### Setting up the bot (normally)
 1. Clone the repository using Git: ``git clone https://github.com/NinoDiscord/Nino`` (If you don't have Git, just go to "Clone or download" and click "Download ZIP" then extract)
 2. Install dependencies with NPM (included in Node.js): ``npm i`` (or with [Yarn](https://yarnpkg.com) ``yarn``)
 3. Create an application.yml file in your working directory and fill it in (see the example for more information)

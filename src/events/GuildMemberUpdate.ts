@@ -24,7 +24,7 @@ export default class GuildMemberUpdateEvent extends Event {
     const settings = await this.guildSettingsService.get(guild.id);
 
     // Automod handles nicknames (only)
-    if (member.nick != old.nick) return this.automodService.handleMemberNameUpdate(member);
+    if (member.nick !== null && member.nick !== old.nick) return this.automodService.handleMemberNameUpdate(member);
 
     // If the member is a bot, don't do anything
     if (member.user.bot) return;
@@ -34,19 +34,15 @@ export default class GuildMemberUpdateEvent extends Event {
     // Fetch audit logs
     if (!guild.members.get(this.client.user.id)!.permission.has('viewAuditLogs')) return;
 
-    const logs = await guild.getAuditLogs(10);
+    const logs = await guild.getAuditLogs(10, undefined, Constants.AuditLogActions.MEMBER_ROLE_UPDATE);
 
     if (!logs.entries.length) return; // Don't do anything if there is no entries
 
     // Muted role was taken away
     if (!member.roles.includes(settings.mutedRole) && old.roles.includes(settings.mutedRole)) {
-      const entries = logs.entries.filter(entry =>
-      // Find the removal of the mute without it being by the bot
-        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.targetID === member.id
-      ).sort((a, b) => b.createdAt - a.createdAt);
+      const entries = logs.entries.filter(entry => entry.targetID === member.id).sort((a, b) => b.createdAt - a.createdAt);
 
       const entry = entries[0];
-
       if (!entry || entry.user.id === this.client.user.id) return;
 
       const punishment = new Punishment(PunishmentType.Unmute, {

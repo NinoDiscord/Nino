@@ -1,9 +1,10 @@
-FROM node:lts-alpine
+FROM node:latest
 
-RUN apk add yarn
-RUN apk add git
-COPY . /app
-WORKDIR /app
-RUN yarn && yarn run build
+WORKDIR /opt/Nino
+COPY package*.json ./
+RUN yarn
+RUN npm install -g eslint
+COPY . .
+RUN yarn build
 
-ENTRYPOINT ["yarn", "run", "main"]
+CMD [ "yarn", "run", "main" ]
