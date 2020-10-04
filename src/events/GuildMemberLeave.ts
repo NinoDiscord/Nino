@@ -16,7 +16,7 @@ export default class GuildMemberLeftEvent extends Event {
   }
 
   async emit(guild: Guild, member: Member) {
-    const logs = await guild.getAuditLogs(10, undefined, Constants.AuditLogActions.MEMBER_ROLE_UPDATE);
+    const logs = await guild.getAuditLogs(10, undefined, Constants.AuditLogActions.MEMBER_KICK);
     if (!logs.entries.length) return; // Don't do anything if there is no entries
 
     const entry = logs.entries.filter(entry => entry.targetID === member.id)[0];
