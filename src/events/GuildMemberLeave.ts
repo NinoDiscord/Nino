@@ -20,7 +20,7 @@ export default class GuildMemberLeftEvent extends Event {
     if (!logs.entries.length) return; // Don't do anything if there is no entries
 
     const entry = logs.entries.filter(entry => entry.targetID === member.id)[0];
-    if (!entry || entry.user.id === this.client.user.id || entry.user.bot) return;
+    if (!entry || entry.user.id === this.client.user.id) return;
 
     const punishment = new Punishment(PunishmentType.Kick, { moderator: entry.user });
     const model = await this.punishments.createCase(member, punishment, entry.reason);
