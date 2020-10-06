@@ -40,20 +40,22 @@ export default class TimeoutsManager {
               .catch(this.bot.logger.error)
               .finally(async () => {
                 this.bot.logger.info('Timeouts: Done everything for timeout');
-
-                await this.bot.redis.hdel('timeouts', key);
-                timeout.close();
-                this.timeouts.delete(key);
+                await this.cancelTimeout(member, guild, task);
               });
-          } else {
-            return;
           }
         })
         .catch(this.bot.logger.error);
     }, time);
 
+    if (this.timeouts.has(key)) {
+      this.bot.logger.debug(`Existing timeout already exists for "${key}", closing...`);
+      const old = this.timeouts.get(key)!;
+      old.close();
+    }
+
     timeout.unref();
     this.timeouts.set(key, timeout);
+    this.bot.logger.debug(`Appended timeout for member "${member}" in guild "${guild.name}" for ${time}.`);
   }
 
   /**
@@ -99,7 +101,7 @@ export default class TimeoutsManager {
       this.timeouts.delete(key);
     }
 
-    return this.bot.redis.hdel('timeouts', key);
+    await this.bot.redis.hdel('timeouts', key);
   }
 
   private async resetOldTimeouts() {
