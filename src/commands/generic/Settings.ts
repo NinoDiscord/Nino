@@ -385,7 +385,7 @@ export default class SettingsCommand extends Command {
       case 'automod': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {
-            'automod.dehoist': false, // disabled
+            'automod.dehoist': true,
             'automod.spam': true,
             'automod.mention': true,
             'automod.raid': true,
@@ -398,14 +398,13 @@ export default class SettingsCommand extends Command {
           : ctx.sendTranslate('commands.generic.settings.enable.automod.success'));
       } break;
       case 'automod.dehoist': {
-        return ctx.sendTranslate('global.disabled', { setting: 'automod.dehoist' });
-        //await this.bot.settings.update(ctx.guild!.id, {
-        //$set: {
-        //'automod.dehoist': true
-        //}
-        //}, (error) => error 
-        //? ctx.sendTranslate('commands.generic.settings.enable.dehoist.unable') 
-        //: ctx.sendTranslate('commands.generic.settings.enable.dehoist.success'));
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'automod.dehoist': true
+          }
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.dehoist.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.dehoist.success'));
       }
       case 'automod.spam': {
         await this.bot.settings.update(ctx.guild!.id, {
@@ -522,14 +521,13 @@ export default class SettingsCommand extends Command {
           : ctx.sendTranslate('commands.generic.settings.disable.automod.success'));
       } break;
       case 'automod.dehoist': {
-        return ctx.sendTranslate('global.disabled', { setting: 'automod.dehoist' });
-      //await this.bot.settings.update(ctx.guild!.id, {
-        //$set: {
-        //'automod.dehoist': false
-        //}
-      //}, (error) => error 
-        //? ctx.sendTranslate('commands.generic.settings.disable.dehoist.unable') 
-        //: ctx.sendTranslate('commands.generic.settings.disable.dehoist.success'));
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'automod.dehoist': false
+          }
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.disable.dehoist.unable') 
+          : ctx.sendTranslate('commands.generic.settings.disable.dehoist.success'));
       }
       case 'automod.spam': {
         await this.bot.settings.update(ctx.guild!.id, {
