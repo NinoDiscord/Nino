@@ -101,6 +101,8 @@ export default class Logger {
   }
 
   debug(...message: LogMessage) {
+    if (process.env.NODE_ENV !== 'development') return;
+    
     this.write(LogLevel.DEBUG, LogSeverity.NONE, ...message);
   }
 

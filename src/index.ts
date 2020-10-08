@@ -32,6 +32,8 @@ if (!config.sentryDSN) {
   logger.info('Installed Sentry successfully, now building Nino...');
 }
 
+process.env.NODE_ENV = config.environment;
+
 bot.build()
   .then(() => bot.logger.info('All set!'));
 

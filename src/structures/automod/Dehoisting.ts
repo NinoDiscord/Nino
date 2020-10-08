@@ -31,6 +31,7 @@ export default class AutoModDehoist {
 
     const settings = await this.bot.settings.get(m.guild.id);
     if (!settings || !settings.automod.dehoist) return;
+    if (name >= '0') return;
 
     if (
       !PermissionUtils.above(me, m) || 

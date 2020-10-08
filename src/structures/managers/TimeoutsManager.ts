@@ -24,6 +24,7 @@ export default class TimeoutsManager {
   }
 
   private createTimeout(key: string, task: string, member: string, guild: Guild, time: number) {
+    this.bot.logger.debug(`Called TimeoutsManager.createTimeout(${key}, ${task}, ${member}, ${guild.id}, ${time})`);
     const timeout = setTimeout(() => {
       this.bot.redis.hexists('timeouts', key)
         .then((exists) => {
@@ -39,19 +40,22 @@ export default class TimeoutsManager {
               .catch(this.bot.logger.error)
               .finally(async () => {
                 this.bot.logger.info('Timeouts: Done everything for timeout');
-
-                await this.bot.redis.hdel('timeouts', key);
-                timeout.close();
-                this.timeouts.delete(key);
+                await this.cancelTimeout(member, guild, task);
               });
-          } else {
-            return;
           }
         })
         .catch(this.bot.logger.error);
     }, time);
 
+    if (this.timeouts.has(key)) {
+      this.bot.logger.debug(`Existing timeout already exists for "${key}", closing...`);
+      const old = this.timeouts.get(key)!;
+      old.close();
+    }
+
+    timeout.unref();
     this.timeouts.set(key, timeout);
+    this.bot.logger.debug(`Appended timeout for member "${member}" in guild "${guild.name}" for ${time}.`);
   }
 
   /**
@@ -62,7 +66,7 @@ export default class TimeoutsManager {
    * @param time the amount of time before executing
    */
   async addTimeout(member: string, guild: Guild, task: 'unban' | 'unmute', time: number) {
-    this.bot.logger.info(`Added timeout: to ${task} in ${ms(time)}`);
+    this.bot.logger.debug(`Called TimeoutsManager.addTimeout(${member}, ${guild.id}, ${task}, ${time})`);
     const key = `timeout:${task}:${guild.id}:${member}`;
 
     if (!(await this.hasTimeout(member, guild, task)))
@@ -88,15 +92,16 @@ export default class TimeoutsManager {
    * @param task the punishment
    */
   async cancelTimeout(member: string, guild: Guild, task: string) {
+    this.bot.logger.debug(`Called TimeoutsManager.cancelTimeout(${member}, ${guild.id}, ${task})`);
     const key = `timeout:${task}:${guild.id}:${member}`;
-    if ((await this.hasTimeout(member, guild, <any> task)) && this.timeouts.has(key)) {
+    if (this.timeouts.has(key)) {
       const timeout = this.timeouts.get(key)!;
       timeout.close();
 
       this.timeouts.delete(key);
     }
 
-    return this.bot.redis.hdel('timeouts', key);
+    await this.bot.redis.hdel('timeouts', key);
   }
 
   private async resetOldTimeouts() {

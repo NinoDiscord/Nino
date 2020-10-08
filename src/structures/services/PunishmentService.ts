@@ -155,6 +155,7 @@ export default class PunishmentService {
    * @param audit whether to audit the punishment or not
    */
   async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string) {
+    this.bot.logger.debug(`Called PunishmentService.punish(${member.id}, ${punishment.type}, ${reason || '<unknown>'})`);
     const me = member.guild.members.get(this.client.user.id)!;
     const guild = member.guild;
     const settings = await this.guildSettingsService.getOrCreate(guild.id);
@@ -216,7 +217,6 @@ export default class PunishmentService {
 
     if (punishment.type === PunishmentType.AddRole || punishment.type === PunishmentType.RemoveRole) return undefined;
 
-
     const user = await this.client.getRESTUser(member.id);
     const newCase = await this.createCase({
       username: user.username,
@@ -237,6 +237,7 @@ export default class PunishmentService {
   }
 
   private async applyUnmutePunishment(member: { id: string; guild: Guild } | Member, guild: Guild, settings: GuildModel, reason: string | undefined) {
+    this.bot.logger.debug(`Called PunishmentService.applyUnmutePunishment(${member.id}, ${guild.id}, ${settings.guildID}, ${reason || '<unknown>'})`);
     let mem = this.resolveToMember(member);
 
     const muted = guild.roles.get(settings!.mutedRole)!;
@@ -251,6 +252,7 @@ export default class PunishmentService {
   }
 
   private async applyMutePunishment(punishment: Punishment, settings: GuildModel, guild: Guild, me: Member, member: Member, reason: string | undefined) {
+    this.bot.logger.debug(`Called PunishmentManager.applyMutePunishment(${punishment.type}, ${settings.guildID}, ${me.id}, ${reason || '<no reason>'})`);
     const temp = punishment.options.temp;
     let mutedRole = await this.getOrCreateMutedRole(settings, guild, me);
 
@@ -262,6 +264,7 @@ export default class PunishmentService {
   }
 
   private async getOrCreateMutedRole(settings: GuildModel, guild: Guild, me: Member) {
+    this.bot.logger.debug(`Called PunishmentManager.getOrCreateMutedRole(${settings.guildID}, ${guild.id}, ${me.id})`);
     let mutedRole: string | Role | undefined = settings!.mutedRole;
     if (mutedRole) return mutedRole;
 
@@ -284,6 +287,7 @@ export default class PunishmentService {
   }
 
   private async addMutedRolePermissions(me: Member, mutedRole: Role, guild: Guild) {
+    this.bot.logger.debug(`Called PunishmentManager.addMuteRolePermissions(${me.id}, ${mutedRole.id}, ${guild.id})`);
     const topRole = PermissionUtils.topRole(me)!;
     await mutedRole.editPosition(topRole.position - 1);
 
