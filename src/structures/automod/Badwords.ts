@@ -49,7 +49,7 @@ export default class AutoModBadWords {
 
     for (let word of settings.automod.badwords.wordlist) {
       const content = m.content.toLowerCase().split(' ');
-      const includes = content.filter(c => c === word).length > 0;
+      const includes = content.filter(c => c.toLowerCase() === word.toLowerCase()).length > 0;
 
       if (includes) {
         const punishments = await this.bot.punishments.addWarning(m.member!);
