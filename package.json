@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "0.9.9",
+  "version": "0.9.10",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": "https://github.com/NinoDiscord/Nino",
@@ -10,6 +10,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build:watch": "yarn lint && yarn clean && yarn tsc -w",
+    "prepare": "rm -fr node_modules/@types/**/node_modules",
     "build": "yarn lint && yarn clean && yarn tsc",
     "clean": "rm -fr dist",
     "main": "node dist/index.js",
