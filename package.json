@@ -56,7 +56,7 @@
     "@typescript-eslint/eslint-plugin": "4.4.0",
     "@typescript-eslint/parser": "4.4.0",
     "eslint": "7.11.0",
-    "jest": "26.5.2",
+    "jest": "26.5.3",
     "jest-mock-extended": "1.0.10",
     "nodemon": "2.0.4",
     "ps-list": "7.2.0",
