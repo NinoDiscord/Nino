@@ -13,7 +13,7 @@ class CompilerError extends Error {
   constructor(m: string) {
     super(m);
 
-    this.name = 'CompilerError';
+    this.name = 'TypeScriptError';
   }
 }
 
@@ -33,38 +33,63 @@ export default class EvalCommand extends Command {
 
   async run(ctx: Context) {
     const message = await ctx.send('Now evaluating script...');
-    const script = ctx.args.join(' ');
+    let script = ctx.args.join(' ');
     let result: any;
+    let depthSize = 1;
 
     const typescript = ctx.flags.get('ts');
-    if (typeof typescript === 'string') return ctx.send('Um, I\'m sorry but it\'s just `--ts`');
+    if (typeof typescript === 'string') {
+      const language = this.bot.locales.get('en_US')!;
+      return ctx.send(language.translate('global.invalidFlag.boolean', { flag: 'ts' }));
+    }
 
     const isAsync = script.includes('return') || script.includes('await');
+    const depth = ctx.flags.get('depth');
+
+    if (typeof depth === 'boolean') {
+      const language = this.bot.locales.get('en_US')!;
+      return ctx.send(language.translate('global.invalidFlag.string', { flag: 'depth' }));
+    }
+
+    if (typescript) {
+      script = script.replace('--ts', '');
+    }
+
+    if (depth !== undefined) {
+      depthSize = Number(depth);
+      if (isNaN(depthSize)) return ctx.send('Depth was not a number.');
+
+      script = script.replace(`--depth=${depth}`, '');
+    }
+
+    if (script.startsWith('```js') && script.endsWith('```')) {
+      script = script.replace('```js', '');
+      script = script.replace('```', '');
+    }
 
     try {
       if (typescript) result = eval(this.compileTypescript(isAsync ? `(async() => {${script}})()` : script));
       result = eval(isAsync ? `(async()=>{${script}})();` : script);
-      if ((result as any) instanceof Promise) result = await result;
+
+      if (result instanceof Promise) result = await result;
       if (typeof result !== 'string')
         result = inspect(result, {
-          depth: +!inspect(result, { depth: 1 }),
+          depth: depthSize,
           showHidden: false,
         });
 
       const _res = this.redact(result);
-      await message.edit(stripIndents`
-        > :pencil2: **Script was evaluated, here is the result:**
-        \`\`\`js
-        ${_res}
-        \`\`\`
-      `);
+      await message.edit([
+        '```js',
+        _res,
+        '```'
+      ].join('\n'));
     } catch (e) {
-      await message.edit(stripIndents`
-        > :x: **An error occured while running your script:**
-        \`\`\`js
-        ${e.message}
-        \`\`\`
-      `);
+      await message.edit([
+        '```js',
+        e.stack || 'None',
+        '```'
+      ].join('\n'));
     }
   }
 

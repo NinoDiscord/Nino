@@ -5,6 +5,7 @@ import { TYPES } from '../types';
 import Client from '../structures/Bot';
 import Event from '../structures/Event';
 import { createEmptyEmbed } from '../util/EmbedUtils';
+import CommandService from '../structures/services/CommandService';
 
 interface OldMessage {
   editedTimestamp: number;
@@ -22,7 +23,8 @@ interface OldMessage {
 @injectable()
 export default class MessageUpdatedEvent extends Event {
   constructor(
-    @inject(TYPES.Bot) client: Client
+    @inject(TYPES.Bot) client: Client,
+    @inject(TYPES.CommandService) private commands: CommandService
   ) {
     super(client, 'messageUpdate');
   }
@@ -33,6 +35,9 @@ export default class MessageUpdatedEvent extends Event {
 
     // If it's null, let's not do anything
     if (old === null) return;
+
+    // Let's do the command service next
+    if (m.content !== old.content) await this.commands.handle(m);
 
     // Retrive the guild settings
     const guild = (m.channel as TextChannel).guild;
