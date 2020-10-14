@@ -33,6 +33,13 @@ export default class MessageDeleteEvent extends Event {
       !guild.channels.get(settings.logging.channelID)!.permissionsOf(this.bot.client.user.id).has('sendMessages')
     ) return;
 
+    // Ignore "User has pinned a message" messages
+    const PinnedRegex = /pinned a message/g;
+    if (PinnedRegex.test(message.content)) return;
+
+    // Ignore if the bot deleted it
+    if (message.author.id === this.bot.client.user.id) return;
+
     // Get the channel (so we won't get faulty errors)
     const channel = guild.channels.get(settings.logging.channelID)! as TextChannel;
 
