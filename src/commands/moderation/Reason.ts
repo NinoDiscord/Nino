@@ -26,7 +26,7 @@ export default class ReasonCommand extends Command {
       aliases: ['update'],
       category: Module.Moderation,
       guildOnly: true,
-      userPermissions: Constants.Permissions.banMembers,
+      userPermissions: Constants.Permissions.kickMembers,
       botPermissions: Constants.Permissions.manageMessages
     });
   }
