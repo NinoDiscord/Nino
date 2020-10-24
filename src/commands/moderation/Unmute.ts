@@ -17,7 +17,7 @@ export default class UnmuteCommand extends Command {
       usage: '<user> <reason>',
       category: Module.Moderation,
       guildOnly: true,
-      userPermissions: Constants.Permissions.manageRoles,
+      userPermissions: Constants.Permissions.kickMembers,
       botPermissions: Constants.Permissions.manageRoles | Constants.Permissions.manageChannels
     });
   }
