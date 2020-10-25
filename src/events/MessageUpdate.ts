@@ -98,11 +98,16 @@ export default class MessageUpdatedEvent extends Event {
       ? 'System'
       : `${m.author.username}#${m.author.discriminator}`;
 
+    const attachments: string[] = [];
+    for (let i = 0; i < m.attachments.length; i++) {
+      attachments.push(`[[Attachment #${i + 1}] 'Warning: This image maybe NSFW, view with caution.'](${m.attachments[i].url})`);
+    }
+
     const jumpUrl = `https://discord.com/channels/${m.guildID}/${m.channel.id}/${m.id}`;
     const channel = (<TextChannel> guild.channels.get(settings.logging.channelID)!);
     const embed = createEmptyEmbed()
       .setAuthor(`Message was updated by ${author} in #${m.channel.name}`, '', m.author.avatarURL)
-      .setDescription(`[[Jump Here]](${jumpUrl})`)
+      .setDescription(`[[Jump Here]](${jumpUrl})\n\n${attachments.join(' | ')}`)
       .addField('Old Content', old.content.length > 1993 ? `${old.content.slice(0, 1993)}...` : old.content)
       .addField('New Content', m.content.length > 1993 ? `${m.content.slice(0, 1993)}...` : m.content);
 
