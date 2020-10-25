@@ -1,3 +1,5 @@
+/* eslint-disable camelcase */
+
 import { humanize, formatSize, commitHash } from '../../util';
 import { injectable, inject } from 'inversify';
 import { TYPES } from '../../types';
@@ -11,8 +13,54 @@ import DatabaseManager from '../../structures/managers/DatabaseManager';
 import { createEmptyEmbed } from '../../util/EmbedUtils';
 import CommandManager from '../../structures/managers/CommandManager';
 import { lazyInject } from '../../inversify.config';
+import { performance } from 'perf_hooks';
 
 const pkg = require('../../../package.json');
+
+interface RedisInfo {
+  total_connections_received: number;
+  total_commands_processed: number;
+  instantaneous_ops_per_sec: number;
+  total_net_input_bytes: number;
+  total_net_output_bytes: number;
+  instantaneous_input_kbps: number;
+  instantaneous_output_kbps: number;
+  rejected_connections: number;
+  sync_full: number;
+  sync_partial_ok: number;
+  sync_partial_err: number;
+  expired_keys: number;
+  expired_stale_perc: number;
+  expired_time_cap_reached_count: number;
+  evicted_keys: number;
+  keyspace_hits: number;
+  keyspace_misses: number;
+  pubsub_channels: number;
+  pubsub_patterns: number;
+  latest_fork_usec: number;
+  migrate_cached_sockets: number;
+  slave_expires_tracked_keys: number;
+  active_defrag_hits: number;
+  active_defrag_misses: number;
+  active_defrag_key_hits: number;
+  active_defrag_key_misses: number;
+}
+
+interface MongoStats {
+  uptimeMillis: number;
+  pid: number;
+  connections: {
+    current: number;
+    available: number;
+    totalCreated: number;
+    active: number;
+  };
+  network: {
+    bytesIn: number;
+    bytesOut: number;
+    numRequests: number;
+  }
+}
 
 @injectable()
 export default class StatisticsCommand extends Command {
@@ -43,6 +91,19 @@ export default class StatisticsCommand extends Command {
     const memoryUsage = formatSize(process.memoryUsage().rss);
     const botUser = this.client.user;
 
+    const redis = await this.bot.redis.info('stats');
+    const mongo: MongoStats = await this.bot.database.admin.command({ serverStatus: 1 });
+
+    // shhh i stole this from dono
+    // credit: https://github.com/FurryBotCo/FurryBot/blob/master/src/commands/information/stats-cmd.ts#L22
+    const redisData = redis
+      .split(/\n\r?/)
+      .slice(1, -1)
+      .map((key) => {
+        const [k, v] = key.split(':');
+        return { [k]: v };
+      }).reduce((first, second) => ({ ...first, ...second }), {}) as unknown as RedisInfo;
+
     const embed = createEmptyEmbed()
       .setAuthor(ctx.translate('commands.generic.statistics.title', { 
         username: `${botUser.username}#${botUser.discriminator}`,
@@ -67,7 +128,20 @@ export default class StatisticsCommand extends Command {
         'sys.cpu': sys.getCPUUsage(),
         'sys.free': formatSize(sys.getFreeMemory()),
         'sys.total': formatSize(sys.getTotalMemory()),
-        connection
+        connection,
+        'redis.connections': redisData.total_connections_received.toLocaleString(),
+        'redis.commands': redisData.total_commands_processed.toLocaleString(),
+        'redis.operations': redisData.instantaneous_ops_per_sec.toLocaleString(),
+        'redis.netIn': formatSize(redisData.total_net_input_bytes),
+        'redis.netOut': formatSize(redisData.total_net_output_bytes),
+        'mongo.concurrent.active': mongo.connections.active.toLocaleString(),
+        'mongo.concurrent.current': mongo.connections.current.toLocaleString(),
+        'mongo.connections': mongo.connections.totalCreated.toLocaleString(),
+        'mongo.pid': mongo.pid,
+        'mongo.uptime': humanize(mongo.uptimeMillis),
+        'mongo.netIn': formatSize(mongo.network.bytesIn),
+        'mongo.netOut': formatSize(mongo.network.bytesOut),
+        'mongo.requests': mongo.network.numRequests.toLocaleString()
       }))
       .build();
 
