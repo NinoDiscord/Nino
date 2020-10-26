@@ -57,20 +57,6 @@ export default class MessageDeleteEvent extends Event {
       attachments.push(`[[Attachment #${i + 1}] 'Warning: This image maybe NSFW, view with caution.'](${message.attachments[i].url})`);
     }
 
-    const logs = await guild.getAuditLogs(10, undefined, Constants.AuditLogActions.MESSAGE_DELETE);
-    let blame: string | null = null;
-
-    if (logs.entries) {
-      for (let i = 0; i < logs.entries.length; i++) {
-        const entry = logs.entries[i];
-        if (entry.user.id === message.author.id) break; // let's just break it
-        if (entry.targetID === message.id) {
-          blame = `Blame: **${entry.user.username}#${entry.user.discriminator}** (${entry.user.id})`;
-          break;
-        }
-      }
-    }
-
     if (message.embeds.length > 0) {
       const em = message.embeds[0];
 
@@ -83,7 +69,7 @@ export default class MessageDeleteEvent extends Event {
       if (em.title) embed.setTitle(em.title);
       if (em.url) embed.setURL(em.url);
     } else {
-      embed.setDescription(`${attachments.join(' | ')}\n${blame || ''}\n${message.content.length > 1997 ? `${message.content.slice(0, 1995)}...` : message.content}`);
+      embed.setDescription(`${message.content.length > 1997 ? `${message.content.slice(0, 1995)}...` : message.content || 'None was provided?'}`);
     }
 
     // TODO: Add customizable messages to this
