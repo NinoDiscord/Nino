@@ -101,7 +101,7 @@ export default class StatisticsCommand extends Command {
       .slice(1, -1)
       .map((key) => {
         const [k, v] = key.split(':');
-        return { [k]: v };
+        return { [k]: v.trim() };
       }).reduce((first, second) => ({ ...first, ...second }), {}) as unknown as RedisInfo;
 
     const embed = createEmptyEmbed()
@@ -134,8 +134,6 @@ export default class StatisticsCommand extends Command {
         'redis.operations': redisData.instantaneous_ops_per_sec.toLocaleString(),
         'redis.netIn': formatSize(redisData.total_net_input_bytes),
         'redis.netOut': formatSize(redisData.total_net_output_bytes),
-        'mongo.concurrent.active': mongo.connections.active.toLocaleString(),
-        'mongo.concurrent.current': mongo.connections.current.toLocaleString(),
         'mongo.connections': mongo.connections.totalCreated.toLocaleString(),
         'mongo.pid': mongo.pid,
         'mongo.uptime': humanize(mongo.uptimeMillis),

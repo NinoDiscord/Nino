@@ -16,6 +16,7 @@ describe('CommandService', () => {
     disabledCategories: undefined,
     owners: undefined,
     prometheus: 5595,
+    membersIntent: false,
     discord: {
       token: '',
       prefix: 'x!',
