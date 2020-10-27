@@ -46,6 +46,25 @@ interface RedisInfo {
   active_defrag_key_misses: number;
 }
 
+interface RedisServerInfo {
+  uptime_in_seconds: string;
+  process_id: string;
+  redis_mode: 'standalone' | 'cluster' | 'sentinel';
+}
+
+/*
+const info = await this.bot.redis.info('server');
+const arr = info.split(/\n\r?/).map((value) => {
+  const [key, val] = value.split(':');
+  return { [key]: typeof val === 'string' ? val.trim() : val };
+}).reduce((first, second) => ({ ...first, ...second }), {});
+
+delete arr['# Server\r'];
+delete arr[''];
+
+return arr;
+*/
+
 interface MongoStats {
   uptimeMillis: number;
   pid: number;
@@ -104,6 +123,14 @@ export default class StatisticsCommand extends Command {
         return { [k]: v.trim() };
       }).reduce((first, second) => ({ ...first, ...second }), {}) as unknown as RedisInfo;
 
+    const redisServer = await this.bot.redis.info('server');
+    const serverInfo = redisServer.split(/\n\r?/).slice(1, -1).map((value) => {
+      const [key, val] = value.split(':');
+      return {
+        [key]: typeof val === 'string' ? val.trim() : val
+      };
+    }).reduce((first, second) => ({ ...first, ...second })) as unknown as RedisServerInfo;
+
     const embed = createEmptyEmbed()
       .setAuthor(ctx.translate('commands.generic.statistics.title', { 
         username: `${botUser.username}#${botUser.discriminator}`,
@@ -134,6 +161,9 @@ export default class StatisticsCommand extends Command {
         'redis.operations': redisData.instantaneous_ops_per_sec.toLocaleString(),
         'redis.netIn': formatSize(redisData.total_net_input_bytes),
         'redis.netOut': formatSize(redisData.total_net_output_bytes),
+        'redis.uptime': humanize(Number(serverInfo.uptime_in_seconds) * 1000),
+        'redis.pid': serverInfo.process_id,
+        'redis.type': serverInfo.redis_mode,
         'mongo.connections': mongo.connections.totalCreated.toLocaleString(),
         'mongo.pid': mongo.pid,
         'mongo.uptime': humanize(mongo.uptimeMillis),

@@ -131,16 +131,16 @@ export default class PunishmentService {
     }
   }
 
-  private resolveToMember(member: Member | { id: string; guild: Guild }): Member {
-    let mem: Member;
+  private async resolveToMember(member: Member | { id: string; guild: Guild }) {
     let guild = member.guild;
 
-    if (member instanceof Member)
-      mem = member;
-    else
-      mem = guild.members.get(member.id)!;
-
-    return mem;
+    if (member instanceof Member) {
+      return member;
+    } else if (guild.members.has(member.id)) {
+      return guild.members.get(member.id)!;
+    } else {
+      return await this.bot.client.getRESTGuildMember(guild.id, member.id);
+    }
   }
 
   /**
@@ -171,14 +171,12 @@ export default class PunishmentService {
       } break;
 
       case PunishmentType.Kick: {
-        let mem = this.resolveToMember(member);
-
+        let mem = await this.resolveToMember(member);
         await mem.kick(reason);
       } break;
 
       case PunishmentType.Mute: {
-        let mem = this.resolveToMember(member);
-
+        let mem = await this.resolveToMember(member);
         await this.applyMutePunishment(punishment, settings, guild, me, mem, reason);
       } break;
 
@@ -186,8 +184,7 @@ export default class PunishmentService {
         if (!punishment.options.roleid) return;
         if (!guild.roles.has(punishment.options.roleid)) return;
 
-        let mem = this.resolveToMember(member);
-
+        let mem = await this.resolveToMember(member);
         await this.applyAddRolePunishment(mem, punishment, me, reason);
       } break;
 
@@ -206,7 +203,7 @@ export default class PunishmentService {
       } break;
 
       case PunishmentType.RemoveRole: {
-        let mem = this.resolveToMember(member);
+        let mem = await this.resolveToMember(member);
 
         if (punishment.options.roleid === undefined) return;
         if (!mem.guild.roles.has(punishment.options.roleid)) return;
@@ -238,11 +235,13 @@ export default class PunishmentService {
 
   private async applyUnmutePunishment(member: { id: string; guild: Guild } | Member, guild: Guild, settings: GuildModel, reason: string | undefined) {
     this.bot.logger.debug(`Called PunishmentService.applyUnmutePunishment(${member.id}, ${guild.id}, ${settings.guildID}, ${reason || '<unknown>'})`);
-    let mem = this.resolveToMember(member);
+    const rest = await this.bot.client.getRESTGuildMember(member.guild.id, member.id);
 
     const muted = guild.roles.get(settings!.mutedRole)!;
-    if (mem.roles.find(x => x === muted.id))
-      await mem.removeRole(muted.id, reason);
+    if (rest.roles.some(roleID => roleID === muted.id)) {
+      await rest.removeRole(muted.id);
+      member.guild.members.update(rest);
+    }
   }
 
   private async applyAddRolePunishment(member: Member, punishment: Punishment, me: Member, reason: string | undefined) {
@@ -257,8 +256,11 @@ export default class PunishmentService {
     let mutedRole = await this.getOrCreateMutedRole(settings, guild, me);
 
     const id = mutedRole! instanceof Role ? mutedRole.id : mutedRole;
-    if (!member.roles.includes(id))
+    if (!member.roles.includes(id)) {
       await member.addRole(id, reason);
+      guild.members.update(member);
+    }
+
     if (temp)
       await this.timeoutsManager.addTimeout(member.id, guild, 'unmute', temp!);
   }
@@ -328,7 +330,7 @@ export default class PunishmentService {
     const settings = await this.guildSettingsService.get(caseModel.guild);
     const guild = await fetchGuild(this.client, caseModel.guild);
     const member = await this.client.getRESTUser(caseModel.victim);
-    const moderator = this.resolveToMember({ id: caseModel.moderator, guild: guild });
+    const moderator = await this.resolveToMember({ id: caseModel.moderator, guild: guild });
     const selfUser = this.client.user;
     const punishmentType = caseModel.type;
 
@@ -369,7 +371,7 @@ export default class PunishmentService {
 
     const guild = await fetchGuild(this.client, caseModel.guild);
     const member = await this.client.getRESTUser(caseModel.victim);
-    const moderator = this.resolveToMember({ id: caseModel.moderator, guild: guild });
+    const moderator = await this.resolveToMember({ id: caseModel.moderator, guild: guild });
     const settings = await this.guildSettingsService.getOrCreate(caseModel.guild);
 
     return m.edit({

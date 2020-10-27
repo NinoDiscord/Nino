@@ -402,6 +402,7 @@
             "• Machine Used/Total Memory: **${sys.free}/${sys.total}**",
             "",
             "❯ **Redis**",
+            "• Server Uptime: **${redis.uptime}** under process **${redis.pid}**; running as **${redis.type}**",
             "• Connections: **${redis.connections}**",
             "• Commands Executed: **${redis.commands}**",
             "• Operations: **${redis.operations}/s**",
