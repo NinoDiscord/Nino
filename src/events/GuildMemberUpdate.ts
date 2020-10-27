@@ -35,8 +35,10 @@ export default class GuildMemberUpdateEvent extends Event {
     if (!guild.members.get(this.client.user.id)!.permission.has('viewAuditLogs')) return;
 
     const logs = await guild.getAuditLogs(10, undefined, Constants.AuditLogActions.MEMBER_ROLE_UPDATE);
-
     if (!logs.entries.length) return; // Don't do anything if there is no entries
+
+    // There are no roles updated?
+    if (member.roles === null) return;
 
     // Muted role was taken away
     if (!member.roles.includes(settings.mutedRole) && old.roles.includes(settings.mutedRole)) {

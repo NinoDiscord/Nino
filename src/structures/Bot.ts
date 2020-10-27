@@ -45,6 +45,7 @@ export interface Config {
     token: string;
   };
   redis: RedisOptions;
+  membersIntent: boolean;
   botlists: {
     dservicestoken: string | undefined;
     dboatstoken: string | undefined;

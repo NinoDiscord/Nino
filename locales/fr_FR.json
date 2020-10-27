@@ -1,7 +1,7 @@
 {
     "contributors": [],
     "translator": "jacob#5418",
-    "completion": "completed",
+    "completion": "incomplete",
     "aliases": ["french", "francias", "françias", "fr"],
     "code": "fr_FR",
     "flag": ":flag_fr:",
@@ -388,7 +388,23 @@
                     "• Utilisation de la mémoire Usage (RSS/Heap): **${memory.rss}/${memory.heap}**",
                     "• CPU Usage: **${sys.cpu}%**",
                     "• Systéme opérateur: **${sys.os}**",
-                    "• Mémoire utlisée / totale: **${sys.free}/${sys.total}**"
+                    "• Mémoire utlisée / totale: **${sys.free}/${sys.total}**",
+                    "",
+                    "❯ **Redis**",
+                    "• Server Uptime: **${redis.uptime}** under process **${redis.pid}**; running as **${redis.type}**",
+                    "• Connections: **${redis.connections}**",
+                    "• Commands Executed: **${redis.commands}**",
+                    "• Operations: **${redis.operations}/s**",
+                    "• Network Bytes In: **${redis.netIn}**",
+                    "• Network Bytes Out: **${redis.netOut}**",
+                    "",
+                    "❯ **MongoDB**",
+                    "• Concurrent Sessions (Current/Active): **${mongo.concurrent.current}**/**${mongo.concurrent.alive}**",
+                    "• Total Conections: **${mongo.connections}**",
+                    "• Server Uptime: **${mongo.uptime}** under process ${mongo.pid}",
+                    "• Requests: **${mongo.requests}**",
+                    "• Network Bytes In: **${mongo.netIn}**",
+                    "• Network Bytes Out: **${mongo.netOut}**"
                   ]
                 },
                 "time": "Il s'agit actuellement de ${day}/${month}/${year} à ${h}:${m}:${s}",

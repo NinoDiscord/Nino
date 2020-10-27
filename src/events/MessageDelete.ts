@@ -1,4 +1,4 @@
-import { Message, TextChannel } from 'eris';
+import { Constants, Message, TextChannel } from 'eris';
 import { inject, injectable } from 'inversify';
 import { stripIndents } from 'common-tags';
 import { TYPES } from '../types';
@@ -52,6 +52,11 @@ export default class MessageDeleteEvent extends Event {
       .setAuthor(`Message was deleted by ${author} in #${message.channel.name}`, '', message.author.avatarURL)
       .setTimestamp(timestamp);
 
+    const attachments: string[] = [];
+    for (let i = 0; i < message.attachments.length; i++) {
+      attachments.push(`[[Attachment #${i + 1}] 'Warning: This image maybe NSFW, view with caution.'](${message.attachments[i].url})`);
+    }
+
     if (message.embeds.length > 0) {
       const em = message.embeds[0];
 
@@ -61,12 +66,10 @@ export default class MessageDeleteEvent extends Event {
         for (const field of em.fields) embed.addField(field.name, field.value, field.inline || false);
       }
 
-      if (em.image && em.image.hasOwnProperty('url')) embed.setImage(em.image.url!);
-      if (em.thumbnail && em.thumbnail.hasOwnProperty('url')) embed.setThumbnail(em.thumbnail.url!);
       if (em.title) embed.setTitle(em.title);
       if (em.url) embed.setURL(em.url);
     } else {
-      embed.setDescription(message.content.length > 1997 ? `${message.content.slice(0, 1995)}...` : message.content);
+      embed.setDescription(`${message.content.length > 1997 ? `${message.content.slice(0, 1995)}...` : message.content || 'None was provided?'}`);
     }
 
     // TODO: Add customizable messages to this

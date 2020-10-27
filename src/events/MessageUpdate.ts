@@ -103,8 +103,8 @@ export default class MessageUpdatedEvent extends Event {
     const embed = createEmptyEmbed()
       .setAuthor(`Message was updated by ${author} in #${m.channel.name}`, '', m.author.avatarURL)
       .setDescription(`[[Jump Here]](${jumpUrl})`)
-      .addField('Old Content', old.content.length > 1993 ? `${old.content.slice(0, 1993)}...` : old.content)
-      .addField('New Content', m.content.length > 1993 ? `${m.content.slice(0, 1993)}...` : m.content);
+      .addField('Old Content', old.content.length > 1993 ? `${old.content.slice(0, 1993)}...` : old.content || 'None provided')
+      .addField('New Content', m.content.length > 1993 ? `${m.content.slice(0, 1993)}...` : m.content || 'None provided');
 
     // TODO: Add customizable messages to this
     await channel.createMessage({

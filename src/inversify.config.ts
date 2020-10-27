@@ -82,6 +82,7 @@ try {
     disabledCommands: undefined,
     disabledCategories: undefined,
     owners: undefined,
+    membersIntent: false,
     discord: {
       token: '',
       prefix: 'x!',
@@ -99,17 +100,17 @@ try {
   };
 }
 
+const intents = ['guildBans', 'guildMessages', 'guilds'];
+if (config.membersIntent) intents.push('guildMembers');
+
 decorate(injectable(), Collection);
 
 container.bind<Client>(TYPES.Client).toConstantValue(
   new Client(config.discord.token, {
+    getAllUsers: config.membersIntent,
     maxShards: 'auto',
     restMode: true,
-    intents: [
-      'guildBans',
-      'guildMessages',
-      'guilds'
-    ]
+    intents: (intents as any)
   })
 );
 
