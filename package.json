@@ -49,7 +49,7 @@
   "devDependencies": {
     "@types/common-tags": "1.8.0",
     "@types/ioredis": "4.17.6",
-    "@types/jest": "26.0.14",
+    "@types/jest": "26.0.15",
     "@types/js-yaml": "3.12.4",
     "@types/mongoose": "5.7.36",
     "@types/ms": "0.7.31",
