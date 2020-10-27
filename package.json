@@ -37,7 +37,7 @@
     "eris": "0.13.3",
     "inversify": "5.0.1",
     "inversify-inject-decorators": "3.1.0",
-    "ioredis": "4.17.3",
+    "ioredis": "4.19.0",
     "js-yaml": "3.14.0",
     "leeks.js": "0.0.9",
     "long-timeout": "0.1.1",
@@ -48,7 +48,7 @@
   },
   "devDependencies": {
     "@types/common-tags": "1.8.0",
-    "@types/ioredis": "4.17.5",
+    "@types/ioredis": "4.17.6",
     "@types/jest": "26.0.14",
     "@types/js-yaml": "3.12.4",
     "@types/mongoose": "5.7.36",
