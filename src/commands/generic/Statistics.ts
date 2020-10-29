@@ -131,6 +131,12 @@ export default class StatisticsCommand extends Command {
       };
     }).reduce((first, second) => ({ ...first, ...second })) as unknown as RedisServerInfo;
 
+    const now = new Date();
+    now.setMonth(now.getMonth() + 1);
+    now.setFullYear(2021);
+
+    console.log(humanize(now.getTime()));
+
     const embed = createEmptyEmbed()
       .setAuthor(ctx.translate('commands.generic.statistics.title', { 
         username: `${botUser.username}#${botUser.discriminator}`,
