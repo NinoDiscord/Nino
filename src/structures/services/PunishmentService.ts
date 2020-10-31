@@ -240,7 +240,6 @@ export default class PunishmentService {
     const muted = guild.roles.get(settings!.mutedRole)!;
     if (rest.roles.some(roleID => roleID === muted.id)) {
       await rest.removeRole(muted.id);
-      member.guild.members.update(rest);
     }
   }
 

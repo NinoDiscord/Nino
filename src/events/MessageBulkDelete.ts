@@ -18,7 +18,9 @@ export default class MessageDeleteBulkEvent extends Event {
 
   async emit(messages: Message<TextChannel>[]) {
     // Include only cached messages
-    const all = messages.filter(msg => msg.content !== undefined);
+    const all = messages
+      .filter(msg => msg.content !== undefined)
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
     // Get the settings
     const message = all[0];
@@ -42,8 +44,9 @@ export default class MessageDeleteBulkEvent extends Event {
       const contents = [
         `[ Message #${i + 1}/${all.length} ]`,
         '',
+        `Created At: ${new Date(msg.createdAt).toUTCString()}`,
         `Author:  ${msg.author.username}#${msg.author.discriminator} (${msg.author.id})`,
-        `Guild : ${msg.channel.guild.name} (${msg.channel.guild.id})`
+        `Guild: ${msg.channel.guild.name} (${msg.channel.guild.id})`
       ];
 
       contents.push('');
@@ -57,7 +60,6 @@ export default class MessageDeleteBulkEvent extends Event {
       }
 
       contents.push(
-        '',
         '--------------------------------------',
         ''
       );
@@ -80,7 +82,7 @@ export default class MessageDeleteBulkEvent extends Event {
         '',
         '```apache',
         `Affected Users: ${users.join(', ')}`,
-        `Messages Deleted: ${all.length}/${messages.length} (${(all.length / messages.length) * 100}% cached)`,
+        `Messages Deleted: ${all.length}/${messages.length} (${((all.length / messages.length) * 100).toFixed(2)}% cached)`,
         '```'
       ].join('\n'));
 
@@ -88,7 +90,7 @@ export default class MessageDeleteBulkEvent extends Event {
       channel.createMessage({
         embed: embed.build()
       }),
-      channel.createMessage('', { file: buffer, name: 'trace.txt' })
+      channel.createMessage('', { file: buffer, name: `trace_${Date.now()}.txt` })
     ];
 
     await Promise.all(promises);
