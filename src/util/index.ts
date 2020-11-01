@@ -3,6 +3,9 @@ import { execSync } from 'child_process';
 
 export const commitHash = execSync('git rev-parse HEAD', { encoding: 'utf8' }).slice(0, 8);
 export function humanize(ms: number, long: boolean = false) {
+  const months = Math.floor(ms / 1000 / 60 / 60 / 24 / 7 / 12);
+  ms -= months * 1000 * 60 * 60 * 24 * 7 * 12;
+
   const weeks = Math.floor(ms / 1000 / 60 / 60 / 24 / 7);
   ms -= weeks * 1000 * 60 * 60 * 24 * 7;
 
@@ -19,12 +22,14 @@ export function humanize(ms: number, long: boolean = false) {
 
   let humanized = '';
   if (long) {
+    if (months > 0) humanized += `${months} months, `;
     if (weeks > 0) humanized += `${weeks} weeks, `;
     if (days > 0) humanized += `${days} days, `;
     if (hours > 0) humanized += `${hours} hours, `;
     if (mins > 0) humanized += `${mins} minutes, `;
     if (sec > 0) humanized += `${sec} seconds`;
   } else {
+    if (months > 0) humanized += `${months}mo`;
     if (weeks > 0) humanized += `${weeks}w`;
     if (days > 0) humanized += `${days}d`;
     if (hours > 0) humanized += `${hours}h`;

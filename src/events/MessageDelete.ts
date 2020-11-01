@@ -52,11 +52,6 @@ export default class MessageDeleteEvent extends Event {
       .setAuthor(`Message was deleted by ${author} in #${message.channel.name}`, '', message.author.avatarURL)
       .setTimestamp(timestamp);
 
-    const attachments: string[] = [];
-    for (let i = 0; i < message.attachments.length; i++) {
-      attachments.push(`[[Attachment #${i + 1}] 'Warning: This image maybe NSFW, view with caution.'](${message.attachments[i].url})`);
-    }
-
     if (message.embeds.length > 0) {
       const em = message.embeds[0];
 

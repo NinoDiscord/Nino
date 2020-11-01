@@ -68,6 +68,7 @@ import LocalizationManager from './structures/managers/LocalizationManager';
 import { Collection } from '@augu/immutable';
 import CaseSettingsService from './structures/services/settings/CaseSettingsService';
 import WarningService from './structures/services/WarningService';
+import MessageDeleteBulkEvent from './events/MessageBulkDelete';
 
 let config: Config;
 try {
@@ -353,6 +354,11 @@ container
 container
   .bind<NinoEvent>(TYPES.Event)
   .to(MessageReceivedEvent)
+  .inSingletonScope();
+
+container
+  .bind<NinoEvent>(TYPES.Event)
+  .to(MessageDeleteBulkEvent)
   .inSingletonScope();
 
 container
