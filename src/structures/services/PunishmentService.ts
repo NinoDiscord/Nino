@@ -160,6 +160,10 @@ export default class PunishmentService {
     const guild = member.guild;
     const settings = await this.guildSettingsService.getOrCreate(guild.id);
 
+    // Should remove any unicode character behaviour
+    // to cause the X-Audit-Log-Reason header to fail.
+    if (reason) reason = encodeURIComponent(reason);
+
     if (
       (member instanceof Member && !PermissionUtils.above(me, member)) ||
       (me.permission.allow & this.getPermissions(punishment)) === 0
