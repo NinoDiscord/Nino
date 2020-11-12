@@ -32,7 +32,7 @@ export default class WarnCommand extends Command {
     if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const userID = ctx.args.get(0);
-    const u = findUser(this.bot, userID);
+    const u = await findUser(this.bot, ctx.guild!.id, userID);
     if (!u) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(u.id);
@@ -40,9 +40,11 @@ export default class WarnCommand extends Command {
       user: `${u.username}#${u.discriminator}`
     });
     
+    if (member.user.id === ctx.guild!.ownerID) return ctx.sendTranslate('global.banOwner');
+    if (member.user.id === this.bot.client.user.id) return ctx.sendTranslate('global.banSelf');
+    if (!ctx.member!.permission.has('administrator') && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
-    else if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
-    else if (member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
+    if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
 
     const punishments = await this.punishmentService.addWarning(member!);
     for (let i of punishments) {

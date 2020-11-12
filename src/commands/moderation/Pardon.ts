@@ -34,7 +34,7 @@ export default class PardonCommand extends Command {
     if (!ctx.args.has(1) || !(/^[0-9]+$/).test(ctx.args.get(1))) return ctx.sendTranslate('commands.moderation.pardon.notSpecified');
 
     const userID = ctx.args.get(0);
-    const user = findUser(this.bot, userID);
+    const user = await findUser(this.bot, ctx.guild!.id, userID);
     if (!user) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(user.id);
