@@ -31,7 +31,7 @@ export default class MuteCommand extends Command {
     if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const userID = ctx.args.get(0);
-    const user = findUser(this.bot, userID);
+    const user = await findUser(this.bot, ctx.guild!.id, userID);
     if (!user || user === undefined) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(user.id);
@@ -39,9 +39,11 @@ export default class MuteCommand extends Command {
       user: `${user.username}#${user.discriminator}`
     });
 
+    if (member.user.id === ctx.guild!.ownerID) return ctx.sendTranslate('global.banOwner');
+    if (member.user.id === this.bot.client.user.id) return ctx.sendTranslate('global.banSelf');
+    if (!ctx.member!.permission.has('administrator') && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
     if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
-    if (member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
 
     const settings = await ctx.getSettings();
     const hasRole = member.roles.filter(role => role === settings!.mutedRole).length > 0;

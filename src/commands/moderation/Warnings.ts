@@ -29,7 +29,7 @@ export default class WarningsCommand extends Command {
     if (!ctx.args.has(0)) return ctx.send('You need to specify a user.');
 
     const userID = ctx.args.get(0);
-    const u = findUser(this.bot, userID);
+    const u = await findUser(this.bot, ctx.guild!.id, userID);
     if (!u) return ctx.sendTranslate('global.unableToFind');
 
     const member = ctx.guild!.members.get(u.id);

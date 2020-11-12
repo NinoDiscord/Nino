@@ -33,6 +33,8 @@
       "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
       "disabled": "Setting **${setting}** is disabled until further notice.",
       "banMods": "Nice try... you aren't allowed to perform this action on a Moderator.",
+      "banSelf": "Oh? What did I do to deserve this...? :(",
+      "banOwner": "Nice try, you can't perform this action on the owner... idiot~",
       "members": {
         "bot": "Bot",
         "user": "User"

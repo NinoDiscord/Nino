@@ -3,7 +3,7 @@ import { Constants, Member, Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import PermissionUtils from '../../util/PermissionUtils';
 import { Module } from '../../util';
-import { findId } from '../../util/UserUtil'; 
+import findUser from '../../util/UserUtil'; 
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
@@ -31,18 +31,23 @@ export default class BanCommand extends Command {
     if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const userID = ctx.args.get(0);
-    const user = findId(userID);
+    const user = await findUser(this.bot, ctx.guild!.id, userID);
     if (!user) return ctx.sendTranslate('global.unableToFind');
 
-    let member: Member | { id: string; guild: Guild } | undefined = ctx.guild!.members.get(user);
+    let member: Member | { id: string; guild: Guild } | undefined = ctx.guild!.members.get(user.id);
+
     if (!member || !(member instanceof Member)) member = { id: userID, guild: ctx.guild! };
-    else if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
-    else if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
-    else if (member instanceof Member && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
+    if (member instanceof Member) {
+      if (member.user.id === ctx.guild!.ownerID) return ctx.sendTranslate('global.banOwner');
+      if (member.user.id === this.bot.client.user.id) return ctx.sendTranslate('global.banSelf');
+      if (!member.permission.has('administrator') && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
+      if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
+      if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
+    }
 
     try {
       const bans = await ctx.guild!.getBans();
-      const hasBan = bans.some(ban => ban.user.id === user);
+      const hasBan = bans.find(ban => ban.user.id === user.id);
 
       if (hasBan) return ctx.sendTranslate('global.alreadyBanned');
     } catch {
