@@ -23,7 +23,7 @@ export default class GuildMemberLeftEvent extends Event {
     if (!entry || entry.user.id === this.client.user.id) return;
 
     const punishment = new Punishment(PunishmentType.Kick, { moderator: entry.user });
-    const model = await this.punishments.createCase(member, punishment, entry.reason);
+    const model = await this.punishments.createCase(member, punishment, entry.reason || undefined);
     await this.punishments.postToModLog(model);
   }
 }
