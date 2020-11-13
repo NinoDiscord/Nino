@@ -228,6 +228,7 @@ export default class PunishmentService {
   private async applyRemoveRolePunishment(mem: Member, punishment: Punishment, me: Member, reason: string | undefined) {
     const roleToRemove = mem.guild.roles.get(punishment.options.roleid!)!;
 
+    if (reason) reason = encodeURIComponent(reason);
     if (PermissionUtils.above(me, mem) && PermissionUtils.roleAbove(PermissionUtils.topRole(me)!, roleToRemove)) {
       await mem.removeRole(roleToRemove.id, reason);
     }
@@ -235,9 +236,11 @@ export default class PunishmentService {
 
   private async applyUnmutePunishment(member: { id: string; guild: Guild } | Member, guild: Guild, settings: GuildModel, reason: string | undefined) {
     this.bot.logger.debug(`Called PunishmentService.applyUnmutePunishment(${member.id}, ${guild.id}, ${settings.guildID}, ${reason || '<unknown>'})`);
+    
     const rest = await this.bot.client.getRESTGuildMember(member.guild.id, member.id);
-
     const muted = guild.roles.get(settings!.mutedRole)!;
+    
+    if (reason) reason = encodeURIComponent(reason);
     if (rest.roles.some(roleID => roleID === muted.id)) {
       await rest.removeRole(muted.id);
     }
@@ -245,6 +248,8 @@ export default class PunishmentService {
 
   private async applyAddRolePunishment(member: Member, punishment: Punishment, me: Member, reason: string | undefined) {
     const role = member.guild.roles.get(punishment.options.roleid!)!;
+    
+    if (reason) reason = encodeURIComponent(reason);
     if (PermissionUtils.topRole(me) !== undefined && PermissionUtils.topRole(me)!.position > role.position)
       await member.addRole(role.id, reason);
   }
@@ -255,6 +260,7 @@ export default class PunishmentService {
     let mutedRole = await this.getOrCreateMutedRole(settings, guild, me);
 
     const id = mutedRole! instanceof Role ? mutedRole.id : mutedRole;
+    if (reason) reason = encodeURIComponent(reason);
     if (!member.roles.includes(id)) {
       await member.addRole(id, reason);
       guild.members.update(member);
@@ -304,6 +310,7 @@ export default class PunishmentService {
     const time = punishment.options.temp;
     const soft = !!punishment.options.soft;
 
+    if (reason) reason = encodeURIComponent(reason);
     await guild.banMember(member.id, days, reason);
     if (soft) await guild.unbanMember(member.id, reason);
     else if (typeof time === 'number' && time > 0) {

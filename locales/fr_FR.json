@@ -36,6 +36,8 @@
             "alreadyBanned": "L'utilisateur que vous avez essayé d'exclure a déjà été banni de cette guilde.",
             "noPerms": "Je ne suis pas autorisé à consulter la liste des bannissements, veuillez vous assurer que j'ai cette autorisation!",
             "banMods": "Bien essayé... vous n'êtes pas autorisé à effectuer cette action sur un modérateur.",
+            "banSelf": "Oh? What did I do to deserve this...? :(",
+            "banOwner": "Nice try, you can't perform this action on the owner... idiot~",
             "events": {
               "messageUpdate": "Mises à jour des messages",
               "messageDelete": "Suppression de messages"

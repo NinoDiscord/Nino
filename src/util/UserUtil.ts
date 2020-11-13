@@ -1,5 +1,5 @@
+import { Constants } from 'eris';
 import Bot from '../structures/Bot';
-import { User } from 'eris';
 
 export function findId(query: string): string | undefined {
   if (/^[0-9]+$/.test(query)) return query;
@@ -8,8 +8,11 @@ export function findId(query: string): string | undefined {
   return undefined;
 }
 
-export default function(bot: Bot, query: string): User | undefined {
+export default async function (bot: Bot, guildID: string, query: string) {
   const id = findId(query);
-  if (id) return bot.client.users.get(id);
-  else return undefined;
+  const hasIntent = !!((bot.client.options.intents as number)! & Constants.Intents.guildMembers);
+
+  if (id !== undefined && hasIntent) return bot.client.getRESTGuildMember(guildID, id);
+  else if (id !== undefined && !hasIntent) return bot.client.getRESTUser(id);
+  return undefined;
 }
