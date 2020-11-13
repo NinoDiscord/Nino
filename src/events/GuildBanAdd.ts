@@ -42,7 +42,7 @@ export default class GuildBanAddEvent extends Event {
       username: user.username,
       discriminator: user.discriminator
     };
-    const caseModel = await this.punishmentService.createCase(member, punishment, logEntry.reason);
+    const caseModel = await this.punishmentService.createCase(member, punishment, logEntry.reason || undefined);
     return this.punishmentService.postToModLog(caseModel);
   }
 }
