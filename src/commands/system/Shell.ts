@@ -24,21 +24,18 @@ export default class ShellCommand extends Command {
   async run(ctx: Context) {
     if (!ctx.args.get(0)) return ctx.send('What am I supposed to execute?');
 
-    const message = await ctx.send('Evaluating script...');
     const script = ctx.args.join(' ');
     let result: string;
     try {
       result = execSync(script, { encoding: 'utf-8' });
 
-      await message.edit(stripIndents`
-        > :pencil2: **Script was evaluated successfully, here is the result:**
+      await ctx.send(stripIndents`
         \`\`\`sh
         ${this.redact(result)}
         \`\`\`
       `);
     } catch (ex) {
-      await message.edit(stripIndents`
-        > :x: **Unable to evaluate script:**
+      await ctx.send(stripIndents`
         \`\`\`sh
         ${ex.message}
         \`\`\`
@@ -56,8 +53,9 @@ export default class ShellCommand extends Command {
     ];
 
     if (this.bot.config.ksoft) tokens.push(this.bot.config.ksoft);
-    if (this.bot.config.botlists) tokens.push(this.bot.config.botlists.bfdtoken, this.bot.config.botlists.blstoken, this.bot.config.botlists.topggtoken, this.bot.config.botlists.dboatstoken);
-    
+    if (this.bot.config.botlists) tokens.push(this.bot.config.botlists.bfdtoken, this.bot.config.botlists.blstoken, this.bot.config.botlists.topggtoken, this.bot.config.botlists.dboatstoken, this.bot.config.botlists.dservicestoken, this.bot.config.botlists.deltoken);
+    if (this.bot.config.dbAuth) tokens.push(this.bot.config.dbAuth.password);
+
     tokens = tokens.filter(Boolean);
     const cancellationToken = new RegExp(tokens.join('|'), 'gi');
     return script.replace(cancellationToken, '--snip--');

@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "0.9.13",
+  "version": "0.9.14",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": "https://github.com/NinoDiscord/Nino",
@@ -32,7 +32,7 @@
   "dependencies": {
     "@augu/immutable": "0.5.0",
     "@augu/sysinfo": "0.2.1",
-    "@sentry/node": "5.27.3",
+    "@sentry/node": "5.27.4",
     "common-tags": "1.8.0",
     "eris": "0.14.0",
     "inversify": "5.0.1",
