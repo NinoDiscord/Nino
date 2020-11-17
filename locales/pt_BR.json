@@ -37,6 +37,7 @@
       "noPerms": "I don't have permissions to check the ban list, please make sure I have that permission!",
       "banSelf": "Oh? What did I do to deserve this...? :(",
       "banOwner": "Nice try, you can't perform this action on the owner... idiot~",
+      "unknownMember": "Seems like the member you tried to perform this action... is unknown... non-existent? Seems weird if you ask me.",
       "events": {
         "messageUpdate": "Message Updates",
         "messageDelete": "Message Deletions"
