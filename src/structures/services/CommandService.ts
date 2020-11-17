@@ -155,6 +155,7 @@ export default class CommandService {
         this.bot.logger.info(`Ran command "${prefix}${invoked.command.name}" for ${ctx.sender.username}#${ctx.sender.discriminator} in ${ctx.guild ? `guild ${ctx.guild.name}` : 'DMs'}, now at ${this.bot.statistics.commandsExecuted.toLocaleString()} commands executed!`);
       } catch(ex) {
         if (ex.message.includes('Missing Access')) return ctx.send(locale.translate('global.missingAccess'));
+        if (ex.message.includes('Unknown Member')) return ctx.send(locale.translate('global.unknownMember'));
 
         const embed = createEmptyEmbed();
         const owners = this.bot.owners.map(userID => {
