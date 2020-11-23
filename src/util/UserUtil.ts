@@ -8,11 +8,16 @@ export function findId(query: string): string | undefined {
   return undefined;
 }
 
-export default async function (bot: Bot, guildID: string, query: string) {
+export default async function (bot: Bot, guildID: string, query: string, callRest: boolean = true) {
   const id = findId(query);
   const hasIntent = !!((bot.client.options.intents as number)! & Constants.Intents.guildMembers);
 
-  if (id !== undefined && hasIntent) return bot.client.getRESTGuildMember(guildID, id);
-  else if (id !== undefined && !hasIntent) return bot.client.getRESTUser(id);
-  return undefined;
+  if (callRest) {
+    if (id !== undefined && hasIntent) return bot.client.getRESTGuildMember(guildID, id);
+    else if (id !== undefined && !hasIntent) return bot.client.getRESTUser(id);
+    else return undefined;    
+  } else {
+    if (id !== undefined) return bot.client.users.get(id);
+    return undefined;
+  }
 }

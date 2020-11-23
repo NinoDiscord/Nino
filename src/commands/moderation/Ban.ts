@@ -31,7 +31,7 @@ export default class BanCommand extends Command {
     if (!ctx.args.has(0)) return ctx.sendTranslate('global.noUser');
 
     const userID = ctx.args.get(0);
-    const user = await findUser(this.bot, ctx.guild!.id, userID);
+    const user = await findUser(this.bot, ctx.guild!.id, userID, false);
     if (!user) return ctx.sendTranslate('global.unableToFind');
 
     let member: Member | { id: string; guild: Guild } | undefined = ctx.guild!.members.get(user.id);
@@ -40,7 +40,7 @@ export default class BanCommand extends Command {
     if (member instanceof Member) {
       if (member.user.id === ctx.guild!.ownerID) return ctx.sendTranslate('global.banOwner');
       if (member.user.id === this.bot.client.user.id) return ctx.sendTranslate('global.banSelf');
-      if (!member.permission.has('administrator') && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
+      if (!member.permissions.has('administrator') && member.permissions.has('banMembers')) return ctx.sendTranslate('global.banMods');
       if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
       if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
     }
