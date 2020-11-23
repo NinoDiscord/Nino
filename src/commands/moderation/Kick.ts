@@ -40,7 +40,7 @@ export default class KickCommand extends Command {
 
     if (member.user.id === ctx.guild!.ownerID) return ctx.sendTranslate('global.banOwner');
     if (member.user.id === this.bot.client.user.id) return ctx.sendTranslate('global.banSelf');
-    if (!ctx.member!.permission.has('administrator') && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
+    if (!ctx.member!.permissions.has('administrator') && member.permissions.has('banMembers')) return ctx.sendTranslate('global.banMods');
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
     if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
 
