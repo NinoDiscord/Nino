@@ -44,6 +44,17 @@
       },
       "banMods": "Nice try... you aren't allowed to perform this action on a Moderator."
     },
+    "events": {
+      "mentions": {
+        "title": "Hello there, ${user}! 👋",
+        "description": [
+          "I am **${username}** and I am an advanced moderation bot for **${guild}**!",
+          "If you would like to see all the commands I have available, run **${prefix}help**!",
+          "",
+          "Optionally if you like, you can invite me to your server! Run **${prefix}invite** command for more information."
+        ]
+      }
+    },
     "errors": {
       "title": "Não foi possível usar comando ${command}!",
       "guildOnly": "Desculpe, mas o comando `${command}` deve ser usado num servidor!",

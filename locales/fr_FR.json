@@ -44,6 +44,17 @@
               "messageDelete": "Suppression de messages"
             }
         },
+        "events": {
+            "mentions": {
+                "title": "Hello there, ${user}! 👋",
+                "description": [
+                    "I am **${username}** and I am an advanced moderation bot for **${guild}**!",
+                    "If you would like to see all the commands I have available, run **${prefix}help**!",
+                    "",
+                    "Optionally if you like, you can invite me to your server! Run **${prefix}invite** command for more information."
+                ]
+            }
+        },
         "errors": {
             "title": "Impossible d'exécter la commande ${command}!",
             "guildOnly": "Désolé, mais la commande`${command}` doit être exécutée dans une guilde!",
