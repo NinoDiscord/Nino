@@ -1,5 +1,5 @@
 import PunishmentService, { Punishment, PunishmentType } from '../structures/services/PunishmentService';
-import { Client, Constants, Guild, Member } from 'eris';
+import { Client, Constants, Guild, GuildAuditLog, Member } from 'eris';
 import { inject, injectable } from 'inversify';
 import { TYPES } from '../types';
 import Bot from '../structures/Bot';
@@ -34,7 +34,13 @@ export default class GuildMemberUpdateEvent extends Event {
     // Fetch audit logs
     if (!guild.members.get(this.client.user.id)!.permission.has('viewAuditLogs')) return;
 
-    const logs = await guild.getAuditLogs(10, undefined, Constants.AuditLogActions.MEMBER_ROLE_UPDATE);
+    let logs: GuildAuditLog | undefined = undefined;
+    try {
+      logs = await guild.getAuditLogs(10, undefined, Constants.AuditLogActions.MEMBER_ROLE_UPDATE);
+    } catch(ex) {
+      return;
+    }
+
     if (!logs.entries.length) return; // Don't do anything if there is no entries
 
     // There are no roles updated?

@@ -24,8 +24,14 @@ export default class ShellCommand extends Command {
   async run(ctx: Context) {
     if (!ctx.args.get(0)) return ctx.send('What am I supposed to execute?');
 
-    const script = ctx.args.join(' ');
+    let script = ctx.args.join(' ');
     let result: string;
+
+    if (script.startsWith('"') && script.endsWith('"')) {
+      script = script.replace(/"/g, '');
+      script = script.replace(/"/g, '');
+    }
+
     try {
       result = execSync(script, { encoding: 'utf-8' });
 
@@ -37,7 +43,7 @@ export default class ShellCommand extends Command {
     } catch (ex) {
       await ctx.send(stripIndents`
         \`\`\`sh
-        ${ex.message}
+        ${ex.stack || 'None'}
         \`\`\`
       `);
     }

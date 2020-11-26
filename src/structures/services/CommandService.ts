@@ -109,7 +109,33 @@ export default class CommandService {
     const guild = (m.channel as TextChannel).guild;
     const me = guild.members.get(this.bot.client.user.id);
     if (!(m.channel as TextChannel).permissionsOf(me!.id).has('sendMessages')) return;
-    const mention = new RegExp(`^<@!?${this.bot.client.user.id}> `).exec(m.content);
+    
+    const mentionRegex = new RegExp(`^<@!?${this.bot.client.user.id}> `);
+
+    if ((new RegExp(`^<@!?${this.bot.client.user.id}>$`)).test(m.content)) {
+      const user = await this.bot.userSettings.getOrCreate(m.author.id);
+      const settings = await this.bot.settings.getOrCreate(guild.id);
+      const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
+
+      const embed = createEmptyEmbed()
+        .setTitle(locale.translate('events.mentions.title', { user: `${m.author.username}#${m.author.discriminator}` }))
+        .setDescription(locale.translate('events.mentions.description', {
+          username: this.bot.client.user.username,
+          guild: m.channel.guild.name,
+          prefix: settings.prefix
+        }));
+
+      return m.channel.createMessage({
+        embed: embed.build(),
+        allowedMentions: {
+          everyone: false,
+          roles: false,
+          users: false
+        }
+      });
+    }
+
+    const mention = mentionRegex.exec(m.content);
     const settings = await this.bot.settings.getOrCreate(guild.id);
     const prefixes = [
       settings!.prefix,
@@ -119,12 +145,11 @@ export default class CommandService {
     if (mention !== null) prefixes.push(`${mention}`);
     if (this.bot.client.user.id === '531613242473054229') prefixes.push('nino ');
 
-    const user = await this.bot.userSettings.get(m.author.id);
+    const user = await this.bot.userSettings.getOrCreate(m.author.id);
     const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
 
-    let prefix: string | null = null;
-    for (let pre of prefixes) if (m.content.startsWith(pre)) prefix = pre;
-    if (prefix === null) return;
+    const prefix = prefixes.find(p => m.content.startsWith(p));
+    if (prefix === undefined) return;
     
     const args = m.content.slice(prefix.length).trim().split(/ +/g);
     const ctx = new CommandContext(this.bot, m, args, locale, settings);

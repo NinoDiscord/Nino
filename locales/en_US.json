@@ -45,6 +45,17 @@
         "messageDelete": "Message Deletions"
       }
     },
+    "events": {
+      "mentions": {
+        "title": "Hello there, ${user}! 👋",
+        "description": [
+          "I am **${username}** and I am an advanced moderation bot for **${guild}**!",
+          "If you would like to see all the commands I have available, run **${prefix}help**!",
+          "",
+          "Optionally if you like, you can invite me to your server! Run **${prefix}invite** command for more information."
+        ]
+      }
+    },
     "errors": {
       "title": "Unable to run command ${command}!",
       "guildOnly": "Sorry, but command `${command}` needs to be ran in a guild!",
@@ -97,10 +108,8 @@
         "invite": {
           "title": "Invite Me",
           "description": [
-            "> **Invite me to your server today o-or join my owner's Discord to get updates and such...**",
-            "",
-            ":link: **${invite}**",
-            ":island: **${server}**"
+            ":link:   **Invite**: ${invite}",
+            ":island: **Discord**: ${server}"
           ]
         },
         "locale": {
