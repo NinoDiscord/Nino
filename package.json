@@ -41,7 +41,7 @@
     "js-yaml": "3.14.0",
     "leeks.js": "0.0.9",
     "long-timeout": "0.1.1",
-    "mongoose": "5.10.15",
+    "mongoose": "5.10.16",
     "ms": "2.1.2",
     "reflect-metadata": "0.1.13",
     "wumpfetch": "0.3.1"
