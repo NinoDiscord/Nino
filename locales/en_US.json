@@ -108,10 +108,8 @@
         "invite": {
           "title": "Invite Me",
           "description": [
-            "> **Invite me to your server today o-or join my owner's Discord to get updates and such...**",
-            "",
-            ":link: **${invite}**",
-            ":island: **${server}**"
+            ":link:   **Invite**: ${invite}",
+            ":island: **Discord**: ${server}"
           ]
         },
         "locale": {
