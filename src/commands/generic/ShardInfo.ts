@@ -39,7 +39,7 @@ export default class ShardInfoCommand extends Command {
       });
 
       const prefix = shard.status === 'disconnected' ? '-' : shard.status === 'connecting' || shard.status === 'handshaking' ? '*' : '+';
-      info += `${prefix} ${translated}`;
+      info += `${prefix} ${translated}\n`;
     }
 
     const embed = createEmptyEmbed()
