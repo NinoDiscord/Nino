@@ -50,7 +50,7 @@ export default class SettingsCommand extends Command {
   }
 
   private isInteger(str: string) {
-    return (/^[0-9]$/).test(str);
+    return (/[0-9]\d+/).test(str);
   }
 
   private isInRange(num: Number, lowerBound: Number, upperBound: Number) {
@@ -149,6 +149,7 @@ export default class SettingsCommand extends Command {
         }
 
         const id = this.extractChannelId(channelID);
+        console.log(channelID, id);
         if (id === null) {
           return ctx.sendTranslate('global.invalidChannel', { channel: channelID });
         }
@@ -371,7 +372,7 @@ export default class SettingsCommand extends Command {
     if (str.startsWith('<#') && str.endsWith('>')) {
       return str.substring(2, str.length - 1);
     }
-    if (this.isInteger(str)) {
+    if (/^[0-9]+$/.test(str)) {
       return str;
     }
     return null;
@@ -770,6 +771,7 @@ export default class SettingsCommand extends Command {
     });
 
     const embed = createEmptyEmbed()
+      .setTitle(ctx.translate('commands.generic.settings.view.title', { guild: ctx.guild!.name }))
       .setDescription(desc)
       .build();
 

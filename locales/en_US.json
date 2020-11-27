@@ -361,6 +361,7 @@
             }
           },
           "view": {
+            "title": "[ Settings for ${guild} ]",
             "punishment": [
               "• #${index}. **${type} with ${warnings} warnings**",
               "   • Role: ${roleId}",

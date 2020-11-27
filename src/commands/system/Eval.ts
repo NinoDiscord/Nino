@@ -45,8 +45,10 @@ export default class EvalCommand extends Command {
       script = script.replace('```', '');
     }
 
+    const isAsync = script.includes('return') || script.includes('await');
+  
     try {
-      result = eval(`(async()=>{${script}})()`);
+      result = eval(isAsync ? `(async()=>{${script}})()` : script);
 
       if (result instanceof Promise) result = await result;
       if (typeof result !== 'string')
