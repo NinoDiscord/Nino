@@ -52,19 +52,6 @@ interface RedisServerInfo {
   redis_mode: 'standalone' | 'cluster' | 'sentinel';
 }
 
-/*
-const info = await this.bot.redis.info('server');
-const arr = info.split(/\n\r?/).map((value) => {
-  const [key, val] = value.split(':');
-  return { [key]: typeof val === 'string' ? val.trim() : val };
-}).reduce((first, second) => ({ ...first, ...second }), {});
-
-delete arr['# Server\r'];
-delete arr[''];
-
-return arr;
-*/
-
 interface MongoStats {
   uptimeMillis: number;
   pid: number;
