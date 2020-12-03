@@ -46,6 +46,12 @@ export default class EvalCommand extends Command {
     }
 
     const isAsync = script.includes('return') || script.includes('await');
+    const slient = ctx.flags.get('slient') || ctx.flags.get('s');
+
+    if (typeof slient === 'string') {
+      const language = this.bot.locales.get('en_US')!;
+      return ctx.send(language.translate('global.invalidFlag.boolean', { flag: 'slient' }));
+    }
   
     try {
       result = eval(isAsync ? `(async()=>{${script}})()` : script);
@@ -56,6 +62,8 @@ export default class EvalCommand extends Command {
           depth: depthSize,
           showHidden: false,
         });
+
+      if (slient) return;
 
       const _res = this.redact(result);
       return ctx.send([
