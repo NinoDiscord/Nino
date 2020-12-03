@@ -162,7 +162,7 @@ export default class PunishmentService {
 
     if (
       (member instanceof Member && !PermissionUtils.above(me, member)) ||
-      (me.permission.allow & this.getPermissions(punishment)) === 0
+      (me.permissions.allow & this.getPermissions(punishment)) === 0
     ) return;
 
     switch (punishment.type) {
@@ -172,6 +172,8 @@ export default class PunishmentService {
 
       case PunishmentType.Kick: {
         let mem = await this.resolveToMember(member);
+
+        if (reason) reason = encodeURIComponent(reason);
         await mem.kick(reason);
       } break;
 
@@ -197,9 +199,9 @@ export default class PunishmentService {
       case PunishmentType.Unban: {
         const bans = await guild.getBans();
 
-        if (bans.some(ban => ban.user.id === member.id)) {
+        if (reason) reason = encodeURIComponent(reason);
+        if (bans.some(ban => ban.user.id === member.id)) 
           await guild.unbanMember(member.id, reason);
-        }
       } break;
 
       case PunishmentType.RemoveRole: {

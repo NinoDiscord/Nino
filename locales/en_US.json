@@ -52,7 +52,12 @@
           "I am **${username}** and I am an advanced moderation bot for **${guild}**!",
           "If you would like to see all the commands I have available, run **${prefix}help**!",
           "",
-          "Optionally if you like, you can invite me to your server! Run **${prefix}invite** command for more information."
+          "Available prefixes are **${prefixes}**, example: ${random}help!",
+          "",
+          "Optionally if you like, you can invite me to your server if you think I'll suit your server!",
+          "",
+          ":link: **Invite**: ${invite}",
+          ":island: **Discord**: ${server}"
         ]
       }
     },
@@ -69,7 +74,11 @@
       },
       "unknown": [
         "The error that occured has been logged into our systems.",
-        "If this is repeative, report it to ${owners} at ${server}."
+        "If this is repeative, report it to ${owners} at ${server}.",
+        "",
+        "```js",
+        "${stack}",
+        "```"
       ]
     },
     "automod": {

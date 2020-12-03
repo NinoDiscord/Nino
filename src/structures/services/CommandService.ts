@@ -116,13 +116,20 @@ export default class CommandService {
       const user = await this.bot.userSettings.getOrCreate(m.author.id);
       const settings = await this.bot.settings.getOrCreate(guild.id);
       const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
+      const prefixes = [settings.prefix, this.bot.config.discord.prefix, `<@!${this.bot.client.user.id}>`];
+
+      if (this.bot.client.user.id === '531613242473054229') prefixes.push('nino ');
 
       const embed = createEmptyEmbed()
         .setTitle(locale.translate('events.mentions.title', { user: `${m.author.username}#${m.author.discriminator}` }))
         .setDescription(locale.translate('events.mentions.description', {
           username: this.bot.client.user.username,
           guild: m.channel.guild.name,
-          prefix: settings.prefix
+          prefix: settings.prefix,
+          prefixes: prefixes.filter((value, index) => prefixes.indexOf(value) === index).join(', '),
+          random: prefixes[Math.floor(Math.random() * prefixes.length)],
+          server: 'https://discord.gg/yDnbEDH',
+          invite: `https://discord.com/oauth2/authorize?client_id=${this.bot.client.user.id}&scope=bot`
         }));
 
       return m.channel.createMessage({
@@ -193,7 +200,8 @@ export default class CommandService {
           .setTitle(locale.translate('errors.failed', { command: invoked.command.name }))
           .setDescription(locale.translate('errors.unknown', {
             owners,
-            server: 'https://discord.gg/yDnbEDH'
+            server: 'https://discord.gg/yDnbEDH',
+            stack: ex.stack ? ex.stack : 'UnknownException: I have no idea what occured.'
           }));
 
         this.bot.logger.error(`Unable to run the '${invoked.command.name}' command!`, ex.stack ? ex.stack : ex.message);
