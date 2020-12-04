@@ -474,7 +474,7 @@
           "invalid": "Caso #**${id}** não encontrado!",
           "edited": ":ok_hand: Atualizado caso #**${id}** com razão **${reason}**",
           "error": "Não foi possível alterar caso #${id}.",
-          "notMute": "Case #**${id}** was not a mute."
+          "notMute": "Case #**${id}** was not a mute or unban."
         },
         "warnings": {
           "none": "Usuário não tem avisos.",

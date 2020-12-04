@@ -475,7 +475,7 @@
                     "invalid": "Le cas #**${id}** est introuvable",
                     "edited": ":ok_hand: cas mis à jour #**${id}** avec raison **${reason}**",
                     "error": "Je n'ai pas pu mettre à jour le cas #${id}.",
-                    "notMute": "Case #**${id}** was not a mute."
+                    "notMute": "Case #**${id}** was not a mute or unban."
                 },
                 "warnings": {
                     "none": "L'utilisateur n'a aucun avertissement.",

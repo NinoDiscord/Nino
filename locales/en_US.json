@@ -490,7 +490,7 @@
           "invalid": "Case #**${id}** was not found.",
           "edited": ":ok_hand: Updated case #**${id}** with reason **${reason}**",
           "error": "I was unable to update case #${id}.",
-          "notMute": "Case #**${id}** was not a mute."
+          "notMute": "Case #**${id}** was not a mute or unban."
         },
         "warnings": {
           "none": "User has no warnings.",

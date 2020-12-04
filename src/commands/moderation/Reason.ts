@@ -48,7 +48,7 @@ export default class ReasonCommand extends Command {
 
     if (!caseModel || !caseModel.message) return ctx.sendTranslate('commands.moderation.reason.invalid', { id });
     if (ctx.flags.has('time') || ctx.flags.has('t')) {
-      if (caseModel.type !== 'mute') return ctx.sendTranslate('commands.moderation.reason.notMute', { id });
+      if (caseModel.type !== 'mute' || (<any> caseModel.type) !== 'unban') return ctx.sendTranslate('commands.moderation.reason.notMute', { id });
 
       const t = ctx.flags.get('time') || ctx.flags.get('t');
       if (typeof t === 'boolean') return ctx.sendTranslate('global.invalidFlag.string');
