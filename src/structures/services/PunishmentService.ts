@@ -15,7 +15,6 @@ import TimeoutsManager from '../managers/TimeoutsManager';
 import ms = require('ms');
 import { fetchGuild } from '../../util/DiscordUtils';
 import { firstUpper } from '../../util';
-import { encode } from 'punycode';
 
 /**
  * Punishment types
