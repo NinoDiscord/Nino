@@ -15,6 +15,7 @@ import TimeoutsManager from '../managers/TimeoutsManager';
 import ms = require('ms');
 import { fetchGuild } from '../../util/DiscordUtils';
 import { firstUpper } from '../../util';
+import { encode } from 'punycode';
 
 /**
  * Punishment types
@@ -173,8 +174,7 @@ export default class PunishmentService {
       case PunishmentType.Kick: {
         let mem = await this.resolveToMember(member);
 
-        if (reason) reason = encodeURIComponent(reason);
-        await mem.kick(reason);
+        await mem.kick(reason ? encodeURIComponent(reason) : undefined);
       } break;
 
       case PunishmentType.Mute: {
@@ -199,9 +199,8 @@ export default class PunishmentService {
       case PunishmentType.Unban: {
         const bans = await guild.getBans();
 
-        if (reason) reason = encodeURIComponent(reason);
         if (bans.some(ban => ban.user.id === member.id)) 
-          await guild.unbanMember(member.id, reason);
+          await guild.unbanMember(member.id, reason ? encodeURIComponent(reason) : undefined);
       } break;
 
       case PunishmentType.RemoveRole: {
