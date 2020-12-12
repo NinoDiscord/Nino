@@ -32,7 +32,7 @@
   "dependencies": {
     "@augu/immutable": "0.6.0",
     "@augu/sysinfo": "0.2.1",
-    "@sentry/node": "5.28.0",
+    "@sentry/node": "5.29.0",
     "common-tags": "1.8.0",
     "eris": "0.14.0",
     "inversify": "5.0.1",
