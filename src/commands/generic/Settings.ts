@@ -50,7 +50,7 @@ export default class SettingsCommand extends Command {
   }
 
   private isInteger(str: string) {
-    return (/[0-9]\d+/).test(str);
+    return /[0-9]\d+/.test(str);
   }
 
   private isInRange(num: Number, lowerBound: Number, upperBound: Number) {
@@ -62,7 +62,7 @@ export default class SettingsCommand extends Command {
     const punishment = ctx.args.get(2);
     const punishments = ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'];
 
-    if (!warnings || !this.isInteger(warnings) || !this.isInRange(Number(warnings), 1, 5)) {
+    if (!warnings || !Number.isNaN(warnings) || !this.isInRange(Number(warnings), 1, 5)) {
       return ctx.sendTranslate('commands.generic.settings.add.amountRequired');
     }
 
