@@ -167,7 +167,7 @@
                     "noSubcommand": "Aucune sous-commande n'a été fournie (${subcommands})",
                     "noChannel": "Aucun ID, mention ou nom de chaîne n'a été spêcifié",
                     "add": {
-                        "amountRequired": "Le nombre d'avertiseements pour enchaîner une punition! il doit s'agir d'un nombre compris entre 1 et 5.",
+                        "amountRequired": "Le nombre d'avertiseements pour enchaîner une punition! il doit s'agir d'un nombre compris entre 1 et 10.",
                         "invalidPunishment": "Chaîtiment **${punishment}** n'est pas une punition valide à ajouter. (${punishments})",
                         "missingRoleID": "Il vous manque actuellement un ID de rôle.",
                         "invalidDays": "Nombre de jours incorrect. L'indicateur 'days' est le nombre de jours de messages à supprimer lors de l'interdiction.",

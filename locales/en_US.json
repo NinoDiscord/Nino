@@ -170,7 +170,7 @@
           "noSubcommand": "No subcommand was provided. (${subcommands})",
           "noChannel": "No channel ID, mention, or name were specified.",
           "add": {
-            "amountRequired": "Amount of warnings to chain a punishment is required, make it a number between 1 and 5.",
+            "amountRequired": "Amount of warnings to chain a punishment is required, make it a number between 1 and 10.",
             "invalidPunishment": "Punishment **${punishment}** is not a valid punishment to add. (${punishments})",
             "missingRoleID": "You are currently missing a role ID.",
             "invalidDays": "Incorrect amount of days. The `days` flag is the amount of days of messages to delete when banning.",
