@@ -167,7 +167,7 @@
           "noSubcommand": "Nenhum sub comando provido. (${subcommands})",
           "noChannel": "Falta o ID do canal, menção ou nome.",
           "add": {
-            "amountRequired": "Quantidade de alertas para resultar em punição! Deve ser um número entre 1 e 5.",
+            "amountRequired": "Quantidade de alertas para resultar em punição! Deve ser um número entre 1 e 10.",
             "invalidPunishment": "Punição **${punishment}** não é válida para adicionar. (${punishments})",
             "missingRoleID": "Você precisa prover o ID de um cargo.",
             "invalidDays": "Quantidade incorreta de dias. A flag `days` é a quantidade de dias para remover as mensagens ao banir.",
@@ -176,7 +176,8 @@
             "success": "Punição adicionada ao banco de dados.",
             "invalidTime": "A flag `--time` deve ser uma expressão de tempo correta, exemplos válidos são 0.5h, 30m, 0.5 horas, ou 30 minutos.",
             "invalidRole": "Cargo inválido ou não encontrado.",
-            "noPunishment": "You didn't provide a punishment to do! Please view the list here: ${punishments}."
+            "noPunishment": "You didn't provide a punishment to do! Please view the list here: ${punishments}.",
+            "notInRange": "The amount specific was not in the range: 1 to 10 punishments."
           },
           "remove": {
             "invalidIndex": "Índice provido inválido. Veja o rótulo utilizando `x!settings view`.",
