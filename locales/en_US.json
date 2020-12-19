@@ -179,7 +179,8 @@
             "success": "I have added the punishment to the database.",
             "invalidTime": "The `--time` flag must be a currect time expression, it can be from 0.5h, 30m, 0.5 hours, or 30 minutes.",
             "invalidRole": "The role wasn't found or it was invalid",
-            "noPunishment": "You didn't provide a punishment to do! Please view the list here: ${punishments}."
+            "noPunishment": "You didn't provide a punishment to do! Please view the list here: ${punishments}.",
+            "notInRange": "The amount specific was not in the range: 1 to 10 punishments."
           },
           "remove": {
             "invalidIndex": "The index you provided was not a valid index, you can view the punishment index by `x!settings view`.",

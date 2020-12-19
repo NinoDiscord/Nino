@@ -53,7 +53,10 @@ export default class SettingsCommand extends Command {
     return /[0-9]\d+/.test(str);
   }
 
-  private isInRange(num: Number, lowerBound: Number, upperBound: Number) {
+  private isInRange(num: number | string, lowerBound: number, upperBound: number) {
+    if (typeof num === 'string') num = Number(num);
+    if (isNaN(num)) return false;
+
     return num >= lowerBound && num <= upperBound;
   }
 
@@ -62,9 +65,9 @@ export default class SettingsCommand extends Command {
     const punishment = ctx.args.get(2);
     const punishments = ['ban', 'mute', 'unmute', 'kick', 'role', 'unrole'];
 
-    if (!warnings || !Number.isNaN(warnings) || !this.isInRange(Number(warnings), 1, 5)) {
-      return ctx.sendTranslate('commands.generic.settings.add.amountRequired');
-    }
+    if (!warnings) return ctx.sendTranslate('commands.generic.settings.add.amountRequired');
+    if (isNaN(Number(warnings))) return ctx.sendTranslate('global.nan');
+    if (!this.isInRange(warnings, 1, 10)) return ctx.sendTranslate('commands.generic.settings.add.notInRange');
 
     if (!punishment) return ctx.sendTranslate('commands.generic.settings.add.noPunishment', {
       punishments: punishments.join(', ')
