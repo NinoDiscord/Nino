@@ -2,6 +2,7 @@ FROM node:latest
 
 WORKDIR /opt/Nino
 COPY package*.json ./
+RUN apk add git
 RUN yarn
 RUN npm install -g eslint
 COPY . .
