@@ -40,7 +40,7 @@ First, check our [contributing guidelines](https://github.com/NinoDiscord/Nino/b
 
 Bot credentials (+ extra information) and personal touches are obviously your responsibility. You should know this by now, I hope.
 
-### Setting up the bot using Docker
+### Notes when using Docker
 1. Use the example application.yml but change ``localhost`` in the URL for the database to ``database`` and change the host for Redis to ``redis``
 2. Run ``docker-compose up``
 
