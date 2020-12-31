@@ -128,7 +128,7 @@ export default class CommandService {
           prefix: settings.prefix,
           prefixes: prefixes.filter((value, index) => prefixes.indexOf(value) === index).join(', '),
           random: prefixes[Math.floor(Math.random() * prefixes.length)],
-          server: 'https://discord.gg/yDnbEDH',
+          server: 'https://discord.gg/JjHGR6vhcG',
           invite: `https://discord.com/oauth2/authorize?client_id=${this.bot.client.user.id}&scope=bot`
         }));
 
@@ -200,7 +200,7 @@ export default class CommandService {
           .setTitle(locale.translate('errors.failed', { command: invoked.command.name }))
           .setDescription(locale.translate('errors.unknown', {
             owners,
-            server: 'https://discord.gg/yDnbEDH',
+            server: 'https://discord.gg/JjHGR6vhcG',
             stack: ex.stack ? ex.stack : 'UnknownException: I have no idea what occured.'
           }));
 

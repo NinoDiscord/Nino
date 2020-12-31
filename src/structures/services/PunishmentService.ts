@@ -394,7 +394,7 @@ export default class PunishmentService {
       `;
 
     if (caseModel.soft) description += '\n• **Type**: Soft Ban';
-    else if (caseModel.time) {
+    if (caseModel.time !== undefined) {
       const time = ms(caseModel.time, { long: true });
       description += `\n• **Time**: ${time}`;
     }

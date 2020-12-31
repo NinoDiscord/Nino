@@ -49,7 +49,7 @@ export default class BanCommand extends Command {
       const bans = await ctx.guild!.getBans();
       const hasBan = bans.find(ban => ban.user.id === user.id);
 
-      if (hasBan) return ctx.sendTranslate('global.alreadyBanned');
+      if (hasBan !== undefined) return ctx.sendTranslate('global.alreadyBanned');
     } catch {
       return ctx.sendTranslate('global.noPerms');
     }

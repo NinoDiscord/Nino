@@ -26,7 +26,7 @@ export default class InviteCommand extends Command {
       .setTitle(ctx.translate('commands.generic.invite.title'))
       .setDescription(ctx.translate('commands.generic.invite.description', {
         invite: `<https://discord.com/oauth2/authorize?client_id=${this.client.user.id}&scope=bot>`,
-        server: 'https://discord.gg/yDnbEDH'
+        server: 'https://discord.gg/JjHGR6vhcG'
       }))
       .build();
 

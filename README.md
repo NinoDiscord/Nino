@@ -3,7 +3,7 @@
 
 > :hammer: **| Moderation-based Discord bot initally created for the Discord hackweek, now it is still regularly maintained.**
 >
-> [Website](https://nino.augu.dev) **|** [Support Server](https://discord.gg/pEKkg9r) **|** [Invite](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
+> [Website](https://nino.augu.dev) **|** [Support Server](https://discord.gg/JjHGR6vhcG) **|** [Invite](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
 
 ## How to use the bot?
 Check out the [wiki](https://github.com/NinoDiscord/Nino/wiki)!
@@ -40,11 +40,14 @@ First, check our [contributing guidelines](https://github.com/NinoDiscord/Nino/b
 
 Bot credentials (+ extra information) and personal touches are obviously your responsibility. You should know this by now, I hope.
 
+### Notes when using Docker
+1. Use the example application.yml but change ``localhost`` in the URL for the database to ``database`` and change the host for Redis to ``redis``
+2. Run ``docker-compose up -d``
+
 ### Example application.yml
 ```yaml
 environment: 'development'
 databaseUrl: 'mongodb://localhost:27017/database'
-mode: 'development'
 sentryDSN: 'Your Sentry DSN'
 discord:
   token: 'TOKEN'
@@ -63,11 +66,11 @@ If you wish to use the source code for a project, please add proper crediting in
 ## Credits
 ### Maintainers
 * August#5820 (Lead) ([GitHub](https://github.com/auguwu))
-* dondish#0001 (Development Lead) ([GitHub](https://github.com/dondish))
+* dondish#8072 (Development Lead) ([GitHub](https://github.com/dondish))
 
 ### Hackweek Participants
 * August#5820 (Owner) ([GitHub](https://github.com/auguwu))
 * dondish#8072 ([GitHub](https://github.com/dondish))
-* Kyle#9810 ([GitHub](https://github.com/dvhe))
-* Wesselgame#0498 ([GitHub](https://github.com/PassTheWessel))
+* Imposed#9999 ([GitHub](https://github.com/scrap))
+* Wesselgame#0498 ([GitHub](https://github.com/Wessel))
 * ohlookitsderpy#9721 ([GitHub](https://github.com/ohlookitsderpy))

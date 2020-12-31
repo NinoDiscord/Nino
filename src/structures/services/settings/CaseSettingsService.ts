@@ -25,6 +25,7 @@ export default class CaseSettingsService implements Base<CaseModel> {
       .find({ guild })
       .sort('-id')
       .exec();
+
     const query = new this.model({
       guild,
       moderator,
@@ -33,8 +34,9 @@ export default class CaseSettingsService implements Base<CaseModel> {
       reason,
       id: newest[0] ? newest[0].id + 1 : 1,
       soft,
-      time
+      time: time !== undefined ? time : null
     });
+
     await query.save();
     return query;
   }
