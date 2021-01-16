@@ -48,7 +48,8 @@ export default class PardonCommand extends Command {
 
     const reason = ctx.args.has(2) ? ctx.args.slice(2).join(' ') : undefined;
     const punishment = new Punishment(PunishmentType.RemoveWarning, {
-      moderator: ctx.sender
+      moderator: ctx.sender,
+      amount
     });
 
     const r = reason === undefined
@@ -56,7 +57,6 @@ export default class PardonCommand extends Command {
       : ctx.translate('global.pardon.reason', { reason, amount });
 
     await this.punishmentService.punish(member!, punishment, r);
-    await this.punishmentService.pardon(member!, amount);
     const warns = await this.warningService.get(ctx.guild!.id, member.id);
 
     return warns === null 

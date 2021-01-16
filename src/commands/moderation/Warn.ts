@@ -47,19 +47,32 @@ export default class WarnCommand extends Command {
     if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
 
     const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
-    const punishments = await this.punishmentService.addWarning(member!, ctx.member!, reason);
+    const punishments = await this.punishmentService.addWarning(member!, reason);
 
+    const addWarn = punishments.length > 0;
     for (let i of punishments) {
       try {
-        await this.punishmentService.punish(member!, i, reason);
+        await this.punishmentService.punish(member!, i, reason, true);
       } catch (e) {
         return ctx.sendTranslate('global.unable', { error: e.message });
       }
     }
 
+    if (!addWarn) {
+      await this.punishmentService.punish(member!, new Punishment(PunishmentType.AddWarning, {
+        moderator: ctx.member!.user
+      }), reason);
+    }
+
     const warns = await this.warningService.get(ctx.guild!.id, member.id);
+    const warnings = warns === null
+      ? 1
+      : addWarn
+        ? warns.amount + 1
+        : warns.amount;
+
     return ctx.sendTranslate('commands.moderation.warned', {
-      warnings: warns === null ? 1 : warns.amount,
+      warnings,
       suffix: warns === null ? '' : warns.amount > 1 ? 's' : '',
       user: `${member.username}#${member.discriminator}`,
       reason: reason === undefined ? '' : ` (*${reason}*)`
