@@ -4,6 +4,7 @@ export interface WarningModel extends Document {
   guild: string;
   user: string;
   amount: number;
+  reason?: string;
 }
 
 const schema = new Schema<WarningModel>({
@@ -18,8 +19,12 @@ const schema = new Schema<WarningModel>({
   amount: {
     type: Number,
     default: 1,
-    max: 5,
+    max: 10
   },
+  reason: {
+    type: String,
+    default: undefined
+  }
 });
 
 export default model<WarningModel>('warnings', schema, 'warnings');

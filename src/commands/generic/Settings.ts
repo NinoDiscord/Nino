@@ -456,6 +456,15 @@ export default class SettingsCommand extends Command {
           ? ctx.sendTranslate('commands.generic.settings.enable.invites.unable') 
           : ctx.sendTranslate('commands.generic.settings.enable.invites.success'));
       } break;
+      case 'automod.invites.invalid': {
+        await this.bot.settings.update(ctx.guild!.id, {
+          $set: {
+            'automod.invalidInvite': true
+          }
+        }, (error) => error 
+          ? ctx.sendTranslate('commands.generic.settings.enable.invalidInvite.unable') 
+          : ctx.sendTranslate('commands.generic.settings.enable.invalidInvite.success'));
+      } break;
       case 'logging': {
         await this.bot.settings.update(ctx.guild!.id, {
           $set: {

@@ -14,20 +14,22 @@ export default class WarningService implements Base<WarningModel> {
     return document;
   }
 
-  async create(guildId: string, userId: string) {
+  async create(guildId: string, userId: string, reason?: string) {
     const query = new this.model({
       guild: guildId,
       user: userId,
       amount: 0,
+      reason
     });
+
     await query.save();
     return query;
   }
 
-  async getOrCreate(guildId: string, userId: string) {
+  async getOrCreate(guildId: string, userId: string, reason?: string) {
     const warnings = await this.get(guildId, userId);
     if (!warnings) {
-      return this.create(guildId, userId);
+      return this.create(guildId, userId, reason);
     }
     return warnings;
   }

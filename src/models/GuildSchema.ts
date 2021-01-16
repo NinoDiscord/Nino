@@ -10,6 +10,7 @@ export interface GuildModel extends Document {
     dehoist: boolean;
     spam: boolean;
     invites: boolean;
+    invalidInvite: boolean;
     badwords: {
       enabled: boolean;
       wordlist: string[];

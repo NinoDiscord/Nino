@@ -33,6 +33,8 @@ export enum PunishmentType {
   Unmute = 'unmute',
   Unban = 'unban',
   RemoveRole = 'unrole',
+  AddWarning = 'warning add',
+  RemoveWarning = 'warning remove'
 }
 
 export interface PunishmentOptions {
@@ -84,6 +86,8 @@ export default class PunishmentService {
     if (['ban', 'unban'].includes(punishment.type)) return Constants.Permissions.banMembers;
     if (punishment.type === 'kick') return Constants.Permissions.kickMembers;
     if (punishment.type === 'mute') return Constants.Permissions.manageRoles | Constants.Permissions.manageChannels;
+    if (['warning add', 'warning remove'].includes(punishment.type)) return Constants.Permissions.kickMembers;
+
     return 0;
   }
 
@@ -92,22 +96,31 @@ export default class PunishmentService {
    * Returns the punishment for the amount of warnings he now has (if exists)
    * @param member the member to warn
    */
-  async addWarning(member: Member): Promise<Punishment[]> {
+  async addWarning(
+    member: Member, 
+    mod: Member = member.guild.members.get(this.client.user.id)!, // some hack i guess
+    reason?: string
+  ): Promise<Punishment[]> {
     const me = member.guild.members.get(this.client.user.id)!;
     const settings = await this.guildSettingsService.get(member.guild.id);
     if (!settings) return [];
 
-    const warnings = await this.warningService.getOrCreate(member.guild.id, member.id);
+    const warnings = await this.warningService.getOrCreate(member.guild.id, member.id, reason);
     const newWarningCount = warnings.amount + 1;
 
     await this.warningService.update(member.guild.id, member.id, {
       amount: newWarningCount
     });
 
-    const result: Punishment[] = [];
+    const result = [
+      new Punishment(PunishmentType.AddWarning, { moderator: mod.user })
+    ];
+
     for (let options of settings.punishments.filter(x => x.warnings === newWarningCount)) {
       const punishment = new Punishment(options.type as PunishmentType, Object.assign({ moderator: me.user }, options));
       result.push(punishment);
+
+      result.splice(0, 1); // remove the first item so it doesn't clash in
     }
 
     return result;
@@ -413,9 +426,11 @@ export default class PunishmentService {
       mute: 0xFFFF7F,
       unban: 0x66B266,
       unmute: 0x66B266,
+      ['warning add']: 0xFFFF7F,
+      ['warning remove']: 0x66B266
     }[type];
     let suffix!: string;
-    if (type === 'ban' || type === 'unban') suffix = 'ned';
+    if (type === 'ban' || type === 'unban' || type === 'warning add') suffix = 'ned';
     else if (type.endsWith('e')) suffix = 'd';
     else suffix = 'ed';
 

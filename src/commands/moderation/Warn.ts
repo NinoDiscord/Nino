@@ -8,7 +8,7 @@ import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
 import PermissionUtils from '../../util/PermissionUtils';
 import WarningService from '../../structures/services/WarningService';
-import PunishmentService from '../../structures/services/PunishmentService';
+import PunishmentService, { Punishment, PunishmentType } from '../../structures/services/PunishmentService';
 
 @injectable()
 export default class WarnCommand extends Command {
@@ -42,14 +42,16 @@ export default class WarnCommand extends Command {
     
     if (member.user.id === ctx.guild!.ownerID) return ctx.sendTranslate('global.banOwner');
     if (member.user.id === this.bot.client.user.id) return ctx.sendTranslate('global.banSelf');
-    if (!ctx.member!.permission.has('administrator') && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
+    if (!ctx.member!.permissions.has('administrator') && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');
     if (!PermissionUtils.above(ctx.member!, member)) return ctx.sendTranslate('global.hierarchy');
     if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
 
-    const punishments = await this.punishmentService.addWarning(member!);
+    const reason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
+    const punishments = await this.punishmentService.addWarning(member!, ctx.member!, reason);
+
     for (let i of punishments) {
       try {
-        await this.punishmentService.punish(member!, i, '[Automod] Moderator warned user');
+        await this.punishmentService.punish(member!, i, reason);
       } catch (e) {
         return ctx.sendTranslate('global.unable', { error: e.message });
       }
@@ -59,7 +61,8 @@ export default class WarnCommand extends Command {
     return ctx.sendTranslate('commands.moderation.warned', {
       warnings: warns === null ? 1 : warns.amount,
       suffix: warns === null ? '' : warns.amount > 1 ? 's' : '',
-      user: `${member.username}#${member.discriminator}`
+      user: `${member.username}#${member.discriminator}`,
+      reason: reason === undefined ? '' : ` (*${reason}*)`
     });
   }
 }
