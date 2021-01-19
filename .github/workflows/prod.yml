@@ -39,11 +39,18 @@ jobs:
       - name: Run tests with Jest
         run: jest --config jest.config.js --forceExit
 
-      - name: Push to Docker registry
-        if: github.event_name == 'push'
-        uses: docker/login-action@v1
+      - name: SSH to VM
+        uses: appleboy/ssh-action@master
         with:
-          registry: registry.floofy.dev
-          username: ${{ secrets.REGISTRY_USERNAME }}
-          password: ${{ secrets.REGISTRY_PASSWORD }}
-          tags: registry.floofy.dev/nino:latest
+          host: ${{ secrets.HOST }}
+          port: 22
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd ~/nino-prod
+            git pull
+            rm -fr node_modules
+            rm yarn.lock
+            yarn
+            yarn build
+            pm2 restart nino-prod
