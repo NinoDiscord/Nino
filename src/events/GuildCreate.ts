@@ -28,7 +28,7 @@ export default class GuildJoinedEvent extends Event {
     this.commandStatisticsManager.guildCount++;
     await this.bot.redis.set('guilds', this.client.guilds.size);
 
-    const channel = this.client.getChannel('529593466729267200');
+    const channel = this.client.getChannel('760587940535205899');
     if (channel && channel.type === 0) {
       const chan = (channel as TextChannel);
       const embed = createEmptyEmbed()
