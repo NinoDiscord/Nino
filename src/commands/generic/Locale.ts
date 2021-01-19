@@ -45,7 +45,7 @@ export default class ShardInfoCommand extends Command {
         if (!ctx.args.has(1)) return ctx.sendTranslate('commands.generic.locale.set.none', { prefix: settings.prefix });
 
         return this.setLocale(ctx, settings);
-      } 
+      }
 
       default: return ctx.sendTranslate('commands.generic.locale.invalidSubcommand', {
         subcommand
@@ -109,7 +109,7 @@ export default class ShardInfoCommand extends Command {
         }
       }, (error) =>  ctx.sendTranslate(error ? 'commands.generic.locale.reset.unable:guild' : 'commands.generic.locale.reset.success:guild'));
     }
-      
+
     return this.userSettings.update(ctx.sender.id, {
       $set: {
         'locale': 'en_US'
@@ -132,7 +132,7 @@ export default class ShardInfoCommand extends Command {
           'locale': language.code
         }
       }, (error) =>  ctx.sendTranslate(error ? 'commands.generic.locale.set.unable:guild' : 'commands.generic.locale.set.success:guild', { locale: language.code }));
-    } 
+    }
     return  this.userSettings.update(ctx.sender.id, {
       $set: {
         'locale': language.code

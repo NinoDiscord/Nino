@@ -15,7 +15,7 @@ export default class HelpCommand extends Command {
   private commandManager!: CommandManager;
 
   constructor(
-    @inject(TYPES.Bot) bot: Bot, 
+    @inject(TYPES.Bot) bot: Bot,
     @inject(TYPES.Client) private client: Eris.Client,
     @inject(TYPES.Config) private config: Config
   ) {

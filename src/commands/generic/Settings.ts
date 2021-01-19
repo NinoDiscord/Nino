@@ -79,7 +79,7 @@ export default class SettingsCommand extends Command {
         punishment: punishment || '(none provided)'
       });
     }
-  
+
     const temp = ctx.flags.get('time');
     if (temp && (this.isBoolean(temp) || (this.isString(temp) && (!ms(temp as string) || ms(temp as string) < 1000)))) {
       return ctx.sendTranslate('commands.generic.settings.add.invalidTime');
@@ -143,7 +143,7 @@ export default class SettingsCommand extends Command {
   async set(ctx: Context) {
     const setting = ctx.args.get(1);
     const subcommands = ['modlog', 'prefix', 'mutedrole', 'mutedRole', 'automod.swears', 'logging.channelID', 'logging.ignore', 'logging.ignoreUsers'];
-    
+
     switch (setting) {
       case 'modlog': {
         const channelID = ctx.args.get(2);
@@ -204,7 +204,7 @@ export default class SettingsCommand extends Command {
             prefix
           }
         }, (error) => {
-          return error 
+          return error
             ? ctx.sendTranslate('commands.generic.settings.set.prefix.unable', { prefix })
             : ctx.sendTranslate('commands.generic.settings.set.prefix.success', { prefix });
         });
@@ -213,7 +213,7 @@ export default class SettingsCommand extends Command {
       case 'mutedRole': {
         const mutedRole = ctx.args.get(2);
         if (!mutedRole || !/^[0-9]+$/.test(mutedRole)) {
-          return !mutedRole ? 
+          return !mutedRole ?
             ctx.sendTranslate('commands.generic.settings.set.mutedRole.none') :
             ctx.sendTranslate('commands.generic.settings.set.mutedRole.invalid');
         }
@@ -227,8 +227,8 @@ export default class SettingsCommand extends Command {
           $set: {
             mutedRole: role.id
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.set.mutedRole.unable', { role: role.name }) 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.set.mutedRole.unable', { role: role.name })
           : ctx.sendTranslate('commands.generic.settings.set.mutedRole.success', { role: role.name }));
       } break;
       case 'automod.badwords':
@@ -319,7 +319,7 @@ export default class SettingsCommand extends Command {
 
           const user = await this.bot.client.getRESTUser(id);
           const settings = await ctx.getSettings()!;
-          if (settings.logging.ignoreUsers.includes(user.id)) return ctx.sendTranslate('commands.generic.settings.set.ignoreUsers.alreadyIgnored', { members: [`${user.username}#${user.discriminator}`].join(', ') });  
+          if (settings.logging.ignoreUsers.includes(user.id)) return ctx.sendTranslate('commands.generic.settings.set.ignoreUsers.alreadyIgnored', { members: [`${user.username}#${user.discriminator}`].join(', ') });
 
           this.bot.settings.update(ctx.guild!.id, {
             $push: {
@@ -356,16 +356,16 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.channelID': channel.id
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.set.logChannel.unable', { channel: channel.name }) 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.set.logChannel.unable', { channel: channel.name })
           : ctx.sendTranslate('commands.generic.settings.set.logChannel.success', { channel: channel.name }));
       } break;
       default: {
-        return setting === undefined 
-          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
-          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
-            subcommand: setting, 
-            subcommands: subcommands.join(', ') 
+        return setting === undefined
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') })
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', {
+            subcommand: setting,
+            subcommands: subcommands.join(', ')
           });
       }
     }
@@ -397,8 +397,8 @@ export default class SettingsCommand extends Command {
             'automod.badwords.enabled': true,
             'automod.badwords.wordlist': []
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.automod.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.automod.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.automod.success'));
       } break;
       case 'automod.dehoist': {
@@ -406,8 +406,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.dehoist': true
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.dehoist.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.dehoist.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.dehoist.success'));
       }
       case 'automod.spam': {
@@ -415,8 +415,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.spam': true
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.spam.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.spam.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.spam.success'));
       } break;
       case 'automod.raid': {
@@ -424,8 +424,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.raid': true
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.raid.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.raid.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.raid.success'));
       } break;
       case 'automod.mention': {
@@ -433,8 +433,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.mention': true
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.mention.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.mention.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.mention.success'));
       } break;
       case 'automod.swears':
@@ -443,8 +443,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.badwords.enabled': true
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.badwords.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.badwords.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.badwords.success'));
       } break;
       case 'automod.invites': {
@@ -452,8 +452,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.invites': true
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.invites.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.invites.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.invites.success'));
       } break;
       case 'automod.invites.invalid': {
@@ -461,8 +461,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.invalidInvite': true
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.invalidInvite.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.invalidInvite.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.invalidInvite.success'));
       } break;
       case 'logging': {
@@ -470,8 +470,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.enabled': true
           }
-        }, error => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.logging.unable') 
+        }, error => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.logging.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.logging.success'));
       } break;
       case 'logging.events': {
@@ -480,8 +480,8 @@ export default class SettingsCommand extends Command {
             'logging.events.messageDelete': true,
             'logging.events.messageUpdate': true
           }
-        }, error => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.logEvents.unable') 
+        }, error => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.logEvents.unable')
           : ctx.sendTranslate('commands.generic.settings.enable.logEvents.success'));
       } break;
       case 'logging.events.messageDeleted':
@@ -490,9 +490,9 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.events.messageDelete': true
           }
-        }, error => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.messageDelete.unable') 
-          : ctx.sendTranslate('commands.generic.settings.enable.messageDelete.success')); 
+        }, error => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.messageDelete.unable')
+          : ctx.sendTranslate('commands.generic.settings.enable.messageDelete.success'));
       } break;
       case 'logging.events.messageUpdated':
       case 'logging.events.messageUpdate': {
@@ -500,16 +500,16 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.events.messageUpdate': true
           }
-        }, error => error 
-          ? ctx.sendTranslate('commands.generic.settings.enable.messageUpdate.unable') 
-          : ctx.sendTranslate('commands.generic.settings.enable.messageUpdate.success')); 
+        }, error => error
+          ? ctx.sendTranslate('commands.generic.settings.enable.messageUpdate.unable')
+          : ctx.sendTranslate('commands.generic.settings.enable.messageUpdate.success'));
       } break;
       default: {
-        return setting === undefined 
-          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
-          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
-            subcommand: setting, 
-            subcommands: subcommands.join(', ') 
+        return setting === undefined
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') })
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', {
+            subcommand: setting,
+            subcommands: subcommands.join(', ')
           });
       }
     }
@@ -529,8 +529,8 @@ export default class SettingsCommand extends Command {
             'automod.invites': false,
             'automod.badwords.enabled': false
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.automod.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.automod.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.automod.success'));
       } break;
       case 'automod.dehoist': {
@@ -538,8 +538,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.dehoist': false
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.dehoist.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.dehoist.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.dehoist.success'));
       }
       case 'automod.spam': {
@@ -547,8 +547,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.spam': false
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.spam.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.spam.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.spam.success'));
       } break;
       case 'automod.raid': {
@@ -556,8 +556,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.raid': false
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.raid.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.raid.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.raid.success'));
       } break;
       case 'automod.mention': {
@@ -565,8 +565,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.mention': false
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.mention.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.mention.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.mention.success'));
       } break;
       case 'automod.swears':
@@ -576,8 +576,8 @@ export default class SettingsCommand extends Command {
             'automod.badwords.enabled': false,
             'automod.badwords.wordlist': []
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.badwords.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.badwords.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.badwords.success'));
       } break;
       case 'automod.invites': {
@@ -585,8 +585,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'automod.invites': false
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.invites.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.invites.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.invites.success'));
       } break;
       case 'logging': {
@@ -594,8 +594,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.enabled': false
           }
-        }, error => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.logging.unable') 
+        }, error => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.logging.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.logging.success'));
       } break;
       case 'logging.events': {
@@ -604,8 +604,8 @@ export default class SettingsCommand extends Command {
             'logging.events.messageDelete': false,
             'logging.events.messageUpdate': false
           }
-        }, error => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.logEvents.unable') 
+        }, error => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.logEvents.unable')
           : ctx.sendTranslate('commands.generic.settings.disable.logEvents.success'));
       } break;
       case 'logging.events.messageDeleted':
@@ -614,9 +614,9 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.events.messageDelete': false
           }
-        }, error => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.messageDelete.unable') 
-          : ctx.sendTranslate('commands.generic.settings.disable.messageDelete.success')); 
+        }, error => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.messageDelete.unable')
+          : ctx.sendTranslate('commands.generic.settings.disable.messageDelete.success'));
       } break;
       case 'logging.events.messageUpdated':
       case 'logging.events.messageUpdate': {
@@ -624,16 +624,16 @@ export default class SettingsCommand extends Command {
           $set: {
             'logging.events.messageUpdate': false
           }
-        }, error => error 
-          ? ctx.sendTranslate('commands.generic.settings.disable.messageUpdate.unable') 
-          : ctx.sendTranslate('commands.generic.settings.disable.messageUpdate.success')); 
+        }, error => error
+          ? ctx.sendTranslate('commands.generic.settings.disable.messageUpdate.unable')
+          : ctx.sendTranslate('commands.generic.settings.disable.messageUpdate.success'));
       } break;
       default: {
         return setting === undefined
           ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') })
-          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
-            subcommand: setting, 
-            subcommands: subcommands.join(', ') 
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', {
+            subcommand: setting,
+            subcommands: subcommands.join(', ')
           });
       }
     }
@@ -649,8 +649,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'punishments': []
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.reset.punishments.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.reset.punishments.unable')
           : ctx.sendTranslate('commands.generic.settings.reset.punishments.success'));
       } break;
       case 'prefix': {
@@ -658,8 +658,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'prefix': this.bot.config.discord.prefix
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.reset.prefix.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.reset.prefix.unable')
           : ctx.sendTranslate('commands.generic.settings.reset.prefix.success'));
       } break;
       case 'modlog': {
@@ -667,8 +667,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'modlog': null
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.reset.modlog.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.reset.modlog.unable')
           : ctx.sendTranslate('commands.generic.settings.reset.modlog.success'));
       } break;
       case 'mutedrole':
@@ -677,8 +677,8 @@ export default class SettingsCommand extends Command {
           $set: {
             'mutedRole': null
           }
-        }, (error) => error 
-          ? ctx.sendTranslate('commands.generic.settings.reset.mutedRole.unable') 
+        }, (error) => error
+          ? ctx.sendTranslate('commands.generic.settings.reset.mutedRole.unable')
           : ctx.sendTranslate('commands.generic.settings.reset.mutedRole.success'));
       } break;
       case 'logging.ignore':
@@ -734,11 +734,11 @@ export default class SettingsCommand extends Command {
         });
       } break;
       default: {
-        return setting === undefined 
-          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') }) 
-          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', { 
-            subcommand: setting, 
-            subcommands: subcommands.join(', ') 
+        return setting === undefined
+          ? ctx.sendTranslate('commands.generic.settings.noSubcommand', { subcommands: subcommands.join(', ') })
+          : ctx.sendTranslate('commands.generic.settings.invalidSubcommand', {
+            subcommand: setting,
+            subcommands: subcommands.join(', ')
           });
       }
     }
@@ -754,7 +754,7 @@ export default class SettingsCommand extends Command {
     if (settings.logging.events.messageUpdate) events.push(ctx.translate('global.events.messageUpdate'));
     if (settings.logging.events.messageDelete) events.push(ctx.translate('global.events.messageDelete'));
 
-    const punishments = settings.punishments.length ? settings.punishments.map((value, index) => 
+    const punishments = settings.punishments.length ? settings.punishments.map((value, index) =>
       ctx.translate('commands.generic.settings.view.punishment', {
         index: index + 1,
         warnings: value.warnings,

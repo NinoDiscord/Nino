@@ -183,7 +183,7 @@ export default class PunishmentService {
       case PunishmentType.Unban: {
         const bans = await guild.getBans();
 
-        if (bans.some(ban => ban.user.id === member.id)) 
+        if (bans.some(ban => ban.user.id === member.id))
           await guild.unbanMember(member.id, reason ? encodeURIComponent(reason) : undefined);
       } break;
 
@@ -235,10 +235,10 @@ export default class PunishmentService {
 
   private async applyUnmutePunishment(member: { id: string; guild: Guild } | Member, guild: Guild, settings: GuildModel, reason: string | undefined) {
     this.bot.logger.debug(`Called PunishmentService.applyUnmutePunishment(${member.id}, ${guild.id}, ${settings.guildID}, ${reason || '<unknown>'})`);
-    
+
     const rest = await this.bot.client.getRESTGuildMember(member.guild.id, member.id);
     const muted = guild.roles.get(settings!.mutedRole)!;
-    
+
     if (reason) reason = encodeURIComponent(reason);
     if (rest.roles.some(roleID => roleID === muted.id)) {
       await rest.removeRole(muted.id);
@@ -247,7 +247,7 @@ export default class PunishmentService {
 
   private async applyAddRolePunishment(member: Member, punishment: Punishment, me: Member, reason: string | undefined) {
     const role = member.guild.roles.get(punishment.options.roleid!)!;
-    
+
     if (reason) reason = encodeURIComponent(reason);
     if (PermissionUtils.topRole(me) !== undefined && PermissionUtils.topRole(me)!.position > role.position)
       await member.addRole(role.id, reason);

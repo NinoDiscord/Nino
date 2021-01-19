@@ -59,7 +59,7 @@ export default class PardonCommand extends Command {
     await this.punishmentService.punish(member!, punishment, r);
     const warns = await this.warningService.get(ctx.guild!.id, member.id);
 
-    return warns === null 
+    return warns === null
       ? ctx.sendTranslate('commands.moderation.pardon.noWarnings', { user: `${user.username}#${user.discriminator}`, reason: reason === undefined ? '' : ` (*${reason}*)` })
       : ctx.sendTranslate('commands.moderation.pardon.warnings', {
         warnings: warns.amount,

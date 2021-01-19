@@ -30,9 +30,9 @@ export default class TimeoutsManager {
         .then((exists) => {
           if (exists && this.timeouts.has(key)) {
             this.bot.logger.info(`Timeouts: Exists for key "${key}", now doing task ${task}...`);
-              
+
             this.bot.punishments.punish(
-              { id: member, guild }, 
+              { id: member, guild },
               new Punishment(task as PunishmentType, { moderator: this.bot.client.user }),
               '[Automod] Time\'s up!'
             )
@@ -120,7 +120,7 @@ export default class TimeoutsManager {
   async reapplyTimeouts() {
     await this.resetOldTimeouts();
     const timedates = await this.bot.redis.hkeys('timeouts');
-    
+
     for (let timedate of timedates) {
       const value = await this.bot.redis.hget('timeouts', timedate);
       const start = Number(value!.split(':')[0]);
@@ -129,7 +129,7 @@ export default class TimeoutsManager {
       const guild = this.bot.client.guilds.get(value!.split(':')[3]);
       const task = value!.split(':')[4];
       if (!guild) continue;
-      
+
       this.createTimeout(timedate, task, member, guild, start - Date.now() + amount);
     }
   }

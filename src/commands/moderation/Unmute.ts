@@ -36,7 +36,7 @@ export default class UnmuteCommand extends Command {
 
     const settings = await ctx.getSettings();
     const hasRole = member.roles.filter(role => role === settings!.mutedRole).length;
-    if (!hasRole) return ctx.sendTranslate('commands.moderation.hasNoRole', { 
+    if (!hasRole) return ctx.sendTranslate('commands.moderation.hasNoRole', {
       role: ctx.guild!.roles.has(settings!.mutedRole) ? ctx.guild!.roles.get(settings!.mutedRole)!.name : '[deleted role]'
     });
 
@@ -45,7 +45,7 @@ export default class UnmuteCommand extends Command {
     const punishment = new Punishment(PunishmentType.Unmute, {
       moderator: ctx.sender
     });
-    
+
     try {
       await this.bot.punishments.punish(member!, punishment, reason);
       const prefix = member instanceof Member ? member.user.bot ? 'Bot' : 'User' : 'User';

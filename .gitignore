@@ -9,7 +9,6 @@ coverage/
 # Files
 application.yml
 *.lock
-*-lock.json
 *.log
 
 # Redis dumps, I run redis-server in the working directory :3

@@ -37,7 +37,7 @@ export default class UnbanCommand extends Command {
     const punishment = new Punishment(PunishmentType.Unban, {
       moderator: ctx.sender
     });
-    
+
     try {
       await this.bot.punishments.punish({ id, guild: ctx.guild! }, punishment, reason);
       return ctx.sendTranslate('commands.moderation.unban');

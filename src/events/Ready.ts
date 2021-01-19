@@ -19,7 +19,7 @@ export default class ReadyEvent extends Event {
     setInterval(() => this.bot.status.updateStatus(), 600000);
 
     if (this.bot.client.user.id === '531613242473054229') this.bot.botlists.start();
-    
+
     await this.bot.redis.set('guilds', this.bot.client.guilds.size);
     this.bot.statistics.guildCount = this.bot.client.guilds.size;
     await this.bot.timeouts.reapplyTimeouts();

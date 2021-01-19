@@ -31,7 +31,7 @@ export default class CommandContext {
 
   send(content: string) {
     return this.message.channel.createMessage({
-      content, 
+      content,
       allowedMentions: {
         everyone: false,
         roles: false,
@@ -62,8 +62,8 @@ export default class CommandContext {
   }
 
   get guild() {
-    return (this.message.channel instanceof TextChannel) ? 
-      (this.message.channel as TextChannel).guild : 
+    return (this.message.channel instanceof TextChannel) ?
+      (this.message.channel as TextChannel).guild :
       undefined;
   }
 

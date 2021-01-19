@@ -3,7 +3,7 @@ import { Constants, Member, Guild } from 'eris';
 import { injectable, inject } from 'inversify';
 import PermissionUtils from '../../util/PermissionUtils';
 import { Module } from '../../util';
-import findUser from '../../util/UserUtil'; 
+import findUser from '../../util/UserUtil';
 import { TYPES } from '../../types';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';

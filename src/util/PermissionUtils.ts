@@ -118,7 +118,7 @@ export default class PermissionUtils {
    */
   public static overlaps(user: number, required: number) {
     return (
-      (user & 8) != 0 || (user & required) == required // The user is an admin, automatically overwrites all permissions.
+      (user & 8) !== 0 || (user & required) === required // The user is an admin, automatically overwrites all permissions.
     ); // user & required give all of the permissions in common, it should be required.
   }
 }

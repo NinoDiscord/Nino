@@ -68,10 +68,10 @@ export default class LockdownCommand extends Command {
       .split(', ')
       .map(role => !release ? {
         perm: role[0],
-        role: this.getRole(role.slice(1), ctx) 
+        role: this.getRole(role.slice(1), ctx)
       } : {
         role: this.getRole(role, ctx)
-      }).filter(({ role }) => 
+      }).filter(({ role }) =>
         role && PermissionUtils.topRole(ctx.me!) && PermissionUtils.topRole(ctx.me!)!.position > role.position
       ).map(role => role!);
 

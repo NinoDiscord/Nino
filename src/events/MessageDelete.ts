@@ -44,7 +44,7 @@ export default class MessageDeleteEvent extends Event {
     const channel = guild.channels.get(settings.logging.channelID)! as TextChannel;
 
     // Create an embed and get the message content
-    const author = message.author.system 
+    const author = message.author.system
       ? 'System'
       : `${message.author.username}#${message.author.discriminator}`;
     const timestamp = new Date(message.createdAt);

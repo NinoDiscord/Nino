@@ -39,7 +39,7 @@ export default class WarnCommand extends Command {
     if (!member) return ctx.sendTranslate('commands.moderation.notInGuild', {
       user: `${u.username}#${u.discriminator}`
     });
-    
+
     if (member.user.id === ctx.guild!.ownerID) return ctx.sendTranslate('global.banOwner');
     if (member.user.id === this.bot.client.user.id) return ctx.sendTranslate('global.banSelf');
     if (!ctx.member!.permissions.has('administrator') && member.permission.has('banMembers')) return ctx.sendTranslate('global.banMods');

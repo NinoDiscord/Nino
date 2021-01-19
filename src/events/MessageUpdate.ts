@@ -57,7 +57,7 @@ export default class MessageUpdatedEvent extends Event {
 
     // Check if they have users ignored and check if the user is included in the array
     if (
-      settings.logging.ignoreUsers.length && 
+      settings.logging.ignoreUsers.length &&
       settings.logging.ignoreUsers.includes(m.author.id)
     ) return;
 
@@ -79,7 +79,7 @@ export default class MessageUpdatedEvent extends Event {
 
     // Don't do anything if the guild is unavaliable
     const server = m.guildID ? this.bot.client.guilds.get(m.guildID) : null;
-    if (server != null && server.unavailable) return;
+    if (server !== null && server?.unavailable) return;
 
     // Don't log http/https links
     const HTTPS_REGEX = /^https?:\/\/(.*)/;
@@ -94,7 +94,7 @@ export default class MessageUpdatedEvent extends Event {
     // Check if it's pinned (bc discord is literally shit)
     if (!old.pinned && m.pinned) return;
 
-    const author = m.author.system 
+    const author = m.author.system
       ? 'System'
       : `${m.author.username}#${m.author.discriminator}`;
 

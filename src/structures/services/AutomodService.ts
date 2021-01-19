@@ -58,7 +58,7 @@ export default class AutomodService {
       await this.invites.handle(m) ||
       await this.swearing.handle(m) ||
       await this.spam.handle(m) ||
-      await this.mentions.handle(m) || 
+      await this.mentions.handle(m) ||
       false
     );
   }
@@ -71,7 +71,7 @@ export default class AutomodService {
     return (
       await this.raid.handle(m) ||
       await this.dehoist.handle(m) ||
-      await this.accounts.handle(m) || 
+      await this.accounts.handle(m) ||
       false
     );
   }

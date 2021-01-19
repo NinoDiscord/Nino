@@ -52,7 +52,7 @@ export default class BotListService {
    */
   async postCount(guilds: number) {
     if (!this.bot.config.botlists) return;
-    
+
     if (this.bot.config.botlists.hasOwnProperty('topggtoken')) {
       this.bot.logger.info('Found top.gg token, now posting...');
       const res = await w({

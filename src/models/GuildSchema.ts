@@ -18,10 +18,10 @@ export interface GuildModel extends Document {
     raid: boolean;
     mention: boolean;
   };
-  punishments: { 
-    type: string; 
-    warnings: number; 
-    [options: string]: any 
+  punishments: {
+    type: string;
+    warnings: number;
+    [options: string]: any
   }[];
   logging: {
     enabled: boolean;

@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "0.11.0-edge.1",
+  "version": "0.11.0-edge.2",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": "https://github.com/NinoDiscord/Nino",
@@ -9,16 +9,14 @@
   "bugs": "https://github.com/NinoDiscord/Nino/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
   "main": "dist/index.js",
   "scripts": {
-    "build:watch": "yarn lint && yarn clean && yarn tsc -w",
-    "prepare": "rm -fr node_modules/@types/**/node_modules",
-    "build": "yarn lint && yarn clean && yarn tsc",
-    "clean": "rm -fr dist",
-    "main": "node dist/index.js",
+    "docker:build": "docker build -t nino:latest .",
+    "docker:run": "docker run -d nino:latest",
+    "prepare": "rm -rf node_modules/@types/**/node_modules",
+    "start": "node dist/index.js",
+    "build": "npm run lint && rm -rf build && tsc",
     "lint": "eslint src --ext .ts --fix",
     "test": "jest --config jest.config.js --forceExit",
-    "dev": "nodemon dist/index.js",
-    "docker": "docker build -t nino:latest .",
-    "main:docker": "docker create --name Nino nino"
+    "dev": "nodemon dist/index.js"
   },
   "maintainers": [
     "August (Chris)",
@@ -32,7 +30,7 @@
   "dependencies": {
     "@augu/immutable": "0.6.1",
     "@augu/sysinfo": "0.2.1",
-    "@sentry/node": "5.29.2",
+    "@sentry/node": "5.30.0",
     "common-tags": "1.8.0",
     "eris": "0.14.0",
     "inversify": "5.0.5",
@@ -47,19 +45,20 @@
     "wumpfetch": "0.3.1"
   },
   "devDependencies": {
+    "@augu/eslint-config": "1.9.0",
     "@types/common-tags": "1.8.0",
-    "@types/ioredis": "4.17.10",
-    "@types/jest": "26.0.19",
+    "@types/ioredis": "4.19.0",
+    "@types/jest": "26.0.20",
     "@types/js-yaml": "3.12.4",
     "@types/mongoose": "5.10.1",
     "@types/ms": "0.7.31",
     "@types/node": "14.14.21",
-    "@typescript-eslint/eslint-plugin": "4.11.0",
-    "@typescript-eslint/parser": "4.11.0",
+    "@typescript-eslint/eslint-plugin": "4.14.0",
+    "@typescript-eslint/parser": "4.14.0",
     "eslint": "7.18.0",
     "jest": "26.6.3",
     "jest-mock-extended": "1.0.10",
-    "nodemon": "2.0.6",
+    "nodemon": "2.0.7",
     "ps-list": "7.2.0",
     "ts-jest": "26.4.4",
     "typescript": "4.1.3"
