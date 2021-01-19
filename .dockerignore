@@ -11,3 +11,4 @@ docker-compose.yml
 renovate.json
 *.lock
 *.log
+application.yml

@@ -12,7 +12,7 @@
     "node": "14"
   },
   "scripts": {
-    "docker:build": "docker build -t nino:latest .",
+    "docker:build": "docker build -t nino:latest . branch=latest",
     "docker:run": "docker run -d nino:latest",
     "prepare": "rm -rf node_modules/@types/**/node_modules",
     "start": "node dist/index.js",

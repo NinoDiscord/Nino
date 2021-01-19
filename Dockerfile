@@ -1,6 +1,7 @@
 FROM node:alpine
 
-WORKDIR /opt/Nino
+ARG branch
+WORKDIR /opt/nino-${branch}
 
 COPY . .
 RUN apk add --no-cache git
