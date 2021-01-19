@@ -15,7 +15,7 @@ export default async function (bot: Bot, guildID: string, query: string, callRes
   if (callRest) {
     if (id !== undefined && hasIntent) return bot.client.getRESTGuildMember(guildID, id);
     else if (id !== undefined && !hasIntent) return bot.client.getRESTUser(id);
-    else return undefined;    
+    else return undefined;
   } else {
     if (id !== undefined) return bot.client.users.get(id);
     return undefined;

@@ -79,7 +79,7 @@ export default class Logger {
 
     const msg = message.map(m => m instanceof Array ? `[${m.join(', ')}]` : m instanceof Object ? inspect(m) : m as string).join('\n');
     appendFileSync(`${this.logPath}${sep}Nino.log`, `${this.getDate()} ${this.strip(lvlText)} -> ${this.strip(msg)}\n`);
-    
+
     const output = severity === LogSeverity.ERROR ? process.stderr : process.stdout;
     output.write(`${this.colors.gray(this.getDate())} ${lvlText} <=> ${msg}\n`);
   }
@@ -102,7 +102,7 @@ export default class Logger {
 
   debug(...message: LogMessage) {
     if (process.env.NODE_ENV !== 'development') return;
-    
+
     this.write(LogLevel.DEBUG, LogSeverity.NONE, ...message);
   }
 

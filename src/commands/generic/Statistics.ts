@@ -119,7 +119,7 @@ export default class StatisticsCommand extends Command {
     }).reduce((first, second) => ({ ...first, ...second })) as unknown as RedisServerInfo;
 
     const embed = createEmptyEmbed()
-      .setAuthor(ctx.translate('commands.generic.statistics.title', { 
+      .setAuthor(ctx.translate('commands.generic.statistics.title', {
         username: `${botUser.username}#${botUser.discriminator}`,
         version: `v${pkg.version} / ${commitHash}`
       }), 'https://nino.augu.dev', botUser.dynamicAvatarURL('png', 1024))

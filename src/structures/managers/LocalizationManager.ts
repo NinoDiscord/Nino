@@ -23,7 +23,7 @@ export default class LocalizationManager extends Collection<Language> {
   run() {
     const files = readdirSync(`${process.cwd()}${sep}locales`);
     if (!files.length) return this.bot.logger.info('Couldn\'t find any localization files!');
-    
+
     for (const file of files) {
       if (!file.endsWith('.json')) {
         this.bot.logger.warn(`Localization file ${file} doesn't end with .json!`);

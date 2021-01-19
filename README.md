@@ -21,7 +21,7 @@ First, check our [contributing guidelines](https://github.com/NinoDiscord/Nino/b
 
 ## Installation
 ### Requirements
-* [Node.js](https://nodejs.org) (Node v10 or higher is supported!)
+* [Node.js](https://nodejs.org) (Node v14 or higher is supported!)
 * [Git](https://git-scm.com) (optional)
 * [MongoDB](https://www.mongodb.com)
 * [Redis](https://redis.io)

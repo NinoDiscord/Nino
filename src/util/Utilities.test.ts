@@ -12,7 +12,7 @@ describe('Utilities', () => {
 
   it('should return "5s" as the time', () => {
     const time = util.humanize(5000);
-    
+
     expect(time).toBeDefined();
     expect(time).toStrictEqual('5s');
   });

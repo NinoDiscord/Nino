@@ -202,7 +202,7 @@ container
   .bind<NinoCommand>(TYPES.Command)
   .to(HelpCommand)
   .inSingletonScope();
-  
+
 container
   .bind<NinoCommand>(TYPES.Command)
   .to(InviteCommand)

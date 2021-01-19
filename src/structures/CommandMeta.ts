@@ -1,3 +1,6 @@
+// We disable ESLint due to this file never being used
+/* eslint-disable */
+
 import 'reflect-metadata';
 import CommandContext from './Context';
 import { User, TextChannel, Member, Role, Channel, TextableChannel } from 'eris';
@@ -5,7 +8,7 @@ import { User, TextChannel, Member, Role, Channel, TextableChannel } from 'eris'
 const argumentKey = Symbol('arguments');
 
 export interface CommandArgument {
-  type: User | Member | TextableChannel | Role | Number | string;
+  type: User | Member | TextableChannel | Role | number | string;
   name?: string;
   optional: boolean;
   equals?: string;
@@ -26,7 +29,7 @@ const injectArguments = (target: any, propertyName: string, descriptor: TypedPro
   descriptor.value = function () {
     let args: CommandArgument[] = Reflect.getOwnMetadata(argumentKey, target, propertyName);
     let ctx: CommandContext = arguments[0];
-    
+
     if (args) {
       for (let arg of args) {
 
@@ -42,7 +45,7 @@ const injectArguments = (target: any, propertyName: string, descriptor: TypedPro
             throw new Error(`Missing required flag: --${arg.name!}`);
           }
         }
-        
+
       }
     }
 

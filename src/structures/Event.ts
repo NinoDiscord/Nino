@@ -69,7 +69,7 @@ export default abstract class NinoEvent {
   public event: Emittable;
 
   constructor(
-    client: Client, 
+    client: Client,
     @unmanaged() event: Emittable
   ) {
     this.bot = client;

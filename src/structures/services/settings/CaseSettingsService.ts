@@ -34,7 +34,7 @@ export default class CaseSettingsService implements Base<CaseModel> {
       reason,
       id: newest[0] ? newest[0].id + 1 : 1,
       soft,
-      time: time !== undefined ? time : null
+      time
     });
 
     await query.save();

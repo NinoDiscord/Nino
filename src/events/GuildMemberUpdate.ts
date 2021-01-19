@@ -24,7 +24,9 @@ export default class GuildMemberUpdateEvent extends Event {
     const settings = await this.guildSettingsService.get(guild.id);
 
     // Automod handles nicknames (only)
-    if (member.nick !== null && member.nick !== old.nick) return this.automodService.handleMemberNameUpdate(member);
+    if (member.nick !== null) {
+      if (member.nick !== old.nick) return this.automodService.handleMemberNameUpdate(member);
+    }
 
     // If the member is a bot, don't do anything
     if (member.user.bot) return;

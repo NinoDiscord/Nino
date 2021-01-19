@@ -33,6 +33,8 @@ export enum PunishmentType {
   Unmute = 'unmute',
   Unban = 'unban',
   RemoveRole = 'unrole',
+  AddWarning = 'warning add',
+  RemoveWarning = 'warning remove'
 }
 
 export interface PunishmentOptions {
@@ -41,6 +43,7 @@ export interface PunishmentOptions {
   moderator: User;
   temp?: number;
   roleid?: string;
+  amount?: number;
 }
 
 /**
@@ -84,6 +87,8 @@ export default class PunishmentService {
     if (['ban', 'unban'].includes(punishment.type)) return Constants.Permissions.banMembers;
     if (punishment.type === 'kick') return Constants.Permissions.kickMembers;
     if (punishment.type === 'mute') return Constants.Permissions.manageRoles | Constants.Permissions.manageChannels;
+    if (['warning add', 'warning remove'].includes(punishment.type)) return Constants.Permissions.kickMembers;
+
     return 0;
   }
 
@@ -92,43 +97,23 @@ export default class PunishmentService {
    * Returns the punishment for the amount of warnings he now has (if exists)
    * @param member the member to warn
    */
-  async addWarning(member: Member): Promise<Punishment[]> {
+  async addWarning(
+    member: Member,
+    reason?: string
+  ): Promise<Punishment[]> {
     const me = member.guild.members.get(this.client.user.id)!;
     const settings = await this.guildSettingsService.get(member.guild.id);
     if (!settings) return [];
 
-    const warnings = await this.warningService.getOrCreate(member.guild.id, member.id);
+    const warnings = await this.warningService.getOrCreate(member.guild.id, member.id, reason);
     const newWarningCount = warnings.amount + 1;
-
-    await this.warningService.update(member.guild.id, member.id, {
-      amount: newWarningCount
-    });
 
     const result: Punishment[] = [];
     for (let options of settings.punishments.filter(x => x.warnings === newWarningCount)) {
-      const punishment = new Punishment(options.type as PunishmentType, Object.assign({ moderator: me.user }, options));
-      result.push(punishment);
+      result.push(new Punishment(options.type as PunishmentType, Object.assign({ moderator: me.user, reason }, options)));
     }
 
     return result;
-  }
-
-  /**
-   * Pardons the member (reduces amount of warnings by the amount given)
-   *
-   * @remarks
-   * Round the amount before applying it here
-   *
-   * @param member the member
-   * @param amount the amount of warnings to remove
-   */
-  async pardon(member: Member, amount: number) {
-    let warnings = await this.warningService.get(member.guild.id, member.id);
-    if (!!warnings && amount > 0) {
-      await this.warningService.update(member.guild.id, member.id, {
-        amount: Math.max(0, warnings.amount - amount),
-      });
-    }
   }
 
   private async resolveToMember(member: Member | { id: string; guild: Guild }) {
@@ -154,7 +139,7 @@ export default class PunishmentService {
    * @param reason the reason
    * @param audit whether to audit the punishment or not
    */
-  async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string) {
+  async punish(member: Member | { id: string; guild: Guild }, punishment: Punishment, reason?: string, post: boolean = true) {
     this.bot.logger.debug(`Called PunishmentService.punish(${member.id}, ${punishment.type}, ${reason || '<unknown>'})`);
     const me = member.guild.members.get(this.client.user.id)!;
     const guild = member.guild;
@@ -198,7 +183,7 @@ export default class PunishmentService {
       case PunishmentType.Unban: {
         const bans = await guild.getBans();
 
-        if (bans.some(ban => ban.user.id === member.id)) 
+        if (bans.some(ban => ban.user.id === member.id))
           await guild.unbanMember(member.id, reason ? encodeURIComponent(reason) : undefined);
       } break;
 
@@ -209,6 +194,20 @@ export default class PunishmentService {
         if (!mem.guild.roles.has(punishment.options.roleid)) return;
 
         await this.applyRemoveRolePunishment(mem, punishment, me, reason);
+      } break;
+
+      case PunishmentType.AddWarning: {
+        const warnings = await this.warningService.getOrCreate(member.guild.id, member.id, reason !== undefined ? encodeURIComponent(reason) : undefined);
+        await this.warningService.update(member.guild.id, member.id, {
+          amount: warnings.amount + 1
+        });
+      } break;
+
+      case PunishmentType.RemoveWarning: {
+        const warnings = await this.warningService.getOrCreate(member.guild.id, member.id, reason !== undefined ? encodeURIComponent(reason) : undefined);
+        await this.warningService.update(member.guild.id, member.id, {
+          amount: warnings.amount - punishment.options.amount!
+        });
       } break;
     }
 
@@ -222,7 +221,7 @@ export default class PunishmentService {
       id: member.id,
     }, punishment, reason, punishment.options.soft, punishment.options.temp);
 
-    return this.postToModLog(newCase);
+    if (post) await this.postToModLog(newCase);
   }
 
   private async applyRemoveRolePunishment(mem: Member, punishment: Punishment, me: Member, reason: string | undefined) {
@@ -236,10 +235,10 @@ export default class PunishmentService {
 
   private async applyUnmutePunishment(member: { id: string; guild: Guild } | Member, guild: Guild, settings: GuildModel, reason: string | undefined) {
     this.bot.logger.debug(`Called PunishmentService.applyUnmutePunishment(${member.id}, ${guild.id}, ${settings.guildID}, ${reason || '<unknown>'})`);
-    
+
     const rest = await this.bot.client.getRESTGuildMember(member.guild.id, member.id);
     const muted = guild.roles.get(settings!.mutedRole)!;
-    
+
     if (reason) reason = encodeURIComponent(reason);
     if (rest.roles.some(roleID => roleID === muted.id)) {
       await rest.removeRole(muted.id);
@@ -248,7 +247,7 @@ export default class PunishmentService {
 
   private async applyAddRolePunishment(member: Member, punishment: Punishment, me: Member, reason: string | undefined) {
     const role = member.guild.roles.get(punishment.options.roleid!)!;
-    
+
     if (reason) reason = encodeURIComponent(reason);
     if (PermissionUtils.topRole(me) !== undefined && PermissionUtils.topRole(me)!.position > role.position)
       await member.addRole(role.id, reason);
@@ -367,7 +366,9 @@ export default class PunishmentService {
       }, error => error ? this.bot.logger.error(`Unable to update case:\n${error}`) : null);
       return undefined;
     } catch (ex) {
-      this.bot.logger.error(`Unable to post to modlog:\n${ex}`);
+      this.bot.logger.error('Unable to post to mod-log:');
+      console.error(ex.stack);
+
       return `Sorry ${moderator.username}, I was unable to publish case #${caseModel.id} to the mod log`;
     }
   }
@@ -394,8 +395,8 @@ export default class PunishmentService {
       `;
 
     if (caseModel.soft) description += '\n• **Type**: Soft Ban';
-    if (caseModel.time !== undefined) {
-      const time = ms(caseModel.time, { long: true });
+    if (![undefined, null].includes(caseModel.time as any)) {
+      const time = ms(caseModel.time!, { long: true });
       description += `\n• **Time**: ${time}`;
     }
 
@@ -413,9 +414,13 @@ export default class PunishmentService {
       mute: 0xFFFF7F,
       unban: 0x66B266,
       unmute: 0x66B266,
+      ['warning add']: 0xFFFF7F,
+      ['warning remove']: 0x66B266
     }[type];
     let suffix!: string;
+
     if (type === 'ban' || type === 'unban') suffix = 'ned';
+    else if (type === 'warning add') suffix = 'ed';
     else if (type.endsWith('e')) suffix = 'd';
     else suffix = 'ed';
 

@@ -23,7 +23,7 @@ export default class PingCommand extends Command {
     const shardManager = this.client.shards;
     const startedAt = Date.now();
     const message = await ctx.sendTranslate('commands.generic.ping.oldMessage');
-    
+
     const ws = shardManager.reduce((a, b) => a + b.latency, 0);
     const m = ctx.translate('commands.generic.ping.message', {
       id: ctx.guild ? ctx.guild.shard.id : 0,

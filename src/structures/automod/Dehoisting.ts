@@ -34,9 +34,9 @@ export default class AutoModDehoist {
     if (name >= '0') return;
 
     if (
-      !PermissionUtils.above(me, m) || 
-      !me.permission.has('manageNicknames') || 
-      m.bot || 
+      !PermissionUtils.above(me, m) ||
+      !me.permission.has('manageNicknames') ||
+      m.bot ||
       m.permission.has('manageNicknames')
     ) return;
 

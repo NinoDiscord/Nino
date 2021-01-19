@@ -114,7 +114,7 @@ export default class Bot {
 
   constructor(
     @inject(TYPES.Config) config: Config,
-    @inject(TYPES.Client) client: DiscordClient 
+    @inject(TYPES.Client) client: DiscordClient
   ) {
     this.config = config;
     this.client = client;

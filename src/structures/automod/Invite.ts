@@ -1,4 +1,4 @@
-import { Message, TextChannel } from 'eris';
+import { DiscordRESTError, Invite, Message, TextChannel } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
 import Bot from '../Bot';
 
@@ -53,7 +53,8 @@ export default class AutoModInvite {
         .channel
         .guild
         .getInvites()
-        .then(invites => invites.map(invite => invite.code));
+        .then(invites => invites.map(i => i.code))
+        .catch(() => [] as unknown as string[]);
 
       // Guild#getInvites doesn't include the vanity URL
       // So, if the guild has it enabled, then push it to the invites array
@@ -65,10 +66,27 @@ export default class AutoModInvite {
       const code = regex[0].split('/').pop();
       if (code === undefined) return this.triggerAutomod(m);
 
-      if (invites.find(c => code === c)) 
+      let invalid = false;
+      try {
+        const invite = await this.bot.client.requestHandler.request('GET', `/invites/${code}`, true).then(data => new Invite(data as any, this.bot.client));
+
+        // Push it to the array if it's not inclided
+        const hasInvite = invites.filter(i => i === invite.code).length === 0;
+        if (invite.guild !== undefined && invite.guild.id === m.channel.guild.id && !hasInvite)
+          invites.push(invite.code);
+      } catch(ex) {
+        if (ex instanceof DiscordRESTError && ex.code === 10006 && ex.message.indexOf('Unknown Invite') !== -1) {
+          invalid = true;
+        }
+      }
+
+      if (invites.find(c => code === c)) {
         return false;
-      else
+      } else if (invalid) {
+        return false;
+      } else {
         return this.triggerAutomod(m);
+      }
     }
 
     return false;
@@ -76,7 +94,10 @@ export default class AutoModInvite {
 
   private async triggerAutomod(m: Message<TextChannel>) {
     const settings = await this.bot.settings.get(m.channel.guild.id);
-    if (!settings || !settings.automod.invites) return false;
+    if (!settings || !settings.automod.invites) {
+      console.trace('invite automod not found');
+      return false;
+    }
 
     const user = await this.bot.userSettings.get(m.author.id);
     const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;

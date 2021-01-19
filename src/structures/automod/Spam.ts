@@ -93,13 +93,13 @@ export default class AutoModSpam {
 
         const user = await this.bot.userSettings.get(m.author.id);
         const locale = user === null ? this.bot.locales.get(settings.locale)! : user.locale === 'en_US' ? this.bot.locales.get(settings.locale)! : this.bot.locales.get(user.locale)!;
-  
-        const response = locale.translate('automod.spam', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });  
+
+        const response = locale.translate('automod.spam', { user: m.member ? `${m.member.username}#${m.member.discriminator}` : `${m.author.username}#${m.author.discriminator}` });
         await m.channel.createMessage(response);
         return true;
       }
     }
-    
+
     this.__cleanUp(m.channel.guild.id);
 
     return false;

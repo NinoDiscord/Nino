@@ -71,7 +71,7 @@ export class CommandInvocation {
 export default class CommandService {
   public bucket: RatelimitBucket = new RatelimitBucket();
   public bot: Bot;
-  
+
   constructor(
     @inject(TYPES.Bot) bot: Bot
   ) {
@@ -94,7 +94,7 @@ export default class CommandService {
         ctx.flags.flags = '';
         ctx.args.args = [command.name];
         const help = this.bot.manager.commands.get('help')!;
-        return new CommandInvocation(help, ctx, true); 
+        return new CommandInvocation(help, ctx, true);
       }
       return new CommandInvocation(command, ctx, false);
     }
@@ -109,7 +109,7 @@ export default class CommandService {
     const guild = (m.channel as TextChannel).guild;
     const me = guild.members.get(this.bot.client.user.id);
     if (!(m.channel as TextChannel).permissionsOf(me!.id).has('sendMessages')) return;
-    
+
     const mentionRegex = new RegExp(`^<@!?${this.bot.client.user.id}> `);
 
     if ((new RegExp(`^<@!?${this.bot.client.user.id}>$`)).test(m.content)) {
@@ -157,7 +157,7 @@ export default class CommandService {
 
     const prefix = prefixes.find(p => m.content.startsWith(p));
     if (prefix === undefined) return;
-    
+
     const args = m.content.slice(prefix.length).trim().split(/ +/g);
     const ctx = new CommandContext(this.bot, m, args, locale, settings);
     const invoked = this.getCommandInvocation(ctx);

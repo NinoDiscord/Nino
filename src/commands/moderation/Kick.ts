@@ -4,7 +4,7 @@ import { Constants, Member } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
 import { Module } from '../../util';
 import { TYPES } from '../../types';
-import findUser from '../../util/UserUtil'; 
+import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';

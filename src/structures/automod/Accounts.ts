@@ -32,11 +32,11 @@ export default class AccountsAutomod {
         if (Date.now() - old <= 1000) {
           do {
             await this.bot.punishments.punish(m, new Punishment(PunishmentType.Ban, { moderator: me.user }), '[Automod] Raiding');
-          
+
             const id = (await bucket.pop()).split(':')[1];
             m = guild.members[id];
           } while ((await bucket.length()) > 0);
-  
+
           return true;
         }
       }

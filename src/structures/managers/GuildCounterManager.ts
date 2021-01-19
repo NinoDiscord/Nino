@@ -23,6 +23,6 @@ export default class GuildCounterManager {
     const key = this.getDate();
     await this.pool.push(key);
 
-    
+
   }
 }

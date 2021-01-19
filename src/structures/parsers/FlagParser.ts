@@ -1,3 +1,5 @@
+/* eslint-disable eqeqeq */
+
 export default class FlagParser {
   public flags: string;
 

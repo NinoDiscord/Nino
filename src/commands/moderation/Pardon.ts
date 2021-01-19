@@ -8,7 +8,7 @@ import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
 import WarningService from '../../structures/services/WarningService';
-import PunishmentService from '../../structures/services/PunishmentService';
+import PunishmentService, { Punishment, PunishmentType } from '../../structures/services/PunishmentService';
 
 @injectable()
 export default class PardonCommand extends Command {
@@ -46,14 +46,25 @@ export default class PardonCommand extends Command {
     if (!PermissionUtils.above(ctx.message.member!, member)) return ctx.sendTranslate('global.hierarchy');
     else if (!PermissionUtils.above(ctx.me!, member)) return ctx.sendTranslate('global.botHierarchy');
 
-    await this.punishmentService.pardon(member!, amount);
+    const reason = ctx.args.has(2) ? ctx.args.slice(2).join(' ') : undefined;
+    const punishment = new Punishment(PunishmentType.RemoveWarning, {
+      moderator: ctx.sender,
+      amount
+    });
+
+    const r = reason === undefined
+      ? ctx.translate('global.pardon.noReason', { amount })
+      : ctx.translate('global.pardon.reason', { reason, amount });
+
+    await this.punishmentService.punish(member!, punishment, r);
     const warns = await this.warningService.get(ctx.guild!.id, member.id);
 
-    return warns === null 
-      ? ctx.sendTranslate('commands.moderation.pardon.noWarnings', { user: `${user.username}#${user.discriminator}` })
+    return warns === null
+      ? ctx.sendTranslate('commands.moderation.pardon.noWarnings', { user: `${user.username}#${user.discriminator}`, reason: reason === undefined ? '' : ` (*${reason}*)` })
       : ctx.sendTranslate('commands.moderation.pardon.warnings', {
         warnings: warns.amount,
-        user: `${user.username}#${user.discriminator}`
+        user: `${user.username}#${user.discriminator}`,
+        reason: reason === undefined ? '' : ` (*${reason}*)`
       });
   }
 }

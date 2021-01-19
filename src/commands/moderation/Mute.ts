@@ -4,7 +4,7 @@ import { Constants, Member } from 'eris';
 import PermissionUtils from '../../util/PermissionUtils';
 import { Module } from '../../util';
 import { TYPES } from '../../types';
-import findUser from '../../util/UserUtil'; 
+import findUser from '../../util/UserUtil';
 import Command from '../../structures/Command';
 import Context from '../../structures/Context';
 import Bot from '../../structures/Bot';
@@ -47,14 +47,14 @@ export default class MuteCommand extends Command {
 
     const settings = await ctx.getSettings();
     const hasRole = member.roles.filter(role => role === settings!.mutedRole).length > 0;
-    if (hasRole) return ctx.sendTranslate('commands.moderation.hasRole', { 
+    if (hasRole) return ctx.sendTranslate('commands.moderation.hasRole', {
       role: ctx.guild!.roles.has(settings!.mutedRole) ? ctx.guild!.roles.get(settings!.mutedRole)!.name : '[deleted role]'
     });
-    
+
     const baseReason = ctx.args.has(1) ? ctx.args.slice(1).join(' ') : undefined;
     let reason!: string;
     let time!: string;
-  
+
     if (baseReason) {
       const sliced = baseReason.split(' | ');
       reason = sliced[0];

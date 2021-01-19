@@ -45,7 +45,7 @@ export default class PruneCommand extends Command {
       filter
     });
 
-    const shouldDelete = (allMsgs as Message<TextableChannel>[]).filter((x: Message<TextableChannel>) => 
+    const shouldDelete = (allMsgs as Message<TextableChannel>[]).filter((x: Message<TextableChannel>) =>
       !filter || filter === 'none' ||
       (filter === 'user' ? !x.author.bot : false) ||
       (filter === 'self' ? x.author.id === this.bot.client.user.id : false) ||
@@ -94,7 +94,7 @@ export default class PruneCommand extends Command {
             ${ex.stack ? ex.stack.split('\n').slice(0, 3).join('\n') : ex.message}
             \`\`\`
           `);
-        
+
         return ctx.embed(embed.build());
       }
     }

@@ -54,7 +54,7 @@ export function formatSize(bytes: number) {
 
   if (kilo < 1024) return `${kilo.toFixed(1)}KB`;
   else if (kilo > 1024 && mega < 1024) return `${mega.toFixed(1)}MB`;
-  else return `${giga.toFixed(1)}GB`; 
+  else return `${giga.toFixed(1)}GB`;
 }
 
 export enum Module {

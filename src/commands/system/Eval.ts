@@ -52,7 +52,7 @@ export default class EvalCommand extends Command {
       const language = this.bot.locales.get('en_US')!;
       return ctx.send(language.translate('global.invalidFlag.boolean', { flag: 'slient' }));
     }
-  
+
     try {
       result = eval(isAsync ? `(async()=>{${script}})()` : script);
 

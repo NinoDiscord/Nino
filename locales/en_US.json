@@ -43,6 +43,10 @@
       "events": {
         "messageUpdate": "Message Updates",
         "messageDelete": "Message Deletions"
+      },
+      "pardon": {
+        "noReason": "No reason was specified. (${amount} warnings were removed)",
+        "reason": "${reason} (${amount} warnings were removed)"
       }
     },
     "events": {
@@ -322,6 +326,10 @@
             "messageUpdate": {
               "unable": "I was unable to enable the Message Update logging event.",
               "success": "I have enabled the Message Update logging event."
+            },
+            "invalidInvite": {
+              "unable": "I was unable to enable validating invalid invites.",
+              "success": "Successfully enabled **Validing Invalid Invites** feature, all invalid invites will now not be punishable."
             }
           },
           "disable": {
@@ -368,6 +376,10 @@
             "messageUpdate": {
               "unable": "I was unable to disable the Message Update logging event.",
               "success": "I have disabled the Message Update logging event."
+            },
+            "invalidInvite": {
+              "unable": "I was unable to disable validating invalid invites.",
+              "success": "Successfully disabled **Validing Invalid Invites** feature, all invalid invites will now be punishable."
             }
           },
           "view": {
@@ -449,7 +461,7 @@
         "mute": "${type} was successfully muted.",
         "unban": "User was successfully unbanned.",
         "unmute": "${type} was successfully unmuted.",
-        "warned": "I have warned **${user}**, they now have **${warnings}** warning${suffix}.",
+        "warned": "I have warned **${user}**, they now have **${warnings}** warning${suffix}.${reason}",
         "unable": "Unable to ${type}: `${message}`",
         "invalidSnowflake": "User was already ${type}.",
         "notInGuild": "User `${user}` is not in the guild.",
@@ -468,8 +480,8 @@
         },
         "pardon": {
           "notSpecified": "You didn't specify an amount of warnings to remove.",
-          "noWarnings": "User **${user}** now has no warnings.",
-          "warnings": "User **${user}** now has **${warnings}** warnings."
+          "noWarnings": "User **${user}** now has no warnings.${reason}",
+          "warnings": "User **${user}** now has **${warnings}** warnings.${reason}"
         },
         "prune": {
           "noAmount": "You'll need to specify an amount to delete.",
