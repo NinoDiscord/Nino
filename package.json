@@ -8,6 +8,9 @@
   "private": true,
   "bugs": "https://github.com/NinoDiscord/Nino/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
   "main": "dist/index.js",
+  "engines": {
+    "node": "14"
+  },
   "scripts": {
     "docker:build": "docker build -t nino:latest .",
     "docker:run": "docker run -d nino:latest",
