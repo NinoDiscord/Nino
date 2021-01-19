@@ -1,4 +1,6 @@
-name: Lint the repository, test with Jest, and update the Discord bot (Edge)
+# Worklow to update Nino Edge, development bot for testing the edge branch
+
+name: Update Edge instance
 on:
   push:
     branches:
@@ -13,35 +15,35 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version: [14.x]
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js v${{ matrix.node-version }}
+      - name: Checkout the repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js v15.x
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
-      - name: Installs global packages
-        run: npm i -g eslint jest
-      - name: Install dependencies
-        run: npm i
-      - name: Lints the repository
+          node-version: 15.x
+
+      - name: Install global packages
+        run: npm i -g eslint jest typescript
+
+      - name: Install local packages
+        run: npm ci
+
+      - name: Run the linter
         run: npm run lint
-      - name: Runs all tests with Jest
-        run: npm run test
-      - name: SSH to VM
-        uses: appleboy/ssh-action@master
+
+      - name: Build the project for any errors
+        run: tsc --noEmit
+
+      - name: Run tests with Jest
+        run: jest --config jest.config.js --forceExit
+
+      - name: Push to Docker registry
+        if: github.event_name == 'push'
+        uses: docker/login-action@v1
         with:
-          host: ${{ secrets.HOST }}
-          port: 22
+          registry: registry.floofy.dev
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
-          script: |
-            cd ~/nino-edge
-            git pull
-            rm -fr node_modules
-            rm yarn.lock
-            yarn
-            yarn build
-            pm2 restart nino-edge
+          tags: registry.floofy.dev/nino:edge
