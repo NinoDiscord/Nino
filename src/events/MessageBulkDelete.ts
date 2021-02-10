@@ -51,6 +51,7 @@ export default class MessageDeleteBulkEvent extends Event {
 
       contents.push('');
       if (msg.embeds.length) {
+        contents.push(msg.content, '');
         for (let i = 0; i < msg.embeds.length; i++) {
           const content = unembedify(msg.embeds[i]);
           contents.push(content, '', '');
@@ -78,7 +79,7 @@ export default class MessageDeleteBulkEvent extends Event {
     const embed = createEmptyEmbed()
       .setTitle('[ Bulk Message Deletion Occured ]')
       .setDescription([
-        `Recent occurence of bulked deleted message has occured in ${message.channel.mention}, view file for all bulk deleted messages.`,
+        `Recent occurence of bulk deleted message has occured in ${message.channel.mention}, view file for all bulk deleted messages.`,
         '',
         '```apache',
         `Affected Users: ${users.join(', ')}`,
