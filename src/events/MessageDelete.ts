@@ -34,8 +34,7 @@ export default class MessageDeleteEvent extends Event {
     ) return;
 
     // Ignore "User has pinned a message" messages
-    const PinnedRegex = /pinned a message/g;
-    if (PinnedRegex.test(message.content)) return;
+    if (message.content.indexOf('pinned a message') !== -1) return;
 
     // Ignore if the bot deleted it
     if (message.author.id === this.bot.client.user.id) return;

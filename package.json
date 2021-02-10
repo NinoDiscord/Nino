@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "homepage": "https://nino.augu.dev",
   "license": "MIT",
   "repository": "https://github.com/NinoDiscord/Nino",
@@ -9,7 +9,7 @@
   "bugs": "https://github.com/NinoDiscord/Nino/issues/new?assignees=&labels=bug&template=bug_report.md&title=",
   "main": "dist/index.js",
   "engines": {
-    "node": "14"
+    "node": ">=14"
   },
   "scripts": {
     "docker:build": "docker build --build-arg branch=latest -t nino:latest .",
