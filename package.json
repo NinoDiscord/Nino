@@ -38,7 +38,7 @@
     "eris": "0.14.0",
     "inversify": "5.0.5",
     "inversify-inject-decorators": "3.1.0",
-    "ioredis": "4.19.4",
+    "ioredis": "4.22.0",
     "js-yaml": "3.14.0",
     "leeks.js": "0.0.9",
     "long-timeout": "0.1.1",
@@ -50,7 +50,7 @@
   "devDependencies": {
     "@augu/eslint-config": "1.9.0",
     "@types/common-tags": "1.8.0",
-    "@types/ioredis": "4.19.0",
+    "@types/ioredis": "4.19.3",
     "@types/jest": "26.0.20",
     "@types/js-yaml": "3.12.4",
     "@types/mongoose": "5.10.1",
