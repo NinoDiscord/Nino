@@ -27,6 +27,7 @@ export interface ArgumentInfo {
   optional?: boolean;
   default?: any;
   rest?: boolean;
+  max?: number;
   type: string;
   name: string;
 }
@@ -41,7 +42,8 @@ export default class Argument {
       default: info.default ?? null,
       rest: info.rest ?? false,
       type: info.type,
-      name: info.name
+      name: info.name,
+      max: info.max
     };
   }
 

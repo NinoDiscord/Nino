@@ -21,15 +21,24 @@
  */
 
 import type CommandMessage from '../CommandMessage';
-import { NotInjectable } from '@augu/lilith';
-import Argument from './Argument';
+import ArgumentResolver from '../arguments/ArgumentResolver';
+import type Argument from '../arguments/Argument';
 
-type PossiblePromise<T> = Promise<T> | T;
+export default class IntegerResolver extends ArgumentResolver<number> {
+  constructor() {
+    super('int');
+  }
 
-@NotInjectable()
-export default abstract class ArgumentResolver<T> {
-  constructor(public id: string) {}
+  validate(_: CommandMessage, possible: string, arg: Argument) {
+    const value = Number.parseInt(possible);
+    if (Number.isNaN(value))
+      return 'The number you provided was not a number.';
 
-  abstract validate(msg: CommandMessage, possible: string, arg: Argument): PossiblePromise<string | undefined>;
-  abstract parse(msg: CommandMessage, possible: string, arg: Argument): PossiblePromise<T>;
+    if (arg.info.max !== undefined && value > arg.info.max)
+      return `Value \`${value}\` has to be lower or equal to \`${arg.info.max}\`.`;
+  }
+
+  parse(_: CommandMessage, possible: string) {
+    return Number.parseInt(possible);
+  }
 }

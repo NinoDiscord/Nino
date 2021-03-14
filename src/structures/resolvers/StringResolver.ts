@@ -21,15 +21,18 @@
  */
 
 import type CommandMessage from '../CommandMessage';
-import { NotInjectable } from '@augu/lilith';
-import Argument from './Argument';
+import ArgumentResolver from '../arguments/ArgumentResolver';
 
-type PossiblePromise<T> = Promise<T> | T;
+export default class StringResolver extends ArgumentResolver<string> {
+  constructor() {
+    super('string');
+  }
 
-@NotInjectable()
-export default abstract class ArgumentResolver<T> {
-  constructor(public id: string) {}
+  validate(msg: CommandMessage, possible: string) {
+    return undefined;
+  }
 
-  abstract validate(msg: CommandMessage, possible: string, arg: Argument): PossiblePromise<string | undefined>;
-  abstract parse(msg: CommandMessage, possible: string, arg: Argument): PossiblePromise<T>;
+  parse(_: CommandMessage, possible: string) {
+    return possible;
+  }
 }
