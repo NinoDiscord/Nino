@@ -1,6 +1,5 @@
 {
-    "typescript.tsdk": "node_modules\\typescript\\lib",
-    "eslint.validate": ["typescript"],
-    "editor.tabSize": 2,
-    "deno.enable": false
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  "eslint.validate": ["typescript"],
+  "editor.tabSize": 2
 }

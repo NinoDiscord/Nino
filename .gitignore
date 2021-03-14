@@ -2,6 +2,7 @@
 node_modules/
 dist/
 data/
+old/
 
 # Jest
 coverage/
