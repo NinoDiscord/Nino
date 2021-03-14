@@ -20,10 +20,13 @@
  * SOFTWARE.
  */
 
+import Argument, { ArgumentInfo } from './arguments/Argument';
+import { getSubcommandsIn } from './decorators/Subcommand';
 import type CommandMessage from './CommandMessage';
 import Flag, { FlagInfo } from './Flag';
 import { NotInjectable } from '@augu/lilith';
 import { Categories } from '../util/Constants';
+import Subcommand from './Subcommand';
 
 export type CommandRestriction = 'owner' | 'guild';
 
@@ -37,6 +40,7 @@ interface CommandInfo {
   aliases?: string[];
   hidden?: boolean;
   flags?: FlagInfo[];
+  args?: ArgumentInfo[];
   name: string;
 }
 
@@ -51,6 +55,7 @@ export default abstract class NinoCommand {
   public aliases:         string[];
   public hidden:          boolean;
   public flags:           Flag[];
+  public args:            Argument[];
   public name:            string;
 
   constructor(info: CommandInfo) {
@@ -73,11 +78,12 @@ export default abstract class NinoCommand {
     this.aliases      = info.aliases ?? [];
     this.hidden       = info.hidden ?? false;
     this.flags        = info.flags?.map(info => new Flag(info)) ?? [];
+    this.args         = info.args?.map(info => new Argument(info)) ?? [];
     this.name         = info.name;
   }
 
   get subcommands() {
-    return [];
+    return getSubcommandsIn(this).map(sub => new Subcommand(sub));
   }
 
   abstract run(msg: CommandMessage): Promise<any>;

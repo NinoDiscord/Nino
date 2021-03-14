@@ -48,3 +48,11 @@ export const enum Categories {
   General    = 'general',
   Owner      = 'owner'
 }
+
+/**
+ * List of metadata keys for decorators
+ */
+export const enum MetadataKeys {
+  Subcommand = '$nino::subcommands',
+  Subscribe  = '$nino::subscriptions'
+}
