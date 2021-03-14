@@ -20,26 +20,15 @@
  * SOFTWARE.
  */
 
-import type CommandMessage from './CommandMessage';
-import { NotInjectable } from '@augu/lilith';
-import type Command from './Command';
+import type CommandMessage from '../CommandMessage';
+import Restriction from '../Restriction';
 
-export interface SubcommandInfo {
-  run(this: Command, msg: CommandMessage): Promise<any>;
+export default class GuildOnlyRestriction extends Restriction {
+  constructor() {
+    super('guild');
+  }
 
-  description?: string;
-  name: string;
-}
-
-@NotInjectable()
-export default class Subcommand {
-  public description: string;
-  public name: string;
-  public run: (this: Command, msg: CommandMessage) => Promise<any>;
-
-  constructor(info: SubcommandInfo) {
-    this.description = info.description ?? 'No description is available for this subcommand.';
-    this.name = info.name;
-    this.run = info.run;
+  run(msg: CommandMessage) {
+    return true;
   }
 }

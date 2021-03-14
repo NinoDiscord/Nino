@@ -22,11 +22,15 @@
 
 import type { Message, TextChannel } from 'eris';
 import { NotInjectable } from '@augu/lilith';
+import type Command from './Command';
 
 @NotInjectable()
 export default class CommandMessage {
   #message: Message<TextChannel>;
-  constructor(message: Message<TextChannel>) {
+  #command: Command;
+
+  constructor(message: Message<TextChannel>, command: Command) {
     this.#message = message;
+    this.#command = command;
   }
 }
