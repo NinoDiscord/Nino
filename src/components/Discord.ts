@@ -20,20 +20,30 @@
  * SOFTWARE.
  */
 
-import { Component } from '@augu/lilith';
+import { Component, Inject } from '@augu/lilith';
 import { Client } from 'eris';
 import { Logger } from 'tslog';
+import Config from './Config';
 
 export default class Discord implements Component {
   public priority: number = 1;
   public client!: Client;
   public name: string = 'Discord';
 
+  @Inject
+  private config!: Config;
+
   private logger: Logger = new Logger();
 
   load() {
     if (this.client !== undefined) {
       this.logger.warn('A client has already been created.');
+      return;
+    }
+
+    const token = this.config.getProperty('token');
+    if (token === undefined) {
+      this.logger.fatal('Property `token` doesn\'t exist in the config file, please populate it.');
       return;
     }
 

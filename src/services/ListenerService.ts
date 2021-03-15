@@ -20,53 +20,42 @@
  * SOFTWARE.
  */
 
-import type { Message, TextChannel } from 'eris';
-import type ArgumentResolver from '../structures/arguments/ArgumentResolver';
+import { getSubscriptionsIn } from '../structures/decorators/Subscribe';
 import { readdirSync, Ctor } from '@augu/utils';
 import { Service, Inject } from '@augu/lilith';
-import type NinoCommand from '../structures/Command';
-import { Collection } from '@augu/collections';
 import { Logger } from 'tslog';
 import { join } from 'path';
 import Discord from '../components/Discord';
 
-import StringResolver from '../structures/resolvers/StringResolver';
-import IntResolver from '../structures/resolvers/IntegerResolver';
-
-export default class CommandService implements Service {
-  private resolvers: Collection<string, ArgumentResolver<any>> = new Collection();
-  private commands: Collection<string, NinoCommand> = new Collection();
+export default class ListenerService implements Service {
   private logger: Logger = new Logger();
-  public name = 'Commands';
+  public name = 'Listeners';
 
   @Inject
   private discord!: Discord;
 
   async load() {
-    // Add in resolvers
-    this.resolvers.set('string', new StringResolver());
-    this.resolvers.set('int', new IntResolver());
+    this.logger.info('Initializing all event listeners...');
 
-    // Add in the message create event
-    this.discord.client.on('messageCreate', this.handleCommand.bind(this));
-
-    // Load in commands
-    this.logger.info('Now loading in commands...');
-    const files = readdirSync(join(__dirname, '..', 'commands'));
-
+    const files = readdirSync(join(__dirname, '..', 'listeners'));
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const ctor: Ctor<any> = await import(file);
-      const command: NinoCommand = ctor.default ? new ctor.default() : new ctor();
+      const listener = new ctor.default!();
 
-      this.commands.set(command.name, command);
-      this.logger.info(`Initialized command ${command.name}`);
+      const subscriptions = getSubscriptionsIn(listener);
+      for (const sub of subscriptions) {
+        const handler = sub.run.bind(listener);
+        this.discord.client.on(sub.event, async (...args: any[]) => {
+          try {
+            await handler(...args);
+          } catch(ex) {
+            this.logger.error(`Unable to handle event ${sub.event}:`, ex);
+          }
+        });
+      }
+
+      this.logger.info(`Initialized ${subscriptions.length} events! (${subscriptions.map(r => r.event).join(', ')})`);
     }
-
-    this.logger.info(`Loaded ${this.commands.size} commands!`);
-  }
-
-  private async handleCommand(msg: Message<TextChannel>) {
-    console.log(`${msg.content} by ${msg.author.username}#${msg.author.discriminator}`);
   }
 }
