@@ -20,39 +20,42 @@
  * SOFTWARE.
  */
 
-import 'reflect-metadata';
-
-import app from './container';
-import { getInjectables } from '@augu/lilith';
+import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
-import CommandService from './services/CommandService';
+import IORedis from 'ioredis';
+import Config from './Config';
 
-const logger = new Logger();
+export default class Redis implements Component {
+  private client!: IORedis.Redis;
+  public priority: number = 1;
+  public name: string = 'Redis';
 
-const applyInjections = () => {
-  logger.info('Applying injections in commands and listeners...');
-  const commands = app.$ref(CommandService);
+  private logger: Logger = new Logger();
 
-  console.log(commands);
-};
+  @Inject
+  private config!: Config;
 
-(async() => {
-  logger.info('Verifying application state...');
-  try {
-    await app.verify();
-  } catch(ex) {
-    logger.fatal('Unable to verify application state');
-    console.error(ex);
-    process.exit(1);
+  async load() {
+    this.logger.info('Connecting to Redis...');
+    this.client = new IORedis({
+      enableReadyCheck: true,
+      connectionName: 'Nino',
+      password: this.config.getProperty('redis.password'),
+      host: this.config.getProperty('redis.host'),
+      port: this.config.getProperty('redis.port'),
+      db: this.config.getProperty('redis.index')
+    });
+
+    await this.client.client('SETNAME', 'Nino');
+    this.client.on('ready', () =>
+      this.logger.info('Connected to Redis!')
+    );
+
+    this.client.on('error', this.logger.error);
+    return this.client.connect();
   }
 
-  logger.info('Application state has been verified! :D');
-  applyInjections();
-
-  process.on('SIGINT', () => {
-    logger.warn('Received CTRL+C call!');
-
-    app.dispose();
-    process.exit(0);
-  });
-})();
+  dispose() {
+    return this.client.disconnect();
+  }
+}

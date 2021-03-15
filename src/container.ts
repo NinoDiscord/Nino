@@ -20,8 +20,11 @@
  * SOFTWARE.
  */
 
-import { Logger } from 'tslog';
+import { Application } from '@augu/lilith';
+import { join } from 'path';
 
-const logger = new Logger();
+const app = new Application()
+  .findComponentsIn(join(__dirname, 'components'))
+  .findServicesIn(join(__dirname, 'services'));
 
-export default logger;
+export default app;

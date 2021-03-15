@@ -47,8 +47,7 @@ export default class Database implements Component {
   public users!: Repository<UserEntity>;
   public name: string = 'Database';
 
-  @Inject
-  private logger!: Logger;
+  private logger: Logger = new Logger();
 
   @Inject
   private config!: Config;
@@ -73,6 +72,12 @@ export default class Database implements Component {
 
       await this.connection.connect();
       this.initRepos();
+
+      this.logger.info('Connection has been established, showing and running migrations...');
+      const migrations = await this.connection.runMigrations();
+
+      if (migrations.length > 0)
+        this.logger.info('Ran migrations', migrations.map(migration => `${migration.name} (${migration.id}): ${new Date(migration.timestamp).toISOString()}`));
     }
 
     const connection = await createConnection({
@@ -87,6 +92,12 @@ export default class Database implements Component {
     this.connection = connection;
     await this.connection.connect();
     this.initRepos();
+
+    this.logger.info('Connection has been established, showing and running migrations...');
+    const migrations = await this.connection.runMigrations();
+
+    if (migrations.length > 0)
+      this.logger.info('Ran migrations', migrations.map(migration => `${migration.name} (${migration.id}): ${new Date(migration.timestamp).toISOString()}`));
   }
 
   dispose() {

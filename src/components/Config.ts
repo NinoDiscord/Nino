@@ -33,6 +33,7 @@ interface Configuration {
   sentryDsn?: string;
   botlists?: BotlistConfig;
   database: DatabaseConfig;
+  prefixes: string[];
   owners: string[];
   ksoft?: string;
   redis: RedisConfig;

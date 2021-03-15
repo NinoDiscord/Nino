@@ -1,5 +1,6 @@
 # Folders
 node_modules/
+build/
 dist/
 data/
 old/
@@ -9,6 +10,7 @@ coverage/
 
 # Files
 application.yml
+config.yml
 *.lock
 *.log
 
