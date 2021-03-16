@@ -20,36 +20,6 @@
  * SOFTWARE.
  */
 
-import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
+import { Logger } from 'tslog';
 
-export enum PunishmentType {
-  Unmute = 'unmute',
-  Unban  = 'unban',
-  Kick   = 'kick',
-  Ban    = 'ban'
-}
-
-@Entity({ name: 'punishments' })
-export default class PunishmentEntity {
-  @Column({ default: 1 })
-  public warnings!: number;
-
-  @PrimaryColumn({ name: 'guild_id' })
-  @Column({ default: undefined })
-  public roleID?: string;
-
-  @PrimaryGeneratedColumn()
-  public index!: number;
-
-  @Column({ default: false })
-  public soft!: boolean;
-
-  @Column({ default: undefined })
-  public time?: number;
-
-  @Column({
-    type: 'enum',
-    enum: PunishmentType
-  })
-  public type!: PunishmentType;
-}
+export default new Logger();

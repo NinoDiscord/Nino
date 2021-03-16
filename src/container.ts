@@ -22,9 +22,20 @@
 
 import { Application } from '@augu/lilith';
 import { join } from 'path';
+import logger from './singletons/Logger';
 
 const app = new Application()
   .findComponentsIn(join(__dirname, 'components'))
   .findServicesIn(join(__dirname, 'services'));
+
+app.on('component.initializing', component => logger.debug(`Component ${component.name} is being initialized...`));
+app.on('component.loaded', component => logger.info(`Component ${component.name} has been initialized successfully!`));
+
+app.on('service.initializing', service => logger.debug(`Service ${service.name} is being initialized...`));
+app.on('service.loaded', service => logger.info(`Service ${service.name} has been initialized!`));
+
+app.on('debug', message => logger.debug(`Lilith: ${message}`));
+
+app.addSingleton(logger);
 
 export default app;

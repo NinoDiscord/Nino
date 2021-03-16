@@ -40,7 +40,7 @@ export default class Database implements Component {
   public punishments!: Repository<PunishmentEntity>;
   public warnings!: Repository<WarningEntity>;
   public logging!: Repository<LoggingEntity>;
-  public priority: number = 1;
+  public priority: number = 2;
   public automod!: Repository<AutomodEntity>;
   public guilds!: Repository<GuildEntity>;
   public cases!: Repository<CaseEntity>;
@@ -58,19 +58,22 @@ export default class Database implements Component {
     const url = this.config.getProperty('database.url');
     if (url !== undefined) {
       this.logger.info('Found a connection URI string, opting to use that...');
-      const connection = await createConnection({
+      this.connection = await createConnection({
+        migrations: ['./migrations/*.ts'],
+        entities: [
+          PunishmentEntity,
+          LoggingEntity,
+          WarningEntity,
+          AutomodEntity,
+          GuildEntity,
+          CaseEntity,
+          UserEntity
+        ],
         type: 'postgres',
+        name: 'Nino',
         url
       });
 
-      if (connection.isConnected) {
-        this.logger.warn('Connection already exists, not re-connecting...');
-        return;
-      }
-
-      this.connection = connection;
-
-      await this.connection.connect();
       this.initRepos();
 
       this.logger.info('Connection has been established, showing and running migrations...');
@@ -78,19 +81,30 @@ export default class Database implements Component {
 
       if (migrations.length > 0)
         this.logger.info('Ran migrations', migrations.map(migration => `${migration.name} (${migration.id}): ${new Date(migration.timestamp).toISOString()}`));
+
+      return;
     }
 
-    const connection = await createConnection({
+    this.connection = await createConnection({
+      migrations: ['./migrations/*.ts'],
       username: this.config.getProperty('database.username'),
       password: this.config.getProperty('database.password'),
       database: this.config.getProperty('database.database'),
+      entities: [
+        PunishmentEntity,
+        LoggingEntity,
+        WarningEntity,
+        AutomodEntity,
+        GuildEntity,
+        CaseEntity,
+        UserEntity
+      ],
       host: this.config.getProperty('database.host'),
       port: this.config.getProperty('database.port'),
-      type: 'postgres'
+      type: 'postgres',
+      name: 'Nino'
     });
 
-    this.connection = connection;
-    await this.connection.connect();
     this.initRepos();
 
     this.logger.info('Connection has been established, showing and running migrations...');

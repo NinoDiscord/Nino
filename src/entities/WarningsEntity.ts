@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'warnings' })
 export default class WarningsEntity {
@@ -33,6 +33,6 @@ export default class WarningsEntity {
   @Column({ default: 1 })
   public amount!: number;
 
-  @Column({ name: 'user_id' })
+  @PrimaryColumn({ name: 'user_id' })
   public userID!: string;
 }

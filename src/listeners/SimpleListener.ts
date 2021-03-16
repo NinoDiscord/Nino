@@ -25,6 +25,6 @@ import Subscribe from '../structures/decorators/Subscribe';
 export default class SimpleListener {
   @Subscribe('debug')
   debug(msg: string) {
-    console.log(msg);
+    console.trace(msg);
   }
 }

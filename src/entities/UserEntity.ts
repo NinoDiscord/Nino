@@ -20,13 +20,13 @@
  * SOFTWARE.
  */
 
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'users' })
 export default class UserEntity {
   @Column({ default: 'en_US' })
   public language!: string;
 
-  @Column({ name: 'user_id' })
+  @PrimaryColumn({ name: 'user_id' })
   public id!: string;
 }

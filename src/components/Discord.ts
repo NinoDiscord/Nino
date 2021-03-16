@@ -48,7 +48,7 @@ export default class Discord implements Component {
     }
 
     this.logger.info('Booting up the bot...');
-    this.client = new Client('some token', {
+    this.client = new Client(token, {
       getAllUsers: true,
       maxShards: 'auto',
       restMode: true,
@@ -58,6 +58,16 @@ export default class Discord implements Component {
         'guildMembers',
         'guildMessages'
       ]
+    });
+
+    this.client.on('ready', () => {
+      this.logger.info(`Connected as ${this.client.user.username}#${this.client.user.discriminator} (ID: ${this.client.user.id})`);
+      this.logger.info(`Guilds: ${this.client.guilds.size.toLocaleString()} | Users: ${this.client.users.size.toLocaleString()}`);
+
+      this.client.editStatus('online', {
+        name: 'Ice being cute',
+        type: 3
+      });
     });
 
     return this.client.connect()

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 export enum CaseType {
   WarningRemove = 'warning_remove',
@@ -42,7 +42,7 @@ export default class CaseEntity {
   @Column({ name: 'victim_id' })
   public victimID!: string;
 
-  @Column({ name: 'guild_id' })
+  @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
 
   @Column({ default: undefined })

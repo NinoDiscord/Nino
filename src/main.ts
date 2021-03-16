@@ -20,20 +20,36 @@
  * SOFTWARE.
  */
 
+import 'source-map-support/register';
 import 'reflect-metadata';
 
 import app from './container';
 import { getInjectables } from '@augu/lilith';
 import { Logger } from 'tslog';
 import CommandService from './services/CommandService';
+import ListenerService from './services/ListenerService';
 
 const logger = new Logger();
 
 const applyInjections = () => {
   logger.info('Applying injections in commands and listeners...');
-  const commands = app.$ref(CommandService);
+  // @ts-expect-error (we expect it but type-cast it to A INSTANCE of it!)
+  const commands = app.$ref<CommandService>(CommandService);
 
-  console.log(commands);
+  // @ts-expect-error
+  const listeners = app.$ref<ListenerService>(ListenerService);
+
+  for (const command of commands.commands.values()) {
+    const injections = getInjectables(command);
+    app.inject(injections, command);
+  }
+
+  for (const listener of listeners.events.values()) {
+    const injections = getInjectables(listener);
+    app.inject(injections, listener);
+  }
+
+  logger.info('Added injectables!');
 };
 
 (async() => {

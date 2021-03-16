@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'automod' })
 export default class AutomodEntity {
-  @Column({ default: [], type: 'array' })
+  @Column({ array: true, default: [], type: 'text' })
   public blacklistWords!: string[];
 
   @Column({ default: false })
@@ -39,7 +39,7 @@ export default class AutomodEntity {
   @Column({ default: false })
   public dehoist!: boolean;
 
-  @Column({ name: 'guild_id' })
+  @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
 
   @Column({ default: false })

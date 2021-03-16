@@ -35,9 +35,11 @@ import IntResolver from '../structures/resolvers/IntegerResolver';
 
 export default class CommandService implements Service {
   private resolvers: Collection<string, ArgumentResolver<any>> = new Collection();
-  private commands: Collection<string, NinoCommand> = new Collection();
-  private logger: Logger = new Logger();
+  public commands: Collection<string, NinoCommand> = new Collection();
   public name = 'Commands';
+
+  @Inject
+  private logger!: Logger;
 
   @Inject
   private discord!: Discord;
@@ -57,7 +59,7 @@ export default class CommandService implements Service {
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const ctor: Ctor<any> = await import(file);
-      const command: NinoCommand = ctor.default ? new ctor.default() : new ctor();
+      const command: NinoCommand = new ctor.default!();
 
       this.commands.set(command.name, command);
       this.logger.info(`Initialized command ${command.name}`);

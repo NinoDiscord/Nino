@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 export enum LoggingEvents {
   MessageDeleted = 'message_delete',
@@ -30,10 +30,10 @@ export enum LoggingEvents {
 
 @Entity({ name: 'logging' })
 export default class LoggingEntity {
-  @Column({ default: [], type: 'array' })
+  @Column({ default: [], array: true, type: 'text' })
   public ignoreChannels!: string[];
 
-  @Column({ default: [], type: 'array' })
+  @Column({ default: [], array: true, type: 'text' })
   public ignoreUsers!: string[];
 
   @Column({ name: 'channel_id' })
@@ -45,6 +45,6 @@ export default class LoggingEntity {
   @Column({ default: false })
   public enabled!: boolean;
 
-  @Column({ name: 'guild_id' })
+  @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
 }

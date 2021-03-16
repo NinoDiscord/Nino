@@ -23,13 +23,17 @@
 import { getSubscriptionsIn } from '../structures/decorators/Subscribe';
 import { readdirSync, Ctor } from '@augu/utils';
 import { Service, Inject } from '@augu/lilith';
+import { Collection } from '@augu/collections';
 import { Logger } from 'tslog';
 import { join } from 'path';
 import Discord from '../components/Discord';
 
 export default class ListenerService implements Service {
-  private logger: Logger = new Logger();
+  public events: Collection<string, any> = new Collection();
   public name = 'Listeners';
+
+  @Inject
+  private logger!: Logger;
 
   @Inject
   private discord!: Discord;
@@ -55,6 +59,7 @@ export default class ListenerService implements Service {
         });
       }
 
+      this.events.set(listener.constructor.name.replace(/Listener/gi, '').trim().toLowerCase(), listener);
       this.logger.info(`Initialized ${subscriptions.length} events! (${subscriptions.map(r => r.event).join(', ')})`);
     }
   }

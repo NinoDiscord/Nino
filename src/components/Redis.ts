@@ -38,6 +38,7 @@ export default class Redis implements Component {
   async load() {
     this.logger.info('Connecting to Redis...');
     this.client = new IORedis({
+      lazyConnect: true,
       enableReadyCheck: true,
       connectionName: 'Nino',
       password: this.config.getProperty('redis.password'),
@@ -52,7 +53,7 @@ export default class Redis implements Component {
     );
 
     this.client.on('error', this.logger.error);
-    return this.client.connect();
+    return this.client.connect().catch(() => {}); // eslint-disable-line
   }
 
   dispose() {

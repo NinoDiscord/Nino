@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'guilds' })
 export default class GuildEntity {
@@ -30,12 +30,12 @@ export default class GuildEntity {
   @Column({ default: undefined })
   public mutedRoleID?: string;
 
-  @Column({ default: [], type: 'array' })
+  @Column({ array: true, default: [], type: 'varchar', length: 25 })
   public prefixes!: string[];
 
   @Column({ default: 'en_US' })
   public language!: string;
 
-  @Column({ name: 'guild_id' })
+  @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
 }
