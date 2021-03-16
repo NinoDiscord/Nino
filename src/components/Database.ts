@@ -40,7 +40,7 @@ export default class Database implements Component {
   public punishments!: Repository<PunishmentEntity>;
   public warnings!: Repository<WarningEntity>;
   public logging!: Repository<LoggingEntity>;
-  public priority: number = 2;
+  public priority: number = 1;
   public automod!: Repository<AutomodEntity>;
   public guilds!: Repository<GuildEntity>;
   public cases!: Repository<CaseEntity>;

@@ -19,6 +19,7 @@
     "node": ">=14"
   },
   "scripts": {
+    "migrations": "ts-node --project ./tsconfig.scripts.json scripts/create-tables.ts",
     "build": "npm run lint && rm -rf build && tsc",
     "start": "node build/main.js",
     "lint": "eslint src --ext .ts --fix"
@@ -49,6 +50,7 @@
     "@typescript-eslint/eslint-plugin": "4.18.0",
     "@typescript-eslint/parser": "4.18.0",
     "eslint": "7.22.0",
+    "ts-node": "9.1.1",
     "typescript": "4.2.3"
   }
 }

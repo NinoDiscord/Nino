@@ -27,6 +27,9 @@ export default class UserEntity {
   @Column({ default: 'en_US' })
   public language!: string;
 
+  @Column({ array: true, default: [], type: 'varchar' })
+  public prefixes!: string[];
+
   @PrimaryColumn({ name: 'user_id' })
   public id!: string;
 }
