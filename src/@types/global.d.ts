@@ -20,12 +20,16 @@
  * SOFTWARE.
  */
 
-import { hostname } from 'os';
-import { Logger } from 'tslog';
+import { Application } from '@augu/lilith';
 
-export default new Logger({
-  exposeErrorCodeFrame: true,
-  displayInstanceName: true,
-  displayFilePath: 'hideNodeModulesOnly',
-  instanceName: `nino-${hostname()}`
-});
+declare global {
+  /** The current application instance */
+  var app: Application;
+
+  namespace NodeJS {
+    interface Global {
+      /** The current application instance */
+      app: Application;
+    }
+  }
+}

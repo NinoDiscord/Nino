@@ -19,13 +19,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import { hostname } from 'os';
-import { Logger } from 'tslog';
-
-export default new Logger({
-  exposeErrorCodeFrame: true,
-  displayInstanceName: true,
-  displayFilePath: 'hideNodeModulesOnly',
-  instanceName: `nino-${hostname()}`
-});

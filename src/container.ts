@@ -23,6 +23,7 @@
 import { Application } from '@augu/lilith';
 import { join } from 'path';
 import logger from './singletons/Logger';
+import http from './singletons/Http';
 
 const app = new Application()
   .findComponentsIn(join(__dirname, 'components'))
@@ -37,5 +38,6 @@ app.on('service.loaded', service => logger.info(`Service ${service.name} has bee
 app.on('debug', message => logger.debug(`Lilith: ${message}`));
 
 app.addSingleton(logger);
+app.addSingleton(http);
 
 export default app;

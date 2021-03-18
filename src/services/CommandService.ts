@@ -114,9 +114,6 @@ export default class CommandService implements Service {
       userSettings = entry;
     }
 
-    console.log('guild settings', guildSettings);
-    console.log('user settings', userSettings);
-
     if ((new RegExp(`^<@!?${this.discord.client.user.id}>$`)).test(msg.content)) {
       const prefixes = ([] as string[]).concat(
         guildSettings!.prefixes,
