@@ -13,6 +13,7 @@ application.yml
 config.yml
 *.lock
 *.log
+.env
 
 # Redis dumps, I run redis-server in the working directory :3
 *.rdb
@@ -20,3 +21,4 @@ launch.json
 
 # Ignore user-config
 .vscode/
+.idea/

@@ -24,7 +24,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'automod' })
 export default class AutomodEntity {
-  @Column({ array: true, default: [], type: 'text' })
+  @Column({ array: true, type: 'text' })
   public blacklistWords!: string[];
 
   @Column({ default: false })

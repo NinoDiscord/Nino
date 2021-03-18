@@ -24,13 +24,13 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'guilds' })
 export default class GuildEntity {
-  @Column({ default: undefined })
+  @Column({ default: null, nullable: true })
   public modlogChannelID?: string;
 
-  @Column({ default: undefined })
+  @Column({ default: null, nullable: true })
   public mutedRoleID?: string;
 
-  @Column({ array: true, default: [], type: 'varchar', length: 25 })
+  @Column({ array: true, type: 'text' })
   public prefixes!: string[];
 
   @Column({ default: 'en_US' })

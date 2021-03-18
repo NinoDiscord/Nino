@@ -80,7 +80,7 @@ export default class Database implements Component {
       const migrations = await this.connection.runMigrations();
 
       if (migrations.length > 0)
-        this.logger.info('Ran migrations', migrations.map(migration => `${migration.name} (${migration.id}): ${new Date(migration.timestamp).toISOString()}`));
+        this.logger.info('Ran migrations', migrations.map(migration => `• ${migration.name} at ${new Date(migration.timestamp).toLocaleDateString()}`));
 
       return;
     }
@@ -111,7 +111,7 @@ export default class Database implements Component {
     const migrations = await this.connection.runMigrations();
 
     if (migrations.length > 0)
-      this.logger.info('Ran migrations', migrations.map(migration => `${migration.name} (${migration.id}): ${new Date(migration.timestamp).toISOString()}`));
+      this.logger.info('Ran migrations', migrations.map(migration => `• ${migration.name} at ${new Date(migration.timestamp).toLocaleDateString()}`));
   }
 
   dispose() {

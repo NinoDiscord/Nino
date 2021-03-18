@@ -19,13 +19,14 @@
     "node": ">=14"
   },
   "scripts": {
-    "migrations": "ts-node --project ./tsconfig.scripts.json scripts/create-tables.ts",
+    "sync:db": "npm run build && typeorm schema:sync",
     "build": "npm run lint && rm -rf build && tsc",
     "start": "node build/main.js",
     "lint": "eslint src --ext .ts --fix"
   },
   "dependencies": {
     "@augu/collections": "1.0.5",
+    "@augu/dotenv": "1.3.0",
     "@augu/lilith": "1.1.2",
     "@augu/orchid": "2.2.2",
     "@augu/utils": "1.2.0",

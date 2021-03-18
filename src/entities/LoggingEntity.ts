@@ -30,16 +30,16 @@ export enum LoggingEvents {
 
 @Entity({ name: 'logging' })
 export default class LoggingEntity {
-  @Column({ default: [], array: true, type: 'text' })
+  @Column({ default: '{}', array: true, type: 'text' })
   public ignoreChannels!: string[];
 
-  @Column({ default: [], array: true, type: 'text' })
+  @Column({ default: '{}', array: true, type: 'text' })
   public ignoreUsers!: string[];
 
   @Column({ name: 'channel_id' })
   public channelID!: string;
 
-  @Column({ type: 'enum', array: true, enum: LoggingEvents, default: [] })
+  @Column({ type: 'enum', array: true, enum: LoggingEvents })
   public events!: LoggingEvents[];
 
   @Column({ default: false })
