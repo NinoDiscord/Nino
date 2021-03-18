@@ -19,6 +19,9 @@
     "node": ">=14"
   },
   "scripts": {
+    "clean:node_modules": "rm -rf node_modules/**/node_modules && rm -rf node_modules/@types/**/node_modules && rm -rf node_modules/@augu/**/node_modules",
+    "clean:win:tar": "cp node_modules/@augu/collections/build/index.js.* node_modules/@augu/collections/build/index.js && rm node_modules/@augu/collections/build/index.js.*",
+    "prepare": "npm run clean:node_modules",
     "sync:db": "npm run build && typeorm schema:sync",
     "build": "npm run lint && rm -rf build && tsc",
     "start": "node build/main.js",
@@ -27,15 +30,13 @@
   "dependencies": {
     "@augu/collections": "1.0.5",
     "@augu/dotenv": "1.3.0",
-    "@augu/lilith": "1.1.2",
-    "@augu/orchid": "2.2.2",
+    "@augu/lilith": "1.1.3",
+    "@augu/orchid": "2.2.3",
     "@augu/utils": "1.2.0",
     "@sentry/node": "6.2.2",
     "eris": "0.14.0",
     "ioredis": "4.24.2",
     "js-yaml": "4.0.0",
-    "leeks.js": "0.1.1",
-    "long-timeout": "0.1.1",
     "pg": "8.5.1",
     "reflect-metadata": "0.1.13",
     "source-map-support": "0.5.19",

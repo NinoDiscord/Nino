@@ -1,9 +1,10 @@
-# Nino 
-[![Build Status](https://travis-ci.org/auguwu/Nino.svg?branch=master)](https://travis-ci.org/auguwu/Nino)
-
-> :hammer: **| Moderation-based Discord bot initally created for the Discord hackweek, now it is still regularly maintained.**
+# Nino
+> :hammer: **Advanced and cute moderation discord bot as an entry of Discord's Hack Week!**
 >
-> [Website](https://nino.augu.dev) **|** [Support Server](https://discord.gg/JjHGR6vhcG) **|** [Invite](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
+> [Website](https://nino.floofy.dev) **|** [Support](https://discord.gg/JjHGR6vhcG) **|** [Invite Me!](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
+
+## NOTICE
+This branch is where v1 is being written from the ground up! Most of the README section will be replaced once we are done with it.
 
 ## How to use the bot?
 Check out the [wiki](https://github.com/NinoDiscord/Nino/wiki)!
@@ -65,11 +66,12 @@ If you wish to use the source code for a project, please add proper crediting in
 
 ## Credits
 ### Maintainers
-* August#5820 (Lead) ([GitHub](https://github.com/auguwu))
-* dondish#8072 (Development Lead) ([GitHub](https://github.com/dondish))
+* Rodentman87#8787 (Frontend Developer) ([GitHub](https://github.com/Rodentman87))
+* August#5820 (Project Lead) ([GitHub](https://github.com/auguwu))
+* Ice#4710 (DevOps, Developer) ([GitHub](https://github.com/IceeMC))
 
 ### Hackweek Participants
-* August#5820 (Owner) ([GitHub](https://github.com/auguwu))
+* August#5820 ([GitHub](https://github.com/auguwu))
 * dondish#8072 ([GitHub](https://github.com/dondish))
 * Imposed#9999 ([GitHub](https://github.com/scrap))
 * Wesselgame#0498 ([GitHub](https://github.com/Wessel))
