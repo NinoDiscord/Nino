@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { createConnection, Connection, Repository } from 'typeorm';
+import { createConnection, Connection, Repository, ConnectionOptions } from 'typeorm';
 import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import Config from './Config';
@@ -56,36 +56,21 @@ export default class Database implements Component {
     this.logger.info('Now connecting to the database...');
 
     const url = this.config.getProperty('database.url');
-    if (url !== undefined) {
-      this.logger.info('Found a connection URI string, opting to use that...');
-      this.connection = await createConnection({
-        migrations: ['./migrations/*.ts'],
-        entities: [
-          PunishmentEntity,
-          LoggingEntity,
-          WarningEntity,
-          AutomodEntity,
-          GuildEntity,
-          CaseEntity,
-          UserEntity
-        ],
-        type: 'postgres',
-        name: 'Nino',
-        url
-      });
-
-      this.initRepos();
-
-      this.logger.info('Connection has been established, showing and running migrations...');
-      const migrations = await this.connection.runMigrations();
-
-      if (migrations.length > 0)
-        this.logger.info('Ran migrations', migrations.map(migration => `• ${migration.name} at ${new Date(migration.timestamp).toLocaleDateString()}`));
-
-      return;
-    }
-
-    this.connection = await createConnection({
+    const config: ConnectionOptions = url !== undefined ? {
+      migrations: ['./migrations/*.ts'],
+      entities: [
+        PunishmentEntity,
+        LoggingEntity,
+        WarningEntity,
+        AutomodEntity,
+        GuildEntity,
+        CaseEntity,
+        UserEntity
+      ],
+      type: 'postgres',
+      name: 'Nino',
+      url
+    } : {
       migrations: ['./migrations/*.ts'],
       username: this.config.getProperty('database.username'),
       password: this.config.getProperty('database.password'),
@@ -103,15 +88,16 @@ export default class Database implements Component {
       port: this.config.getProperty('database.port'),
       type: 'postgres',
       name: 'Nino'
-    });
+    };
 
+    this.connection = await createConnection(config);
     this.initRepos();
 
     this.logger.info('Connection has been established, showing and running migrations...');
     const migrations = await this.connection.runMigrations();
 
     if (migrations.length > 0)
-      this.logger.info('Ran migrations', migrations.map(migration => `• ${migration.name} at ${new Date(migration.timestamp).toLocaleDateString()}`));
+      this.logger.info('Ran migrations', migrations.map(migration => `• ${migration.name} at ${new Date(migration.timestamp).toLocaleDateString()}`).join('\n'));
   }
 
   dispose() {

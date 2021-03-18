@@ -26,8 +26,8 @@ import IORedis from 'ioredis';
 import Config from './Config';
 
 export default class Redis implements Component {
-  private client!: IORedis.Redis;
   public priority: number = 1;
+  public client!: IORedis.Redis;
   public name: string = 'Redis';
 
   private logger: Logger = new Logger();
@@ -37,15 +37,26 @@ export default class Redis implements Component {
 
   async load() {
     this.logger.info('Connecting to Redis...');
-    this.client = new IORedis({
-      lazyConnect: true,
+
+    const redis = this.config.getProperty('redis')!;
+    const config: IORedis.RedisOptions = (redis.sentinels ?? []).length > 0 ? {
       enableReadyCheck: true,
       connectionName: 'Nino',
-      password: this.config.getProperty('redis.password'),
-      host: this.config.getProperty('redis.host'),
-      port: this.config.getProperty('redis.port'),
-      db: this.config.getProperty('redis.index')
-    });
+      lazyConnect: true,
+      sentinels: redis.sentinels,
+      password: redis.password,
+      db: redis.index
+    } : {
+      enableReadyCheck: true,
+      connectionName: 'Nino',
+      lazyConnect: true,
+      password: redis.password,
+      host: redis.host,
+      port: redis.port,
+      db: redis.index
+    };
+
+    this.client = new IORedis(config);
 
     await this.client.client('SETNAME', 'Nino');
     this.client.on('ready', () =>

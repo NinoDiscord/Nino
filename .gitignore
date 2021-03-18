@@ -1,9 +1,6 @@
 # Folders
 node_modules/
 build/
-dist/
-data/
-old/
 
 # Jest
 coverage/

@@ -64,20 +64,14 @@ export default class Discord implements Component {
       this.logger.info(`Connected as ${this.client.user.username}#${this.client.user.discriminator} (ID: ${this.client.user.id})`);
       this.logger.info(`Guilds: ${this.client.guilds.size.toLocaleString()} | Users: ${this.client.users.size.toLocaleString()}`);
 
+      const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
       this.client.editStatus('online', {
-        name: 'Ice being cute',
-        type: 3
+        name: `${prefixes[Math.floor(Math.random() * prefixes.length)]}help in ${this.client.guilds.size.toLocaleString()} Guilds`,
+        type: 2
       });
     });
 
-    return this.client.connect()
-      .then(() => {
-        this.logger.info('Connecting to Discord!');
-        this.client.editStatus('idle', {
-          name: 'to waves of websockets... ✨',
-          type: 2
-        });
-      });
+    return this.client.connect();
   }
 
   dispose() {

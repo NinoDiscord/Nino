@@ -30,6 +30,7 @@ import yaml from 'js-yaml';
 const NOT_FOUND_SYMBOL = Symbol.for('$nino::config::not.found');
 
 interface Configuration {
+  environment: 'development' | 'production';
   sentryDsn?: string;
   botlists?: BotlistConfig;
   database: DatabaseConfig;
@@ -59,11 +60,15 @@ interface DatabaseConfig {
 }
 
 interface RedisConfig {
+  sentinels?: RedisSentinelConfig[];
   password?: string;
   index?: number;
   host: string;
   port: number;
 }
+
+// eslint-disable-next-line
+interface RedisSentinelConfig extends Pick<RedisConfig, 'host' | 'port'> {}
 
 export default class Config implements Component {
   private config!: Configuration;
@@ -72,7 +77,19 @@ export default class Config implements Component {
 
   async load() {
     const contents = await readFile(join(__dirname, '..', '..', 'config.yml'), 'utf8');
-    this.config = yaml.load(contents) as unknown as Configuration;
+    const config = yaml.load(contents) as unknown as Configuration;
+
+    this.config = {
+      environment: config.environment ?? 'production',
+      sentryDsn: config.sentryDsn,
+      botlists: config.botlists,
+      database: config.database,
+      prefixes: config.prefixes,
+      owners: config.owners,
+      ksoft: config.ksoft,
+      redis: config.redis,
+      token: config.token
+    };
   }
 
   getProperty<K extends keyof Configuration>(key: K): Configuration[K] | undefined;
