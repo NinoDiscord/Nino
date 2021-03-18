@@ -26,11 +26,16 @@ import type Command from './Command';
 
 @NotInjectable()
 export default class CommandMessage {
-  #message: Message<TextChannel>;
+  private _cmdArgs: any = {};
+  public message: Message<TextChannel>;
   #command: Command;
 
   constructor(message: Message<TextChannel>, command: Command) {
-    this.#message = message;
+    this.message = message;
     this.#command = command;
+  }
+
+  args<T extends object>(): T {
+    return this._cmdArgs;
   }
 }

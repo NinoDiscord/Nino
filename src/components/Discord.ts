@@ -26,6 +26,7 @@ import { Logger } from 'tslog';
 import Config from './Config';
 
 export default class Discord implements Component {
+  public mentionRegex!: RegExp;
   public priority: number = 1;
   public client!: Client;
   public name: string = 'Discord';
@@ -64,6 +65,8 @@ export default class Discord implements Component {
       this.logger.info(`Connected as ${this.client.user.username}#${this.client.user.discriminator} (ID: ${this.client.user.id})`);
       this.logger.info(`Guilds: ${this.client.guilds.size.toLocaleString()} | Users: ${this.client.users.size.toLocaleString()}`);
 
+      this.mentionRegex = new RegExp(`^<@!?${this.client.user.id}> `);
+
       const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
       this.client.editStatus('online', {
         name: `${prefixes[Math.floor(Math.random() * prefixes.length)]}help in ${this.client.guilds.size.toLocaleString()} Guilds`,
@@ -71,10 +74,28 @@ export default class Discord implements Component {
       });
     });
 
+    this
+      .client
+      .on('shardReady', this.onShardReady.bind(this))
+      .on('shardDisconnect', this.onShardDisconnect.bind(this))
+      .on('shardResume', this.onShardResume.bind(this));
+
     return this.client.connect();
   }
 
   dispose() {
     return this.client.disconnect({ reconnect: false });
+  }
+
+  private onShardReady(id: number) {
+    this.logger.info(`Shard #${id} is now ready.`);
+  }
+
+  private onShardDisconnect(error: any, id: number) {
+    this.logger.fatal(`Shard #${id} has disconnected from the universe`, error || new Error('Connection has been reset by peer'));
+  }
+
+  private onShardResume(id: number) {
+    this.logger.info(`Shard #${id} has resumed it's connection!`);
   }
 }

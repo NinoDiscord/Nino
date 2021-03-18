@@ -27,19 +27,16 @@ import type Command from './Command';
 export interface SubcommandInfo {
   run(this: Command, msg: CommandMessage): Promise<any>;
 
-  description?: string;
-  name: string;
+  methodName: string;
 }
 
 @NotInjectable()
 export default class Subcommand {
-  public description: string;
   public name: string;
   public run: (this: Command, msg: CommandMessage) => Promise<any>;
 
   constructor(info: SubcommandInfo) {
-    this.description = info.description ?? 'No description is available for this subcommand.';
-    this.name = info.name;
+    this.name = info.methodName;
     this.run = info.run;
   }
 }

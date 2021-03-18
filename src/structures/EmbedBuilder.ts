@@ -22,12 +22,13 @@
 
 /* eslint-disable camelcase */
 
-import type { APIEmbed, APIEmbedAuthor, APIEmbedField, APIEmbedFooter, APIEmbedImage, APIEmbedThumbnail } from 'discord-api-types';
+import type { APIEmbedAuthor, APIEmbedField, APIEmbedFooter, APIEmbedImage, APIEmbedThumbnail } from 'discord-api-types';
+import type { EmbedOptions } from 'eris';
 import { omitUndefinedOrNull } from '@augu/utils';
 
 export default class EmbedBuilder {
   public description?: string;
-  public timestamp?: string;
+  public timestamp?: string | Date;
   public thumbnail?: APIEmbedThumbnail;
   public author?: APIEmbedAuthor;
   public footer?: APIEmbedFooter;
@@ -37,11 +38,11 @@ export default class EmbedBuilder {
   public title?: string;
   public url?: string;
 
-  constructor(data: APIEmbed = {}) {
+  constructor(data: EmbedOptions = {}) {
     this.patch(data);
   }
 
-  patch(data: APIEmbed) {
+  patch(data: EmbedOptions) {
     if (data.description !== undefined)
       this.description = data.description;
 
@@ -171,11 +172,15 @@ export default class EmbedBuilder {
   }
 
   build() {
-    return omitUndefinedOrNull<APIEmbed>({
+    return omitUndefinedOrNull<EmbedOptions>({
       description: this.description,
       thumbnail: this.thumbnail,
       timestamp: this.timestamp,
-      author: this.author,
+      author: this.author ? {
+        name: this.author.name!,
+        url: this.author.url,
+        icon_url: this.author.icon_url
+      } : undefined,
       fields: this.fields,
       image: this.image,
       color: this.color,

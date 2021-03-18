@@ -32,6 +32,6 @@ export default class SimpleCommand extends Command {
   }
 
   async run(msg: CommandMessage) {
-    console.log('a');
+    throw new TypeError('ur mom gay');
   }
 }

@@ -20,11 +20,7 @@
  * SOFTWARE.
  */
 
+import { Inject } from '@augu/lilith';
 import Subscribe from '../structures/decorators/Subscribe';
 
-export default class SimpleListener {
-  @Subscribe('debug')
-  debug(msg: string) {
-    console.trace(msg);
-  }
-}
+export default class GuildMemberListener {}

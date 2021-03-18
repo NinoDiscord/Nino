@@ -20,36 +20,7 @@
  * SOFTWARE.
  */
 
-import { NotInjectable, Inject } from '@augu/lilith';
-import type CommandService from '../../services/CommandService';
-import ArgumentResolver from './ArgumentResolver';
+import { Inject } from '@augu/lilith';
+import Subscribe from '../structures/decorators/Subscribe';
 
-export interface ArgumentInfo {
-  optional?: boolean;
-  default?: any;
-  rest?: boolean;
-  max?: number;
-  type: string;
-  name: string;
-}
-
-@NotInjectable()
-export default class Argument {
-  public service!: CommandService;
-  public info: ArgumentInfo;
-
-  constructor(info: ArgumentInfo) {
-    this.info = {
-      optional: info.optional ?? false,
-      default: info.default ?? null,
-      rest: info.rest ?? false,
-      type: info.type,
-      name: info.name,
-      max: info.max
-    };
-  }
-
-  get resolver() {
-    return this.service.getArgumentResolver(this.info.type);
-  }
-}
+export default class GuildMemberListener {}
