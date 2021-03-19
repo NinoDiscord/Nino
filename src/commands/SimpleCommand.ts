@@ -21,6 +21,8 @@
  */
 
 import type CommandMessage from '../structures/CommandMessage';
+import { Inject } from '@augu/lilith';
+import Kubernetes from '../components/Kubernetes';
 import Command from '../structures/Command';
 
 export default class SimpleCommand extends Command {
@@ -31,7 +33,12 @@ export default class SimpleCommand extends Command {
     });
   }
 
+  @Inject
+  private k8s!: Kubernetes;
+
   async run(msg: CommandMessage) {
-    throw new TypeError('ur mom gay');
+    const nodes = await this.k8s.getCurrentNodes();
+
+    return msg.reply(`~ Current Nodes ~\n\`\`\`apache\n${nodes.map(node => `[${node.name} | ${node.node}] ${typeof node.createdAt === 'string' ? 'malformed date!' : node.createdAt.toUTCString()}`).join('\n')}\n\`\`\``);
   }
 }

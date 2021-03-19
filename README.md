@@ -71,8 +71,8 @@ If you wish to use the source code for a project, please add proper crediting in
 * Ice#4710 (DevOps, Developer) ([GitHub](https://github.com/IceeMC))
 
 ### Hackweek Participants
-* August#5820 ([GitHub](https://github.com/auguwu))
-* dondish#8072 ([GitHub](https://github.com/dondish))
-* Imposed#9999 ([GitHub](https://github.com/scrap))
-* Wesselgame#0498 ([GitHub](https://github.com/Wessel))
-* ohlookitsderpy#9721 ([GitHub](https://github.com/ohlookitsderpy))
+* Chris ([GitHub](https://github.com/auguwu))
+* dondish ([GitHub](https://github.com/dondish))
+* Kyle ([GitHub](https://github.com/scrap))
+* Wessel ([GitHub](https://github.com/Wessel))
+* David ([GitHub](https://github.com/davidjcralph))

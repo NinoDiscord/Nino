@@ -39,6 +39,7 @@ interface Configuration {
   ksoft?: string;
   redis: RedisConfig;
   token: string;
+  k8s?: KubernetesConfig;
 }
 
 interface BotlistConfig {
@@ -67,6 +68,10 @@ interface RedisConfig {
   port: number;
 }
 
+interface KubernetesConfig {
+  namespace: string;
+}
+
 // eslint-disable-next-line
 interface RedisSentinelConfig extends Pick<RedisConfig, 'host' | 'port'> {}
 
@@ -88,7 +93,8 @@ export default class Config implements Component {
       owners: config.owners,
       ksoft: config.ksoft,
       redis: config.redis,
-      token: config.token
+      token: config.token,
+      k8s: config.k8s
     };
   }
 
@@ -96,6 +102,7 @@ export default class Config implements Component {
   getProperty<K extends keyof DatabaseConfig>(key: `database.${K}`): DatabaseConfig[K] | undefined;
   getProperty<K extends keyof BotlistConfig>(key: `botlists.${K}`): BotlistConfig[K] | undefined;
   getProperty<K extends keyof RedisConfig>(key: `redis.${K}`): RedisConfig[K] | undefined;
+  getProperty<K extends keyof KubernetesConfig>(key: `k8s.${K}`): KubernetesConfig[K] | undefined;
   getProperty(key: string) {
     const nodes = key.split('.');
     let value: any = this.config;

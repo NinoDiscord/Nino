@@ -76,7 +76,7 @@ export default class CommandService implements Service {
     );
 
     this.discord.client.on('messageUpdate', (msg: Message<TextChannel>, old) =>
-      this.handler.onMessageEdit.call(this, msg, old)
+      this.handler.onMessageEdit.call(this.handler, msg, old)
     );
 
     // Load in commands

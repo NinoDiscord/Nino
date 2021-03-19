@@ -20,31 +20,6 @@
  * SOFTWARE.
  */
 
-import 'source-map-support/register';
-import 'reflect-metadata';
+import Router, { Route } from '../Router';
 
-import logger from './singletons/Logger';
-import API from './api/API';
-import app from './container';
-
-(async() => {
-  logger.info('Verifying application state...');
-  try {
-    await app.verify();
-  } catch(ex) {
-    logger.fatal('Unable to verify application state');
-    console.error(ex);
-    process.exit(1);
-  }
-
-  const api = new API();
-  await app.addComponent(api, true);
-
-  logger.info('Application state has been verified! :D');
-  process.on('SIGINT', () => {
-    logger.warn('Received CTRL+C call!');
-
-    app.dispose();
-    process.exit(0);
-  });
-})();
+export default class UsersRouter extends Router {}

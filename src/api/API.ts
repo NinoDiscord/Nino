@@ -20,31 +20,21 @@
  * SOFTWARE.
  */
 
-import 'source-map-support/register';
-import 'reflect-metadata';
+import { Component, Inject } from '@augu/lilith';
+import { Logger } from 'tslog';
+import Config from '../components/Config';
 
-import logger from './singletons/Logger';
-import API from './api/API';
-import app from './container';
+export default class API implements Component {
+  public priority: number = 2;
+  public name: string = 'API';
 
-(async() => {
-  logger.info('Verifying application state...');
-  try {
-    await app.verify();
-  } catch(ex) {
-    logger.fatal('Unable to verify application state');
-    console.error(ex);
-    process.exit(1);
+  @Inject
+  private logger!: Logger;
+
+  @Inject
+  private config!: Config;
+
+  async load() {
+    // noop
   }
-
-  const api = new API();
-  await app.addComponent(api, true);
-
-  logger.info('Application state has been verified! :D');
-  process.on('SIGINT', () => {
-    logger.warn('Received CTRL+C call!');
-
-    app.dispose();
-    process.exit(0);
-  });
-})();
+}

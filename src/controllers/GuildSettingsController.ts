@@ -40,7 +40,7 @@ export default class GuildSettingsController {
 
       await this.repository.save(entry);
       await this.database.logging.create(id);
-      await this.database.automod.create(id);
+      //await this.database.automod.create(id);
 
       return entry;
     }

@@ -24,6 +24,7 @@ import { hostname } from 'os';
 import { Logger } from 'tslog';
 
 export default new Logger({
+  displayFunctionName: true,
   exposeErrorCodeFrame: true,
   displayInstanceName: true,
   displayFilePath: 'hideNodeModulesOnly',

@@ -62,6 +62,11 @@ export default class CommandMessage {
         users: false
       }
     };
+
+    if (typeof content === 'string') {
+      payload.content = content;
+      return this.channel.createMessage(payload);
+    }
   }
 }
 
