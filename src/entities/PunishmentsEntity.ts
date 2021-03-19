@@ -23,10 +23,12 @@
 import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 
 export enum PunishmentType {
-  Unmute = 'unmute',
-  Unban  = 'unban',
-  Kick   = 'kick',
-  Ban    = 'ban'
+  RoleRemove = 'role.remove',
+  RoleAdd    = 'role.add',
+  Unmute     = 'unmute',
+  Unban      = 'unban',
+  Kick       = 'kick',
+  Ban        = 'ban'
 }
 
 @Entity({ name: 'punishments' })

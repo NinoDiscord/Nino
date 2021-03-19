@@ -28,6 +28,9 @@ import Config from './Config';
 // Controllers
 import GuildSettingsController from '../controllers/GuildSettingsController';
 import UserSettingsController from '../controllers/UserSettingsController';
+import PunishmentsController from '../controllers/PunishmentsController';
+import WarningsController from '../controllers/WarningsController';
+import LoggingController from '../controllers/LoggingController';
 
 // Import entities
 import PunishmentEntity from '../entities/PunishmentsEntity';
@@ -40,10 +43,10 @@ import CaseEntity from '../entities/CaseEntity';
 import UserEntity from '../entities/UserEntity';
 
 export default class Database implements Component {
-  public punishments!: Repository<PunishmentEntity>;
+  public punishments!: PunishmentsController;
   public connection!: Connection;
-  public warnings!: Repository<WarningEntity>;
-  public logging!: Repository<LoggingEntity>;
+  public warnings!: WarningsController;
+  public logging!: LoggingController;
   public priority: number = 1;
   public automod!: Repository<AutomodEntity>;
   public guilds!: GuildSettingsController;
@@ -108,11 +111,9 @@ export default class Database implements Component {
   }
 
   private initRepos() {
-    // idk how to make this cleaner
-    // typeorm doesn't provide .getRepositories(EntityLike[]) so uh yea
-    this.punishments = this.connection.getRepository(PunishmentEntity);
-    this.warnings = this.connection.getRepository(WarningEntity);
-    this.logging = this.connection.getRepository(LoggingEntity);
+    this.punishments = new PunishmentsController(this);
+    this.warnings = new WarningsController(this);
+    this.logging = new LoggingController(this);
     this.automod = this.connection.getRepository(AutomodEntity);
     this.guilds = new GuildSettingsController(this);
     this.cases = this.connection.getRepository(CaseEntity);

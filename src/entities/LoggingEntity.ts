@@ -36,8 +36,8 @@ export default class LoggingEntity {
   @Column({ default: '{}', array: true, type: 'text' })
   public ignoreUsers!: string[];
 
-  @Column({ name: 'channel_id' })
-  public channelID!: string;
+  @Column({ name: 'channel_id', nullable: true })
+  public channelID?: string;
 
   @Column({ default: false })
   public enabled!: boolean;

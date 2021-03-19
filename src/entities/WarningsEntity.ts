@@ -27,10 +27,13 @@ export default class WarningsEntity {
   @Column({ name: 'guild_id' })
   public guildID!: string;
 
+  @Column({ name: 'case_id' })
+  public caseID!: string;
+
   @Column({ default: undefined, nullable: true })
   public reason?: string;
 
-  @Column({ default: 1 })
+  @Column({ default: 0 })
   public amount!: number;
 
   @PrimaryColumn({ name: 'user_id' })

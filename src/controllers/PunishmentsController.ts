@@ -32,7 +32,7 @@ interface CreatePunishmentOptions {
   type: PunishmentType;
 }
 
-export default class UserSettingsController {
+export default class PunishmentsController {
   constructor(private database: Database) {}
 
   private get repository() {
@@ -62,5 +62,33 @@ export default class UserSettingsController {
       entry.time = time;
 
     return this.repository.save(entry);
+  }
+
+  getAll(guildID: string) {
+    return this.repository.find({ guildID });
+  }
+
+  async shouldBeSoft(guildID: string, index: number, soft: boolean) {
+    const entry = await this.repository.findOneOrFail({ guildID, index });
+    entry.soft = soft;
+    await this.repository.save(entry);
+
+    return entry.soft;
+  }
+
+  async setTime(guildID: string, index: number, time: number) {
+    const entry = await this.repository.findOneOrFail({ guildID, index });
+    entry.time = time;
+
+    await this.repository.save(entry);
+  }
+
+  async setRoleTo(guildID: string, roleID: string, index: number) {
+    const entry = await this.repository.findOneOrFail({ guildID, index });
+    if (entry.type !== PunishmentType.RoleAdd && entry.type !== PunishmentType.RoleRemove)
+      throw new TypeError(`Cannot add role to type ${entry.type}`);
+
+    entry.roleID = roleID;
+    await this.repository.save(entry);
   }
 }
