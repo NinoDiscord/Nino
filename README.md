@@ -1,7 +1,7 @@
 # Nino
 > :hammer: **Advanced and cute moderation discord bot as an entry of Discord's Hack Week!**
 >
-> [Website](https://nino.floofy.dev) **|** [Support](https://discord.gg/JjHGR6vhcG) **|** [Invite Me!](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
+> [Website](https://nino.floofy.dev) **|** [Support](https://discord.gg/JjHGR6vhcG) **|** [Invite Me!](https://discord.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
 
 ## NOTICE
 This branch is where v1 is being written from the ground up! Most of the README section will be replaced once we are done with it.
