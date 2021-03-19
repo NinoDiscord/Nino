@@ -86,7 +86,8 @@ export default class CommandHandler {
     const message = new CommandMessage(msg);
     const owners = this.config.getProperty('owners') ?? [];
     if (command.ownerOnly && !owners.includes(msg.author.id))
-      return message.error(`Command **${command.name}** is a developer-only command, nice try...`);
+      //return message.error(`Command **${command.name}** is a developer-only command, nice try...`);
+      return 'blep';
 
     // Check for permissions of Nino
     if (command.botPermissions.length) {
@@ -94,7 +95,8 @@ export default class CommandHandler {
       const missing = command.botPermissions.filter(perm => !permissions.has(perm));
 
       if (missing.length > 0)
-        return message.error(`I am missing the following permissions: **${missing.join(', ')}**`);
+        //return message.error(`I am missing the following permissions: **${missing.join(', ')}**`);
+        return 'blep';
     }
 
     // Check for the user's permissions
@@ -103,7 +105,8 @@ export default class CommandHandler {
       const missing = command.userPermissions.filter(perm => !permissions.has(perm));
 
       if (missing.length > 0)
-        return message.error(`You are missing the following permission: **${missing.join(', ')}**`);
+        //return message.error(`You are missing the following permission: **${missing.join(', ')}**`);
+        return 'blep';
     }
 
     // Cooldowns
@@ -118,7 +121,8 @@ export default class CommandHandler {
       const time = timestamps.get(msg.author.id)! + amount;
       if (now < time) {
         const left = (time - now) / 1000;
-        return message.error(`Please wait **${left.toFixed()}** seconds before executing this command.`);
+        //return message.error(`Please wait **${left.toFixed()}** seconds before executing this command.`);
+        return 'blep';
       }
     }
 
@@ -142,7 +146,8 @@ export default class CommandHandler {
 
     const [args, error] = await this.parseArgs(subcommand ?? command, rawArgs);
     if (error !== undefined)
-      return message.error(error);
+      //return message.error(error);
+      return 'blep';
 
     message['_cmdArgs'] = args;
     try {
