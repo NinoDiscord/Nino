@@ -23,23 +23,19 @@
 import Argument, { ArgumentInfo } from './arguments/Argument';
 import { getSubcommandsIn } from './decorators/Subcommand';
 import type CommandMessage from './CommandMessage';
-import Flag, { FlagInfo } from './Flag';
 import { NotInjectable } from '@augu/lilith';
 import { Categories } from '../util/Constants';
 import Subcommand from './Subcommand';
 
-export type CommandRestriction = 'owner' | 'guild';
-
 interface CommandInfo {
   userPermissions?: string | string[];
   botPermissions?: string[];
-  restrictions?: CommandRestriction[];
   description?: string;
+  ownerOnly?: boolean;
   category?: Categories;
   cooldown?: number;
   aliases?: string[];
   hidden?: boolean;
-  flags?: FlagInfo[];
   args?: ArgumentInfo[];
   name: string;
 }
@@ -48,13 +44,12 @@ interface CommandInfo {
 export default abstract class NinoCommand {
   public userPermissions: string[];
   public botPermissions:  string[];
-  public restrictions:    CommandRestriction[];
   public description:     string;
+  public ownerOnly:       boolean;
   public category:        Categories;
   public cooldown:        number;
   public aliases:         string[];
   public hidden:          boolean;
-  public flags:           Flag[];
   public args:            Argument[];
   public name:            string;
 
@@ -71,13 +66,12 @@ export default abstract class NinoCommand {
         ? info.botPermissions
         : [];
 
-    this.restrictions = info.restrictions ?? [];
     this.description  = info.description ?? 'No description is available for this command.';
+    this.ownerOnly    = info.ownerOnly ?? false;
     this.category     = info.category ?? Categories.General;
     this.cooldown     = info.cooldown ?? 5;
     this.aliases      = info.aliases ?? [];
     this.hidden       = info.hidden ?? false;
-    this.flags        = info.flags?.map(info => new Flag(info)) ?? [];
     this.args         = info.args?.map(info => new Argument(info)) ?? [];
     this.name         = info.name;
   }

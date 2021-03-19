@@ -27,6 +27,7 @@ import Config from './Config';
 
 // Controllers
 import GuildSettingsController from '../controllers/GuildSettingsController';
+import UserSettingsController from '../controllers/UserSettingsController';
 
 // Import entities
 import PunishmentEntity from '../entities/PunishmentsEntity';
@@ -47,7 +48,7 @@ export default class Database implements Component {
   public automod!: Repository<AutomodEntity>;
   public guilds!: GuildSettingsController;
   public cases!: Repository<CaseEntity>;
-  public users!: Repository<UserEntity>;
+  public users!: UserSettingsController;
   public name: string = 'Database';
 
   private logger: Logger = new Logger();
@@ -115,6 +116,6 @@ export default class Database implements Component {
     this.automod = this.connection.getRepository(AutomodEntity);
     this.guilds = new GuildSettingsController(this);
     this.cases = this.connection.getRepository(CaseEntity);
-    this.users = this.connection.getRepository(UserEntity);
+    this.users = new UserSettingsController(this);
   }
 }

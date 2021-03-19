@@ -20,20 +20,18 @@
  * SOFTWARE.
  */
 
-import type { Message, TextChannel } from 'eris';
+import type { AdvancedMessageContent, Message, TextChannel } from 'eris';
 import { NotInjectable } from '@augu/lilith';
-import type Command from './Command';
+import { EmbedBuilder } from '.';
 
 @NotInjectable()
 export default class CommandMessage {
   private _cmdArgs: any = {};
 
   #message: Message<TextChannel>;
-  #command: Command;
 
-  constructor(message: Message<TextChannel>, command: Command) {
+  constructor(message: Message<TextChannel>) {
     this.#message = message;
-    this.#command = command;
   }
 
   get channel() {
@@ -55,4 +53,39 @@ export default class CommandMessage {
   args<T extends object>(): T {
     return this._cmdArgs;
   }
+
+  reply(content: string | EmbedBuilder) {
+    const payload: AdvancedMessageContent = {
+      allowedMentions: {
+        everyone: false,
+        roles: false,
+        users: false
+      }
+    };
+  }
 }
+
+/*
+  send(content: string) {
+    return this.message.channel.createMessage({
+      content,
+      allowedMentions: {
+        everyone: false,
+        roles: false,
+        users: false
+      }
+    });
+  }
+
+  embed(content: EmbedOptions) {
+    if (this.guild) {
+      if (this.me!.permission.has('embedLinks')) {
+        return this.message.channel.createMessage({ embed: content });
+      } else {
+        return this.send(unembedify(content));
+      }
+    } else {
+      return this.message.channel.createMessage({ embed: content });
+    }
+  }
+*/

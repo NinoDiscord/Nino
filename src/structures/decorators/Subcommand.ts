@@ -22,15 +22,17 @@
 
 
 import type { SubcommandInfo } from '../Subcommand';
+import type { ArgumentInfo } from '../arguments/Argument';
 import { MetadataKeys } from '../../util/Constants';
 
 export const getSubcommandsIn = (target: any): SubcommandInfo[] => Reflect.getMetadata(MetadataKeys.Subcommand, target) ?? [];
 
-export default function Subcommand(): MethodDecorator {
+export default function Subcommand(args?: ArgumentInfo[]): MethodDecorator {
   return (target, methodName, descriptor: TypedPropertyDescriptor<any>) => {
     const subcommands: SubcommandInfo[] = Reflect.getMetadata(MetadataKeys.Subcommand, target) ?? [];
     subcommands.push({
       methodName: String(methodName),
+      args: args ?? [],
       run: descriptor.value!
     });
 
