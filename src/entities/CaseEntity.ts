@@ -36,8 +36,8 @@ export default class CaseEntity {
   @Column({ name: 'moderator_id' })
   public moderatorID!: string;
 
-  @Column({ name: 'message_id' })
-  public messageID!: string;
+  @Column({ name: 'message_id', nullable: true, default: undefined })
+  public messageID?: string;
 
   @Column({ name: 'victim_id' })
   public victimID!: string;
@@ -45,11 +45,10 @@ export default class CaseEntity {
   @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
 
-  @Column({ default: undefined })
+  @Column({ nullable: true })
   public reason?: string;
 
   @Column({
-    name: 'type',
     type: 'enum',
     enum: CaseType
   })
@@ -58,6 +57,6 @@ export default class CaseEntity {
   @Column({ default: false })
   public soft!: boolean;
 
-  @Column({ default: undefined })
+  @Column({ nullable: true, default: undefined })
   public time?: number;
 }

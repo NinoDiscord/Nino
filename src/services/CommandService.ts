@@ -139,18 +139,8 @@ export default class CommandService implements Service {
     if (![0, 5].includes(msg.channel.type))
       return msg.channel.createMessage(`[ <:xmark:464708589123141634> **~** ${msg.author.username}#${msg.author.discriminator} ]\nCommands cannot be ran in a non-textable channel, please run a command in a guild.`);
 
-    let guildSettings = await this.database.guilds.findOne({ guildID: msg.channel.guild.id });
+    const guildSettings = await this.database.guilds.get(msg.channel.guild.id);
     let userSettings = await this.database.users.findOne({ id: msg.author.id });
-
-    if (!guildSettings) {
-      const entity = new GuildEntity();
-      entity.prefixes = [];
-      entity.language = 'en_US';
-      entity.guildID = msg.channel.guild.id;
-
-      await this.database.guilds.save(entity);
-      guildSettings = entity;
-    }
 
     if (!userSettings) {
       const entry = new UserEntity();
@@ -163,7 +153,7 @@ export default class CommandService implements Service {
     }
 
     const prefixes = [`${this.discord.mentionRegex}`]
-      .concat(guildSettings!.prefixes, userSettings!.prefixes, this.config.getProperty('prefixes')!)
+      .concat(guildSettings.prefixes, userSettings!.prefixes, this.config.getProperty('prefixes')!)
       .filter(Boolean);
 
     if (this.discord.client.user.id === '531613242473054229')

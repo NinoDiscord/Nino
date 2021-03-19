@@ -19,3 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import { Service } from '@augu/lilith';
+
+export default class BotlistsService implements Service {
+  public name: string = 'botlists';
+}

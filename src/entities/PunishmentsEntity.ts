@@ -35,6 +35,8 @@ export default class PunishmentEntity {
   public warnings!: number;
 
   @PrimaryColumn({ name: 'guild_id' })
+  public guildID!: string;
+
   @Column({ default: undefined })
   public roleID?: string;
 

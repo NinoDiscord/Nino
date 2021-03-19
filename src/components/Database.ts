@@ -25,8 +25,12 @@ import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import Config from './Config';
 
+// Controllers
+import GuildSettingsController from '../controllers/GuildSettingsController';
+
 // Import entities
 import PunishmentEntity from '../entities/PunishmentsEntity';
+import BlacklistEntity from '../entities/BlacklistEntity';
 import LoggingEntity from '../entities/LoggingEntity';
 import WarningEntity from '../entities/WarningsEntity';
 import AutomodEntity from '../entities/AutomodEntity';
@@ -35,14 +39,13 @@ import CaseEntity from '../entities/CaseEntity';
 import UserEntity from '../entities/UserEntity';
 
 export default class Database implements Component {
-  private connection!: Connection;
-
   public punishments!: Repository<PunishmentEntity>;
+  public connection!: Connection;
   public warnings!: Repository<WarningEntity>;
   public logging!: Repository<LoggingEntity>;
   public priority: number = 1;
   public automod!: Repository<AutomodEntity>;
-  public guilds!: Repository<GuildEntity>;
+  public guilds!: GuildSettingsController;
   public cases!: Repository<CaseEntity>;
   public users!: Repository<UserEntity>;
   public name: string = 'Database';
@@ -60,6 +63,7 @@ export default class Database implements Component {
       migrations: ['./migrations/*.ts'],
       entities: [
         PunishmentEntity,
+        BlacklistEntity,
         LoggingEntity,
         WarningEntity,
         AutomodEntity,
@@ -77,6 +81,7 @@ export default class Database implements Component {
       database: this.config.getProperty('database.database'),
       entities: [
         PunishmentEntity,
+        BlacklistEntity,
         LoggingEntity,
         WarningEntity,
         AutomodEntity,
@@ -93,11 +98,8 @@ export default class Database implements Component {
     this.connection = await createConnection(config);
     this.initRepos();
 
-    this.logger.info('Connection has been established, showing and running migrations...');
-    const migrations = await this.connection.runMigrations();
-
-    if (migrations.length > 0)
-      this.logger.info('Ran migrations', migrations.map(migration => `• ${migration.name} at ${new Date(migration.timestamp).toLocaleDateString()}`).join('\n'));
+    const migrations = await this.connection.showMigrations();
+    this.logger.info(`Connection to the database has been established successfully${migrations ? ', there are pending migrations! Run `npm run sync:db` to sync them.' : '!'}`);
   }
 
   dispose() {
@@ -111,7 +113,7 @@ export default class Database implements Component {
     this.warnings = this.connection.getRepository(WarningEntity);
     this.logging = this.connection.getRepository(LoggingEntity);
     this.automod = this.connection.getRepository(AutomodEntity);
-    this.guilds = this.connection.getRepository(GuildEntity);
+    this.guilds = new GuildSettingsController(this);
     this.cases = this.connection.getRepository(CaseEntity);
     this.users = this.connection.getRepository(UserEntity);
   }

@@ -20,19 +20,24 @@
  * SOFTWARE.
  */
 
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, PrimaryColumn, Column } from 'typeorm';
 
-@Entity({ name: 'warnings' })
-export default class WarningsEntity {
-  @Column({ name: 'guild_id' })
-  public guildID!: string;
+export enum BlacklistType {
+  Guild,
+  User
+}
 
-  @Column({ default: undefined, nullable: true })
+@Entity({ name: 'blacklists' })
+export default class BlacklistEntity {
+  @Column({ nullable: true })
   public reason?: string;
 
-  @Column({ default: 1 })
-  public amount!: number;
+  @Column()
+  public issuer!: string;
 
-  @PrimaryColumn({ name: 'user_id' })
-  public userID!: string;
+  @Column({ type: 'enum', enum: BlacklistType })
+  public type!: BlacklistType;
+
+  @PrimaryColumn()
+  public id!: string;
 }

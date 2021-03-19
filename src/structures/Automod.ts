@@ -19,3 +19,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import type { Member, Message, TextChannel } from 'eris';
+
+/**
+ * Interface to implement as a [Automod] action.
+ */
+export interface Automod {
+  /**
+   * Handles any member's nickname updates
+   * @param member The member
+   */
+  onMemberNickUpdate?(member: Member): Promise<any>;
+
+  /**
+   * Handles any members joining the guild
+   * @param member The member
+   */
+  onMemberJoin?(member: Member): Promise<any>;
+
+  /**
+   * Handles any message updates or creation
+   * @param message The message
+   */
+  onMessage?(message: Message<TextChannel>): Promise<any>;
+
+  /**
+   * The name for this [Automod] class.
+   */
+  name: string;
+}

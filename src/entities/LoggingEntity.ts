@@ -39,11 +39,11 @@ export default class LoggingEntity {
   @Column({ name: 'channel_id' })
   public channelID!: string;
 
-  @Column({ type: 'enum', array: true, enum: LoggingEvents })
-  public events!: LoggingEvents[];
-
   @Column({ default: false })
   public enabled!: boolean;
+
+  @Column({ type: 'enum', array: true, enum: LoggingEvents, default: '{}' })
+  public events!: LoggingEvents[];
 
   @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
