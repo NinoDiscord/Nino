@@ -20,38 +20,47 @@
  * SOFTWARE.
  */
 
-import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
+import PunishmentEntity, { PunishmentType } from '../entities/PunishmentsEntity';
+import Database from '../components/Database';
 
-export enum PunishmentType {
-  Unmute = 'unmute',
-  Unban  = 'unban',
-  Kick   = 'kick',
-  Ban    = 'ban'
+interface CreatePunishmentOptions {
+  warnings: number;
+  roleID?: string;
+  guildID: string;
+  soft?: boolean;
+  time?: number;
+  type: PunishmentType;
 }
 
-@Entity({ name: 'punishments' })
-export default class PunishmentEntity {
-  @Column({ default: 1 })
-  public warnings!: number;
+export default class UserSettingsController {
+  constructor(private database: Database) {}
 
-  @PrimaryColumn({ name: 'guild_id' })
-  public guildID!: string;
+  private get repository() {
+    return this.database.connection.getRepository(PunishmentEntity);
+  }
 
-  @Column({ default: undefined, nullable: true })
-  public roleID?: string;
+  create({
+    warnings,
+    guildID,
+    roleID,
+    soft,
+    time,
+    type
+  }: CreatePunishmentOptions) {
+    const entry = new PunishmentEntity();
+    entry.warnings = warnings;
+    entry.guildID = guildID;
+    entry.type = type;
 
-  @PrimaryGeneratedColumn()
-  public index!: number;
+    if (roleID !== undefined)
+      entry.roleID = roleID;
 
-  @Column({ default: false })
-  public soft!: boolean;
+    if (soft !== undefined && soft === true)
+      entry.soft = true;
 
-  @Column({ default: undefined, nullable: true })
-  public time?: number;
+    if (time !== undefined)
+      entry.time = time;
 
-  @Column({
-    type: 'enum',
-    enum: PunishmentType
-  })
-  public type!: PunishmentType;
+    return this.repository.save(entry);
+  }
 }

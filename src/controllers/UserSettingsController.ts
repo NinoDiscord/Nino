@@ -23,7 +23,7 @@
 import UserEntity from '../entities/UserEntity';
 import Database from '../components/Database';
 
-export default class GuildSettingsController {
+export default class UserSettingsController {
   constructor(private database: Database) {}
 
   private get repository() {
