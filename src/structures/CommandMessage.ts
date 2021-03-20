@@ -28,7 +28,7 @@ import app from '../container';
 
 @NotInjectable()
 export default class CommandMessage {
-  private _cmdArgs: any = {};
+  private _flags: any = {};
 
   #message: Message<TextChannel>;
 
@@ -58,8 +58,8 @@ export default class CommandMessage {
     return this.guild.members.get(discord.client.user.id);
   }
 
-  args<T extends object>(): T {
-    return this._cmdArgs;
+  flags<T extends object>(): T {
+    return this._flags;
   }
 
   reply(content: string | EmbedBuilder) {

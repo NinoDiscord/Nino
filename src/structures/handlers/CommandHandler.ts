@@ -31,7 +31,6 @@ import { Logger } from 'tslog';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
-import { raw } from 'express';
 
 @NotInjectable()
 export default class CommandHandler {
@@ -145,7 +144,7 @@ export default class CommandHandler {
     if (error !== undefined)
       return message.reply(error);
 
-    message['_cmdArgs'] = args;
+    message['_flags'] = this.parseFlags(rawArgs.join(' '));
     try {
       const executor = Reflect.get(command, methodName);
       if (typeof executor !== 'function')
@@ -203,5 +202,15 @@ export default class CommandHandler {
     }
 
     return [list];
+  }
+
+  private parseFlags(content: string): Record<string, string | true> {
+    const record: Record<string, string | true> = {};
+    content.replaceAll(/(?:--?|—)([\w]+)(=| ?(\w+|['"].*['"]))?/gi, (_, key: string, value: string) => {
+      record[key.trim()] = value ? value.replaceAll(/(^[='"]+|['"]+$)/g, '').trim() : true;
+      return value;
+    });
+
+    return record;
   }
 }

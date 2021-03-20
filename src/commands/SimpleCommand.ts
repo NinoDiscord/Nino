@@ -21,42 +21,18 @@
  */
 
 import type CommandMessage from '../structures/CommandMessage';
-import { Inject } from '@augu/lilith';
-import Kubernetes from '../components/Kubernetes';
 import Command from '../structures/Command';
 
 export default class SimpleCommand extends Command {
   constructor() {
     super({
       description: 'A simple command for your needs.',
-      args: [
-        {
-          name: 'node',
-          type: 'string',
-          default: 'us-dedi1'
-        },
-        {
-          name: 'uwu',
-          type: 'int',
-          default: 69
-        }
-      ],
       name: 'simple'
     });
   }
 
-  @Inject
-  private k8s!: Kubernetes;
-
-  async run(msg: CommandMessage, args: { node: string; uwu: number }) {
-    const nodes = await this.k8s.getCurrentNodes();
-    if (Object.keys(args).length > 0) {
-      return msg.reply(`node provided: **${args.node}**\nuwu provided: ${args.uwu}`);
-    }
-
-    if (nodes.length === 0)
-      return msg.reply('unable to list nodes due to no kubernetes namespace!');
-
-    return msg.reply(`~ Current Nodes ~\n\`\`\`apache\n${nodes.map(node => `[${node.name} | ${node.node}] ${typeof node.createdAt === 'string' ? 'malformed date!' : node.createdAt.toUTCString()}`).join('\n')}\n\`\`\``);
+  async run(msg: CommandMessage) {
+    const flags = msg.flags();
+    return msg.reply(`Received flags:\n\`\`\`js\n${JSON.stringify(flags, null, '\t')}\`\`\``);
   }
 }
