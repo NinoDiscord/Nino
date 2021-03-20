@@ -54,6 +54,8 @@ export default abstract class NinoCommand {
   public name:            string;
 
   constructor(info: CommandInfo) {
+    this._validateArgs(info.args ?? []);
+
     this.userPermissions = typeof info.userPermissions === 'string'
       ? [info.userPermissions]
       : Array.isArray(info.userPermissions)
@@ -80,5 +82,23 @@ export default abstract class NinoCommand {
     return getSubcommandsIn(this).map(sub => new Subcommand(sub));
   }
 
-  abstract run(msg: CommandMessage): Promise<any>;
+  private _validateArgs(args: ArgumentInfo[]) {
+    let hasRest = false;
+    let hasOptional = false;
+
+    for (let i = 0; i < args.length; i++) {
+      if (hasRest)
+        throw new SyntaxError('No additional arguments cannot come after a rest argument');
+
+      if (args[i].optional === true)
+        hasOptional = true;
+      else if (hasOptional)
+        throw new SyntaxError('No required arguments cannot come after a optional one');
+
+      if (args[i].rest === true)
+        hasRest = true;
+    }
+  }
+
+  abstract run(msg: CommandMessage, ...args: any[]): Promise<any>;
 }

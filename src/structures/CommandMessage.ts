@@ -23,6 +23,8 @@
 import type { AdvancedMessageContent, Message, TextChannel } from 'eris';
 import { NotInjectable } from '@augu/lilith';
 import { EmbedBuilder } from '.';
+import Discord from '../components/Discord';
+import app from '../container';
 
 @NotInjectable()
 export default class CommandMessage {
@@ -50,13 +52,21 @@ export default class CommandMessage {
     return this.#message.channel.guild;
   }
 
+  get self() {
+    // @ts-expect-error (fuck you)
+    const discord = app.$ref<Discord>(Discord);
+    return this.guild.members.get(discord.client.user.id);
+  }
+
   args<T extends object>(): T {
     return this._cmdArgs;
   }
 
   reply(content: string | EmbedBuilder) {
     const payload: AdvancedMessageContent = {
+      messageReferenceID: this.#message.id,
       allowedMentions: {
+        replied_user: false, // eslint-disable-line camelcase
         everyone: false,
         roles: false,
         users: false
@@ -66,31 +76,16 @@ export default class CommandMessage {
     if (typeof content === 'string') {
       payload.content = content;
       return this.channel.createMessage(payload);
+    } else {
+      if (this.guild) {
+        if (this.self?.permissions.has('embedLinks'))
+          return this.channel.createMessage({ embed: content.build(), ...payload });
+        else
+          // TODO: unembedify util
+          return this.channel.createMessage({ content: content.description!, ...payload });
+      } else {
+        return this.channel.createMessage({ embed: content.build(), ...payload });
+      }
     }
   }
 }
-
-/*
-  send(content: string) {
-    return this.message.channel.createMessage({
-      content,
-      allowedMentions: {
-        everyone: false,
-        roles: false,
-        users: false
-      }
-    });
-  }
-
-  embed(content: EmbedOptions) {
-    if (this.guild) {
-      if (this.me!.permission.has('embedLinks')) {
-        return this.message.channel.createMessage({ embed: content });
-      } else {
-        return this.send(unembedify(content));
-      }
-    } else {
-      return this.message.channel.createMessage({ embed: content });
-    }
-  }
-*/

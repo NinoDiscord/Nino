@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-import { NotInjectable, Inject } from '@augu/lilith';
+import type { CommandMessage } from '..';
 import type CommandService from '../../services/CommandService';
-import ArgumentResolver from './ArgumentResolver';
+import { NotInjectable } from '@augu/lilith';
 
 export interface ArgumentInfo {
   optional?: boolean;
@@ -31,6 +31,11 @@ export interface ArgumentInfo {
   max?: number;
   type: string;
   name: string;
+}
+
+interface ArgumentResolveResult {
+  error?: string;
+  value?: any;
 }
 
 @NotInjectable()
@@ -51,5 +56,42 @@ export default class Argument {
 
   get resolver() {
     return this.service.getArgumentResolver(this.info.type);
+  }
+
+  get format() {
+    const prefix = this.info.optional === true ? '[' : '<';
+    const suffix = this.info.optional === true ? ']' : '>';
+    let text = `${prefix}${this.info.name}`;
+
+    if (this.info.default !== null)
+      text += ` = ${this.info.default}`;
+
+    return (text += suffix, text);
+  }
+
+  // todo: make this more cleaner?
+  async resolve(msg: CommandMessage, possible: string): Promise<ArgumentResolveResult> {
+    if (possible.length === 0) {
+      if (this.info.optional === false)
+        return {
+          error: `Argument **${this.info.name}** is required.`
+        };
+
+      return {
+        value: this.info.default !== null ? this.info.default : undefined
+      };
+    }
+
+    const validated = await this.resolver.validate(msg, possible, this);
+    if (validated !== undefined)
+      return { error: validated };
+
+    try {
+      const result = await this.resolver.parse(msg, possible, this);
+      return { value: result };
+    } catch(ex) {
+      // todo: error handling?
+      return { error: ex.message };
+    }
   }
 }

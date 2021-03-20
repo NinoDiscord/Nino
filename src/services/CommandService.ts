@@ -115,7 +115,7 @@ export default class CommandService implements Service {
   }
 
   getArgumentResolver(type: string) {
-    return this.resolvers.get('string')!;
+    return this.resolvers.get(type)!;
   }
 
   private _addResolvers() {

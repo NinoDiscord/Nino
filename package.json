@@ -37,7 +37,7 @@
     "@augu/utils": "1.2.0",
     "@kubernetes/client-node": "0.14.0",
     "@sentry/node": "6.2.2",
-    "eris": "0.14.0",
+    "eris": "github:abalabahaha/eris#dev",
     "express": "4.17.1",
     "ioredis": "4.24.2",
     "js-yaml": "4.0.0",

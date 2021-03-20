@@ -24,13 +24,14 @@ import type { Message, OldMessage, TextChannel } from 'eris';
 import { Command, EmbedBuilder } from '..';
 import { NotInjectable, Inject } from '@augu/lilith';
 import type CommandService from '../../services/CommandService';
-import type Subcommand from '../Subcommand';
 import { Collection } from '@augu/collections';
 import CommandMessage from '../CommandMessage';
+import Subcommand from '../Subcommand';
 import { Logger } from 'tslog';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
+import { raw } from 'express';
 
 @NotInjectable()
 export default class CommandHandler {
@@ -86,8 +87,7 @@ export default class CommandHandler {
     const message = new CommandMessage(msg);
     const owners = this.config.getProperty('owners') ?? [];
     if (command.ownerOnly && !owners.includes(msg.author.id))
-      //return message.error(`Command **${command.name}** is a developer-only command, nice try...`);
-      return 'blep';
+      return message.reply(`Command **${command.name}** is a developer-only command, nice try...`);
 
     // Check for permissions of Nino
     if (command.botPermissions.length) {
@@ -95,8 +95,7 @@ export default class CommandHandler {
       const missing = command.botPermissions.filter(perm => !permissions.has(perm));
 
       if (missing.length > 0)
-        //return message.error(`I am missing the following permissions: **${missing.join(', ')}**`);
-        return 'blep';
+        return message.reply(`I am missing the following permissions: **${missing.join(', ')}**`);
     }
 
     // Check for the user's permissions
@@ -105,8 +104,7 @@ export default class CommandHandler {
       const missing = command.userPermissions.filter(perm => !permissions.has(perm));
 
       if (missing.length > 0)
-        //return message.error(`You are missing the following permission: **${missing.join(', ')}**`);
-        return 'blep';
+        return message.reply(`You are missing the following permission: **${missing.join(', ')}**`);
     }
 
     // Cooldowns
@@ -121,8 +119,7 @@ export default class CommandHandler {
       const time = timestamps.get(msg.author.id)! + amount;
       if (now < time) {
         const left = (time - now) / 1000;
-        //return message.error(`Please wait **${left.toFixed()}** seconds before executing this command.`);
-        return 'blep';
+        return message.reply(`Please wait **${left.toFixed()}** seconds before executing this command.`);
       }
     }
 
@@ -144,10 +141,9 @@ export default class CommandHandler {
     if (subcommand !== undefined)
       rawArgs.shift();
 
-    const [args, error] = await this.parseArgs(subcommand ?? command, rawArgs);
+    const [args, error] = await this.parseArgs(message, subcommand ?? command, rawArgs);
     if (error !== undefined)
-      //return message.error(error);
-      return 'blep';
+      return message.reply(error);
 
     message['_cmdArgs'] = args;
     try {
@@ -155,7 +151,7 @@ export default class CommandHandler {
       if (typeof executor !== 'function')
         throw new SyntaxError(`${subcommand ? 'Subc' : 'C'}ommand "${subcommand ? methodName : command.name}" was not a function.`);
 
-      await executor.call(command, message);
+      await executor.call(command, message, args);
       this.logger.info(`Command "${command.name}" has been ran by ${msg.author.username}#${msg.author.discriminator} in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
     } catch(ex) {
       const contact = owners
@@ -180,7 +176,32 @@ export default class CommandHandler {
     }
   }
 
-  private async parseArgs(command: Command | Subcommand, args: string[]): Promise<[list: any, error?: string]> {
-    return [{}];
+  private async parseArgs(message: CommandMessage, command: Command | Subcommand, rawArgs: string[]): Promise<[list: any, error?: string]> {
+    if (!command.args.length || !rawArgs.length)
+      return [{}];
+
+    // hopefully this is good?
+    if (!rawArgs.length && command.args.some(r => r.info.default !== null))
+      return [command.args.reduce<any>((prev, curr) => (prev[curr.info.name] = curr.info.default, prev), {})];
+    else if (!rawArgs.length && command.args.every(r => r.info.default === null))
+      return [{}];
+
+    const isSub = command instanceof Subcommand;
+    const list: any = {};
+
+    if (rawArgs.length > command.args.length && command.args[command.args.length - 1].info.rest === false)
+      return [list, `You have provided too many arguments! Review the ${isSub ? 'subcommand': 'command'}'s usage: \`help ${command.name}\``];
+
+    for (let i = 0; i < command.args.length; i++) {
+      const arg = command.args[i];
+      const result = await arg.resolve(message, arg.info.rest === true ? rawArgs.slice(i).join(' ') : rawArgs[i]);
+
+      if (result.error)
+        return [list, result.error];
+
+      list[arg.info.name] = result.value;
+    }
+
+    return [list];
   }
 }
