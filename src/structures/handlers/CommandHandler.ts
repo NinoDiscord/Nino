@@ -204,6 +204,7 @@ export default class CommandHandler {
     return [list];
   }
 
+  // credit for regex: Ice <3
   private parseFlags(content: string): Record<string, string | true> {
     const record: Record<string, string | true> = {};
     content.replaceAll(/(?:--?|—)([\w]+)(=| ?(\w+|['"].*['"]))?/gi, (_, key: string, value: string) => {
