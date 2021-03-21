@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import WarningEntity from '../entities/WarningsEntity';
 import type Database from '../components/Database';
 
@@ -56,10 +57,14 @@ export default class WarningsController {
     return this.repository.save(entry);
   }
 
-  async setReason(guildID: string, userID: string, caseID: string, reason: string) {
-    const entry = await this.repository.findOneOrFail({ guildID, userID, caseID });
-    entry.reason = reason;
-
-    await this.repository.save(entry);
+  update(guildID: string, values: QueryDeepPartialEntity<WarningEntity>) {
+    return this
+      .database
+      .connection
+      .createQueryBuilder()
+      .update(WarningEntity)
+      .set(values)
+      .where(':id = guild_id', { id: guildID })
+      .execute();
   }
 }

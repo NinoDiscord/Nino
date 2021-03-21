@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import type Database from '../components/Database';
 import UserEntity from '../entities/UserEntity';
-import Database from '../components/Database';
 
 export default class UserSettingsController {
   constructor(private database: Database) {}
@@ -45,25 +46,14 @@ export default class UserSettingsController {
     return settings;
   }
 
-  async addPrefix(guildID: string, prefix: string) {
-    const settings = await this.get(guildID);
-    settings.prefixes.push(prefix);
-
-    return this.repository.save(settings);
-  }
-
-  async removePrefix(guildID: string, prefix: string) {
-    const settings = await this.get(guildID);
-    const index = settings.prefixes.findIndex(val => val.toLowerCase() === prefix.toLowerCase());
-    settings.prefixes.splice(index, 1);
-
-    return this.repository.save(settings);
-  }
-
-  async setLocale(guildID: string, locale: string) {
-    const settings = await this.get(guildID);
-    settings.language = locale;
-
-    return this.repository.save(settings);
+  update(userID: string, values: QueryDeepPartialEntity<UserEntity>) {
+    return this
+      .database
+      .connection
+      .createQueryBuilder()
+      .update(UserEntity)
+      .set(values)
+      .where(':id = user_id', { id: userID })
+      .execute();
   }
 }

@@ -17,10 +17,11 @@
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
+ * SOFTWA
+ * RE.
  */
-
-import LoggingEntity, { LoggingEvents } from '../entities/LoggingEntity';
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import LoggingEntity from '../entities/LoggingEntity';
 import type Database from '../components/Database';
 
 export default class LoggingController {
@@ -45,62 +46,14 @@ export default class LoggingController {
     return this.repository.save(entry);
   }
 
-  async addIgnoreChannel(guildID: string, channelID: string) {
-    const entry = await this.get(guildID);
-    entry?.ignoreChannels.push(channelID);
-
-    if (entry !== undefined)
-      await this.repository.save(entry);
-  }
-
-  async removeIgnoreChannel(guildID: string, channelID: string) {
-    const entry = await this.get(guildID);
-    if (entry === undefined)
-      throw new TypeError(); // shouldn't reach here but HEY, you never know
-
-    const index = entry.ignoreChannels.findIndex(id => id === channelID);
-    if (index === -1)
-      throw new RangeError(`channel "${channelID}" was not found`); // we can reach this, so yes
-
-    entry.ignoreChannels.splice(index, 1);
-    await this.repository.save(entry);
-  }
-
-  async addIgnoredUser(guildID: string, userID: string) {
-    const entry = await this.get(guildID);
-    entry?.ignoreUsers.push(userID);
-
-    if (entry !== undefined)
-      await this.repository.save(entry);
-  }
-
-  async removeIgnoredUser(guildID: string, userID: string) {
-    const entry = await this.get(guildID);
-    if (entry === undefined)
-      throw new TypeError(); // shouldn't reach here but HEY, you never know
-
-    const index = entry.ignoreUsers.findIndex(id => id === userID);
-    if (index === -1)
-      throw new RangeError(`user "${userID}" was not found`); // we can reach this, so yes
-
-    entry.ignoreUsers.splice(index, 1);
-    await this.repository.save(entry);
+  update(guildID: string, values: QueryDeepPartialEntity<LoggingEntity>) {
+    return this
+      .database
+      .connection
+      .createQueryBuilder()
+      .update(LoggingEntity)
+      .set(values)
+      .where(':id = guild_id', { id: guildID })
+      .execute();
   }
 }
-
-/*
-  @Column({ default: '{}', array: true, type: 'text' })
-  public ignoreUsers!: string[];
-
-  @Column({ name: 'channel_id', nullable: true })
-  public channelID?: string;
-
-  @Column({ default: false })
-  public enabled!: boolean;
-
-  @Column({ type: 'enum', array: true, enum: LoggingEvents, default: '{}' })
-  public events!: LoggingEvents[];
-
-  @PrimaryColumn({ name: 'guild_id' })
-  public guildID!: string;
-*/

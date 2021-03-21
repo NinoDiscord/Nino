@@ -22,6 +22,7 @@
 
 import GuildEntity from '../entities/GuildEntity';
 import Database from '../components/Database';
+import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 export default class GuildSettingsController {
   constructor(private database: Database) {}
@@ -52,39 +53,14 @@ export default class GuildSettingsController {
     return this.repository.delete({ guildID: id });
   }
 
-  async setModLogChannel(guildID: string, id: string) {
-    const settings = await this.get(guildID);
-    settings.modlogChannelID = id;
-
-    return this.repository.save(settings);
-  }
-
-  async setMutedRole(guildID: string, id: string) {
-    const settings = await this.get(guildID);
-    settings.mutedRoleID = id;
-
-    return this.repository.save(settings);
-  }
-
-  async addPrefix(guildID: string, prefix: string) {
-    const settings = await this.get(guildID);
-    settings.prefixes.push(prefix);
-
-    return this.repository.save(settings);
-  }
-
-  async removePrefix(guildID: string, prefix: string) {
-    const settings = await this.get(guildID);
-    const index = settings.prefixes.findIndex(val => val.toLowerCase() === prefix.toLowerCase());
-    settings.prefixes.splice(index, 1);
-
-    return this.repository.save(settings);
-  }
-
-  async setLocale(guildID: string, locale: string) {
-    const settings = await this.get(guildID);
-    settings.language = locale;
-
-    return this.repository.save(settings);
+  update(guildID: string, values: QueryDeepPartialEntity<GuildEntity>) {
+    return this
+      .database
+      .connection
+      .createQueryBuilder()
+      .update(GuildEntity)
+      .set(values)
+      .where(':id = guild_id', { id: guildID })
+      .execute();
   }
 }
