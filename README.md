@@ -3,74 +3,65 @@
 >
 > [Website](https://nino.floofy.dev) **|** [Support](https://discord.gg/JjHGR6vhcG) **|** [Invite Me!](https://discord.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
 
-## NOTICE
-This branch is where v1 is being written from the ground up! Most of the README section will be replaced once we are done with it.
-
-## How to use the bot?
-Check out the [wiki](https://github.com/NinoDiscord/Nino/wiki)!
+## Features
+- Auto Moderation: **Prevents raids, spam, ads, and much more!**
+- Advanced warning system and automated punishments: **Automically punish who commit offenses!**
+- and much more!
 
 ## Contributing
-First, check our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/CODE_OF_CONDUCT.md).
+View our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/CODE_OF_CONDUCT.md).
 
-## Features
+## Self-hosting
+Before attempting to self-host Nino, we didn't plan for users to be able to self-host their own instance of Nino. Most builds are usually buggy and untested as of late, we do have a "stable" branch but it can be buggy sometimes! If you want to use cutting edge features that are most likely not finished, view the [next](https://github.com/NinoDiscord/Nino/tree/next) branch for more details. The "stable" branch is master, so anything that should be stable will be added to the upstream.
 
-* Auto Moderation - Prevents raids, spam, ads and many more!
-* Lockdown command - locks one, multiple or all channels for a specific role downwards
-* Moderation commands - many moderation commands to simplify your moderators' work.
-* Moderation Log and Cases - easy and organized way of seeing the actions done by you and your mods! 
-* Advanced warning system and auto punishments - automatically punish those who commit offenses!
+We will not provide support on how to self-host Nino, use at your own risk! If you do not want to bother hosting it, you can always invite the [public instance](https://discord.com/oauth2/authorize?client_id=531613242473054229&scope=bot) which will be the same experience if you hosted it or not.
 
-## Installation
-### Requirements
-* [Node.js](https://nodejs.org) (Node v14 or higher is supported!)
-* [Git](https://git-scm.com) (optional)
-* [MongoDB](https://www.mongodb.com)
-* [Redis](https://redis.io)
-* [Sentry](https://sentry.io) (optional)
-* [Docker](https://docker.com) (optional)
+### Prerequisites
+Before running your own instance of Nino, you will need the following tools:
 
-### Setting up the bot (normally)
-1. Clone the repository using Git: ``git clone https://github.com/NinoDiscord/Nino`` (If you don't have Git, just go to "Clone or download" and click "Download ZIP" then extract)
-2. Install dependencies with NPM (included in Node.js): ``npm i`` (or with [Yarn](https://yarnpkg.com) ``yarn``)
-3. Create an application.yml file in your working directory and fill it in (see the example for more information)
-4. Compile TypeScript (install TypeScript with ``npm i -g typescript`` or with Yarn ``yarn global add typescript``): ``tsc``
-5. Run the bot in the `dist` directory: ``node bot.js``
-6. Invite the bot to your server: ``https://discordapp.com/oauth2/authorize?client_id=BOTIDHERE&scope=bot`` (replace "BOTIDHERE" with your Discord bot's client id)
+- [Node.js](https://nodejs.org) (Latest is always used in development, but LTS is recommended)
+- [PostgreSQL](https://postgresql.org) (12 is used in development but anything above 10 should fairly work!)
+- [Redis](https://redis.io)
 
-(4 and 5 can be bypassed by running ``npm run main``)
+If you're moving from v0 to v1, you will need your MongoDB instance before to port the database!
 
-Bot credentials (+ extra information) and personal touches are obviously your responsibility. You should know this by now, I hope.
+There is tools that are optional but are recommended in most cases!
 
-### Notes when using Docker
-1. Use the example application.yml but change ``localhost`` in the URL for the database to ``database`` and change the host for Redis to ``redis``
-2. Run ``docker-compose up -d``
+- [Sentry](https://sentry.io)
+- [Docker](https://docker.com)
+- [Git](https://git-scm.com)
 
-### Example application.yml
-```yaml
-environment: 'development'
-databaseUrl: 'mongodb://localhost:27017/database'
-sentryDSN: 'Your Sentry DSN'
-discord:
-  token: 'TOKEN'
-  prefix: 'x!'
+### Setting up
+There are 2 ways to setup Nino, the normal way and the Docker way. The Docker way is generally used with the public instances of Nino but not recommended for smaller instances, so that's why the normal way exists!
 
-# options from ioredis
-# read here: https://github.com/luin/ioredis/blob/master/API.md#new-redisport-host-options
+### Docker
+This step isn't finished due to the rewrite not being stable.
+
+### Normal
+This step isn't finished due to the rewrite not being stable.
+
+## Example `config.yml` file
+```yml
+environment: development
+token: <discord token>
+
+prefixes:
+  - !
+
+database:
+  url: postgres://<username>:<password>@<host>:<port>/<database>
+
 redis:
-  host: 'localhost'
+  host: <host>
   port: 6379
 ```
 
-## Cloning/Using Source Code
-If you wish to use the source code for a project, please add proper crediting in your code using the LICENSE displayed [here](/LICENSE).
-
-## Credits
-### Maintainers
+## Maintainers
 * Rodentman87#8787 (Frontend Developer) ([GitHub](https://github.com/Rodentman87))
 * August#5820 (Project Lead) ([GitHub](https://github.com/auguwu))
 * Ice#4710 (DevOps, Developer) ([GitHub](https://github.com/IceeMC))
 
-### Hackweek Participants
+## Hackweek Participants
 * Chris ([GitHub](https://github.com/auguwu))
 * dondish ([GitHub](https://github.com/dondish))
 * Kyle ([GitHub](https://github.com/scrap))
