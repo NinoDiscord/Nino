@@ -53,7 +53,7 @@ export default class UserSettingsController {
       .createQueryBuilder()
       .update(UserEntity)
       .set(values)
-      .where(':id = user_id', { id: userID })
+      .where('user_id = :id', { id: userID })
       .execute();
   }
 }

@@ -207,7 +207,7 @@ export default class CommandHandler {
   // credit for regex: Ice <3
   private parseFlags(content: string): Record<string, string | true> {
     const record: Record<string, string | true> = {};
-    content.replaceAll(/(?:--?|—)([\w]+)(=| ?(\w+|['"].*['"]))?/gi, (_, key: string, value: string) => {
+    content.replaceAll(/(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi, (_, key: string, value: string) => {
       record[key.trim()] = value ? value.replaceAll(/(^[='"]+|['"]+$)/g, '').trim() : true;
       return value;
     });

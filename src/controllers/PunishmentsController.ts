@@ -76,7 +76,7 @@ export default class PunishmentsController {
       .createQueryBuilder()
       .update(PunishmentEntity)
       .set(values)
-      .where(':id = guild_id', { id: guildID })
+      .where('guild_id = :id', { id: guildID })
       .execute();
   }
 }

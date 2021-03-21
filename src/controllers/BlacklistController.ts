@@ -17,47 +17,55 @@
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWA
- * RE.
+ * SOFTWARE.
  */
+
+import BlacklistEntity, { BlacklistType } from '../entities/BlacklistEntity';
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import LoggingEntity from '../entities/LoggingEntity';
 import type Database from '../components/Database';
 
-export default class LoggingController {
+interface CreateBlacklistOptions {
+  reason?: string;
+  issuer: string;
+  type: BlacklistType;
+  id: string;
+}
+
+export default class BlacklistController {
   constructor(private database: Database) {}
 
   private get repository() {
-    return this.database.connection.getRepository(LoggingEntity);
+    return this.database.connection.getRepository(BlacklistEntity);
   }
 
-  async get(guildID: string) {
-    const entry = await this.repository.findOne({ guildID });
-    if (entry === undefined)
-      return this.create(guildID);
-
-    return entry;
+  get(id: string) {
+    return this.repository.findOne({ id });
   }
 
-  create(guildID: string) {
-    const entry = new LoggingEntity();
-    entry.ignoreChannels = [];
-    entry.ignoreUsers = [];
-    entry.enabled = false;
-    entry.events = [];
-    entry.guildID = guildID;
+  create({ reason, issuer, type, id }: CreateBlacklistOptions) {
+    const entry = new BlacklistEntity();
+    entry.issuer = issuer;
+    entry.type = type;
+    entry.id = id;
+
+    if (reason !== undefined)
+      entry.reason = reason;
 
     return this.repository.save(entry);
   }
 
-  update(guildID: string, values: QueryDeepPartialEntity<LoggingEntity>) {
+  delete(id: string) {
+    return this.repository.delete({ id });
+  }
+
+  update(id: string, values: QueryDeepPartialEntity<BlacklistEntity>) {
     return this
       .database
       .connection
       .createQueryBuilder()
-      .update(LoggingEntity)
+      .update(BlacklistEntity)
       .set(values)
-      .where('guild_id = :id', { id: guildID })
+      .where('id = :id', { id })
       .execute();
   }
 }

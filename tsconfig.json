@@ -4,7 +4,7 @@
     "sourceMap": true,
     "moduleResolution": "node",
     "types": ["node", "reflect-metadata"],
-    "typeRoots": ["./src/@types"],
+    "typeRoots": ["./src/@types", "./node_modules/@types"],
     "rootDir": "./src",
     "outDir": "./build"
   },

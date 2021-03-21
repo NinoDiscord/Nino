@@ -17,45 +17,69 @@
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWA
- * RE.
+ * SOFTWARE.
  */
+
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import LoggingEntity from '../entities/LoggingEntity';
+import CaseEntity, { CaseType } from '../entities/CaseEntity';
 import type Database from '../components/Database';
 
-export default class LoggingController {
+interface CreateCaseOptions {
+  moderatorID: string;
+  victimID: string;
+  guildID: string;
+  reason?: string;
+  soft?: boolean;
+  time?: number;
+  type: CaseType;
+}
+
+export default class CasesController {
   constructor(private database: Database) {}
 
   private get repository() {
-    return this.database.connection.getRepository(LoggingEntity);
+    return this.database.connection.getRepository(CaseEntity);
   }
 
-  async get(guildID: string) {
-    const entry = await this.repository.findOne({ guildID });
-    if (entry === undefined)
-      return this.create(guildID);
-
-    return entry;
+  get(guildID: string, caseID: number) {
+    return this.repository.findOne({ guildID, index: caseID });
   }
 
-  create(guildID: string) {
-    const entry = new LoggingEntity();
-    entry.ignoreChannels = [];
-    entry.ignoreUsers = [];
-    entry.enabled = false;
-    entry.events = [];
+  getAll(guildID: string) {
+    return this.repository.find({ guildID });
+  }
+
+  create({
+    moderatorID,
+    victimID,
+    guildID,
+    reason,
+    soft,
+    time,
+    type
+  }: CreateCaseOptions) {
+    const entry = new CaseEntity();
+    entry.moderatorID = moderatorID;
+    entry.victimID = victimID;
     entry.guildID = guildID;
+    entry.soft = soft === true; // if it's undefined, then it'll be false so no ternaries :crab:
+    entry.type = type;
+
+    if (reason !== undefined)
+      entry.reason = reason;
+
+    if (time !== undefined)
+      entry.time = time;
 
     return this.repository.save(entry);
   }
 
-  update(guildID: string, values: QueryDeepPartialEntity<LoggingEntity>) {
+  update(guildID: string, values: QueryDeepPartialEntity<CaseEntity>) {
     return this
       .database
       .connection
       .createQueryBuilder()
-      .update(LoggingEntity)
+      .update(CaseEntity)
       .set(values)
       .where('guild_id = :id', { id: guildID })
       .execute();

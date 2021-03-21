@@ -48,3 +48,6 @@ import app from './container';
     process.exit(0);
   });
 })();
+
+process.on('unhandledRejection', error => logger.fatal('Unhandled promise rejection has occured', error));
+process.on('uncaughtException', error => logger.fatal('Uncaught exception has occured', error));

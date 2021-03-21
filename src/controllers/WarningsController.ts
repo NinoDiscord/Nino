@@ -57,14 +57,15 @@ export default class WarningsController {
     return this.repository.save(entry);
   }
 
-  update(guildID: string, values: QueryDeepPartialEntity<WarningEntity>) {
+  update(guildID: string, userID: string, values: QueryDeepPartialEntity<WarningEntity>) {
     return this
       .database
       .connection
       .createQueryBuilder()
       .update(WarningEntity)
       .set(values)
-      .where(':id = guild_id', { id: guildID })
+      .where('guild_id = :id', { id: guildID })
+      .andWhere('user_id = :id', { id: userID })
       .execute();
   }
 }

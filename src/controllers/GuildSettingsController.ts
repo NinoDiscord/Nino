@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import type Database from '../components/Database';
 import GuildEntity from '../entities/GuildEntity';
-import Database from '../components/Database';
-import { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 export default class GuildSettingsController {
   constructor(private database: Database) {}
@@ -41,7 +41,7 @@ export default class GuildSettingsController {
 
       await this.repository.save(entry);
       await this.database.logging.create(id);
-      //await this.database.automod.create(id);
+      await this.database.automod.create(id);
 
       return entry;
     }
@@ -60,7 +60,7 @@ export default class GuildSettingsController {
       .createQueryBuilder()
       .update(GuildEntity)
       .set(values)
-      .where(':id = guild_id', { id: guildID })
+      .where('guild_id = :id', { id: guildID })
       .execute();
   }
 }

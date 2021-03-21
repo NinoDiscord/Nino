@@ -17,18 +17,18 @@
  * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWA
- * RE.
+ * SOFTWARE.
  */
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import LoggingEntity from '../entities/LoggingEntity';
-import type Database from '../components/Database';
 
-export default class LoggingController {
+import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import type Database from '../components/Database';
+import AutomodEntity from '../entities/AutomodEntity';
+
+export default class AutomodController {
   constructor(private database: Database) {}
 
   private get repository() {
-    return this.database.connection.getRepository(LoggingEntity);
+    return this.database.connection.getRepository(AutomodEntity);
   }
 
   async get(guildID: string) {
@@ -40,22 +40,24 @@ export default class LoggingController {
   }
 
   create(guildID: string) {
-    const entry = new LoggingEntity();
-    entry.ignoreChannels = [];
-    entry.ignoreUsers = [];
-    entry.enabled = false;
-    entry.events = [];
+    // all automod is disabled by default
+    const entry = new AutomodEntity();
+    entry.blacklistWords = [];
     entry.guildID = guildID;
 
     return this.repository.save(entry);
   }
 
-  update(guildID: string, values: QueryDeepPartialEntity<LoggingEntity>) {
+  delete(guildID: string) {
+    return this.repository.delete({ guildID });
+  }
+
+  update(guildID: string, values: QueryDeepPartialEntity<AutomodEntity>) {
     return this
       .database
       .connection
       .createQueryBuilder()
-      .update(LoggingEntity)
+      .update(AutomodEntity)
       .set(values)
       .where('guild_id = :id', { id: guildID })
       .execute();
