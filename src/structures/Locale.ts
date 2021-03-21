@@ -22,5 +22,48 @@
 
 import { NotInjectable } from '@augu/lilith';
 
+type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
+
+interface LocalizationMeta {
+  contributors: string[];
+  translator: string;
+  aliases: string[];
+  flag: string;
+  full: string;
+  code: string;
+}
+
+interface Localization {
+  meta: LocalizationMeta;
+  strings: {
+    [x: string]: DeepPartial<string | string[] | Record<string, string | string[]>>;
+  }
+}
+
+const KEY_REGEX = /[$]\{([\w\.]+)\}/g;
+
 @NotInjectable()
-export default class Locale {}
+export default class Locale {
+  public contributors: string[];
+  public translator: string;
+  public aliases: string[];
+  public flag: string;
+  public full: string;
+  public code: string;
+
+  #strings: Localization['strings'];
+
+  constructor({ meta, strings }: Localization) {
+    this.contributors = meta.contributors;
+    this.translator   = meta.translator;
+    this.#strings     = strings;
+    this.aliases      = meta.aliases;
+    this.flag         = meta.flag;
+    this.full         = meta.full;
+    this.code         = meta.code;
+  }
+
+  translate(key: string) {
+    // todo: whatever the fuck im supposed to do :(
+  }
+}

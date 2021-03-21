@@ -30,6 +30,7 @@ import yaml from 'js-yaml';
 const NOT_FOUND_SYMBOL = Symbol.for('$nino::config::not.found');
 
 interface Configuration {
+  defaultLocale?: string;
   environment: 'development' | 'production';
   sentryDsn?: string;
   botlists?: BotlistConfig;
@@ -85,6 +86,7 @@ export default class Config implements Component {
     const config = yaml.load(contents) as unknown as Configuration;
 
     this.config = {
+      defaultLocale: config.defaultLocale ?? 'en_US',
       environment: config.environment ?? 'production',
       sentryDsn: config.sentryDsn,
       botlists: config.botlists,
