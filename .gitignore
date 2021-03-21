@@ -1,5 +1,6 @@
 # Folders
 node_modules/
+old_locales/
 build/
 
 # Jest
