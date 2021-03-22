@@ -22,6 +22,10 @@
 
 import { Application } from '@augu/lilith';
 
+type DeepPartial<T> = {
+  [P in keyof T]?: DeepPartial<T[P]>;
+}
+
 declare global {
   /** The current application instance */
   var app: Application;

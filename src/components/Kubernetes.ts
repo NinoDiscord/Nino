@@ -37,7 +37,7 @@ export default class K8SClient implements Component {
   @Inject
   private config!: Config;
 
-  async load() {
+  load() {
     const environment = this.config.getProperty('environment') ?? 'development';
     if (environment !== 'production')
       return;

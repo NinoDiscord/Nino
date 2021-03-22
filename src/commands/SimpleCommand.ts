@@ -22,6 +22,8 @@
 
 import type CommandMessage from '../structures/CommandMessage';
 import Command from '../structures/Command';
+import { Inject } from '@augu/lilith';
+import LocalizationService from '../services/LocalizationService';
 
 export default class SimpleCommand extends Command {
   constructor() {
@@ -31,8 +33,14 @@ export default class SimpleCommand extends Command {
     });
   }
 
+  @Inject
+  private localization!: LocalizationService;
+
   async run(msg: CommandMessage) {
-    const flags = msg.flags();
-    return msg.reply(`Received flags:\n\`\`\`js\n${JSON.stringify(flags, null, '\t')}\`\`\``);
+    return msg.reply([
+      `- \`en_US\` & \`en_US\`: **${this.localization.get('en_US', 'en_US').code}**`,
+      `- \`en_US\` & \`fr_FR\`: **${this.localization.get('en_US', 'fr_FR').code}**`,
+      `- \`fr_FR\` & \`en_US\`: **${this.localization.get('fr_FR', 'en_US').code}**`
+    ].join('\n'));
   }
 }

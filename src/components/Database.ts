@@ -100,7 +100,30 @@ export default class Database implements Component {
     this.initRepos();
 
     const migrations = await this.connection.showMigrations();
-    this.logger.info(`Connection to the database has been established successfully${migrations ? ', there are pending migrations! Run `npm run sync:db` to sync them.' : '!'}`);
+    const shouldRun = this.config.getProperty('runPendingMigrations');
+    if (migrations && (shouldRun === undefined || shouldRun === false)) {
+      this.logger.info('There are pending migrations to be ran, but you have `runPendingMigrations` disabled! Run `npm run migrations` to migrate the database or set `runPendingMigrations` = true to run them at runtime.');
+    } else if (migrations && shouldRun === true) {
+      this.logger.info('Found pending migrations and `runPendingMigrations` is enabled, now running...');
+
+      try {
+        const ran = await this.connection.runMigrations({ transaction: 'all' });
+        this.logger.info(`Ran ${ran.length} migrations! You're all to go.`);
+      } catch(ex) {
+        if (ex.message.indexOf('already exists') !== -1) {
+          this.logger.warn('Seems like relations or indexes existed!');
+          return Promise.resolve();
+        }
+
+        return Promise.reject(ex);
+      }
+    } else {
+      this.logger.info('No migrations needs to be ran and the connection to the database is healthy.');
+      return Promise.resolve();
+    }
+
+    this.logger.info('All migrations has been migrated and the connection has been established correctly!');
+    return Promise.resolve();
   }
 
   dispose() {

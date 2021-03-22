@@ -20,18 +20,10 @@
  * SOFTWARE.
  */
 
+import type { LocalizationStrings, LocalizationMeta } from '../@types/locale';
 import { NotInjectable } from '@augu/lilith';
 
 type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
-
-interface LocalizationMeta {
-  contributors: string[];
-  translator: string;
-  aliases: string[];
-  flag: string;
-  full: string;
-  code: string;
-}
 
 interface Localization {
   meta: LocalizationMeta;
@@ -51,19 +43,19 @@ export default class Locale {
   public full: string;
   public code: string;
 
-  #strings: Localization['strings'];
+  #strings: LocalizationStrings;
 
   constructor({ meta, strings }: Localization) {
     this.contributors = meta.contributors;
     this.translator   = meta.translator;
-    this.#strings     = strings;
+    this.#strings     = strings as any; // yes
     this.aliases      = meta.aliases;
     this.flag         = meta.flag;
     this.full         = meta.full;
     this.code         = meta.code;
   }
 
-  translate(key: string) {
-    // todo: whatever the fuck im supposed to do :(
+  translate(key: string, args?: { [x: string]: any } | any[]) {
+    return 'blep';
   }
 }

@@ -30,6 +30,7 @@ import yaml from 'js-yaml';
 const NOT_FOUND_SYMBOL = Symbol.for('$nino::config::not.found');
 
 interface Configuration {
+  runPendingMigrations?: boolean;
   defaultLocale?: string;
   environment: 'development' | 'production';
   sentryDsn?: string;
@@ -86,6 +87,7 @@ export default class Config implements Component {
     const config = yaml.load(contents) as unknown as Configuration;
 
     this.config = {
+      runPendingMigrations: config.runPendingMigrations ?? false,
       defaultLocale: config.defaultLocale ?? 'en_US',
       environment: config.environment ?? 'production',
       sentryDsn: config.sentryDsn,
@@ -98,6 +100,9 @@ export default class Config implements Component {
       token: config.token,
       k8s: config.k8s
     };
+
+    // resolve the promise
+    return Promise.resolve();
   }
 
   getProperty<K extends keyof Configuration>(key: K): Configuration[K] | undefined;

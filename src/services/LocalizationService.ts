@@ -43,9 +43,7 @@ export default class LocalizationService implements Service {
     this.logger.info('Loading in localization files...');
 
     const directory = join(process.cwd(), '..', 'locales');
-    const files = await readdir(directory, {
-      extensions: [/\.json$/]
-    });
+    const files = await readdir(directory);
 
     if (!files.length) {
       this.logger.fatal('Missing localization files, did you clone the wrong commit?');
