@@ -29,7 +29,6 @@ interface CreateWarningOptions {
   guildID: string;
   reason?: string;
   amount: number;
-  caseID: string;
 }
 
 export default class WarningsController {
@@ -43,13 +42,12 @@ export default class WarningsController {
     return this.repository.find({ guildID, userID });
   }
 
-  create({ guildID, userID, reason, amount, caseID }: CreateWarningOptions) {
+  create({ guildID, userID, reason, amount }: CreateWarningOptions) {
     if (amount < 0)
       throw new RangeError('amount index out of bounds');
 
     const entry = new WarningEntity();
     entry.guildID = guildID;
-    entry.caseID = caseID;
     entry.reason = reason;
     entry.amount = amount;
     entry.userID = userID;

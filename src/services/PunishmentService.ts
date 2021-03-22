@@ -20,8 +20,80 @@
  * SOFTWARE.
  */
 
-import { Service } from '@augu/lilith';
+import { Constants, Member } from 'eris';
+import { Inject, Service } from '@augu/lilith';
+import { PunishmentType } from '../entities/PunishmentsEntity';
+import Database from '../components/Database';
+import Discord from '../components/Discord';
 
-export default class AutomodService implements Service {
-  public name: string = 'automod';
+export default class PunishmentService implements Service {
+  public name: string = 'punishments';
+
+  @Inject
+  private database!: Database;
+
+  @Inject
+  private discord!: Discord;
+
+  permissionsFor(type: PunishmentType) {
+    switch (type) {
+      case PunishmentType.RoleRemove:
+      case PunishmentType.RoleAdd:
+      case PunishmentType.Unmute:
+      case PunishmentType.Mute:
+        return Constants.Permissions.manageRoles;
+
+      case PunishmentType.VoiceDeafen:
+        return Constants.Permissions.voiceDeafenMembers;
+
+      case PunishmentType.VoiceMute:
+        return Constants.Permissions.voiceMuteMembers;
+
+      case PunishmentType.Unban:
+      case PunishmentType.Ban:
+        return Constants.Permissions.banMembers;
+
+      case PunishmentType.Kick:
+        return Constants.Permissions.kickMembers;
+
+      default:
+        return 0;
+    }
+  }
+
+  async createWarning(member: Member, reason?: string, amount?: number) {
+    const self = member.guild.members.get(this.discord.client.user.id)!;
+    const warnings = await this.database.warnings.getAll(member.guild.id, member.id);
+    const latest = warnings[warnings.length - 1];
+    const count = latest
+      ? (amount !== undefined ? latest.amount + amount : latest.amount + 1)
+      : (amount !== undefined ? amount : 1);
+
+    if (count < 0)
+      throw new RangeError('amount out of bounds');
+
+    const punishments = await this.database.punishments.getAll(member.guild.id);
+    const results = punishments.filter(x => x.warnings === count);
+
+    //if (results.length) {
+    //  await this.bulkPublish();
+    //} else {
+    //  await this.publishToModLog();
+    //}
+
+    return this.database.warnings.create({
+      guildID: member.guild.id,
+      reason,
+      amount: count,
+      userID: member.id
+    });
+  }
+
+  async removeWarning(member: Member, reason?: string, amount?: number | 'all') {
+    const self = member.guild.members.get(this.discord.client.user.id)!;
+    const warnings = await this.database.warnings.getAll(member.guild.id, member.id);
+    const latest = warnings[warnings.length - 1];
+    if (latest === undefined)
+      throw new SyntaxError('user doesn\'t have any punishments to be removed');
+  }
 }

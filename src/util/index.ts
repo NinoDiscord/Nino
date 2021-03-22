@@ -20,43 +20,23 @@
  * SOFTWARE.
  */
 
-import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
-
-export enum PunishmentType {
-  VoiceDeafen = 'voice.deafen',
-  RoleRemove  = 'role.remove',
-  VoiceMute   = 'voice.mute',
-  RoleAdd     = 'role.add',
-  Unmute      = 'unmute',
-  Unban       = 'unban',
-  Kick        = 'kick',
-  Mute        = 'mute',
-  Ban         = 'ban'
-}
-
-@Entity({ name: 'punishments' })
-export default class PunishmentEntity {
-  @Column({ default: 1 })
-  public warnings!: number;
-
-  @PrimaryColumn({ name: 'guild_id' })
-  public guildID!: string;
-
-  @Column({ default: undefined, nullable: true })
-  public roleID?: string;
-
-  @PrimaryGeneratedColumn()
-  public index!: number;
-
-  @Column({ default: false })
-  public soft!: boolean;
-
-  @Column({ default: undefined, nullable: true })
-  public time?: number;
-
-  @Column({
-    type: 'enum',
-    enum: PunishmentType
-  })
-  public type!: PunishmentType;
+/**
+ * Iterator function to provide a tuple of `[index, item]` in a Array.
+ * @param arr The array to run this iterator function
+ * @example
+ * ```ts
+ * const arr = ['str', 'uwu', 'owo'];
+ * for (const [index, item] of withIndex(arr)) {
+ *    console.log(`${index}: ${item}`);
+ *    // prints out:
+ *    // 0: str
+ *    // 1: uwu
+ *    // 2: owo
+ * }
+ * ```
+ */
+export function* withIndex<T extends any[]>(arr: T): Generator<[index: number, item: T[any]]> {
+  for (let i = 0; i < arr.length; i++) {
+    yield [i, arr[i]];
+  }
 }
