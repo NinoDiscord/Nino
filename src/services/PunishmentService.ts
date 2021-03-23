@@ -23,6 +23,7 @@
 import { Constants, Guild, Member, User, VoiceChannel } from 'eris';
 import { Inject, Service } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
+import { EmbedBuilder } from '../structures';
 import type GuildEntity from '../entities/GuildEntity';
 import Permissions from '../util/Permissions';
 import { Logger } from 'tslog';
@@ -30,10 +31,9 @@ import Database from '../components/Database';
 import Discord from '../components/Discord';
 import ms = require('ms');
 
-
 type MemberLike = Member | { id: string; guild: Guild };
 
-enum PunishmentEntryType {
+export enum PunishmentEntryType {
   WarningRemoved = 'Warning Removed',
   WarningAdded   = 'Warning Added',
   VoiceUndeafen  = 'Voice Undeafen',
@@ -48,12 +48,13 @@ enum PunishmentEntryType {
 }
 
 interface ApplyPunishmentOptions {
-  channelID?: string;
   moderator: Member;
   publish?: boolean;
   reason?: string;
   member: MemberLike;
+  soft?: boolean;
   time?: number;
+  days?: number;
   type: PunishmentType;
 }
 
@@ -68,7 +69,7 @@ interface PublishModLogOptions {
   type: PunishmentEntryType;
 }
 
-interface ApplyUnmuteOptions extends ApplyActionOptions {
+interface ApplyGenericMuteOptions extends ApplyActionOptions {
   settings: GuildEntity;
 }
 
@@ -76,12 +77,17 @@ interface ApplyActionOptions {
   reason?: string;
   member: Member;
   guild: Guild;
+  time?: number;
   self: Member;
 }
 
-interface ApplyGenericVoiceAction extends ApplyActionOptions {
+interface ApplyGenericVoiceAction extends Exclude<ApplyActionOptions, 'guild' | 'time' | 'self'> {
   statement: PublishModLogOptions;
-  channelID: string;
+}
+
+interface ApplyBanActionOptions extends ApplyActionOptions {
+  soft: boolean;
+  days: number;
 }
 
 function stringifyDBType(type: PunishmentType): PunishmentEntryType | null {
@@ -218,12 +224,14 @@ export default class PunishmentService implements Service {
   }
 
   async apply({
-    channelID,
     moderator,
     publish,
     reason,
     member,
-    type
+    soft,
+    type,
+    days,
+    time
   }: ApplyPunishmentOptions) {
     this.logger.info(`Told to apply punishment ${type} on member ${member.id}${reason ? `, with reason: ${reason}` : ''}${publish ? ', publishing to modlog!' : ''}`);
 
@@ -244,7 +252,15 @@ export default class PunishmentService implements Service {
 
     switch (type) {
       case PunishmentType.Ban:
-        await this.applyBan(user, member.guild, `[${moderator.username}#${moderator.discriminator} | Ban] ${reason ? encodeURIComponent(reason) : 'No reason was specified.'}`);
+        await this.applyBan({
+          member: user,
+          reason,
+          guild: member.guild,
+          self,
+          days: days ?? 7,
+          soft: soft === true,
+          time
+        });
         break;
 
       case PunishmentType.Kick:
@@ -253,10 +269,12 @@ export default class PunishmentService implements Service {
 
       case PunishmentType.Mute:
         await this.applyMute({
+          settings,
           member: user,
           reason,
           guild: member.guild,
-          self
+          self,
+          time
         });
 
         break;
@@ -271,7 +289,8 @@ export default class PunishmentService implements Service {
           member: user,
           reason,
           guild: member.guild,
-          self
+          self,
+          time
         });
 
         break;
@@ -279,11 +298,11 @@ export default class PunishmentService implements Service {
       case PunishmentType.VoiceMute:
         await this.applyVoiceMute({
           statement: modlogStatement,
-          channelID: channelID!,
           member: user,
           reason,
           guild: member.guild,
-          self
+          self,
+          time
         });
 
         break;
@@ -291,11 +310,11 @@ export default class PunishmentService implements Service {
       case PunishmentType.VoiceDeafen:
         await this.applyVoiceDeafen({
           statement: modlogStatement,
-          channelID: channelID!,
           member: user,
           reason,
           guild: member.guild,
-          self
+          self,
+          time
         });
 
         break;
@@ -303,7 +322,6 @@ export default class PunishmentService implements Service {
       case PunishmentType.VoiceUnmute:
         await this.applyVoiceUnmute({
           statement: modlogStatement,
-          channelID: channelID!,
           member: user,
           reason,
           guild: member.guild,
@@ -315,7 +333,6 @@ export default class PunishmentService implements Service {
       case PunishmentType.VoiceUndeafen:
         await this.applyVoiceUndeafen({
           statement: modlogStatement,
-          channelID: channelID!,
           member: user,
           reason,
           guild: member.guild,
@@ -330,38 +347,77 @@ export default class PunishmentService implements Service {
     }
   }
 
-  private async applyBan(member: Member, guild: Guild, reason: string) {
-    // noop
+  private async applyBan({
+    reason,
+    member,
+    guild,
+    days,
+    soft,
+    time
+  }: ApplyBanActionOptions) {
+    await guild.banMember(member.id, days, reason);
+    if (soft) await guild.unbanMember(member.id, reason);
+    if (!soft && time !== undefined && time > 0) {
+      // do something
+      // this.timeouts;
+    }
   }
 
   private async applyUnmute({
     settings,
     reason,
     member,
-    guild,
-    self
-  }: ApplyUnmuteOptions) {
-    // noop
+    guild
+  }: ApplyGenericMuteOptions) {
+    const role = guild.roles.get(settings.mutedRoleID!)!;
+    if (member.roles.includes(role.id))
+      await member.removeRole(role.id, reason ? encodeURIComponent(reason) : 'No reason was specified.');
   }
 
-  private async applyMute({ reason, member, guild, self }: ApplyActionOptions) {
-    // noop
+  private async applyMute({ settings, reason, member, guild, time }: ApplyGenericMuteOptions) {
+    const roleID = await this.getOrCreateMutedRole(guild, settings);
+
+    if (reason) reason = encodeURIComponent(reason);
+    if (!member.roles.includes(roleID)) {
+      await member.addRole(roleID, reason ?? 'No reason was specified.');
+    }
+
+    if (time !== undefined && time > 0) {
+      // do something
+      // this.timeouts;
+    }
   }
 
-  private async applyVoiceMute({ reason, member, guild, self, channelID, statement }: ApplyGenericVoiceAction) {
-    // noop
+  private async applyVoiceMute({ reason, member, statement }: ApplyGenericVoiceAction) {
+    if (reason) reason = encodeURIComponent(reason);
+    if (member.voiceState !== undefined && !member.voiceState.mute)
+      await member.edit({ mute: true }, reason ?? 'No reason was specified.');
+
+    statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
   }
 
-  private async applyVoiceDeafen({ reason, member, guild, self, channelID, statement }: ApplyGenericVoiceAction) {
-    // noop
+  private async applyVoiceDeafen({ reason, member, statement }: ApplyGenericVoiceAction) {
+    if (reason) reason = encodeURIComponent(reason);
+    if (member.voiceState !== undefined && !member.voiceState.deaf)
+      await member.edit({ deaf: true }, reason ?? 'No reason was specified.');
+
+    statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
   }
 
-  private async applyVoiceUnmute({ reason, member, guild, self, channelID, statement }: ApplyGenericVoiceAction) {
-    // noop
+  private async applyVoiceUnmute({ reason, member, statement }: ApplyGenericVoiceAction) {
+    if (reason) reason = encodeURIComponent(reason);
+    if (member.voiceState !== undefined && member.voiceState.mute)
+      await member.edit({ mute: false }, reason ?? 'No reason was specified.');
+
+    statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
   }
 
-  private async applyVoiceUndeafen({ reason, member, guild, self, channelID, statement }: ApplyGenericVoiceAction) {
-    // noop
+  private async applyVoiceUndeafen({ reason, member, statement }: ApplyGenericVoiceAction) {
+    if (reason) reason = encodeURIComponent(reason);
+    if (member.voiceState !== undefined && member.voiceState.deaf)
+      await member.edit({ deaf: false }, reason ?? 'No reason was specified.');
+
+    statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
   }
 
   private async bulkPublish(items: PublishModLogOptions[]) {
@@ -378,5 +434,78 @@ export default class PunishmentService implements Service {
     time
   }: PublishModLogOptions) {
     // noop
+  }
+
+  private async getOrCreateMutedRole(guild: Guild, settings: GuildEntity) {
+    let muteRole = settings.mutedRoleID;
+    if (muteRole)
+      return muteRole;
+
+    let role = guild.roles.find(x => x.name.toLowerCase() === 'muted');
+    if (!role) {
+      role = await guild.createRole({
+        mentionable: false,
+        permissions: 0,
+        hoist: false,
+        name: 'Muted'
+      }, `[${this.discord.client.user.username}#${this.discord.client.user.discriminator}] Created "Muted" role`);
+
+      muteRole = role.id;
+
+      const topRole = Permissions.getTopRole(guild.members.get(this.discord.client.user.id)!);
+      if (topRole !== undefined) {
+        await role.editPosition(topRole.position - 1);
+        for (const channel of guild.channels.values()) {
+          const permissions = channel.permissionsOf(this.discord.client.user.id);
+          if (permissions.has('manageChannels'))
+            await channel.editPermission(
+              /* overwriteID */ role.id,
+              /* allowed */ 0,
+              /* denied */ Constants.Permissions.sendMessages,
+              /* type */ 'role',
+              /* reason */ `[${this.discord.client.user.username}#${this.discord.client.user.discriminator}] Overrided permissions for new Muted role`
+            );
+        }
+      }
+    }
+
+    await this.database.guilds.update(guild.id, { mutedRoleID: role.id });
+    return role.id;
+  }
+
+  getModLogEmbed({
+    warningsRemoved,
+    warningsAdded,
+    moderator,
+    channel,
+    reason,
+    victim,
+    time
+  }: PublishModLogOptions) {
+    const embed = new EmbedBuilder()
+      .setColor(0xDAA2C6)
+      .setAuthor(`~ ${victim.username}#${victim.discriminator} (${victim.id}) ~`, undefined, victim.dynamicAvatarURL('png', 1024))
+      .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${moderator.id})`, false);
+
+    if (reason !== undefined)
+      embed.addField('• Reason', reason, true);
+
+    if (warningsRemoved !== undefined)
+      embed.addField(
+        '• Warnings Removed',
+        warningsRemoved === 'all' ? 'All' : warningsRemoved.toString(),
+        true
+      );
+
+    if (warningsAdded !== undefined)
+      embed.addField('• Warnings Added', warningsAdded.toString(), true);
+
+    if (channel !== undefined)
+      embed.addField('• Voice Channel', `${channel.name} (${channel.id})`, true);
+
+    if (time !== undefined)
+      embed.addField('• Time', ms(time), true);
+
+    return embed;
   }
 }

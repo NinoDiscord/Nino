@@ -23,7 +23,7 @@
 import type CommandMessage from '../structures/CommandMessage';
 import Command from '../structures/Command';
 import { Inject } from '@augu/lilith';
-import LocalizationService from '../services/LocalizationService';
+import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 
 export default class SimpleCommand extends Command {
   constructor() {
@@ -34,13 +34,14 @@ export default class SimpleCommand extends Command {
   }
 
   @Inject
-  private localization!: LocalizationService;
+  private punishments!: PunishmentService;
 
   async run(msg: CommandMessage) {
-    return msg.reply([
-      `- \`en_US\` & \`en_US\`: **${this.localization.get('en_US', 'en_US').code}**`,
-      `- \`en_US\` & \`fr_FR\`: **${this.localization.get('en_US', 'fr_FR').code}**`,
-      `- \`fr_FR\` & \`en_US\`: **${this.localization.get('fr_FR', 'en_US').code}**`
-    ].join('\n'));
+    return msg.reply(this.punishments.getModLogEmbed({
+      moderator: msg.guild.members.get('302604426781261824')!.user,
+      victim: msg.member!.user,
+      reason: 'being too cute uwu',
+      type: PunishmentEntryType.Muted
+    }));
   }
 }
