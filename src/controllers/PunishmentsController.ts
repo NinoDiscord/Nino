@@ -26,7 +26,6 @@ import Database from '../components/Database';
 
 interface CreatePunishmentOptions {
   warnings: number;
-  roleID?: string;
   guildID: string;
   soft?: boolean;
   time?: number;
@@ -43,7 +42,6 @@ export default class PunishmentsController {
   create({
     warnings,
     guildID,
-    roleID,
     soft,
     time,
     type
@@ -52,9 +50,6 @@ export default class PunishmentsController {
     entry.warnings = warnings;
     entry.guildID = guildID;
     entry.type = type;
-
-    if (roleID !== undefined)
-      entry.roleID = roleID;
 
     if (soft !== undefined && soft === true)
       entry.soft = true;

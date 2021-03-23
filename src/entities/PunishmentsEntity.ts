@@ -23,15 +23,15 @@
 import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 
 export enum PunishmentType {
-  VoiceDeafen = 'voice.deafen',
-  RoleRemove  = 'role.remove',
-  VoiceMute   = 'voice.mute',
-  RoleAdd     = 'role.add',
-  Unmute      = 'unmute',
-  Unban       = 'unban',
-  Kick        = 'kick',
-  Mute        = 'mute',
-  Ban         = 'ban'
+  VoiceUndeafen = 'voice.undeafen',
+  VoiceUnmute   = 'voice.unmute',
+  VoiceDeafen   = 'voice.deafen',
+  VoiceMute     = 'voice.mute',
+  Unmute        = 'unmute',
+  Unban         = 'unban',
+  Kick          = 'kick',
+  Mute          = 'mute',
+  Ban           = 'ban'
 }
 
 @Entity({ name: 'punishments' })
@@ -41,9 +41,6 @@ export default class PunishmentEntity {
 
   @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
-
-  @Column({ default: undefined, nullable: true })
-  public roleID?: string;
 
   @PrimaryGeneratedColumn()
   public index!: number;
