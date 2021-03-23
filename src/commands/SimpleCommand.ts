@@ -37,11 +37,6 @@ export default class SimpleCommand extends Command {
   private punishments!: PunishmentService;
 
   async run(msg: CommandMessage) {
-    return msg.reply(this.punishments.getModLogEmbed({
-      moderator: msg.guild.members.get('302604426781261824')!.user,
-      victim: msg.member!.user,
-      reason: 'being too cute uwu',
-      type: PunishmentEntryType.Muted
-    }));
+    return msg.reply('owo');
   }
 }

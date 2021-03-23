@@ -21,8 +21,9 @@
  */
 
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import CaseEntity, { CaseType } from '../entities/CaseEntity';
+import { PunishmentType } from '../entities/PunishmentsEntity';
 import type Database from '../components/Database';
+import CaseEntity from '../entities/CaseEntity';
 
 interface CreateCaseOptions {
   moderatorID: string;
@@ -31,7 +32,7 @@ interface CreateCaseOptions {
   reason?: string;
   soft?: boolean;
   time?: number;
-  type: CaseType;
+  type: PunishmentType;
 }
 
 export default class CasesController {
@@ -74,7 +75,7 @@ export default class CasesController {
     return this.repository.save(entry);
   }
 
-  update(guildID: string, values: QueryDeepPartialEntity<CaseEntity>) {
+  update(guildID: string, index: number, values: QueryDeepPartialEntity<CaseEntity>) {
     return this
       .database
       .connection
@@ -82,6 +83,7 @@ export default class CasesController {
       .update(CaseEntity)
       .set(values)
       .where('guild_id = :id', { id: guildID })
+      .andWhere('index = :idx', { idx: index })
       .execute();
   }
 }

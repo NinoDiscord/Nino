@@ -23,15 +23,17 @@
 import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
 
 export enum PunishmentType {
-  VoiceUndeafen = 'voice.undeafen',
-  VoiceUnmute   = 'voice.unmute',
-  VoiceDeafen   = 'voice.deafen',
-  VoiceMute     = 'voice.mute',
-  Unmute        = 'unmute',
-  Unban         = 'unban',
-  Kick          = 'kick',
-  Mute          = 'mute',
-  Ban           = 'ban'
+  WarningRemoved = 'warning.removed',
+  VoiceUndeafen  = 'voice.undeafen',
+  WarningAdded   = 'warning.added',
+  VoiceUnmute    = 'voice.unmute',
+  VoiceDeafen    = 'voice.deafen',
+  VoiceMute      = 'voice.mute',
+  Unmute         = 'unmute',
+  Unban          = 'unban',
+  Kick           = 'kick',
+  Mute           = 'mute',
+  Ban            = 'ban'
 }
 
 @Entity({ name: 'punishments' })

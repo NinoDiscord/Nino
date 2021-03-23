@@ -21,15 +21,7 @@
  */
 
 import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum CaseType {
-  WarningRemove = 'warning_remove',
-  WarningAdd    = 'warning_add',
-  Unmute        = 'unmute',
-  Unban         = 'unban',
-  Kick          = 'kick',
-  Ban           = 'ban'
-}
+import { PunishmentType } from './PunishmentsEntity';
 
 @Entity({ name: 'cases' })
 export default class CaseEntity {
@@ -53,9 +45,9 @@ export default class CaseEntity {
 
   @Column({
     type: 'enum',
-    enum: CaseType
+    enum: PunishmentType
   })
-  public type!: CaseType;
+  public type!: PunishmentType;
 
   @Column({ default: false })
   public soft!: boolean;

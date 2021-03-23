@@ -20,11 +20,12 @@
  * SOFTWARE.
  */
 
-import { Constants, Guild, Member, User, VoiceChannel } from 'eris';
+import { Constants, Guild, Member, User, VoiceChannel, TextChannel, Message } from 'eris';
 import { Inject, Service } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
 import { EmbedBuilder } from '../structures';
 import type GuildEntity from '../entities/GuildEntity';
+import type CaseEntity from '../entities/CaseEntity';
 import Permissions from '../util/Permissions';
 import { Logger } from 'tslog';
 import Database from '../components/Database';
@@ -65,6 +66,7 @@ interface PublishModLogOptions {
   channel?: VoiceChannel;
   reason?: string;
   victim: User;
+  guild: Guild;
   time?: number;
   type: PunishmentEntryType;
 }
@@ -174,6 +176,7 @@ export default class PunishmentService implements Service {
       warningsAdded: result.warnings, // i think?
       moderator: self.user,
       victim: member.user,
+      guild: member.guild,
       type: stringifyDBType(result.type)!
     }));
 
@@ -188,12 +191,22 @@ export default class PunishmentService implements Service {
       });
     }
 
-    return results.length ? this.bulkPublish(items) : this.publishToModLog({
+    const model = await this.database.cases.create({
+      moderatorID: this.discord.client.user.id,
+      victimID: member.id,
+      guildID: member.guild.id,
+      reason,
+      soft: false,
+      type: PunishmentType.WarningRemoved
+    });
+
+    return results.length ? this.bulkPublish(items.map(r => ({ model, ...r }))) : this.publishToModLog({
       warningsAdded: count,
       moderator: self.user,
       victim: member.user,
+      guild: member.guild,
       type: PunishmentEntryType.WarningAdded
-    });
+    }, model);
   }
 
   async removeWarning(member: Member, reason?: string, amount?: number | 'all') {
@@ -204,22 +217,40 @@ export default class PunishmentService implements Service {
 
     if (amount === 'all') {
       await this.database.warnings.clean(member.guild.id, member.id);
+      const model = await this.database.cases.create({
+        moderatorID: this.discord.client.user.id,
+        victimID: member.id,
+        guildID: member.guild.id,
+        reason,
+        type: PunishmentType.WarningRemoved
+      });
+
       return this.publishToModLog({
         warningsRemoved: 'all',
         moderator: self.user,
         victim: member.user,
         reason,
+        guild: member.guild,
         type: PunishmentEntryType.WarningRemoved
-      });
+      }, model);
     } else {
       const count = amount !== undefined ? (warnings.amount - amount) : (warnings.amount - 1);
+      const model = await this.database.cases.create({
+        moderatorID: this.discord.client.user.id,
+        victimID: member.id,
+        guildID: member.guild.id,
+        reason,
+        type: PunishmentType.WarningRemoved
+      });
+
       return this.publishToModLog({
         warningsRemoved: count,
         moderator: self.user,
         victim: member.user,
         reason,
+        guild: member.guild,
         type: PunishmentEntryType.WarningRemoved
-      });
+      }, model);
     }
   }
 
@@ -247,6 +278,7 @@ export default class PunishmentService implements Service {
     const modlogStatement: PublishModLogOptions = {
       moderator: moderator.user,
       victim: user.user,
+      guild: member.guild,
       type: stringifyDBType(type)!
     };
 
@@ -342,8 +374,18 @@ export default class PunishmentService implements Service {
         break;
     }
 
+    const model = await this.database.cases.create({
+      moderatorID: moderator.id,
+      victimID: member.id,
+      guildID: member.guild.id,
+      reason,
+      soft: soft === true,
+      time,
+      type
+    });
+
     if (publish) {
-      await this.publishToModLog(modlogStatement);
+      await this.publishToModLog(modlogStatement, model);
     }
   }
 
@@ -420,7 +462,7 @@ export default class PunishmentService implements Service {
     statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
   }
 
-  private async bulkPublish(items: PublishModLogOptions[]) {
+  private async bulkPublish(items: (PublishModLogOptions & { model: CaseEntity })[]) {
     // noop
   }
 
@@ -431,9 +473,43 @@ export default class PunishmentService implements Service {
     channel,
     reason,
     victim,
-    time
-  }: PublishModLogOptions) {
-    // noop
+    guild,
+    time,
+    type
+  }: PublishModLogOptions, caseModel: CaseEntity) {
+    const settings = await this.database.guilds.get(guild.id);
+    if (!settings.modlogChannelID) return;
+
+    const modlog = guild.channels.get(settings.modlogChannelID) as TextChannel;
+    if (!modlog)
+      return;
+
+    if (
+      !modlog.permissionsOf(this.discord.client.user.id).has('sendMessages') ||
+      !modlog.permissionsOf(this.discord.client.user.id).has('embedLinks')
+    ) return;
+
+    const embed = this.getModLogEmbed({ warningsRemoved, warningsAdded, moderator, channel, reason, victim, guild, time }).build();
+    const content = `**[** :question: **~** Case #**${caseModel.index}** (${type}) ]`;
+    const message = await modlog.createMessage({
+      embed,
+      content
+    });
+
+    await this.database.cases.update(guild.id, caseModel.index, { messageID: message.id });
+  }
+
+  editModLog(model: CaseEntity, message: Message) {
+    return message.edit({
+      content: message.content,
+      embed: this.getModLogEmbed({
+        moderator: this.discord.client.users.get(model.moderatorID)!,
+        victim: this.discord.client.users.get(model.victimID)!,
+        reason: model.reason,
+        guild: this.discord.client.guilds.get(model.guildID)!,
+        time: model.time
+      }).build()
+    });
   }
 
   private async getOrCreateMutedRole(guild: Guild, settings: GuildEntity) {
@@ -481,7 +557,7 @@ export default class PunishmentService implements Service {
     reason,
     victim,
     time
-  }: PublishModLogOptions) {
+  }: Omit<PublishModLogOptions, 'type'>) {
     const embed = new EmbedBuilder()
       .setColor(0xDAA2C6)
       .setAuthor(`~ ${victim.username}#${victim.discriminator} (${victim.id}) ~`, undefined, victim.dynamicAvatarURL('png', 1024))
