@@ -20,11 +20,31 @@
  * SOFTWARE.
  */
 
-import { Constants, Member } from 'eris';
+import { Constants, Guild, Member, User } from 'eris';
 import { Inject, Service } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
+import { Logger } from 'tslog';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
+import Permissions from '../util/Permissions';
+
+type MemberLike = Member | { id: string; guild: Guild };
+
+interface ApplyPunishmentOptions {
+  moderator: Member;
+  publish?: boolean;
+  reason?: string;
+  member: MemberLike;
+  type: PunishmentType;
+}
+
+interface PublishModLogOptions {
+  warningsRemoved?: number;
+  warningsAdded?: number;
+  moderator: User;
+  reason?: string;
+  victim: User;
+}
 
 export default class PunishmentService implements Service {
   public name: string = 'punishments';
@@ -34,6 +54,17 @@ export default class PunishmentService implements Service {
 
   @Inject
   private discord!: Discord;
+
+  @Inject
+  private logger!: Logger;
+
+  private async resolveMember(member: MemberLike) {
+    return member instanceof Member
+      ? member
+      : member.guild.members.has(member.id)
+        ? member.guild.members.get(member.id)!
+        : (await this.discord.client.getRESTGuildMember(member.guild.id, member.id));
+  }
 
   permissionsFor(type: PunishmentType) {
     switch (type) {
@@ -63,10 +94,9 @@ export default class PunishmentService implements Service {
 
   async createWarning(member: Member, reason?: string, amount?: number) {
     const self = member.guild.members.get(this.discord.client.user.id)!;
-    const warnings = await this.database.warnings.getAll(member.guild.id, member.id);
-    const latest = warnings[warnings.length - 1];
-    const count = latest
-      ? (amount !== undefined ? latest.amount + amount : latest.amount + 1)
+    const warnings = await this.database.warnings.get(member.guild.id, member.id);
+    const count = warnings
+      ? (amount !== undefined ? warnings.amount + amount : warnings.amount + 1)
       : (amount !== undefined ? amount : 1);
 
     if (count < 0)
@@ -91,9 +121,52 @@ export default class PunishmentService implements Service {
 
   async removeWarning(member: Member, reason?: string, amount?: number | 'all') {
     const self = member.guild.members.get(this.discord.client.user.id)!;
-    const warnings = await this.database.warnings.getAll(member.guild.id, member.id);
-    const latest = warnings[warnings.length - 1];
-    if (latest === undefined)
+    const warnings = await this.database.warnings.get(member.guild.id, member.id);
+    if (warnings === undefined)
       throw new SyntaxError('user doesn\'t have any punishments to be removed');
+
+    if (amount === 'all') {
+      await this.database.warnings.clean(member.guild.id, member.id);
+      return this.publishToModLog();
+    } else {
+      const count = amount !== undefined ? (warnings.amount - amount) : (warnings.amount - 1);
+      return this.publishToModLog();
+    }
+  }
+
+  async apply({
+    moderator,
+    publish,
+    reason,
+    member,
+    type
+  }: ApplyPunishmentOptions) {
+    this.logger.info(`Told to apply punishment ${type} on member ${member.id}${reason ? `, with reason: ${reason}` : ''}${publish ? ', publishing to modlog!' : ''}`);
+
+    const settings = await this.database.guilds.get(member.guild.id);
+    const self = member.guild.members.get(this.discord.client.user.id)!;
+
+    if (
+      (member instanceof Member && !Permissions.isMemberAbove(self, member)) ||
+      (self.permissions.allow & this.permissionsFor(type)) === 0
+    ) return;
+
+    switch (type) {
+      case PunishmentType.Ban:
+        await this.applyBan(type, member, member.guild, reason);
+        break;
+
+      case PunishmentType.Kick: {
+        const mem = await this.resolveMember(member);
+        await mem.kick(reason
+          ? `[${moderator.username}#${moderator.discriminator} (${moderator.id}) | Kick] ${encodeURIComponent(reason)}`
+          : `[${moderator.username}#${moderator.discriminator} (${moderator.id}) | Kick] No reason was specified.`
+        );
+      } break;
+
+      case PunishmentType.Mute:
+        await this.applyMute();
+        break;
+    }
   }
 }

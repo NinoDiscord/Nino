@@ -38,8 +38,8 @@ export default class WarningsController {
     return this.database.connection.getRepository(WarningEntity);
   }
 
-  getAll(guildID: string, userID: string) {
-    return this.repository.find({ guildID, userID });
+  get(guildID: string, userID: string) {
+    return this.repository.findOne({ guildID, userID });
   }
 
   create({ guildID, userID, reason, amount }: CreateWarningOptions) {
@@ -65,5 +65,9 @@ export default class WarningsController {
       .where('guild_id = :id', { id: guildID })
       .andWhere('user_id = :id', { id: userID })
       .execute();
+  }
+
+  clean(guildID: string, userID: string) {
+    return this.repository.delete({ guildID, userID });
   }
 }
