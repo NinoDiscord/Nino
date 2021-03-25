@@ -23,6 +23,7 @@
 import 'source-map-support/register';
 import 'reflect-metadata';
 
+import Timeouts from './structures/timeouts/TimeoutsManager';
 import logger from './singletons/Logger';
 import API from './api/API';
 import app from './container';
@@ -38,7 +39,10 @@ import app from './container';
   }
 
   const api = new API();
-  await app.addComponent(api, true);
+  const timeouts = new Timeouts();
+
+  await app.addComponent(api);
+  await app.addComponent(timeouts);
 
   logger.info('Application state has been verified! :D');
   process.on('SIGINT', () => {

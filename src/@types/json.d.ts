@@ -20,14 +20,7 @@
  * SOFTWARE.
  */
 
-import { hostname } from 'os';
-import { Logger } from 'tslog';
-
-export default new Logger({
-  displayFunctionName: true,
-  exposeErrorCodeFrame: true,
-  displayInstanceName: true,
-  displayTypes: false,
-  displayFilePath: 'hideNodeModulesOnly',
-  instanceName: `nino-${hostname()}`
-});
+/** */
+interface JSON {
+  parse<T>(content: string, reviver?: (this: any, key: string, value: any) => any): T;
+}

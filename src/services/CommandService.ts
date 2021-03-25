@@ -44,7 +44,7 @@ import IntResolver from '../structures/resolvers/IntegerResolver';
 export default class CommandService implements Service {
   public commandsExecuted: number = 0;
   public messagesSeen: number = 0;
-  private resolvers: Collection<string, ArgumentResolver<any>> = new Collection();
+  public resolvers: Collection<string, ArgumentResolver<any>> = new Collection();
   public cooldowns: Collection<string, Collection<string, number>> = new Collection();
   public commands: Collection<string, NinoCommand> = new Collection();
   private handler: CommandHandler = new CommandHandler(this);

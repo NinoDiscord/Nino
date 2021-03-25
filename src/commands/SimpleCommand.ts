@@ -22,8 +22,8 @@
 
 import type CommandMessage from '../structures/CommandMessage';
 import Command from '../structures/Command';
-import { Inject } from '@augu/lilith';
-import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
+import Timeouts from '../structures/timeouts/TimeoutsManager';
+import app from '../container';
 
 export default class SimpleCommand extends Command {
   constructor() {
@@ -33,10 +33,10 @@ export default class SimpleCommand extends Command {
     });
   }
 
-  @Inject
-  private punishments!: PunishmentService;
-
   async run(msg: CommandMessage) {
-    return msg.reply('owo');
+    const timeouts: Timeouts = app.$ref<any>(Timeouts);
+    console.log(timeouts);
+
+    return msg.reply('Check logs!');
   }
 }

@@ -40,4 +40,5 @@ app.on('debug', message => logger.debug(`Lilith: ${message}`));
 app.addSingleton(logger);
 app.addSingleton(http);
 
+(global as any).app = app;
 export default app;

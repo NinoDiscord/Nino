@@ -49,7 +49,7 @@ export enum PunishmentEntryType {
 }
 
 interface ApplyPunishmentOptions {
-  moderator: Member;
+  moderator: User;
   publish?: boolean;
   reason?: string;
   member: MemberLike;
@@ -172,19 +172,11 @@ export default class PunishmentService implements Service {
       userID: member.id
     });
 
-    const items = results.map<PublishModLogOptions>(result => ({
-      warningsAdded: result.warnings, // i think?
-      moderator: self.user,
-      victim: member.user,
-      guild: member.guild,
-      type: stringifyDBType(result.type)!
-    }));
-
     // run the actual punishments
     for (let i = 0; i < results.length; i++) {
       const result = results[i];
       await this.apply({
-        moderator: self,
+        moderator: this.discord.client.users.get(this.discord.client.user.id)!,
         publish: false,
         member,
         type: result.type
@@ -200,7 +192,7 @@ export default class PunishmentService implements Service {
       type: PunishmentType.WarningRemoved
     });
 
-    return results.length ? this.bulkPublish(items.map(r => ({ model, ...r }))) : this.publishToModLog({
+    return results.length ? Promise.resolve() : this.publishToModLog({
       warningsAdded: count,
       moderator: self.user,
       victim: member.user,
@@ -276,7 +268,7 @@ export default class PunishmentService implements Service {
 
     const user = await this.resolveMember(member);
     const modlogStatement: PublishModLogOptions = {
-      moderator: moderator.user,
+      moderator,
       victim: user.user,
       guild: member.guild,
       type: stringifyDBType(type)!
@@ -460,10 +452,6 @@ export default class PunishmentService implements Service {
       await member.edit({ deaf: false }, reason ?? 'No reason was specified.');
 
     statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
-  }
-
-  private async bulkPublish(items: (PublishModLogOptions & { model: CaseEntity })[]) {
-    // noop
   }
 
   private async publishToModLog({
