@@ -24,10 +24,10 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'guilds' })
 export default class GuildEntity {
-  @Column({ default: null, nullable: true })
+  @Column({ default: null, nullable: true, name: 'modlog_channel_id' })
   public modlogChannelID?: string;
 
-  @Column({ default: null, nullable: true })
+  @Column({ default: null, nullable: true, name: 'muted_role_id' })
   public mutedRoleID?: string;
 
   @Column({ array: true, type: 'text' })

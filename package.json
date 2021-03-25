@@ -42,7 +42,6 @@
     "express": "4.17.1",
     "ioredis": "4.24.2",
     "js-yaml": "4.0.0",
-    "mongodb": "^3.6.5",
     "ms": "2.1.2",
     "pg": "8.5.1",
     "reflect-metadata": "0.1.13",

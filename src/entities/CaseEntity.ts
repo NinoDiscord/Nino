@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn } from 'typeorm';
 import { PunishmentType } from './PunishmentsEntity';
 
 @Entity({ name: 'cases' })
@@ -40,7 +40,7 @@ export default class CaseEntity {
   @Column({ nullable: true, default: undefined })
   public reason?: string;
 
-  @PrimaryGeneratedColumn()
+  @Column()
   public index!: number;
 
   @Column({

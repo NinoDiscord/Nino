@@ -22,8 +22,8 @@
 
 import type CommandMessage from '../structures/CommandMessage';
 import Command from '../structures/Command';
-import Timeouts from '../structures/timeouts/TimeoutsManager';
 import app from '../container';
+import Database from '../components/Database';
 
 export default class SimpleCommand extends Command {
   constructor() {
@@ -34,8 +34,8 @@ export default class SimpleCommand extends Command {
   }
 
   async run(msg: CommandMessage) {
-    const timeouts: Timeouts = app.$ref<any>(Timeouts);
-    console.log(timeouts);
+    const database: Database = app.$ref<any>(Database);
+    console.log(await database.guilds.get(msg.guild.id));
 
     return msg.reply('Check logs!');
   }
