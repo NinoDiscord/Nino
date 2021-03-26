@@ -201,7 +201,7 @@ export default class StatisticsCommand extends Command {
           inline: false
         }
       ])
-      .setFooter(`Owners: ${owners.map((user) => `${user.username}#${user.discriminator}`).join(' | ')}`);
+      .setFooter(`Owners: ${owners.map((user) => `${user.username}#${user.discriminator}`).join(', ')}`);
 
     return msg.reply(embed);
   }
