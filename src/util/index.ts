@@ -40,3 +40,13 @@ export function* withIndex<T extends any[]>(arr: T): Generator<[index: number, i
     yield [i, arr[i]];
   }
 }
+
+export function formatSize(bytes: number) {
+  const kilo = bytes / 1024;
+  const mega = kilo / 1024;
+  const giga = mega / 1024;
+
+  if (kilo < 1024) return `${kilo.toFixed(1)}KB`;
+  else if (kilo > 1024 && mega < 1024) return `${mega.toFixed(1)}MB`;
+  else return `${giga.toFixed(1)}GB`;
+}

@@ -176,6 +176,7 @@ export default class EmbedBuilder {
       description: this.description,
       thumbnail: this.thumbnail,
       timestamp: this.timestamp,
+      footer: this.footer,
       author: this.author ? {
         name: this.author.name!,
         url: this.author.url,
