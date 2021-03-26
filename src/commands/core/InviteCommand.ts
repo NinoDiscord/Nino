@@ -21,43 +21,29 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { calculateHRTime } from '@augu/utils';
 import { Inject } from '@augu/lilith';
 import Discord from '../../components/Discord';
-import K8s from '../../components/Kubernetes';
 
-export default class PingCommand extends Command {
+export default class InviteCommand extends Command {
   @Inject
   private discord!: Discord;
 
-  @Inject
-  private k8s!: K8s;
-
   constructor() {
     super({
-      description: 'descriptions.ping',
-      aliases: ['pong', 'latency', 'lat'],
-      cooldown: 1,
-      name: 'ping'
+      description: 'descriptions.invite',
+      aliases: ['inviteme', 'inv'],
+      cooldown: 2,
+      name: 'invite'
     });
   }
 
-  async run(msg: CommandMessage) {
-    const startedAt = process.hrtime();
-    const message = await msg.reply('What did you want me to respond to?');
-    const ping = calculateHRTime(startedAt);
-    const node = await this.k8s.getCurrentNode();
-
-    const deleteMsg = process.hrtime();
-    await message.delete();
-
-    const shard = this.discord.client.shards.get(msg.guild?.shard.id ?? 0)!;
+  run(msg: CommandMessage) {
     return msg.reply([
-      `:satellite_orbital: Running under node **${node ?? 'unknown'}**`,
+      ':wave: Wanting to invite me? Use the link below to do so:',
+      `<https://discord.com/oauth2/authorize?client_id=${this.discord.client.user.id}&scope=bot>`,
       '',
-      `> **Message Delete**: ${calculateHRTime(deleteMsg).toFixed()}ms`,
-      `> **Message Send**: ${ping.toFixed()}ms`,
-      `> **Shard #${shard.id}**: ${shard.latency}ms`
+      ':question: Have questions about me? Join the support server under the #support channel:',
+      'https://discord.gg/JjHGR6vhcG'
     ].join('\n'));
   }
 }

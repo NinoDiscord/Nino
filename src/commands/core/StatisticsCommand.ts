@@ -20,44 +20,55 @@
  * SOFTWARE.
  */
 
+import { Color, version, commitHash } from '../../util/Constants';
 import { Command, CommandMessage } from '../../structures';
-import { calculateHRTime } from '@augu/utils';
 import { Inject } from '@augu/lilith';
+import Stopwatch from '../../util/Stopwatch';
+import Database from '../../components/Database';
 import Discord from '../../components/Discord';
-import K8s from '../../components/Kubernetes';
+import Redis from '../../components/Redis';
 
-export default class PingCommand extends Command {
+export default class StatisticsCommand extends Command {
+  @Inject
+  private database!: Database;
+
   @Inject
   private discord!: Discord;
 
   @Inject
-  private k8s!: K8s;
+  private redis!: Redis;
 
   constructor() {
     super({
-      description: 'descriptions.ping',
-      aliases: ['pong', 'latency', 'lat'],
-      cooldown: 1,
-      name: 'ping'
+      description: 'descriptions.statistics',
+      aliases: ['stats', 'botinfo', 'info', 'me'],
+      cooldown: 8,
+      name: 'statistics'
     });
   }
 
+  private async getRedisPing() {
+    const stopwatch = new Stopwatch();
+
+    stopwatch.start();
+    await this.redis.client.ping('Ice is cute as FUCK');
+
+    return stopwatch.end();
+  }
+
+  private async getDBPing() {
+    const stopwatch = new Stopwatch();
+    stopwatch.start();
+
+    await this.database.connection.query('SELECT * FROM guilds;');
+    return stopwatch.end();
+  }
+
   async run(msg: CommandMessage) {
-    const startedAt = process.hrtime();
-    const message = await msg.reply('What did you want me to respond to?');
-    const ping = calculateHRTime(startedAt);
-    const node = await this.k8s.getCurrentNode();
+    // Check for databases ping
+    const redisPing = await this.getRedisPing();
+    const dbPing = await this.getDBPing();
 
-    const deleteMsg = process.hrtime();
-    await message.delete();
-
-    const shard = this.discord.client.shards.get(msg.guild?.shard.id ?? 0)!;
-    return msg.reply([
-      `:satellite_orbital: Running under node **${node ?? 'unknown'}**`,
-      '',
-      `> **Message Delete**: ${calculateHRTime(deleteMsg).toFixed()}ms`,
-      `> **Message Send**: ${ping.toFixed()}ms`,
-      `> **Shard #${shard.id}**: ${shard.latency}ms`
-    ].join('\n'));
+    // Check for database information
   }
 }

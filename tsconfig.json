@@ -1,7 +1,6 @@
 {
   "extends": "@augu/tsconfig",
   "compilerOptions": {
-    "sourceMap": true,
     "moduleResolution": "node",
     "types": ["node", "reflect-metadata"],
     "typeRoots": ["./src/@types", "./node_modules/@types"],
