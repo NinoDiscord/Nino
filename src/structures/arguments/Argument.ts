@@ -78,7 +78,7 @@ export default class Argument {
         };
 
       return {
-        value: this.info.default !== null ? this.info.default : undefined
+        value: this.info.default
       };
     }
 

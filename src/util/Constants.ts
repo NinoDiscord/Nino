@@ -39,6 +39,7 @@ export const commitHash: string | null = (() => {
   }
 })();
 
+export const Color = 0xDAA2C6;
 export const USER_MENTION_REGEX = /<@!?([0-9]+)>/gi;
 export const CHANNEL_REGEX = /<#([0-9]+)>/gi;
 export const ROLE_REGEX = /^<@&([0-9]+)>/gi;

@@ -212,6 +212,8 @@ export default class CommandHandler {
       return value;
     });
 
-    return record;
+    // keep it immutable so
+    // the application doesn't mutate its state
+    return Object.freeze(record);
   }
 }

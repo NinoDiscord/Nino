@@ -100,5 +100,5 @@ export default abstract class NinoCommand {
     }
   }
 
-  abstract run(msg: CommandMessage, ...args: any[]): Promise<any>;
+  abstract run(msg: CommandMessage, ...args: any[]): any;
 }

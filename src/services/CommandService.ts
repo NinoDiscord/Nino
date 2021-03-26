@@ -90,14 +90,14 @@ export default class CommandService implements Service {
 
       // only the help command will have the `commands` prop to be this
       const injections = getInjectables(command);
-      app.inject(injections.filter(inject => inject.property !== 'commands'), command);
+      app.inject(injections.filter(inject => inject.property !== 'service'), command);
 
       // if it's the help command, let's inject it
-      const injection = injections.filter(inject => inject.property === 'commands')[0];
+      const injection = injections.filter(inject => inject.property === 'service')[0];
       if (injection !== undefined)
         app.inject([
           {
-            property: 'commands',
+            property: 'service',
             ref: CommandService
           }
         ], command);
