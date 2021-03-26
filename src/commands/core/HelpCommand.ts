@@ -21,6 +21,7 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
+import { firstUpper } from '@augu/utils';
 import * as Constants from '../../util/Constants';
 import CommandService from '../../services/CommandService';
 import { Inject } from '@augu/lilith';
@@ -93,7 +94,7 @@ export default class HelpCommand extends Command {
 
     for (const cat in (this.categories as Required<CommandCategories>)) {
       const commands = (this.categories[cat] as Command[]);
-      embed.addField(`• ${cat} [${this.categories[cat].length}]`, commands.map(cmd => `**\`${cmd.name}\`**`).join(', '), false);
+      embed.addField(`• ${firstUpper(cat)} [${this.categories[cat].length}]`, commands.map(cmd => `**\`${cmd.name}\`**`).join(', '), false);
     }
 
     return msg.reply(embed);

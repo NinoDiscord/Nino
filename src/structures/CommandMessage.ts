@@ -21,6 +21,7 @@
  */
 
 import type { AdvancedMessageContent, Message, TextChannel } from 'eris';
+import type { ErisMessage } from './handlers/CommandHandler';
 import { NotInjectable } from '@augu/lilith';
 import { EmbedBuilder } from '.';
 import Discord from '../components/Discord';
@@ -30,9 +31,9 @@ import app from '../container';
 export default class CommandMessage {
   private _flags: any = {};
 
-  #message: Message<TextChannel>;
+  #message: ErisMessage;
 
-  constructor(message: Message<TextChannel>) {
+  constructor(message: ErisMessage) {
     this.#message = message;
   }
 
@@ -66,7 +67,7 @@ export default class CommandMessage {
     const payload: AdvancedMessageContent = {
       messageReferenceID: this.#message.id,
       allowedMentions: {
-        replied_user: false, // eslint-disable-line camelcase
+        repliedUser: false, // eslint-disable-line camelcase
         everyone: false,
         roles: false,
         users: false

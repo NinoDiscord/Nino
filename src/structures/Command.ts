@@ -23,13 +23,15 @@
 import Argument, { ArgumentInfo } from './arguments/Argument';
 import { getSubcommandsIn } from './decorators/Subcommand';
 import type CommandMessage from './CommandMessage';
+import type { Constants } from 'eris';
 import { NotInjectable } from '@augu/lilith';
 import { Categories } from '../util/Constants';
 import Subcommand from './Subcommand';
 
+type PermissionField = keyof Constants['Permissions'];
 interface CommandInfo {
-  userPermissions?: string | string[];
-  botPermissions?: string[];
+  userPermissions?: PermissionField | PermissionField[];
+  botPermissions?: PermissionField | PermissionField[];
   description?: string;
   ownerOnly?: boolean;
   category?: Categories;
@@ -42,8 +44,8 @@ interface CommandInfo {
 
 @NotInjectable()
 export default abstract class NinoCommand {
-  public userPermissions: string[];
-  public botPermissions:  string[];
+  public userPermissions: PermissionField[];
+  public botPermissions:  PermissionField[];
   public description:     string;
   public ownerOnly:       boolean;
   public category:        Categories;

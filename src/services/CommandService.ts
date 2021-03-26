@@ -71,11 +71,11 @@ export default class CommandService implements Service {
     app.inject(injections, this.handler);
 
     // Add in the message create and event
-    this.discord.client.on('messageCreate', (msg: Message<TextChannel>) =>
+    this.discord.client.on('messageCreate', (msg: any) =>
       this.handler.handleCommand.call(this.handler, msg)
     );
 
-    this.discord.client.on('messageUpdate', (msg: Message<TextChannel>, old) =>
+    this.discord.client.on('messageUpdate', (msg: any, old) =>
       this.handler.onMessageEdit.call(this.handler, msg, old)
     );
 

@@ -32,6 +32,12 @@ import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
 
+// hacky solution for:
+// "Property 'x' does not exist on type 'TextChannel | { id: string }'."
+export interface ErisMessage extends Message<TextChannel> {
+  channel: TextChannel;
+}
+
 @NotInjectable()
 export default class CommandHandler {
   constructor(private service: CommandService) {}
@@ -48,7 +54,7 @@ export default class CommandHandler {
   @Inject
   private discord!: Discord;
 
-  async onMessageEdit(msg: Message<TextChannel>, old: OldMessage | null) {
+  async onMessageEdit(msg: ErisMessage, old: OldMessage | null) {
     if (old === null)
       return;
 
@@ -56,7 +62,7 @@ export default class CommandHandler {
       return this.handleCommand(msg);
   }
 
-  async handleCommand(msg: Message<TextChannel>) {
+  async handleCommand(msg: ErisMessage) {
     this.service.messagesSeen++;
 
     if (msg.author.bot) return;
