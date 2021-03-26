@@ -21,11 +21,12 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
+import { Constants as ErisConstants } from 'eris';
 import { firstUpper } from '@augu/utils';
 import * as Constants from '../../util/Constants';
 import CommandService from '../../services/CommandService';
+import Permissions from '../../util/Permissions';
 import { Inject } from '@augu/lilith';
-import Database from '../../components/Database';
 
 interface HelpCommandArgs {
   cmdOrMod?: string;
@@ -39,9 +40,6 @@ interface CommandCategories {
 
 export default class HelpCommand extends Command {
   private categories!: CommandCategories;
-
-  @Inject
-  private database!: Database;
 
   @Inject
   private service!: CommandService;
@@ -69,6 +67,10 @@ export default class HelpCommand extends Command {
       return this.renderDoc(msg, args.cmdOrMod);
   }
 
+  private _calculateLength(a: Command) {
+    return a.name.length;
+  }
+
   private async renderHelpCommand(msg: CommandMessage) {
     if (this.categories === undefined) {
       this.categories = {};
@@ -80,9 +82,7 @@ export default class HelpCommand extends Command {
       }
     }
 
-    const settings = await this.database.guilds.get(msg.guild.id);
-    const prefix = settings.prefixes[settings.prefixes.length - 1];
-
+    const prefix = msg.settings.prefixes[msg.settings.prefixes.length - 1];
     const embed = new EmbedBuilder()
       .setColor(Constants.Color)
       .setDescription([
@@ -100,7 +100,71 @@ export default class HelpCommand extends Command {
     return msg.reply(embed);
   }
 
-  private renderDoc(msg: CommandMessage, cmdOrMod: string) {
-    return msg.reply('uwu / owo');
+  private async renderDoc(msg: CommandMessage, cmdOrMod: string) {
+    const command = this.service.commands.filter(cmd => !cmd.hidden && cmd.name === cmdOrMod || cmd.aliases.includes(cmdOrMod))[0];
+    const prefix = msg.settings.prefixes[msg.settings.prefixes.length - 1];
+
+    if (command !== undefined) {
+      const embed = new EmbedBuilder()
+        .setColor(Constants.Color)
+        .setTitle(`[ :pencil2: Command ${command.name} ]`)
+        .setDescription(`> **${command.description}**`)
+        .addFields(
+          [
+            {
+              name: '• Syntax',
+              value: `${prefix}${command.format}`,
+              inline: false
+            },
+            {
+              name: '• Category',
+              value: `**${firstUpper(command.category)}**`,
+              inline: true
+            },
+            {
+              name: '• Aliases',
+              value: command.aliases.join(' ') || 'No aliases available',
+              inline: true
+            },
+            {
+              name: '• Owner Only',
+              value: command.ownerOnly ? 'Yes' : 'No',
+              inline: true
+            },
+            {
+              name: '• Cooldown',
+              value: `${command.cooldown} Seconds`,
+              inline: true
+            },
+            {
+              name: '• User Permissions',
+              value: Permissions.stringify(command.userPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0)) || 'None',
+              inline: true
+            },
+            {
+              name: '• Bot Permissions',
+              value: Permissions.stringify(command.botPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0)) || 'None',
+              inline: true
+            }
+          ]
+        );
+
+      return msg.reply(embed);
+    } else {
+      const mod = this.service.commands.filter(cmd => cmd.category.toLowerCase() === cmdOrMod.toLowerCase());
+      if (mod.length > 0) {
+        const longestName = this._calculateLength(mod.sort((a, b) => this._calculateLength(b) - this._calculateLength(a))[0]);
+        const embed = new EmbedBuilder()
+          .setColor(Constants.Color)
+          .setAuthor(`[ Module ${firstUpper(cmdOrMod)} ]`)
+          .setDescription(mod.map(command =>
+            `**\`${prefix}${command.name.padEnd((longestName * 2), ' \u200b')}\`** ~  \u200b \u200b${command.description}`
+          ));
+
+        return msg.reply(embed);
+      } else {
+        return msg.reply(`:x: Command or module **${cmdOrMod}** was not found.`);
+      }
+    }
   }
 }

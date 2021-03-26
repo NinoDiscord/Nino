@@ -89,7 +89,7 @@ export default class CommandHandler {
     if (command === null)
       return;
 
-    const message = new CommandMessage(msg);
+    const message = new CommandMessage(msg, settings, userSettings);
     const owners = this.config.getProperty('owners') ?? [];
     if (command.ownerOnly && !owners.includes(msg.author.id))
       return message.reply(`Command **${command.name}** is a developer-only command, nice try...`);
@@ -159,8 +159,15 @@ export default class CommandHandler {
       await executor.call(command, message, args);
       this.logger.info(`Command "${command.name}" has been ran by ${msg.author.username}#${msg.author.discriminator} in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
     } catch(ex) {
-      const contact = owners
-        .map(r => this.discord.client.users.get(r)!)
+      const _owners = await Promise.all(owners.map(id => {
+        const user = this.discord.client.users.get(id);
+        if (user === undefined)
+          return this.discord.client.getRESTUser(id);
+        else
+          return Promise.resolve(user);
+      }));
+
+      const contact = _owners
         .map((r, index) => `${index + 1 === owners.length ? 'or ' : ''}**${r.username}#${r.discriminator}**`)
         .join(', ');
 
@@ -176,8 +183,11 @@ export default class CommandHandler {
         ])
         .build();
 
-      msg.channel.createMessage({ embed });
-      this.logger.fatal(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute`, ex);
+      await msg.channel.createMessage({ embed });
+
+      // hacky way for "TypeError  Cannot set property name of  which has only a getter"
+      this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute`);
+      console.error(ex.stack);
     }
   }
 

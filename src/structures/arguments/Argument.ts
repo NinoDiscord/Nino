@@ -63,9 +63,6 @@ export default class Argument {
     const suffix = this.info.optional === true ? ']' : '>';
     let text = `${prefix}${this.info.name}`;
 
-    if (this.info.default !== null)
-      text += ` = ${this.info.default}`;
-
     return (text += suffix, text);
   }
 

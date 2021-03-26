@@ -20,20 +20,27 @@
  * SOFTWARE.
  */
 
-import type { AdvancedMessageContent, Message, TextChannel } from 'eris';
+import type { AdvancedMessageContent } from 'eris';
 import type { ErisMessage } from './handlers/CommandHandler';
 import { NotInjectable } from '@augu/lilith';
+import type GuildEntity from '../entities/GuildEntity';
 import { EmbedBuilder } from '.';
+import type UserEntity from '../entities/UserEntity';
 import Discord from '../components/Discord';
 import app from '../container';
 
+
 @NotInjectable()
 export default class CommandMessage {
+  public userSettings: UserEntity;
+  public settings: GuildEntity;
   private _flags: any = {};
 
   #message: ErisMessage;
 
-  constructor(message: ErisMessage) {
+  constructor(message: ErisMessage, settings: GuildEntity, userSettings: UserEntity) {
+    this.userSettings = userSettings;
+    this.settings = settings;
     this.#message = message;
   }
 

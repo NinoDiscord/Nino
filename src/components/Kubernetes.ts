@@ -21,7 +21,7 @@
  */
 
 import { Component, Inject } from '@augu/lilith';
-import { HttpClient } from '@augu/orchid';
+import { hostname } from 'os';
 import { Logger } from 'tslog';
 import * as k8s from '@kubernetes/client-node';
 import Config from './Config';
@@ -46,21 +46,17 @@ export default class K8SClient implements Component {
     this.kubeConfig.loadFromDefault();
   }
 
-  async getCurrentNodes() {
+  async getCurrentNode() {
     const environment = this.config.getProperty('environment') ?? 'development';
     if (environment !== 'production')
-      return [];
+      return;
 
     const api = this.kubeConfig.makeApiClient(k8s.CoreV1Api);
     const ns = this.config.getProperty('k8s.namespace');
     if (ns === undefined)
-      return [];
+      return;
 
     const pod = await api.listNamespacedPod(ns);
-    return pod.body.items.map(item => ({
-      createdAt: item.metadata?.creationTimestamp !== undefined ? new Date(item.metadata?.creationTimestamp) : '[malformed date]',
-      node: item.spec?.nodeName ?? '<... unknown? ...?',
-      name: item.metadata?.name
-    }));
+    return pod.body.items.find(pod => pod.metadata!.name! === hostname())?.spec!.nodeName;
   }
 }

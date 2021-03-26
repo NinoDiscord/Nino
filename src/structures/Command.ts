@@ -84,6 +84,18 @@ export default abstract class NinoCommand {
     return getSubcommandsIn(this).map(sub => new Subcommand(sub));
   }
 
+  get format() {
+    let text = this.name;
+    this.subcommands.forEach(sub => {
+      const args = sub.args.map(r => r.format);
+      text += ` [${sub.name} ${args}]`;
+    });
+
+    this.args.forEach(arg => (text += ` ${arg.format}`));
+
+    return text;
+  }
+
   private _validateArgs(args: ArgumentInfo[]) {
     let hasRest = false;
     let hasOptional = false;
