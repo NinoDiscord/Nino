@@ -21,40 +21,22 @@
  */
 
 import { Service, Inject, getInjectables } from '@augu/lilith';
-import type { Message, TextChannel } from 'eris';
-import type ArgumentResolver from '../structures/arguments/ArgumentResolver';
 import { readdirSync, Ctor } from '@augu/utils';
 import type NinoCommand from '../structures/Command';
 import CommandHandler from '../structures/handlers/CommandHandler';
-import CommandMessage from '../structures/CommandMessage';
 import { Collection } from '@augu/collections';
-import EmbedBuilder from '../structures/EmbedBuilder';
-import UserEntity from '../entities/UserEntity';
 import { Logger } from 'tslog';
-import Database from '../components/Database';
 import { join } from 'path';
 import Discord from '../components/Discord';
-import Config from '../components/Config';
 import app from '../container';
-
-// resolvers
-import StringResolver from '../structures/resolvers/StringResolver';
-import IntResolver from '../structures/resolvers/IntegerResolver';
 
 export default class CommandService implements Service {
   public commandsExecuted: number = 0;
   public messagesSeen: number = 0;
-  public resolvers: Collection<string, ArgumentResolver<any>> = new Collection();
   public cooldowns: Collection<string, Collection<string, number>> = new Collection();
   public commands: Collection<string, NinoCommand> = new Collection();
   private handler: CommandHandler = new CommandHandler(this);
   public name = 'Commands';
-
-  @Inject
-  private config!: Config;
-
-  @Inject
-  private database!: Database;
 
   @Inject
   private logger!: Logger;
@@ -63,9 +45,6 @@ export default class CommandService implements Service {
   private discord!: Discord;
 
   async load() {
-    // Add in resolvers
-    this._addResolvers();
-
     // Add injections to the command handler
     const injections = getInjectables(this.handler);
     app.inject(injections, this.handler);
@@ -102,24 +81,10 @@ export default class CommandService implements Service {
           }
         ], command);
 
-      // Arguments needs the resolvers, so this instance needs to be populated
-      command.args.forEach(arg => {
-        arg.service = this;
-      });
-
       this.commands.set(command.name, command);
       this.logger.info(`Initialized command ${command.name}`);
     }
 
     this.logger.info(`Loaded ${this.commands.size} commands!`);
-  }
-
-  getArgumentResolver(type: string) {
-    return this.resolvers.get(type)!;
-  }
-
-  private _addResolvers() {
-    this.resolvers.set('string', new StringResolver());
-    this.resolvers.set('int', new IntResolver());
   }
 }

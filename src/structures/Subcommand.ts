@@ -22,24 +22,23 @@
 
 import type CommandMessage from './CommandMessage';
 import { NotInjectable } from '@augu/lilith';
-import Argument, { ArgumentInfo } from './arguments/Argument';
 import type Command from './Command';
 
 export interface SubcommandInfo {
   run(this: Command, msg: CommandMessage): Promise<any>;
 
   methodName: string;
-  args: ArgumentInfo[];
+  usage: string;
 }
 
 @NotInjectable()
 export default class Subcommand {
-  public args: Argument[];
+  public usage: string;
   public name: string;
   public run: (this: Command, msg: CommandMessage) => Promise<any>;
 
   constructor(info: SubcommandInfo) {
-    this.args = info.args.map(info => new Argument(info));
+    this.usage = info.usage;
     this.name = info.methodName;
     this.run = info.run;
   }

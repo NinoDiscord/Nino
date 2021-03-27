@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-import Argument, { ArgumentInfo } from './arguments/Argument';
 import { getSubcommandsIn } from './decorators/Subcommand';
 import type CommandMessage from './CommandMessage';
 import type { Constants } from 'eris';
@@ -38,7 +37,7 @@ interface CommandInfo {
   cooldown?: number;
   aliases?: string[];
   hidden?: boolean;
-  args?: ArgumentInfo[];
+  usage?: string;
   name: string;
 }
 
@@ -52,12 +51,10 @@ export default abstract class NinoCommand {
   public cooldown:        number;
   public aliases:         string[];
   public hidden:          boolean;
-  public args:            Argument[];
+  public usage:           string;
   public name:            string;
 
   constructor(info: CommandInfo) {
-    this._validateArgs(info.args ?? []);
-
     this.userPermissions = typeof info.userPermissions === 'string'
       ? [info.userPermissions]
       : Array.isArray(info.userPermissions)
@@ -76,7 +73,7 @@ export default abstract class NinoCommand {
     this.cooldown     = info.cooldown ?? 5;
     this.aliases      = info.aliases ?? [];
     this.hidden       = info.hidden ?? false;
-    this.args         = info.args?.map(info => new Argument(info)) ?? [];
+    this.usage        = info.usage ?? '';
     this.name         = info.name;
   }
 
@@ -85,33 +82,8 @@ export default abstract class NinoCommand {
   }
 
   get format() {
-    let text = this.name;
-    this.subcommands.forEach(sub => {
-      const args = sub.args.map(r => r.format);
-      text += ` [${sub.name} ${args}]`;
-    });
-
-    this.args.forEach(arg => (text += ` ${arg.format}`));
-
-    return text;
-  }
-
-  private _validateArgs(args: ArgumentInfo[]) {
-    let hasRest = false;
-    let hasOptional = false;
-
-    for (let i = 0; i < args.length; i++) {
-      if (hasRest)
-        throw new SyntaxError('No additional arguments cannot come after a rest argument');
-
-      if (args[i].optional === true)
-        hasOptional = true;
-      else if (hasOptional)
-        throw new SyntaxError('No required arguments cannot come after a optional one');
-
-      if (args[i].rest === true)
-        hasRest = true;
-    }
+    const subcommands = this.subcommands.map(sub => `"${sub.name} ${sub.usage}"`).join(' | ');
+    return `${this.name}${subcommands} ${this.usage}`;
   }
 
   abstract run(msg: CommandMessage, ...args: any[]): any;

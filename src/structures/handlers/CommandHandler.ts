@@ -22,7 +22,8 @@
 
 import type { Message, OldMessage, TextChannel } from 'eris';
 import { Command, EmbedBuilder } from '..';
-import { NotInjectable, Inject } from '@augu/lilith';
+import { NotInjectable, Inject } from '@augu/lilith'
+;import LocalizationService from '../../services/LocalizationService';
 import type CommandService from '../../services/CommandService';
 import { Collection } from '@augu/collections';
 import CommandMessage from '../CommandMessage';
@@ -41,6 +42,9 @@ export interface ErisMessage extends Message<TextChannel> {
 @NotInjectable()
 export default class CommandHandler {
   constructor(private service: CommandService) {}
+
+  @Inject
+  private localization!: LocalizationService;
 
   @Inject
   private database!: Database;
@@ -89,7 +93,8 @@ export default class CommandHandler {
     if (command === null)
       return;
 
-    const message = new CommandMessage(msg, settings, userSettings);
+    const locale = this.localization.get(settings.language, userSettings.language);
+    const message = new CommandMessage(msg, locale, settings, userSettings);
     const owners = this.config.getProperty('owners') ?? [];
     if (command.ownerOnly && !owners.includes(msg.author.id))
       return message.reply(`Command **${command.name}** is a developer-only command, nice try...`);
@@ -146,17 +151,13 @@ export default class CommandHandler {
     if (subcommand !== undefined)
       rawArgs.shift();
 
-    const [args, error] = await this.parseArgs(message, subcommand ?? command, rawArgs);
-    if (error !== undefined)
-      return message.reply(error);
-
     message['_flags'] = this.parseFlags(rawArgs.join(' '));
     try {
       const executor = Reflect.get(command, methodName);
       if (typeof executor !== 'function')
         throw new SyntaxError(`${subcommand ? 'Subc' : 'C'}ommand "${subcommand ? methodName : command.name}" was not a function.`);
 
-      await executor.call(command, message, args);
+      await executor.call(command, message, rawArgs);
       this.logger.info(`Command "${command.name}" has been ran by ${msg.author.username}#${msg.author.discriminator} in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
     } catch(ex) {
       const _owners = await Promise.all(owners.map(id => {
@@ -189,35 +190,6 @@ export default class CommandHandler {
       this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute`);
       console.error(ex.stack);
     }
-  }
-
-  private async parseArgs(message: CommandMessage, command: Command | Subcommand, rawArgs: string[]): Promise<[list: any, error?: string]> {
-    if (!command.args.length || !rawArgs.length)
-      return [{}];
-
-    // hopefully this is good?
-    if (!rawArgs.length && command.args.some(r => r.info.default !== null))
-      return [command.args.reduce<any>((prev, curr) => (prev[curr.info.name] = curr.info.default, prev), {})];
-    else if (!rawArgs.length && command.args.every(r => r.info.default === null))
-      return [{}];
-
-    const isSub = command instanceof Subcommand;
-    const list: any = {};
-
-    if (rawArgs.length > command.args.length && command.args[command.args.length - 1].info.rest === false)
-      return [list, `You have provided too many arguments! Review the ${isSub ? 'subcommand': 'command'}'s usage: \`help ${command.name}\``];
-
-    for (let i = 0; i < command.args.length; i++) {
-      const arg = command.args[i];
-      const result = await arg.resolve(message, arg.info.rest === true ? rawArgs.slice(i).join(' ') : rawArgs[i]);
-
-      if (result.error)
-        return [list, result.error];
-
-      list[arg.info.name] = result.value;
-    }
-
-    return [list];
   }
 
   // credit for regex: Ice <3

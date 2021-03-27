@@ -28,7 +28,8 @@
     "prepare": "npm run clean:node_modules",
     "build": "npm run lint && rm -rf build && tsc",
     "start": "node build/main.js",
-    "lint": "eslint src --ext .ts --fix"
+    "lint": "eslint src --ext .ts --fix",
+    "dev": "cd src && ts-node --files --project ../tsconfig.json main.ts"
   },
   "dependencies": {
     "@augu/collections": "1.0.5",

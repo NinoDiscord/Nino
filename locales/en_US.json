@@ -11,7 +11,9 @@
   },
   "strings": {
     "descriptions": {},
-    "commands": {},
+    "commands": {
+      "test": "Hey, you are %s!"
+    },
     "generic": {},
     "automod": {},
     "errors": {}

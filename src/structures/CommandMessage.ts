@@ -26,22 +26,24 @@ import { NotInjectable } from '@augu/lilith';
 import type GuildEntity from '../entities/GuildEntity';
 import { EmbedBuilder } from '.';
 import type UserEntity from '../entities/UserEntity';
+import type Locale from './Locale';
 import Discord from '../components/Discord';
 import app from '../container';
-
 
 @NotInjectable()
 export default class CommandMessage {
   public userSettings: UserEntity;
   public settings: GuildEntity;
   private _flags: any = {};
+  public locale: Locale;
 
   #message: ErisMessage;
 
-  constructor(message: ErisMessage, settings: GuildEntity, userSettings: UserEntity) {
+  constructor(message: ErisMessage, locale: Locale, settings: GuildEntity, userSettings: UserEntity) {
     this.userSettings = userSettings;
     this.settings = settings;
     this.#message = message;
+    this.locale = locale;
   }
 
   get channel() {

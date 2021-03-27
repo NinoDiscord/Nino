@@ -49,22 +49,15 @@ export default class HelpCommand extends Command {
       description: 'descriptions.help',
       cooldown: 2,
       aliases: ['halp', 'h', 'cmds', 'commands'],
-      name: 'help',
-      args: [
-        {
-          name: 'cmdOrMod',
-          type: 'string',
-          optional: true
-        }
-      ]
+      name: 'help'
     });
   }
 
-  run(msg: CommandMessage, args: HelpCommandArgs) {
-    if (!args.cmdOrMod)
+  run(msg: CommandMessage, [command]: [string]) {
+    if (!command)
       return this.renderHelpCommand(msg);
     else
-      return this.renderDoc(msg, args.cmdOrMod);
+      return this.renderDoc(msg, command);
   }
 
   private _calculateLength(a: Command) {
@@ -118,12 +111,12 @@ export default class HelpCommand extends Command {
             },
             {
               name: '• Category',
-              value: `**${firstUpper(command.category)}**`,
+              value: firstUpper(command.category),
               inline: true
             },
             {
               name: '• Aliases',
-              value: command.aliases.join(' ') || 'No aliases available',
+              value: command.aliases.join(', ') || 'No aliases available',
               inline: true
             },
             {
