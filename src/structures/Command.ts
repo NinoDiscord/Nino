@@ -85,7 +85,7 @@ export default abstract class NinoCommand {
   }
 
   get format() {
-    const subcommands = this.subcommands.map(sub => `"${sub.name} ${sub.usage}"`).join(' | ');
+    const subcommands = this.subcommands.map(sub => `[${sub.name} ${sub.usage}]`.trim()).join(' | ');
     return `${this.name}${subcommands} ${this.usage}`;
   }
 

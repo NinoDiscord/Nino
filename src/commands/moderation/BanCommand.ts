@@ -21,10 +21,11 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
+import { DiscordRESTError, User } from 'eris';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
+import { Categories } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
-import { DiscordRESTError, User } from 'eris';
 import Discord from '../../components/Discord';
 import ms = require('ms');
 
@@ -46,6 +47,7 @@ export default class BanCommand extends Command {
       userPermissions: ['banMembers'],
       botPermissions: ['banMembers'],
       description: 'descriptions.ban',
+      category: Categories.Moderation,
       examples: [
         'ban @Nino',
         'ban @Nino some reason!',

@@ -29,7 +29,7 @@ import Locale from '../structures/Locale';
 import Config from '../components/Config';
 
 export default class LocalizationService implements Service {
-  private defaultLocale!: Locale;
+  public defaultLocale!: Locale;
   public locales: Collection<string, Locale> = new Collection();
   public name: string = 'localization';
 

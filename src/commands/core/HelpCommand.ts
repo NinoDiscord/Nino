@@ -153,7 +153,7 @@ export default class HelpCommand extends Command {
           .setColor(Constants.Color)
           .setAuthor(`[ Module ${firstUpper(cmdOrMod)} ]`)
           .setDescription(mod.map(command =>
-            `**\`${prefix}${command.name.padEnd((longestName * 2), ' \u200b')}\`** ~  \u200b \u200b${command.description}`
+            `**\`${prefix}${command.name}\`** ~  \u200b \u200b${command.description}`
           ));
 
         return msg.reply(embed);

@@ -157,6 +157,7 @@ export default class CommandHandler {
       if (typeof executor !== 'function')
         throw new SyntaxError(`${subcommand ? 'Subc' : 'C'}ommand "${subcommand ? methodName : command.name}" was not a function.`);
 
+      this.service.commandsExecuted++;
       await executor.call(command, message, rawArgs);
       this.logger.info(`Command "${command.name}" has been ran by ${msg.author.username}#${msg.author.discriminator} in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
     } catch(ex) {
