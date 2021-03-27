@@ -20,10 +20,33 @@
  * SOFTWARE.
  */
 
-import type { LocalizationStrings, LocalizationMeta } from '../@types/locale';
 import { NotInjectable } from '@augu/lilith';
+import { isObject } from '@augu/utils';
 
-type DeepPartial<T> = { [P in keyof T]?: DeepPartial<T[P]> };
+const NOT_FOUND_SYMBOL = Symbol.for('$nino::localization::not_found');
+
+/**
+ * Metadata for a locale, this is used in the "meta" object
+ */
+ interface LocalizationMeta {
+  /** List of contributors (by user ID) who helped translate or fix minor issues with this Locale */
+  contributors: string[];
+
+  /** The translator's ID */
+  translator: string;
+
+  /** Any additional aliases to use when setting or resetting a locale */
+  aliases: string[];
+
+  /** The flag's emoji (example: `:flag_us:`) */
+  flag: string;
+
+  /** The full name of the Locale (i.e `English (UK)`) */
+  full: string;
+
+  /** The locale's code (i.e `en_US`) */
+  code: string;
+}
 
 interface Localization {
   meta: LocalizationMeta;
@@ -43,19 +66,67 @@ export default class Locale {
   public full: string;
   public code: string;
 
-  #strings: LocalizationStrings;
+  #strings: Localization['strings'];
 
   constructor({ meta, strings }: Localization) {
     this.contributors = meta.contributors;
     this.translator   = meta.translator;
-    this.#strings     = strings as any; // yes
+    this.#strings     = strings;
     this.aliases      = meta.aliases;
     this.flag         = meta.flag;
     this.full         = meta.full;
     this.code         = meta.code;
   }
 
+  // todo: type safety?
   translate(key: string, args?: { [x: string]: any } | any[]) {
-    return 'blep';
+    const nodes = key.split('.');
+    let value: any = this.#strings;
+
+    for (const node of nodes) {
+      try {
+        value = value[node];
+      } catch(ex) {
+        value = NOT_FOUND_SYMBOL;
+        break;
+      }
+    }
+
+    if (value === NOT_FOUND_SYMBOL)
+      throw new TypeError(`Node '${key}' doesn't exist...`);
+
+    if (isObject(value))
+      throw new TypeError(`Node '${key}' is a object!`);
+
+    if (Array.isArray(value)) {
+      return value.map(val => this.stringify(val, args)).join('\n');
+    } else {
+      return this.stringify(value, args);
+    }
+  }
+
+  private stringify(value: any, args?: { [x: string]: any } | any[]) {
+    // If no arguments are provided, best to assume to return the string
+    if (!args)
+      return value;
+
+    // Convert it to a string
+    if (typeof value !== 'string')
+      value = String(value);
+
+    // Translate all ${} keys
+    let content = (value as string).replaceAll(KEY_REGEX, (_, key) => {
+      const value = String(args[key]);
+      if (value === '')
+        return '';
+      else
+        return value || '?';
+    });
+
+    // Translate all %s and %d calls
+    let i = 0;
+    content = content.replaceAll(/%s|%d/g, (_, key) => args[i++]);
+
+    return content;
   }
 }
