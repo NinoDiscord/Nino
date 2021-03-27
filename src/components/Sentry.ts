@@ -22,6 +22,7 @@
 
 import { version, commitHash } from '../util/Constants';
 import { Component, Inject } from '@augu/lilith';
+import { hostname } from 'os';
 import { Logger } from 'tslog';
 import sentry from '@sentry/node';
 import Config from './Config';
@@ -46,7 +47,12 @@ export default class Sentry implements Component {
     }
 
     sentry.init({
+      tracesSampleRate: 1.0,
+      integrations: [
+        new sentry.Integrations.Http({ tracing: true })
+      ],
       environment: this.config.getProperty('environment')!,
+      serverName: hostname(),
       release: version,
       dsn
     });

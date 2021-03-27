@@ -30,7 +30,8 @@ export default class Redis implements Component {
   public client!: IORedis.Redis;
   public name: string = 'Redis';
 
-  private logger: Logger = new Logger();
+  @Inject
+  private logger!: Logger;
 
   @Inject
   private config!: Config;

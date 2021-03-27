@@ -23,11 +23,15 @@
 import { hostname } from 'os';
 import { Logger } from 'tslog';
 
-export default new Logger({
+const logger = new Logger({
   displayFunctionName: true,
   exposeErrorCodeFrame: true,
   displayInstanceName: true,
-  displayTypes: false,
   displayFilePath: 'hideNodeModulesOnly',
-  instanceName: `nino-${hostname()}`
+  dateTimePattern: '[ day-month-year / hour:minute:second ]',
+  displayTypes: false,
+  instanceName: hostname(),
+  name: 'Nino'
 });
+
+export default logger;

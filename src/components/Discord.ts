@@ -35,7 +35,8 @@ export default class Discord implements Component {
   @Inject
   private config!: Config;
 
-  private logger: Logger = new Logger();
+  @Inject
+  private logger!: Logger;
 
   load() {
     if (this.client !== undefined) {
@@ -119,6 +120,37 @@ export default class Discord implements Component {
     }
 
     return null;
+  }
+
+  getChannel(query: string, guild?: Guild) {
+    return new Promise<AnyChannel | null>(resolve => {
+      if (ID_REGEX.test(query)) {
+        if (guild) {
+          return resolve(guild.channels.has(query) ? guild.channels.get(query)! : null);
+        } else {
+          const channel = query in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[query])?.channels.get(query);
+          return resolve(channel || null);
+        }
+      }
+
+      if (CHANNEL_REGEX.test(query)) {
+        const match = query.match(CHANNEL_REGEX)!;
+        if (guild) {
+          return resolve(guild.channels.has(match[1]) ? guild.channels.get(match[1])! : null);
+        } else {
+          const channel = match[1] in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[match[1]])?.channels.get(match[1]);
+          return resolve(channel || null);
+        }
+      }
+
+      if (guild !== undefined) {
+        const channels = guild.channels.filter(chan => chan.name.toLowerCase().includes(query.toLowerCase()));
+        if (channels.length > 0)
+          return resolve(channels[0]);
+      }
+
+      resolve(null);
+    });
   }
 
   private onShardReady(id: number) {
