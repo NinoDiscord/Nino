@@ -125,7 +125,7 @@ export default class CommandHandler {
     const timestamps = this.service.cooldowns.get(command.name)!;
     const amount = command.cooldown * 1000;
 
-    if (timestamps.has(msg.author.id)) {
+    if (!owners.includes(msg.author.id) && timestamps.has(msg.author.id)) {
       const time = timestamps.get(msg.author.id)! + amount;
       if (now < time) {
         const left = (time - now) / 1000;

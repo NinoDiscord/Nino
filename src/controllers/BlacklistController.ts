@@ -42,6 +42,10 @@ export default class BlacklistController {
     return this.repository.findOne({ id });
   }
 
+  getByType(type: BlacklistType) {
+    return this.repository.find({ type });
+  }
+
   create({ reason, issuer, type, id }: CreateBlacklistOptions) {
     const entry = new BlacklistEntity();
     entry.issuer = issuer;

@@ -76,7 +76,7 @@ export default class CommandMessage {
     const payload: AdvancedMessageContent = {
       messageReferenceID: this.#message.id,
       allowedMentions: {
-        repliedUser: false, // eslint-disable-line camelcase
+        repliedUser: false,
         everyone: false,
         roles: false,
         users: false
