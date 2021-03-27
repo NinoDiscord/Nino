@@ -33,6 +33,7 @@ interface CommandInfo {
   botPermissions?: PermissionField | PermissionField[];
   description?: string;
   ownerOnly?: boolean;
+  examples?: string[];
   category?: Categories;
   cooldown?: number;
   aliases?: string[];
@@ -47,6 +48,7 @@ export default abstract class NinoCommand {
   public botPermissions:  PermissionField[];
   public description:     string;
   public ownerOnly:       boolean;
+  public examples:        string[];
   public category:        Categories;
   public cooldown:        number;
   public aliases:         string[];
@@ -69,6 +71,7 @@ export default abstract class NinoCommand {
 
     this.description  = info.description ?? 'No description is available for this command.';
     this.ownerOnly    = info.ownerOnly ?? false;
+    this.examples     = info.examples ?? [];
     this.category     = info.category ?? Categories.General;
     this.cooldown     = info.cooldown ?? 5;
     this.aliases      = info.aliases ?? [];

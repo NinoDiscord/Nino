@@ -28,10 +28,6 @@ import CommandService from '../../services/CommandService';
 import Permissions from '../../util/Permissions';
 import { Inject } from '@augu/lilith';
 
-interface HelpCommandArgs {
-  cmdOrMod?: string;
-}
-
 interface CommandCategories {
   moderation?: Command[];
   settings?: Command[];
@@ -47,6 +43,7 @@ export default class HelpCommand extends Command {
   constructor() {
     super({
       description: 'descriptions.help',
+      examples: ['help', 'help help', 'help General'],
       cooldown: 2,
       aliases: ['halp', 'h', 'cmds', 'commands'],
       name: 'help'
@@ -138,6 +135,11 @@ export default class HelpCommand extends Command {
               name: '• Bot Permissions',
               value: Permissions.stringify(command.botPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0)) || 'None',
               inline: true
+            },
+            {
+              name: '• Examples',
+              value: command.examples.map(example => `• **${prefix}${example}**`).join('\n') || 'No examples are available.',
+              inline: false
             }
           ]
         );

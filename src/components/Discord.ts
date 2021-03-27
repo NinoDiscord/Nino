@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
+import { USER_MENTION_REGEX, USERNAME_DISCRIM_REGEX, ID_REGEX, CHANNEL_REGEX, ROLE_REGEX } from '../util/Constants';
+import { Client, User, Guild, AnyChannel } from 'eris';
 import { Component, Inject } from '@augu/lilith';
-import { Client } from 'eris';
 import { Logger } from 'tslog';
 import Config from './Config';
 
@@ -85,6 +86,39 @@ export default class Discord implements Component {
 
   dispose() {
     return this.client.disconnect({ reconnect: false });
+  }
+
+  async getUser(query: string) {
+    if (USER_MENTION_REGEX.test(query)) {
+      const match = query.match(USER_MENTION_REGEX)!;
+      if (match === null)
+        return null;
+
+      const user = this.client.users.get(match[1]);
+      if (user !== undefined)
+        return user;
+    }
+
+    if (USERNAME_DISCRIM_REGEX.test(query)) {
+      const match = query.match(USERNAME_DISCRIM_REGEX)!;
+      const users = this.client.users.filter(user =>
+        user.username === match[1] && Number(user.discriminator) === Number(match[2])
+      );
+
+      // TODO: pagination?
+      if (users.length > 0)
+        return users[0];
+    }
+
+    if (ID_REGEX.test(query)) {
+      const user = this.client.users.get(query);
+      if (user !== undefined)
+        return user;
+      else
+        return this.client.getRESTUser(query);
+    }
+
+    return null;
   }
 
   private onShardReady(id: number) {

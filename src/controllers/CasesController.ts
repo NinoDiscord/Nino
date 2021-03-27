@@ -50,7 +50,7 @@ export default class CasesController {
     return this.repository.find({ guildID });
   }
 
-  create({
+  async create({
     moderatorID,
     victimID,
     guildID,
@@ -59,10 +59,14 @@ export default class CasesController {
     time,
     type
   }: CreateCaseOptions) {
+    const cases = await this.getAll(guildID);
+    const index = cases[cases.length - 1].index + 1;
+
     const entry = new CaseEntity();
     entry.moderatorID = moderatorID;
     entry.victimID = victimID;
     entry.guildID = guildID;
+    entry.index = index;
     entry.soft = soft === true; // if it's undefined, then it'll be false so no ternaries :crab:
     entry.type = type;
 

@@ -106,6 +106,20 @@ function stringifyDBType(type: PunishmentType): PunishmentEntryType | null {
   }
 }
 
+const emojis: { [P in PunishmentEntryType]: string } = {
+  [PunishmentEntryType.WarningRemoved]: ':pencil:',
+  [PunishmentEntryType.VoiceUndeafen]: ':speaking_head:',
+  [PunishmentEntryType.WarningAdded]: ':pencil:',
+  [PunishmentEntryType.VoiceUnmute]: ':loudspeaker:',
+  [PunishmentEntryType.VoiceMute]: ':mute:',
+  [PunishmentEntryType.VoiceDeaf]: ':mute:',
+  [PunishmentEntryType.Unmuted]: ':loudspeaker:',
+  [PunishmentEntryType.Kicked]: ':boot:',
+  [PunishmentEntryType.Banned]: ':hammer:',
+  [PunishmentEntryType.Unban]: ':bust_in_silhouette:',
+  [PunishmentEntryType.Muted]: ':mute:'
+};
+
 export default class PunishmentService implements Service {
   public name: string = 'punishments';
 
@@ -118,12 +132,12 @@ export default class PunishmentService implements Service {
   @Inject
   private logger!: Logger;
 
-  private async resolveMember(member: MemberLike) {
+  private async resolveMember(member: MemberLike, rest: boolean = true) {
     return member instanceof Member
       ? member
       : member.guild.members.has(member.id)
         ? member.guild.members.get(member.id)!
-        : (await this.discord.client.getRESTGuildMember(member.guild.id, member.id));
+        : (rest ? await this.discord.client.getRESTGuildMember(member.guild.id, member.id) : new Member({ id: member.id }, member.guild, this.discord.client));
   }
 
   permissionsFor(type: PunishmentType): number {
@@ -266,12 +280,14 @@ export default class PunishmentService implements Service {
       (self.permissions.allow & this.permissionsFor(type)) === 0
     ) return;
 
-    const user = await this.resolveMember(member);
+    const user = await this.resolveMember(member, type !== PunishmentType.Ban);
     const modlogStatement: PublishModLogOptions = {
       moderator,
+      reason,
       victim: user.user,
       guild: member.guild,
-      type: stringifyDBType(type)!
+      type: stringifyDBType(type)!,
+      time
     };
 
     switch (type) {
@@ -288,7 +304,7 @@ export default class PunishmentService implements Service {
         break;
 
       case PunishmentType.Kick:
-        await user.kick(`[${moderator.username}#${moderator.discriminator} | Kick] ${reason ? encodeURIComponent(reason) : 'No reason was specified.'}`);
+        await user.kick(reason ? encodeURIComponent(reason) : 'No reason was specified.');
         break;
 
       case PunishmentType.Mute:
@@ -304,7 +320,7 @@ export default class PunishmentService implements Service {
         break;
 
       case PunishmentType.Unban:
-        await member.guild.unbanMember(member.id, `[${moderator.username}#${moderator.discriminator} | Unban] ${reason ? encodeURIComponent(reason) : 'No reason was specified.'}`);
+        await member.guild.unbanMember(member.id, reason ? encodeURIComponent(reason) : 'No reason was specified.');
         break;
 
       case PunishmentType.Unmute:
@@ -477,8 +493,8 @@ export default class PunishmentService implements Service {
       !modlog.permissionsOf(this.discord.client.user.id).has('embedLinks')
     ) return;
 
-    const embed = this.getModLogEmbed({ warningsRemoved, warningsAdded, moderator, channel, reason, victim, guild, time }).build();
-    const content = `**[** :question: **~** Case #**${caseModel.index}** (${type}) ]`;
+    const embed = this.getModLogEmbed(caseModel.index, { warningsRemoved, warningsAdded, moderator, channel, reason, victim, guild, time, type: stringifyDBType(caseModel.type)! }).build();
+    const content = `**[** ${emojis[type] ?? ':question:'} **~** Case #**${caseModel.index}** (${type}) ]`;
     const message = await modlog.createMessage({
       embed,
       content
@@ -490,12 +506,13 @@ export default class PunishmentService implements Service {
   editModLog(model: CaseEntity, message: Message) {
     return message.edit({
       content: message.content,
-      embed: this.getModLogEmbed({
+      embed: this.getModLogEmbed(model.index, {
         moderator: this.discord.client.users.get(model.moderatorID)!,
         victim: this.discord.client.users.get(model.victimID)!,
         reason: model.reason,
         guild: this.discord.client.guilds.get(model.guildID)!,
-        time: model.time
+        time: model.time,
+        type: stringifyDBType(model.type)!
       }).build()
     });
   }
@@ -537,22 +554,28 @@ export default class PunishmentService implements Service {
     return role.id;
   }
 
-  getModLogEmbed({
+  getModLogEmbed(caseID: number, {
     warningsRemoved,
     warningsAdded,
     moderator,
     channel,
     reason,
     victim,
-    time
-  }: Omit<PublishModLogOptions, 'type'>) {
+    time,
+    type
+  }: PublishModLogOptions) {
     const embed = new EmbedBuilder()
       .setColor(0xDAA2C6)
-      .setAuthor(`~ ${victim.username}#${victim.discriminator} (${victim.id}) ~`, undefined, victim.dynamicAvatarURL('png', 1024))
-      .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${moderator.id})`, false);
+      .setAuthor(`${victim.username}#${victim.discriminator} (${victim.id})`, undefined, victim.dynamicAvatarURL('png', 1024))
+      .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${moderator.id})`, true);
 
-    if (reason !== undefined)
-      embed.addField('• Reason', reason, true);
+    embed.setDescription([
+      reason !== undefined ? `**${reason}**` : '**No reason was specified**',
+      reason === undefined ? `• Use **\`reason ${caseID} <reason>\`** to update the reason` : '',
+      time === undefined && [PunishmentEntryType.VoiceDeaf, PunishmentEntryType.VoiceMute, PunishmentEntryType.Muted, PunishmentEntryType.Banned].includes(type)
+        ? `• Use **\`ut ${caseID} <time>\`** to update the time of this case.`
+        : ''
+    ]);
 
     if (warningsRemoved !== undefined)
       embed.addField(
@@ -568,7 +591,7 @@ export default class PunishmentService implements Service {
       embed.addField('• Voice Channel', `${channel.name} (${channel.id})`, true);
 
     if (time !== undefined)
-      embed.addField('• Time', ms(time), true);
+      embed.addField('• Time', ms(time, { long: true }), true);
 
     return embed;
   }
