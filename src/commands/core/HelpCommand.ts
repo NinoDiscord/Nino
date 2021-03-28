@@ -65,7 +65,7 @@ export default class HelpCommand extends Command {
     if (this.categories === undefined) {
       this.categories = {};
 
-      const commands = this.service.commands.filter(cmd => !cmd.ownerOnly || !cmd.hidden);
+      const commands = this.service.commands.filter(cmd => !cmd.ownerOnly);
       for (let i = 0; i < commands.length; i++) {
         const command = commands[i];
         (this.categories[command.category] ??= []).push(command);

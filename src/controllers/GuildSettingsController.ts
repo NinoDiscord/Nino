@@ -27,7 +27,7 @@ import GuildEntity from '../entities/GuildEntity';
 export default class GuildSettingsController {
   constructor(private database: Database) {}
 
-  private get repository() {
+  get repository() {
     return this.database.connection.getRepository(GuildEntity);
   }
 

@@ -105,28 +105,28 @@ export default class Locale {
     }
   }
 
-  private stringify(value: any, args?: { [x: string]: any } | any[]) {
+  private stringify(value: any, rawArgs?: { [x: string]: any } | any[]) {
     // If no arguments are provided, best to assume to return the string
-    if (!args)
+    if (!rawArgs)
       return value;
 
     // Convert it to a string
     if (typeof value !== 'string')
       value = String(value);
 
-    // Translate all ${} keys
-    let content = (value as string).replaceAll(KEY_REGEX, (_, key) => {
-      const value = String(args[key]);
-      if (value === '')
-        return '';
-      else
-        return value || '?';
-    });
-
-    // Translate all %s and %d calls
     let i = 0;
-    content = content.replaceAll(/%s|%d/g, (_, key) => args[i++]);
+    const regex = Array.isArray(rawArgs) ? /%s|%d/g : KEY_REGEX;
 
-    return content;
+    return (value as string).replace(regex, (_, key) => {
+      if (Array.isArray(rawArgs)) {
+        return rawArgs[i++];
+      } else {
+        const value = String(rawArgs[key]);
+        if (value === '')
+          return '';
+        else
+          return value || '?';
+      }
+    });
   }
 }

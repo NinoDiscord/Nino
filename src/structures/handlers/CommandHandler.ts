@@ -33,6 +33,8 @@ import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
 
+const FLAG_REGEX = /(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi;
+
 // hacky solution for:
 // "Property 'x' does not exist on type 'TextChannel | { id: string }'."
 export interface ErisMessage extends Message<TextChannel> {
@@ -84,7 +86,7 @@ export default class CommandHandler {
     if (prefix === undefined)
       return;
 
-    const rawArgs = msg.content.slice(prefix.length).trim().split(/ +/g);
+    let rawArgs = msg.content.slice(prefix.length).trim().split(/ +/g);
     const name = rawArgs.shift()!;
     const command = this.service.commands.find(command =>
       command.name === name || command.aliases.includes(name)
@@ -92,6 +94,34 @@ export default class CommandHandler {
 
     if (command === null)
       return;
+
+    // Check for if the guild is blacklisted
+    const guildBlacklist = await this.database.blacklists.get(msg.guildID);
+    if (guildBlacklist !== undefined) {
+      const issuer = this.discord.client.users.get(guildBlacklist.issuer);
+      await msg.channel.createMessage([
+        `:pencil2: **This guild is blacklisted by ${issuer?.username ?? 'Unknown User'}#${issuer?.discriminator ?? '0000'}**`,
+        `> ${guildBlacklist.reason ?? '*(no reason provided)*'}`,
+        '',
+        'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.',
+        'I will attempt to leave this guild, goodbye. :wave:'
+      ].join('\n'));
+
+      await msg.channel.guild.leave();
+      return;
+    }
+
+    // Check if the user is blacklisted
+    const userBlacklist = await this.database.blacklists.get(msg.author.id);
+    if (userBlacklist !== undefined) {
+      const issuer = this.discord.client.users.get(userBlacklist.issuer);
+      return msg.channel.createMessage([
+        `:pencil2: **You were blacklisted by ${issuer?.username ?? 'Unknown User'}#${issuer?.discriminator ?? '0000'}**`,
+        `> ${userBlacklist.reason ?? '*(no reason provided)*'}`,
+        '',
+        'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.'
+      ].join('\n'));
+    }
 
     const locale = this.localization.get(settings.language, userSettings.language);
     const message = new CommandMessage(msg, locale, settings, userSettings);
@@ -152,6 +182,12 @@ export default class CommandHandler {
       rawArgs.shift();
 
     message['_flags'] = this.parseFlags(rawArgs.join(' '));
+
+    // Santize command args
+    if (command.name !== 'eval') {
+      rawArgs = rawArgs.filter(arg => !FLAG_REGEX.test(arg));
+    }
+
     try {
       const executor = Reflect.get(command, methodName);
       if (typeof executor !== 'function')
@@ -196,7 +232,7 @@ export default class CommandHandler {
   // credit for regex: Ice <3
   private parseFlags(content: string): Record<string, string | true> {
     const record: Record<string, string | true> = {};
-    content.replaceAll(/(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi, (_, key: string, value: string) => {
+    content.replaceAll(FLAG_REGEX, (_, key: string, value: string) => {
       record[key.trim()] = value ? value.replaceAll(/(^[='"]+|['"]+$)/g, '').trim() : true;
       return value;
     });

@@ -76,7 +76,7 @@ export default class EvalCommand extends Command {
 
     stopwatch.start();
     try {
-      result = eval(isAsync ? `(async() => {${script}})();` : script);
+      result = eval(isAsync ? `(async()=>{${script}})()` : script);
 
       if (result instanceof Promise) result = await result;
       if (typeof result !== 'string')

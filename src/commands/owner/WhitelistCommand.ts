@@ -21,11 +21,11 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { BlacklistType } from '../../entities/BlacklistEntity';
 import { Categories } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
+import Config from '../../components/Config';
 
 export default class WhitelistCommand extends Command {
   @Inject
@@ -33,6 +33,9 @@ export default class WhitelistCommand extends Command {
 
   @Inject
   private discord!: Discord;
+
+  @Inject
+  private config!: Config;
 
   constructor() {
     super({
@@ -45,26 +48,30 @@ export default class WhitelistCommand extends Command {
     });
   }
 
-  async run(msg: CommandMessage, [type, id, ...reason]: ['guild' | 'user', string, ...string[]]) {
+  async run(msg: CommandMessage, [type, id]: ['guild' | 'user', string]) {
     if (!['guild', 'user'].includes(type))
       return msg.reply('Missing the type to blacklist. Available options: `user` and `guild`.');
 
     if (type === 'guild') {
-      const guild = this.discord.client.guilds.get(id);
-      if (!guild)
-        return msg.reply(`Guild **${id}** doesn't exist`);
+      const entry = await this.database.blacklists.get(id);
+      if (entry === undefined)
+        return msg.reply(`Guild **${id}** is already whitelisted`);
 
       await this.database.blacklists.delete(id);
-      return msg.reply(`:thumbsup: Whitelisted guild **${guild.name}** for *${reason ?? 'no reason provided'}*`);
+      return msg.reply(`:thumbsup: Whitelisted guild **${id}**.`);
     }
 
     if (type === 'user') {
-      const user = await this.discord.getUser(id);
-      if (user === null)
-        return msg.reply(`User ${id} doesn't exist.`);
+      const owners = this.config.getProperty('owners') ?? [];
+      if (owners.includes(id))
+        return msg.reply('Cannot whitelist a owner');
+
+      const entry = await this.database.blacklists.get(id);
+      if (entry === undefined)
+        return msg.reply(`User **${id}** is already whitelisted`);
 
       await this.database.blacklists.delete(id);
-      return msg.reply(`:thumbsup: Whitelisted user ${user.username}#${user.discriminator} for *${reason?.join(' ') ?? 'no reason, just felt like it.'}*`);
+      return msg.reply(`:thumbsup: Whitelisted user ${id}.`);
     }
   }
 }

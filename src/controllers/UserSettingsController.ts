@@ -27,7 +27,7 @@ import UserEntity from '../entities/UserEntity';
 export default class UserSettingsController {
   constructor(private database: Database) {}
 
-  private get repository() {
+  get repository() {
     return this.database.connection.getRepository(UserEntity);
   }
 

@@ -26,6 +26,7 @@ import { BlacklistType } from '../../entities/BlacklistEntity';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
+import Config from '../../components/Config';
 
 export default class BlacklistCommand extends Command {
   @Inject
@@ -33,6 +34,9 @@ export default class BlacklistCommand extends Command {
 
   @Inject
   private discord!: Discord;
+
+  @Inject
+  private config!: Config;
 
   constructor() {
     super({
@@ -68,6 +72,10 @@ export default class BlacklistCommand extends Command {
       if (!guild)
         return msg.reply(`Guild **${id}** doesn't exist`);
 
+      const entry = await this.database.blacklists.get(id);
+      if (entry !== undefined)
+        return msg.reply(`Guild **${guild.name}** is already on the blacklist.`);
+
       await this.database.blacklists.create({
         issuer: msg.author.id,
         reason: reason ? reason.join(' ') : undefined,
@@ -79,15 +87,23 @@ export default class BlacklistCommand extends Command {
     }
 
     if (type === 'user') {
+      const owners = this.config.getProperty('owners') ?? [];
       const user = await this.discord.getUser(id);
       if (user === null)
         return msg.reply(`User ${id} doesn't exist.`);
+
+      if (owners.includes(id))
+        return msg.reply('Cannot blacklist a owner');
+
+      const entry = await this.database.blacklists.get(user.id);
+      if (entry !== undefined)
+        return msg.reply(`User **${user.username}#${user.discriminator}** is already on the blacklist.`);
 
       await this.database.blacklists.create({
         issuer: msg.author.id,
         reason: reason ? reason.join(' ') : undefined,
         type: BlacklistType.User,
-        id
+        id: user.id
       });
 
       return msg.reply(`:thumbsup: Blacklisted user ${user.username}#${user.discriminator} for *${reason?.join(' ') ?? 'no reason, just felt like it.'}*`);
