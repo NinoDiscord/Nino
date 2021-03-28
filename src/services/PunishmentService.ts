@@ -505,7 +505,7 @@ export default class PunishmentService implements Service {
 
   editModLog(model: CaseEntity, message: Message) {
     return message.edit({
-      content: message.content,
+      content: `**[** ${emojis[stringifyDBType(model.type)!] ?? ':question:'} ~ Case #**${model.index}** (${stringifyDBType(model.type) ?? '... unknown ...'}) **]**`,
       embed: this.getModLogEmbed(model.index, {
         moderator: this.discord.client.users.get(model.moderatorID)!,
         victim: this.discord.client.users.get(model.victimID)!,
@@ -590,8 +590,13 @@ export default class PunishmentService implements Service {
     if (channel !== undefined)
       embed.addField('• Voice Channel', `${channel.name} (${channel.id})`, true);
 
-    if (time !== undefined)
-      embed.addField('• Time', ms(time, { long: true }), true);
+    if (time !== undefined || time !== null) {
+      try {
+        embed.addField('• Time', ms(time!, { long: true }), true);
+      } catch {
+        // ignore since fuck you
+      }
+    }
 
     return embed;
   }

@@ -25,6 +25,7 @@ import { HttpServer, middleware, Router } from '@augu/http';
 import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import { join } from 'path';
+import express from 'express';
 import Config from '../components/Config';
 
 interface RouterCtor {
@@ -54,6 +55,7 @@ export default class API implements Component {
       port: api.port
     });
 
+    this.server.app.use(express.json());
     this.server.app.use(middleware.headers());
     this.server.app.use(middleware.logging().bind(this.server));
 
