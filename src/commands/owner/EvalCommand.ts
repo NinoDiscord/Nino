@@ -78,7 +78,15 @@ export default class EvalCommand extends Command {
     try {
       result = eval(isAsync ? `(async()=>{${script}})()` : script);
 
-      if (result instanceof Promise) result = await result;
+      const time = stopwatch.end();
+      let asyncTimer: string | undefined = undefined;
+      if (result instanceof Promise) {
+        stopwatch.restart();
+        result = await result;
+
+        asyncTimer = stopwatch.end();
+      }
+
       if (typeof result !== 'string')
         result = inspect(result, {
           depth,
@@ -88,10 +96,9 @@ export default class EvalCommand extends Command {
       if (slient)
         return;
 
-      const time = stopwatch.end();
       const res = this.redact(result);
       return msg.reply([
-        `:timer: **${time}**`,
+        `:timer: **${asyncTimer !== undefined ? `${time}<${asyncTimer}>` : time}**`,
         '',
         '```js',
         res,

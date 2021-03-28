@@ -21,7 +21,7 @@
  */
 
 import { USER_MENTION_REGEX, USERNAME_DISCRIM_REGEX, ID_REGEX, CHANNEL_REGEX, ROLE_REGEX } from '../util/Constants';
-import { Client, User, Guild, AnyChannel } from 'eris';
+import { Client, Role, Guild, AnyChannel } from 'eris';
 import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import Config from './Config';
@@ -122,32 +122,51 @@ export default class Discord implements Component {
     return null;
   }
 
-  getChannel(query: string, guild?: Guild) {
-    return new Promise<AnyChannel | null>(resolve => {
+  getChannel<T extends AnyChannel = AnyChannel>(query: string, guild?: Guild) {
+    return new Promise<T | null>(resolve => {
       if (ID_REGEX.test(query)) {
+        query = query.replace('<#', '').replace('>', '');
         if (guild) {
-          return resolve(guild.channels.has(query) ? guild.channels.get(query)! : null);
+          return resolve(guild.channels.has(query) ? guild.channels.get(query)! as T : null);
         } else {
           const channel = query in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[query])?.channels.get(query);
-          return resolve(channel || null);
+          return resolve(channel as T || null);
         }
       }
 
       if (CHANNEL_REGEX.test(query)) {
         const match = query.match(CHANNEL_REGEX)!;
         if (guild) {
-          return resolve(guild.channels.has(match[1]) ? guild.channels.get(match[1])! : null);
+          return resolve(guild.channels.has(match[1]) ? guild.channels.get(match[1])! as T : null);
         } else {
           const channel = match[1] in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[match[1]])?.channels.get(match[1]);
-          return resolve(channel || null);
+          return resolve(channel as T || null);
         }
       }
 
       if (guild !== undefined) {
         const channels = guild.channels.filter(chan => chan.name.toLowerCase().includes(query.toLowerCase()));
-        if (channels.length > 0)
-          return resolve(channels[0]);
+        if (channels.length > 0) {
+          return resolve(channels[0] as T);
+        }
       }
+
+      resolve(null);
+    });
+  }
+
+  getRole(query: string, guild: Guild) {
+    return new Promise<Role | null>(resolve => {
+      if (ROLE_REGEX.test(query)) {
+        const match = query.match(ROLE_REGEX)!;
+        const role = guild.roles.get(match[1]);
+
+        if (role !== undefined)
+          return resolve(role);
+      }
+
+      if (ID_REGEX.test(query))
+        return resolve(guild.roles.has(query) ? guild.roles.get(query)! : null);
 
       resolve(null);
     });

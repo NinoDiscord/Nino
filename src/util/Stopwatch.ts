@@ -22,24 +22,22 @@
 
 import { performance } from 'perf_hooks';
 
-/** Represents the current state of the [Stopwatch] */
-enum State {
-  Started,
-  Stopped,
-  Unknown
-}
-
 /**
  * Utility stopwatch for calculating duration on asynchronous execution
  */
 export default class Stopwatch {
-  public startTime?: number;
-  public state: State = State.Unknown;
+  private startTime?: number;
+  private endTime?: number;
 
   private symbolOf(type: number) {
     if (type > 1000) return `${type.toFixed(1)}s`;
     if (type > 1) return `${type.toFixed(1)}ms`;
     return `${type.toFixed(1)}µs`;
+  }
+
+  restart() {
+    this.startTime = performance.now();
+    this.endTime = undefined;
   }
 
   start() {
@@ -53,7 +51,7 @@ export default class Stopwatch {
     if (!this.startTime)
       throw new TypeError('Stopwatch has not started');
 
-    const endTime = performance.now();
-    return this.symbolOf(endTime - this.startTime);
+    this.endTime = performance.now();
+    return this.symbolOf(this.endTime - this.startTime);
   }
 }
