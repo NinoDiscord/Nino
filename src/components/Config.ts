@@ -22,8 +22,11 @@
 
 /* eslint-disable camelcase */
 
-import { Component } from '@augu/lilith';
+import { writeFileSync, existsSync } from 'fs';
+import { Component, Inject } from '@augu/lilith';
+import { randomBytes } from 'crypto';
 import { readFile } from 'fs/promises';
+import { Logger } from 'tslog';
 import { join } from 'path';
 import yaml from 'js-yaml';
 
@@ -42,6 +45,7 @@ interface Configuration {
   redis: RedisConfig;
   token: string;
   k8s?: KubernetesConfig;
+  api?: APIConfig;
 }
 
 interface BotlistConfig {
@@ -74,6 +78,11 @@ interface KubernetesConfig {
   namespace: string;
 }
 
+interface APIConfig {
+  secret: string;
+  port: number;
+}
+
 // eslint-disable-next-line
 interface RedisSentinelConfig extends Pick<RedisConfig, 'host' | 'port'> {}
 
@@ -82,7 +91,28 @@ export default class Config implements Component {
   public priority: number = 0;
   public name: string = 'Config';
 
+  @Inject
+  private logger!: Logger;
+
   async load() {
+    if (!existsSync(join(__dirname, '..', '..', 'config.yml'))) {
+      const config = yaml.dump({
+        runPendingMigrations: true,
+        defaultLocale: 'en_US',
+        environment: 'production',
+        prefixes: ['!'],
+        owners: [],
+        token: '-- replace me --'
+      }, {
+        indent: 2,
+        noArrayIndent: false
+      });
+
+      writeFileSync(join(__dirname, '..', '..', 'config.yml'), config);
+      return Promise.reject(new SyntaxError('Weird, you didn\'t have a configuration file... So, I may have provided you a default one, if you don\'t mind... >W<'));
+    }
+
+    this.logger.info('Loading configuration...');
     const contents = await readFile(join(__dirname, '..', '..', 'config.yml'), 'utf8');
     const config = yaml.load(contents) as unknown as Configuration;
 
@@ -98,8 +128,21 @@ export default class Config implements Component {
       ksoft: config.ksoft,
       redis: config.redis,
       token: config.token,
-      k8s: config.k8s
+      k8s: config.k8s,
+      api: config.api
     };
+
+    if (this.config.token === '-- replace me --')
+      return Promise.reject(new TypeError('Restore `token` in config with your discord bot token.'));
+
+    if (this.config.api !== undefined && this.config.api.secret === undefined) {
+      this.config.api.secret = randomBytes(32).toString('hex');
+
+      const config = yaml.dump(this.config, { indent: 2, noArrayIndent: false });
+      writeFileSync(join(__dirname, '..', '..', 'config.yml'), config);
+
+      this.logger.warn('API secret was missing so I did it myself and is saved in your configuration file.');
+    }
 
     // resolve the promise
     return Promise.resolve();
@@ -110,6 +153,7 @@ export default class Config implements Component {
   getProperty<K extends keyof BotlistConfig>(key: `botlists.${K}`): BotlistConfig[K] | undefined;
   getProperty<K extends keyof RedisConfig>(key: `redis.${K}`): RedisConfig[K] | undefined;
   getProperty<K extends keyof KubernetesConfig>(key: `k8s.${K}`): KubernetesConfig[K] | undefined;
+  getProperty<K extends keyof APIConfig>(key: `api.${K}`): APIConfig[K] | undefined;
   getProperty(key: string) {
     const nodes = key.split('.');
     let value: any = this.config;

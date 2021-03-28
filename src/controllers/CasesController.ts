@@ -60,7 +60,7 @@ export default class CasesController {
     type
   }: CreateCaseOptions) {
     const cases = await this.getAll(guildID);
-    const index = cases[cases.length - 1].index + 1;
+    const index = (cases[cases.length - 1].index ?? 0) + 1;
 
     const entry = new CaseEntity();
     entry.moderatorID = moderatorID;

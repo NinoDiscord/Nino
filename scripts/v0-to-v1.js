@@ -41,7 +41,9 @@ const logger = new LoggerWithoutCallSite({
   exposeErrorCodeFrame: true,
   displayInstanceName: true,
   displayFilePath: false,
-  instanceName: 'script: v0 -> v1'
+  dateTimePattern: '[ day-month-year / hour:minute:second ]',
+  instanceName: 'script: v0 -> v1',
+  name: 'scripts'
 });
 
 const getFlags = (content) => {
@@ -194,7 +196,6 @@ const startTimer = process.hrtime();
     const caseDocs = await cases.find({}).toArray();
 
     for (const c of caseDocs) {
-      //console.log(c.id);
       const entry = new CaseEntity();
 
       entry.moderatorID = c.moderator;

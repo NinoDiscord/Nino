@@ -20,11 +20,19 @@
  * SOFTWARE.
  */
 
+import { ConstructorReturnType, Ctor, firstUpper, readdirSync } from '@augu/utils';
+import { HttpServer, middleware, Router } from '@augu/http';
 import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
+import { join } from 'path';
 import Config from '../components/Config';
 
+interface RouterCtor {
+  default: ConstructorReturnType<Ctor<Router>>;
+}
+
 export default class API implements Component {
+  private server!: HttpServer;
   public priority: number = 2;
   public name: string = 'API';
 
@@ -35,6 +43,42 @@ export default class API implements Component {
   private config!: Config;
 
   async load() {
-    // noop
+    const api = this.config.getProperty('api');
+    if (api === undefined) {
+      this.logger.info('API is not gonna be enabled.');
+      return Promise.resolve(); // resolve the promise idfk
+    }
+
+    this.logger.info('Now launching API...');
+    this.server = new HttpServer({
+      port: api.port
+    });
+
+    this.server.app.use(middleware.headers());
+    this.server.app.use(middleware.logging().bind(this.server));
+
+    const routers = readdirSync(join(process.cwd(), 'api', 'routers'));
+    for (let i = 0; i < routers.length; i++) {
+      const path = routers[i];
+      const ctor: RouterCtor = await import(path);
+
+      this.server.router(ctor.default);
+    }
+
+    this.server.on('listening', (networks) =>
+      this.logger.info('API service is now listening on the following URLs:\n', networks.map(network => `• ${firstUpper(network.type)} | ${network.host}`).join('\n'))
+    );
+
+    this.server.on('request', (props) =>
+      this.logger.debug(`API: ${props.method} ${props.path} (${props.status}) | ${props.time}ms`)
+    );
+
+    this.server.on('debug', message => this.logger.debug(`API: ${message}`));
+    this.server.on('error', error => this.logger.fatal(error));
+    return this.server.start();
+  }
+
+  dispose() {
+    return this.server.close();
   }
 }

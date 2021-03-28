@@ -40,7 +40,7 @@ export default class CaseEntity {
   @Column({ nullable: true, default: undefined })
   public reason?: string;
 
-  @Column()
+  @PrimaryColumn()
   public index!: number;
 
   @Column({

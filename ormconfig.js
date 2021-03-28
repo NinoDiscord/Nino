@@ -24,7 +24,7 @@ module.exports = {
   password: config.DATABASE_PASSWORD,
   entities: ['./build/entities/*.js'],
   database: config.DATABASE_NAME,
-  logging: config.NODE_ENV === 'production',
+  logging: false, // enable this when the deprecated message is gone
   type: 'postgres',
   host: config.DATABASE_HOST,
   port: config.DATABASE_PORT,

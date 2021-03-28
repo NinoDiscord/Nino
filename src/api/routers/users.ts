@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
-import Router, { Route } from '../Router';
+import { Router } from '@augu/http';
+const router = new Router('/users');
 
-export default class UsersRouter extends Router {}
+export default router;

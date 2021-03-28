@@ -24,9 +24,9 @@
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
 import { Color, version, commitHash } from '../../util/Constants';
+import { firstUpper, humanize } from '@augu/utils';
 import CommandService from '../../services/CommandService';
 import { formatSize } from '../../util';
-import { firstUpper, humanize } from '@augu/utils';
 import Kubernetes from '../../components/Kubernetes';
 import { Inject } from '@augu/lilith';
 import Stopwatch from '../../util/Stopwatch';

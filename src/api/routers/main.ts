@@ -20,6 +20,38 @@
  * SOFTWARE.
  */
 
-import Router, { Route } from '../Router';
+import { Router } from '@augu/http';
+import Database from '../../components/Database';
+import Discord from '../../components/Discord';
+import Redis from '../../components/Redis';
+import app from '../../container';
 
-export default class MainRouter extends Router {}
+const router = new Router('/');
+const statuses = {
+  disconnected: 'Disconnected',
+  handshaking: 'Connecting',
+  connecting: 'Connecting',
+  resuming: 'Resuming',
+  ready: 'Ready'
+};
+
+// You're not allowed here!
+router.get('/', (_, res) => res.redirect('https://nino.floofy.dev'));
+
+// Health checks
+router.get('/health', (_, res) => {
+  const database: Database = app.$ref<any>(Database);
+  const discord: Discord = app.$ref<any>(Discord);
+  const redis: Redis = app.$ref<any>(Redis);
+
+  return res.status(200).json({
+    database: database.connection.isConnected,
+    shards: discord.client.shards.map(shard => ({
+      [shard.id]: statuses[shard.status]
+    })),
+    redis: redis.client.status === 'ready',
+    bot: discord.client.startTime > 0
+  });
+});
+
+export default router;

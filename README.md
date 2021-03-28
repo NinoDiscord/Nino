@@ -3,6 +3,34 @@
 >
 > [Website](https://nino.floofy.dev) **|** [Support](https://discord.gg/JjHGR6vhcG) **|** [Invite Me!](https://discord.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
 
+## Checklist
+- Commands
+  - [] Moderation
+  - [x] Core
+  - [x] Owner
+  - [] Settings
+
+- Core
+  - [x] Commands
+  - [x] Listeners
+  - [x] Punishments
+  - [x] Localization
+  - [x] Database
+  - [x] Redis
+  - [x] Sentry
+
+- Automod
+  - [] Dehoisting
+  - [] Blacklist
+  - [] Mentions
+  - [] Invites
+  - [] Raid
+  - [] Spam
+
+- [] Frontend
+- [] Timeouts
+- [] API
+
 ## Features
 - Auto Moderation: **Prevents raids, spam, ads, and much more!**
 - Advanced warning system and automated punishments: **Automically punish who commit offenses!**

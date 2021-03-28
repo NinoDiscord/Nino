@@ -58,7 +58,8 @@ export default class Database implements Component {
   public users!: UserSettingsController;
   public name: string = 'Database';
 
-  private logger: Logger = new Logger();
+  @Inject
+  private logger!: Logger;
 
   @Inject
   private config!: Config;
