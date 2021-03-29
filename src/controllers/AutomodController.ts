@@ -31,12 +31,8 @@ export default class AutomodController {
     return this.database.connection.getRepository(AutomodEntity);
   }
 
-  async get(guildID: string) {
-    const entry = await this.repository.findOne({ guildID });
-    if (entry === undefined)
-      return this.create(guildID);
-
-    return entry;
+  get(guildID: string) {
+    return this.repository.findOne({ guildID });
   }
 
   create(guildID: string) {

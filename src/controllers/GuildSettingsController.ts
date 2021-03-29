@@ -31,9 +31,11 @@ export default class GuildSettingsController {
     return this.database.connection.getRepository(GuildEntity);
   }
 
-  async get(id: string) {
+  get(id: string, create?: true): Promise<GuildEntity>;
+  get(id: string, create?: false): Promise<GuildEntity | undefined>;
+  async get(id: string, create: boolean = true) {
     const settings = await this.repository.findOne({ guildID: id });
-    if (settings === undefined) {
+    if (settings === undefined && create) {
       const entry = new GuildEntity();
       entry.prefixes = [];
       entry.language = 'en_US';
