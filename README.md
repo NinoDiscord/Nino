@@ -1,7 +1,5 @@
 # Nino
 > :hammer: **Advanced and cute moderation discord bot as an entry of Discord's Hack Week!**
->
-> [Website](https://nino.floofy.dev) **|** [Support](https://discord.gg/JjHGR6vhcG) **|** [Invite Me!](https://discord.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
 
 ## Checklist
 - Commands
@@ -45,6 +43,11 @@
 - Advanced warning system and automated punishments: **Automically punish who commit offenses!**
 - and much more!
 
+## Support
+Need support related to Nino? Join in the **Noelware** Discord server in #support under the **Nino** category
+
+![Discord Embed uwu]()
+
 ## Contributing
 View our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/CODE_OF_CONDUCT.md).
 
@@ -62,14 +65,14 @@ Before running your own instance of Nino, you will need the following tools:
 
 If you're moving from v0 to v1, you will need your MongoDB instance before to port the database!
 
-There is tools that are optional but are recommended in most cases!
+There is tools that are optional but are mostly recommended in some cases:
 
 - [Sentry](https://sentry.io)
 - [Docker](https://docker.com)
 - [Git](https://git-scm.com)
 
 ### Setting up
-There are 2 ways to setup Nino, the normal way and the Docker way. The Docker way is generally used with the public instances of Nino but not recommended for smaller instances, so that's why the normal way exists!
+There are 2 ways to setup Nino. Using Docker or just doing shit yourself.
 
 ### Docker
 This step isn't finished due to the rewrite not being stable.
@@ -94,9 +97,9 @@ redis:
 ```
 
 ## Maintainers
-* Rodentman87#8787 (Frontend Developer) ([GitHub](https://github.com/Rodentman87))
-* August#5820 (Project Lead) ([GitHub](https://github.com/auguwu))
 * Ice#4710 (DevOps, Developer) ([GitHub](https://github.com/IceeMC))
+* Rodentman87#8787 (Frontend Developer) ([GitHub](https://github.com/Rodentman87))
+* August#5820 (Project Lead, Developer) ([GitHub](https://github.com/auguwu))
 
 ## Hackweek Participants
 * Chris ([GitHub](https://github.com/auguwu))
