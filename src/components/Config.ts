@@ -34,6 +34,7 @@ const NOT_FOUND_SYMBOL = Symbol.for('$nino::config::not.found');
 
 interface Configuration {
   runPendingMigrations?: boolean;
+  prometheusPort?: number;
   defaultLocale?: string;
   environment: 'development' | 'production';
   sentryDsn?: string;
@@ -118,6 +119,7 @@ export default class Config implements Component {
 
     this.config = {
       runPendingMigrations: config.runPendingMigrations ?? false,
+      prometheusPort: config.prometheusPort,
       defaultLocale: config.defaultLocale ?? 'en_US',
       environment: config.environment ?? 'production',
       sentryDsn: config.sentryDsn,
