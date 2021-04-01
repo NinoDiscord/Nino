@@ -46,7 +46,7 @@
 ## Support
 Need support related to Nino? Join in the **Noelware** Discord server in #support under the **Nino** category
 
-![Discord Embed uwu]()
+[![discord embed owo](https://discord.com/api/v8/guilds/824066105102303232/widget.png?style=banner3)](https://discord.gg/ATmjFH9kMH)
 
 ## Contributing
 View our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/CODE_OF_CONDUCT.md).
