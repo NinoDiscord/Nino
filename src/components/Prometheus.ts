@@ -27,6 +27,8 @@ import Config from './Config';
 import prom from 'prom-client';
 
 export default class Prometheus implements Component {
+  public commandsExecuted!: prom.Gauge<string>;
+  public messagesSeen!: prom.Gauge<string>;
   public priority: number = 1;
   public name: string = 'Prometheus';
   #server!: ReturnType<typeof createServer>; // yes
@@ -43,6 +45,17 @@ export default class Prometheus implements Component {
       this.logger.warn('Prometheus will not be available! This is not recommended for private instances unless you want analytics.');
       return Promise.resolve();
     }
+
+    prom.collectDefaultMetrics();
+    this.commandsExecuted = new prom.Gauge({
+      name: 'nino_commands_executed',
+      help: 'How many commands Nino has executed successfully'
+    });
+
+    this.messagesSeen = new prom.Gauge({
+      name: 'nino_messages_seen',
+      help: 'How many messages Nino has seen throughout the process lifespan'
+    });
 
     this.#server = createServer(this.onRequest.bind(this));
     this.#server.once('listening', () => this.logger.info(`Prometheus: Listening at http://localhost:${port}`));
