@@ -30,9 +30,11 @@
 - Logging
   - [] Message Delete
   - [] Message Update
-  - [] Voice Joined
-  - [] Voice Switch
-  - [] Voice Left
+  - [x] Voice Joined
+  - [x] Voice Switch
+  - [x] Voice Left
+  - [x] User Banned
+  - [x] User Unbanned
 
 - [] Frontend
 - [] Timeouts

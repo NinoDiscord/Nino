@@ -27,8 +27,7 @@ export enum LoggingEvents {
   VoiceChannelLeft = 'voice_channel_left',
   VoiceChannelJoin = 'voice_channel_join',
   MessageDeleted = 'message_delete',
-  MessageUpdated = 'message_update',
-  SettingUpdated = 'settings_update'
+  MessageUpdated = 'message_update'
 }
 
 @Entity({ name: 'logging' })
