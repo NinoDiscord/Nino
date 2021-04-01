@@ -27,8 +27,9 @@ import Config from './Config';
 import prom from 'prom-client';
 
 export default class Prometheus implements Component {
-  public commandsExecuted!: prom.Gauge<string>;
-  public messagesSeen!: prom.Gauge<string>;
+  public commandsExecuted!: prom.Counter<string>;
+  public messagesSeen!: prom.Counter<string>;
+  public rawWSEvents!: prom.Counter<string>;
   public priority: number = 1;
   public name: string = 'Prometheus';
   #server!: ReturnType<typeof createServer>; // yes
@@ -47,14 +48,21 @@ export default class Prometheus implements Component {
     }
 
     prom.collectDefaultMetrics();
-    this.commandsExecuted = new prom.Gauge({
+    this.commandsExecuted = new prom.Counter({
+      labelNames: ['command'],
       name: 'nino_commands_executed',
       help: 'How many commands Nino has executed successfully'
     });
 
-    this.messagesSeen = new prom.Gauge({
+    this.messagesSeen = new prom.Counter({
       name: 'nino_messages_seen',
       help: 'How many messages Nino has seen throughout the process lifespan'
+    });
+
+    this.rawWSEvents = new prom.Counter({
+      labelNames: ['event'],
+      name: 'nino_discord_websocket_events',
+      help: 'Received WebSocket events from Discord and what they were'
     });
 
     this.#server = createServer(this.onRequest.bind(this));

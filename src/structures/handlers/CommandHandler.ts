@@ -27,6 +27,7 @@ import { NotInjectable, Inject } from '@augu/lilith'
 import type CommandService from '../../services/CommandService';
 import { Collection } from '@augu/collections';
 import CommandMessage from '../CommandMessage';
+import Prometheus from '../../components/Prometheus';
 import Subcommand from '../Subcommand';
 import { Logger } from 'tslog';
 import Database from '../../components/Database';
@@ -49,6 +50,9 @@ export default class CommandHandler {
   private localization!: LocalizationService;
 
   @Inject
+  private prometheus!: Prometheus;
+
+  @Inject
   private database!: Database;
 
   @Inject
@@ -69,6 +73,7 @@ export default class CommandHandler {
   }
 
   async handleCommand(msg: ErisMessage) {
+    this.prometheus.messagesSeen?.inc();
     this.service.messagesSeen++;
 
     if (msg.author.bot) return;
@@ -193,6 +198,7 @@ export default class CommandHandler {
       if (typeof executor !== 'function')
         throw new SyntaxError(`${subcommand ? 'Subc' : 'C'}ommand "${subcommand ? methodName : command.name}" was not a function.`);
 
+      this.prometheus.commandsExecuted?.labels(command.name).inc();
       this.service.commandsExecuted++;
       await executor.call(command, message, rawArgs);
       this.logger.info(`Command "${command.name}" has been ran by ${msg.author.username}#${msg.author.discriminator} in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
