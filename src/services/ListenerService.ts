@@ -20,13 +20,14 @@
  * SOFTWARE.
  */
 
+import { Service, Inject, getInjectables } from '@augu/lilith';
 import { getSubscriptionsIn } from '../structures/decorators/Subscribe';
 import { readdirSync, Ctor } from '@augu/utils';
-import { Service, Inject } from '@augu/lilith';
 import { Collection } from '@augu/collections';
 import { Logger } from 'tslog';
 import { join } from 'path';
 import Discord from '../components/Discord';
+import app from '../container';
 
 export default class ListenerService implements Service {
   public events: Collection<string, any> = new Collection();
@@ -47,6 +48,8 @@ export default class ListenerService implements Service {
       const ctor: Ctor<any> = await import(file);
       const listener = new ctor.default!();
 
+      app.inject(getInjectables(listener), listener);
+
       const subscriptions = getSubscriptionsIn(listener);
       for (const sub of subscriptions) {
         const handler = sub.run.bind(listener);
@@ -59,8 +62,8 @@ export default class ListenerService implements Service {
         });
       }
 
-      this.events.set(listener.constructor.name.replace(/Listener/gi, '').trim().toLowerCase(), listener);
-      this.logger.info(`Initialized ${subscriptions.length} events! (${subscriptions.map(r => r.event).join(', ')})`);
+      this.events.set(listener.constructor.name.replace('Guild', '').replace('Listener', '').trim().toLowerCase(), listener);
+      this.logger.info(`Initialized ${subscriptions.length} events on listener (${subscriptions.map(r => r.event).join(', ')})`);
     }
   }
 }

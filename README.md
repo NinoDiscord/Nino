@@ -27,6 +27,13 @@
   - [] Raid
   - [] Spam
 
+- Logging
+  - [] Message Delete
+  - [] Message Update
+  - [] Voice Joined
+  - [] Voice Switch
+  - [] Voice Left
+
 - [] Frontend
 - [] Timeouts
 - [] API

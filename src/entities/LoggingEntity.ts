@@ -23,6 +23,9 @@
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 export enum LoggingEvents {
+  VoiceChannelSwitch = 'voice_channel_switch',
+  VoiceChannelLeft = 'voice_channel_left',
+  VoiceChannelJoin = 'voice_channel_join',
   MessageDeleted = 'message_delete',
   MessageUpdated = 'message_update',
   SettingUpdated = 'settings_update'

@@ -21,7 +21,7 @@
  */
 
 import { USER_MENTION_REGEX, USERNAME_DISCRIM_REGEX, ID_REGEX, CHANNEL_REGEX, ROLE_REGEX } from '../util/Constants';
-import { Client, Role, Guild, AnyChannel } from 'eris';
+import { Client, Role, Guild, AnyChannel, Emoji } from 'eris';
 import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import Config from './Config';
@@ -30,6 +30,7 @@ export default class Discord implements Component {
   public mentionRegex!: RegExp;
   public priority: number = 1;
   public client!: Client;
+  public emojis!: Emoji[];
   public name: string = 'Discord';
 
   @Inject
@@ -59,7 +60,8 @@ export default class Discord implements Component {
         'guilds',
         'guildBans',
         'guildMembers',
-        'guildMessages'
+        'guildMessages',
+        'guildVoiceStates'
       ]
     });
 
@@ -68,6 +70,7 @@ export default class Discord implements Component {
       this.logger.info(`Guilds: ${this.client.guilds.size.toLocaleString()} | Users: ${this.client.users.size.toLocaleString()}`);
 
       this.mentionRegex = new RegExp(`^<@!?${this.client.user.id}> `);
+      this.emojis = this.client.guilds.map(guild => guild.emojis).reduce((acc, curr) => acc.concat(curr), []);
 
       const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
       this.client.editStatus('online', {

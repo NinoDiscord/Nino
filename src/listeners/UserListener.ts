@@ -23,4 +23,4 @@
 import { Inject } from '@augu/lilith';
 import Subscribe from '../structures/decorators/Subscribe';
 
-export default class GuildMemberListener {}
+export default class UserListener {}
