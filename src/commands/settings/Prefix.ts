@@ -52,6 +52,7 @@ export default class PrefixCommand extends Command {
         'prefix remove 1 --user'
       ],
       aliases: ['prefixes'],
+      usage: '[prefix] [--user]',
       name: 'prefix'
     });
   }

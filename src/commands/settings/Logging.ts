@@ -37,23 +37,35 @@ export default class ModLogCommand extends Command {
   constructor() {
     super({
       userPermissions: ['manageGuild'],
-      description: 'descriptions.modlog',
+      description: 'descriptions.logging',
       category: Categories.Settings,
       examples: [
-        'modlog',
-        'modlog reset',
-        'modlog <#236987412589632587>'
+        'logging | Enable / Disable the feature',
+        'logging reset | Reset the mod log channel',
+        'logging events | Enable all logging events',
+        'logging event message.update | Enable a specific event',
+        'logging <#236987412589632587> | Specify a logs channel',
+        'logging ignore <#5246968653214587563> | Ignores a channel from displaying logs',
+        'logging ignore '
       ],
-      aliases: ['set-modlog'],
-      usage: '[channel]',
-      name: 'modlog'
+      aliases: ['logs'],
+      usage: '[channelID]',
+      name: 'logging'
     });
   }
 
   async run(msg: CommandMessage, [channel]: [string]) {
     if (!channel) {
-      const chan = msg.settings.modlogChannelID !== null ? await this.discord.getChannel<TextChannel>(msg.settings.modlogChannelID!, msg.guild) : null;
-      return msg.reply(chan === null ? 'No mod-log has been set.' : `Mod Logs are set in **#${chan.name}**`);
+      const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
+      const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
+      const settings = await this.database.logging.get(msg.guild.id);
+      const type = !settings.enabled;
+
+      const result = await this.database.logging.update(msg.guild.id, {
+        enabled: type
+      });
+
+      return msg.reply(result.affected === 1 ? checkmark : xmark);
     }
 
     const chan = await this.discord.getChannel<TextChannel>(channel, msg.guild);
@@ -67,22 +79,28 @@ export default class ModLogCommand extends Command {
     if (!perms.has('sendMessages') || !perms.has('readMessages') || !perms.has('embedLinks'))
       return msg.reply(`I am missing the following permissions: **Send Messages**, **Read Messages**, and **Embed Links** in #${chan.name}.`);
 
-    await this.database.guilds.update(msg.guild.id, {
-      modlogChannelID: chan.id
+    await this.database.logging.update(msg.guild.id, {
+      channelID: chan.id
     });
 
-    return msg.reply(`Mod Logs are now set in #${chan.name}!`);
+    return msg.reply(`Logs will be shown in #${chan.name}!`);
   }
 
   @Subcommand()
   async reset(msg: CommandMessage) {
-    if (!msg.settings.modlogChannelID)
+    const settings = await this.database.logging.get(msg.guild.id);
+    if (!settings.channelID)
       return msg.reply('No mod logs channel has been set.');
 
-    await this.database.guilds.update(msg.guild.id, {
-      modlogChannelID: undefined
+    await this.database.logging.update(msg.guild.id, {
+      channelID: undefined
     });
 
     return msg.reply('Resetted the mod log successfully.');
+  }
+
+  @Subcommand('<event>')
+  async event(msg: CommandMessage, [event]: string) {
+    // todo: this
   }
 }

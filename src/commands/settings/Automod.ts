@@ -22,7 +22,6 @@
 
 import { Command, CommandMessage, Subcommand, EmbedBuilder } from '../../structures';
 import { Categories, Color } from '../../util/Constants';
-import { getQuotedStrings } from '../../util';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 
@@ -52,24 +51,24 @@ export default class AutomodCommand extends Command {
     const embed = new EmbedBuilder()
       .setColor(Color)
       .setDescription([
-        `• ${settings!.blacklist ? checkmark : xmark} **Blacklist Words** (${msg.settings.prefixes[0]}automod blacklist)`,
-        `• ${settings!.mentions ? checkmark : xmark} **Mentions** (${msg.settings.prefixes[0]}automod mentions)`,
-        `• ${settings!.dehoist ? checkmark : xmark} **Dehoisting** (${msg.settings.prefixes[0]}automod dehoisting)`,
-        `• ${settings!.invites ? checkmark : xmark} **Invites** (${msg.settings.prefixes[0]}automod invites)`,
-        `• ${settings!.raid ? checkmark : xmark} **Raids** (${msg.settings.prefixes[0]}automod raid)`,
-        `• ${settings!.spam ? checkmark : xmark} **Spam** (${msg.settings.prefixes[0]}automod spam)`
+        `• ${settings!.blacklist ? checkmark : xmark} **Blacklist Words** (\`${msg.settings.prefixes[0]}automod blacklist\`)`,
+        `• ${settings!.mentions ? checkmark : xmark} **Mentions** (\`${msg.settings.prefixes[0]}automod mentions\`)`,
+        `• ${settings!.dehoist ? checkmark : xmark} **Dehoisting** (\`${msg.settings.prefixes[0]}automod dehoist\`)`,
+        `• ${settings!.invites ? checkmark : xmark} **Invites** (\`${msg.settings.prefixes[0]}automod invites\`)`,
+        `• ${settings!.raid ? checkmark : xmark} **Raids** (\`${msg.settings.prefixes[0]}automod raid\`)`,
+        `• ${settings!.spam ? checkmark : xmark} **Spam** (\`${msg.settings.prefixes[0]}automod spam\`)`
       ]);
 
     return msg.reply(embed);
   }
 
-  @Subcommand()
+  @Subcommand('[...words]')
   async blacklist(msg: CommandMessage, [...words]: [...string[]]) {
     const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
+    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.automod.get(msg.guild.id);
 
     if (!words.length) {
-      const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
       const type = !settings!.blacklist;
 
       await this.database.automod.update(msg.guild.id, { blacklist: type });
@@ -77,10 +76,70 @@ export default class AutomodCommand extends Command {
     }
 
     const curr = settings!.blacklistWords.concat(words);
-    await this.database.automod.update(msg.guild.id, {
+    const result = await this.database.automod.update(msg.guild.id, {
       blacklistWords: curr
     });
 
-    return msg.reply(checkmark);
+    return msg.reply(result.affected === 1 ? checkmark : xmark);
+  }
+
+  @Subcommand()
+  async mentions(msg: CommandMessage) {
+    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
+    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
+    const settings = await this.database.automod.get(msg.guild.id);
+    const result = await this.database.automod.update(msg.guild.id, {
+      mentions: !settings!.mentions
+    });
+
+    return msg.reply(result.affected === 1 ? checkmark : xmark);
+  }
+
+  @Subcommand()
+  async invites(msg: CommandMessage) {
+    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
+    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
+    const settings = await this.database.automod.get(msg.guild.id);
+    const result = await this.database.automod.update(msg.guild.id, {
+      invites: !settings!.invites
+    });
+
+    return msg.reply(result.affected === 1 ? checkmark : xmark);
+  }
+
+  @Subcommand()
+  async dehoist(msg: CommandMessage) {
+    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
+    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
+    const settings = await this.database.automod.get(msg.guild.id);
+    const result = await this.database.automod.update(msg.guild.id, {
+      dehoist: !settings!.dehoist
+    });
+
+    return msg.reply(result.affected === 1 ? checkmark : xmark);
+  }
+
+  @Subcommand()
+  async spam(msg: CommandMessage) {
+    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
+    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
+    const settings = await this.database.automod.get(msg.guild.id);
+    const result = await this.database.automod.update(msg.guild.id, {
+      spam: !settings!.spam
+    });
+
+    return msg.reply(result.affected === 1 ? checkmark : xmark);
+  }
+
+  @Subcommand()
+  async raid(msg: CommandMessage) {
+    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
+    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
+    const settings = await this.database.automod.get(msg.guild.id);
+    const result = await this.database.automod.update(msg.guild.id, {
+      raid: !settings!.raid
+    });
+
+    return msg.reply(result.affected === 1 ? checkmark : xmark);
   }
 }
