@@ -41,7 +41,6 @@
 ## Features
 - Auto Moderation: **Prevents raids, spam, ads, and much more!**
 - Advanced warning system and automated punishments: **Automically punish who commit offenses!**
-- Prevent Toxicity: **Wanting to prevent toxicity spreading from your user-base? Nino has the ability to detect using [Perspective](https://perspectiveapi.com/)'s API to do so.**
 - Simplicity: **Simplicity is key to any discord bot, and Nino makes sure of it! All commands are tailored to be simple yet powerful.**
 ...and much more!
 
@@ -54,7 +53,7 @@ Need support related to Nino or any microservices under the organization? Join i
 View our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/CODE_OF_CONDUCT.md) before contributing.
 
 ## Self-hosting
-Before attempting to self-host Nino, we didn't plan for users to be able to self-host their own instance of Nino. Most builds are usually buggy and untested as of late, we do have a "stable" branch but it can be buggy sometimes! If you want to use cutting edge features that are most likely not finished, view the [next](https://github.com/NinoDiscord/Nino/tree/next) branch for more details. The "stable" branch is master, so anything that should be stable will be added to the upstream.
+Before attempting to self-host Nino, we didn't plan for users to be able to self-host their own instance of Nino. Most builds are usually buggy and untested as of late, we do have a "stable" branch but it can be buggy sometimes! If you want to use cutting edge features that are most likely not finished, view the [edge](https://github.com/NinoDiscord/Nino/tree/edge) branch for more details. The "stable" branch is master, so anything that should be stable will be added to the upstream.
 
 We will not provide support on how to self-host Nino, use at your own risk! If you do not want to bother hosting it, you can always invite the [public instance](https://discord.com/oauth2/authorize?client_id=531613242473054229&scope=bot) which will be the same experience if you hosted it or not.
 
@@ -88,7 +87,7 @@ This step isn't finished due to the rewrite not being stable.
 - Replace `<password>` with your PostgreSQL database password
 - Replace `<host>` (under `database`) with your PostgreSQL database host, if running locally, just use `localhost` or `database` if on Docker
 - Replace `<port>` with your PostgreSQL database port it's running, if running locally, set it to `5432`
-- Replace `<host>` (user `redis`) with your Redis connection host, if running locally, just use `localhost` or `redis` if on Docker
+- Replace `<host>` (under `redis`) with your Redis connection host, if running locally, just use `localhost` or `redis` if on Docker
 
 ```yml
 environment: development
