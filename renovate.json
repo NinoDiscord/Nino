@@ -1,6 +1,5 @@
 {
   "extends": ["config:base"],
   "automerge": true,
-  "baseBranches": ["edge"],
-  "ignoreDeps": ["prom-client"]
+  "baseBranches": ["edge"]
 }
