@@ -7,4 +7,4 @@ eslint src --ext .ts # `--fix` would normally be here but it should only print a
 echo 'husky - ✔ lint ~ ❓ project - compiling project for errors'
 tsc --noEmit
 
-echo 'husky - ✔ lint  ~ ✔ project - we are done here'
+echo 'husky - ✔ lint ~ ✔ project - we are done here'
