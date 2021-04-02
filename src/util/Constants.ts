@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
+import { readFileSync } from 'fs';
 import { execSync } from 'child_process';
+import { join } from 'path';
 
 /**
  * Returns the current version of Nino
@@ -39,14 +41,18 @@ export const commitHash: string | null = (() => {
   }
 })();
 
+export const SHORT_LINKS = JSON.parse<string[]>(readFileSync(join(process.cwd(), '..', 'assets', 'shortlinks.json'), 'utf8').split(/\n\r?/).join('\n'));
 export const Color = 0xDAA2C6;
 
 export const USERNAME_DISCRIM_REGEX = /^(.+)#(\d{4})$/;
+export const DISCORD_INVITE_REGEX = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg|invite.ink)\/\w+/;
 export const USER_MENTION_REGEX = /<@!?([0-9]+)>/gi;
 export const CHANNEL_REGEX = /<#([0-9]+)>/gi;
 export const QUOTE_REGEX = /['"]/;
 export const ROLE_REGEX = /^<@&([0-9]+)>/gi;
 export const ID_REGEX = /\d{15,21}/;
+
+export const SHORT_LINK_REGEX = new RegExp(`(http(s)?:\\/\\/(www.)?)?(${SHORT_LINKS.join('|')})\/\\w+`);
 
 /**
  * List of categories available to commands
