@@ -44,9 +44,9 @@ export default class ModLogCommand extends Command {
         'logging reset | Reset the mod log channel',
         'logging events | Enable all logging events',
         'logging event message.update | Enable a specific event',
-        'logging <#236987412589632587> | Specify a logs channel',
-        'logging ignore <#5246968653214587563> | Ignores a channel from displaying logs',
-        'logging ignore <@1532589645236985346> | Ignores a specific user from being displayed in logs'
+        'logging 236987412589632587 | Specify a logs channel',
+        'logging ignore 5246968653214587563 | Ignores a channel from displaying logs',
+        'logging ignore 1532589645236985346 | Ignores a specific user from being displayed in logs'
       ],
       aliases: ['logs'],
       usage: '[channelID]',

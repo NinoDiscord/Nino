@@ -1,0 +1,10 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo 'husky - running `npm run lint` for any errors'
+npm run lint
+
+echo 'husky - ✔ lint - now running `tsc --noEmit` for errors'
+tsc --noEmit
+
+echo 'husky - ✔ lint & project - we are done here'

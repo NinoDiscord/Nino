@@ -19,9 +19,10 @@
     "node": ">=14"
   },
   "scripts": {
-    "docker:build:canary": "docker buuild . -t auguwu/nino:canary",
     "clean:node_modules": "rm -rf node_modules/**/node_modules && rm -rf node_modules/@types/**/node_modules && rm -rf node_modules/@augu/**/node_modules",
+    "docker:build:edge": "docker buuild . -t auguwu/nino:edge",
     "clean:win:tar": "cp node_modules/@augu/collections/build/index.js.* node_modules/@augu/collections/build/index.js && rm node_modules/@augu/collections/build/index.js.*",
+    "husky:install": "husky install",
     "docker:build": "docker build . -t auguwu/nino:latest",
     "migrations": "npm run build && typeorm migration:run && typeorm schema:sync",
     "migrate": "node scripts/v0-to-v1.js",
@@ -54,6 +55,7 @@
   },
   "devDependencies": {
     "@augu/eslint-config": "1.10.0",
+    "@augu/tsconfig": "1.0.1",
     "@types/common-tags": "1.8.0",
     "@types/ioredis": "4.22.0",
     "@types/js-yaml": "3.12.4",
@@ -64,6 +66,7 @@
     "@typescript-eslint/parser": "4.19.0",
     "discord-api-types": "0.13.3",
     "eslint": "7.23.0",
+    "husky": "6.0.0",
     "ts-node": "9.1.1",
     "typescript": "4.2.3"
   }

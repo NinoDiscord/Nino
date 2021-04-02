@@ -86,7 +86,7 @@ export default abstract class NinoCommand {
 
   get format() {
     const subcommands = this.subcommands.map(sub => `[${sub.name} ${sub.usage}]`.trim()).join(' | ');
-    return `${this.name}${subcommands} ${this.usage}`;
+    return `${this.name}${this.usage !== '' ? ` ${this.usage}` : ''} ${subcommands}`;
   }
 
   abstract run(msg: CommandMessage, ...args: any[]): any;
