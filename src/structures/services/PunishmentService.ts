@@ -425,7 +425,7 @@ export default class PunishmentService {
     else suffix = 'ed';
 
     return {
-      color: action,
+      color: action!,
       suffix,
     };
   }
