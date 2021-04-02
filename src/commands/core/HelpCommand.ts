@@ -103,7 +103,7 @@ export default class HelpCommand extends Command {
           [
             {
               name: '• Syntax',
-              value: `${prefix}${command.format}`,
+              value: `**\`${prefix}${command.format}\`**`,
               inline: false
             },
             {

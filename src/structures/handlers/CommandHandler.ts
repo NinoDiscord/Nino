@@ -21,10 +21,10 @@
  */
 
 import type { Message, OldMessage, TextChannel } from 'eris';
-import { Command, EmbedBuilder } from '..';
-import { NotInjectable, Inject } from '@augu/lilith'
-;import LocalizationService from '../../services/LocalizationService';
+import { NotInjectable, Inject } from '@augu/lilith';
+import LocalizationService from '../../services/LocalizationService';
 import type CommandService from '../../services/CommandService';
+import { EmbedBuilder } from '..';
 import { Collection } from '@augu/collections';
 import CommandMessage from '../CommandMessage';
 import Prometheus from '../../components/Prometheus';
@@ -188,7 +188,7 @@ export default class CommandHandler {
 
     message['_flags'] = this.parseFlags(rawArgs.join(' '));
 
-    // Santize command args
+    // Sanatize command args
     if (command.name !== 'eval') {
       rawArgs = rawArgs.filter(arg => !FLAG_REGEX.test(arg));
     }
@@ -218,7 +218,7 @@ export default class CommandHandler {
       const embed = new EmbedBuilder()
         .setColor(0xDAA2C6)
         .setDescription([
-          `${subcommand !== undefined ? `Subcommand **${methodName}**` : `Command **${command.name}**`} has failed to execute.`,
+          `${subcommand !== undefined ? `Subcommand **${methodName}** (parent **${command.name}**)` : `Command **${command.name}**`} has failed to execute.`,
           `If this is a re-occuring issue, contact ${contact} at <https://discord.gg/JjHGR6vhcG>, under the <#747522228714733610> channel.`,
           '',
           '```js',

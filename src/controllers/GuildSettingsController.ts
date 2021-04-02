@@ -35,20 +35,23 @@ export default class GuildSettingsController {
   get(id: string, create?: false): Promise<GuildEntity | undefined>;
   async get(id: string, create: boolean = true) {
     const settings = await this.repository.findOne({ guildID: id });
-    if (settings === undefined && create) {
-      const entry = new GuildEntity();
-      entry.prefixes = [];
-      entry.language = 'en_US';
-      entry.guildID = id;
-
-      await this.repository.save(entry);
-      await this.database.logging.create(id);
-      await this.database.automod.create(id);
-
-      return entry;
-    }
+    if (settings === undefined && create)
+      return this.create(id);
 
     return settings;
+  }
+
+  async create(id: string) {
+    const entry = new GuildEntity();
+    entry.prefixes = [];
+    entry.language = 'en_US';
+    entry.guildID = id;
+
+    await this.repository.save(entry);
+    await this.database.logging.create(id);
+    await this.database.automod.create(id);
+
+    return entry;
   }
 
   delete(id: string) {

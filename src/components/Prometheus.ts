@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { createServer, IncomingMessage, ServerResponse, STATUS_CODES } from 'http';
+import { createServer, IncomingMessage, ServerResponse } from 'http';
 import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import Config from './Config';
@@ -30,6 +30,7 @@ export default class Prometheus implements Component {
   public commandsExecuted!: prom.Counter<string>;
   public messagesSeen!: prom.Counter<string>;
   public rawWSEvents!: prom.Counter<string>;
+  public guildCount!: prom.Gauge<string>;
   public priority: number = 1;
   public name: string = 'Prometheus';
   #server!: ReturnType<typeof createServer>; // yes
@@ -65,6 +66,11 @@ export default class Prometheus implements Component {
       help: 'Received WebSocket events from Discord and what they were'
     });
 
+    this.guildCount = new prom.Gauge({
+      name: 'nino_guild_count',
+      help: 'Number of guilds Nino is in'
+    });
+
     this.#server = createServer(this.onRequest.bind(this));
     this.#server.once('listening', () => this.logger.info(`Prometheus: Listening at http://localhost:${port}`));
     this.#server.on('error', error => this.logger.fatal(error));
@@ -72,7 +78,6 @@ export default class Prometheus implements Component {
   }
 
   private async onRequest(req: IncomingMessage, res: ServerResponse) {
-    this.logger.debug(`Prometheus: ${req.method!.toUpperCase()} ${req.url} (${res.statusCode} ${STATUS_CODES[res.statusCode] ?? 'Unknown'})`);
     if (req.url! === '/metrics') {
       res.writeHead(200, { 'Content-Type': prom.register.contentType });
       res.write(await prom.register.metrics());

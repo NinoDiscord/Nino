@@ -20,6 +20,7 @@
  * SOFTWA
  * RE.
  */
+
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import LoggingEntity from '../entities/LoggingEntity';
 import type Database from '../components/Database';
