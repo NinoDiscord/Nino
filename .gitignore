@@ -1,6 +1,7 @@
 # Folders
 node_modules/
 old_locales/
+.husky/_/
 build/
 
 # Jest

@@ -73,7 +73,7 @@ export default class PrefixCommand extends Command {
       ]);
 
     if (defaultPrefixes.length > 0)
-      embed.setFooter(`Prefixes ${defaultPrefixes.join(' ')} will always work no matter what.`);
+      embed.setFooter(`Prefixes ${defaultPrefixes.join(', ')} will always work no matter what.`);
 
     return msg.reply(embed);
   }

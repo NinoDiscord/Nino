@@ -64,6 +64,10 @@ export default class PunishmentsController {
     return this.repository.find({ guildID });
   }
 
+  get(guildID: string, warnings: number) {
+    return this.repository.findOne({ guildID, warnings });
+  }
+
   update(guildID: string, values: QueryDeepPartialEntity<PunishmentEntity>) {
     return this
       .database

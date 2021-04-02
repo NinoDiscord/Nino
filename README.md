@@ -4,11 +4,37 @@
 ## Checklist
 - Commands
   - [] Moderation
+    - [x] ban
+    - [] kick
+    - [] mute
+    - [] warn
+    - [] pardon
+    - [] warnings
+    - [] cases
+    - [] unmute
+    - [] unban
   - [x] Core
+    - [x] help
+    - [x] invite
+    - [x] locale
+    - [x] ping
+    - [x] shardinfo
+    - [x] source
+    - [x] statistics
+    - [x] uptime
   - [x] Owner
+    - [x] blacklist
+    - [x] whitelist
+    - [x] eval
   - [] Settings
+    - [x] punishments
+    - [] mutedRole
+    - [x] mod-log
+    - [x] automod
+    - [x] logging
+    - [x] prefix
 
-- Core
+- Core :tada:
   - [x] Commands
   - [x] Listeners
   - [x] Punishments
@@ -34,8 +60,8 @@
   - [x] User Banned
   - [x] User Unbanned
 
+- [] Timeouts Microservice
 - [] Frontend
-- [] Timeouts
 - [] API
 
 ## Features
