@@ -13,7 +13,7 @@
     - [] cases
     - [] unmute
     - [] unban
-  - [x] Core
+  - [x] Core :tada:
     - [x] help
     - [x] invite
     - [x] locale
@@ -22,13 +22,13 @@
     - [x] source
     - [x] statistics
     - [x] uptime
-  - [x] Owner
+  - [x] Owner :tada:
     - [x] blacklist
     - [x] whitelist
     - [x] eval
-  - [] Settings
+  - [x] Settings :tada:
     - [x] punishments
-    - [] mutedRole
+    - [x] mutedrole
     - [x] mod-log
     - [x] automod
     - [x] logging
@@ -44,6 +44,7 @@
   - [x] Sentry
 
 - Automod
+  - [] Short Links
   - [] Dehoisting
   - [] Blacklist
   - [] Mentions
@@ -88,14 +89,14 @@ Before running your own instance of Nino, you will need the following tools:
 
 - [Node.js](https://nodejs.org) (Latest is always used in development, but LTS is recommended)
 - [PostgreSQL](https://postgresql.org) (12 is used in development but anything above 10 should fairly work!)
-- [Redis](https://redis.io)
+- [Redis](https://redis.io) (6.2 is used in development but above v5 should work)
 
 If you're moving from v0 to v1, you will need your MongoDB instance before to port the database!
 
 There is tools that are optional but are mostly recommended in some cases:
 
 - [Sentry](https://sentry.io) - Useful to find out where errors are in a pretty UI
-- [Docker](https://docker.com)
+- [Docker](https://docker.com) - If you're a masochist and want to run a private instance with Docker
 - [Git](https://git-scm.com) - Useful for fetching new updates easily.
 
 ### Setting up

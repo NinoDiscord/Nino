@@ -28,6 +28,9 @@ export default class AutomodEntity {
   public blacklistWords!: string[];
 
   @Column({ default: false })
+  public shortLinks!: boolean;
+
+  @Column({ default: false })
   public blacklist!: boolean;
 
   @Column({ default: false })
