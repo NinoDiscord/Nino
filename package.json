@@ -25,6 +25,7 @@
     "husky:install": "husky install",
     "docker:build": "docker build . -t auguwu/nino:latest",
     "migrations": "npm run build && typeorm migration:run && typeorm schema:sync",
+    "shortlinks": "node scripts/shortlinks.js",
     "migrate": "node scripts/v0-to-v1.js",
     "prepare": "npm run clean:node_modules",
     "build": "npm run lint && rm -rf build && tsc",
