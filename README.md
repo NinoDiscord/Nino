@@ -52,9 +52,10 @@
   - [] Raid
   - [] Spam
 
-- Logging
-  - [] Message Delete
-  - [] Message Update
+- Logging :tada:
+  - [x] Message Bulk Delete
+  - [x] Message Delete
+  - [x] Message Update
   - [x] Voice Joined
   - [x] Voice Switch
   - [x] Voice Left

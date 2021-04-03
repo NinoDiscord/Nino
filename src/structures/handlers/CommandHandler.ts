@@ -36,12 +36,6 @@ import Config from '../../components/Config';
 
 const FLAG_REGEX = /(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi;
 
-// hacky solution for:
-// "Property 'x' does not exist on type 'TextChannel | { id: string }'."
-export interface ErisMessage extends Message<TextChannel> {
-  channel: TextChannel;
-}
-
 @NotInjectable()
 export default class CommandHandler {
   constructor(private service: CommandService) {}
@@ -64,7 +58,7 @@ export default class CommandHandler {
   @Inject
   private discord!: Discord;
 
-  async onMessageEdit(msg: ErisMessage, old: OldMessage | null) {
+  async onMessageEdit(msg: Message<TextChannel>, old: OldMessage | null) {
     if (old === null)
       return;
 
@@ -72,7 +66,7 @@ export default class CommandHandler {
       return this.handleCommand(msg);
   }
 
-  async handleCommand(msg: ErisMessage) {
+  async handleCommand(msg: Message<TextChannel>) {
     this.prometheus.messagesSeen?.inc();
     this.service.messagesSeen++;
 

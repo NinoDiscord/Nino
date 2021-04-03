@@ -47,7 +47,7 @@ export default class GuildBansListener {
     }
 
     const audits = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_BAN_ADD);
-    const entry = audits.entries.find(entry => entry.targetID === user.id);
+    const entry = audits.entries.find(entry => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
 
     if (entry === undefined)
       return;

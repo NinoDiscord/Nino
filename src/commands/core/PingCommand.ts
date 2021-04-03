@@ -51,7 +51,7 @@ export default class PingCommand extends Command {
     const deleteMsg = process.hrtime();
     await message.delete();
 
-    const shard = this.discord.client.shards.get(msg.guild?.shard.id ?? 0)!;
+    const shard = this.discord.client.shards.get(msg.guild.shard.id)!;
     return msg.reply([
       `:satellite_orbital: Running under node **${node ?? 'unknown'}**`,
       '',

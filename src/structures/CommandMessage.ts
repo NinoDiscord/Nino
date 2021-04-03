@@ -20,8 +20,7 @@
  * SOFTWARE.
  */
 
-import type { AdvancedMessageContent } from 'eris';
-import type { ErisMessage } from './handlers/CommandHandler';
+import type { AdvancedMessageContent, Message, TextChannel } from 'eris';
 import { NotInjectable } from '@augu/lilith';
 import type GuildEntity from '../entities/GuildEntity';
 import { EmbedBuilder } from '.';
@@ -37,9 +36,9 @@ export default class CommandMessage {
   private _flags: any = {};
   public locale: Locale;
 
-  #message: ErisMessage;
+  #message: Message<TextChannel>;
 
-  constructor(message: ErisMessage, locale: Locale, settings: GuildEntity, userSettings: UserEntity) {
+  constructor(message: Message<TextChannel>, locale: Locale, settings: GuildEntity, userSettings: UserEntity) {
     this.userSettings = userSettings;
     this.settings = settings;
     this.#message = message;

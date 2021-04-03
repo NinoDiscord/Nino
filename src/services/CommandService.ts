@@ -21,6 +21,7 @@
  */
 
 import { Service, Inject, getInjectables } from '@augu/lilith';
+import type { Message, TextChannel } from 'eris';
 import { readdirSync, Ctor } from '@augu/utils';
 import type NinoCommand from '../structures/Command';
 import CommandHandler from '../structures/handlers/CommandHandler';
@@ -50,11 +51,11 @@ export default class CommandService implements Service {
     app.inject(injections, this.handler);
 
     // Add in the message create and event
-    this.discord.client.on('messageCreate', (msg: any) =>
+    this.discord.client.on('messageCreate', (msg: Message<TextChannel>) =>
       this.handler.handleCommand.call(this.handler, msg)
     );
 
-    this.discord.client.on('messageUpdate', (msg: any, old) =>
+    this.discord.client.on('messageUpdate', (msg: Message<TextChannel>, old) =>
       this.handler.onMessageEdit.call(this.handler, msg, old)
     );
 
