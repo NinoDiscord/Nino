@@ -20,22 +20,29 @@
  * SOFTWARE.
  */
 
-import { MetadataKeys } from '../../util/Constants';
+declare namespace Reflect {
+  /**
+   * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
+   * @param metadataKey A key used to store and retrieve metadata.
+   * @param target The target object on which the metadata is defined.
+   * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
+   * @example
+   *
+   *     class Example {
+   *     }
+   *
+   *     // constructor
+   *     result = Reflect.getMetadata("custom:annotation", Example);
+   *
+   */
+  function getMetadata<T>(metadataKey: any, target: Record<string, unknown>): T;
 
-interface Subscription {
-  run(...args: any[]): Promise<any>;
-  event: string;
-}
-
-export const getSubscriptionsIn = (target: any) => Reflect.getMetadata<Subscription[]>(MetadataKeys.Subscribe, target) ?? [];
-export default function Subscribe(event: string): MethodDecorator {
-  return (target, _, descriptor: TypedPropertyDescriptor<any>) => {
-    const subscriptions = getSubscriptionsIn(target);
-    subscriptions.push({
-      event,
-      run: descriptor.value!
-    });
-
-    Reflect.defineMetadata(MetadataKeys.Subscribe, subscriptions, target);
-  };
+  /**
+   * Gets the metadata value for the provided metadata key on the target object or its prototype chain.
+   * @param metadataKey A key used to store and retrieve metadata.
+   * @param target The target object on which the metadata is defined.
+   * @param propertyKey The property key for the target.
+   * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
+   */
+  function getMetadata<T>(metadataKey: any, target: Record<string, unknown>, propertyKey: string | symbol): T;
 }

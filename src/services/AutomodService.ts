@@ -20,8 +20,16 @@
  * SOFTWARE.
  */
 
+import type { Automod } from '../structures';
+import { Collection } from '@augu/collections';
 import { Service } from '@augu/lilith';
+import Shortlinks from '../automod/Shortlinks';
 
-export default class AutomodService implements Service {
+export default class AutomodService extends Collection<string, Automod> implements Service {
   public name: string = 'automod';
+
+  load() {
+    // todo: do this with readdir
+    this.set('shortlinks', new Shortlinks());
+  }
 }

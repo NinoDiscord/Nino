@@ -30,19 +30,19 @@ export interface Automod {
    * Handles any member's nickname updates
    * @param member The member
    */
-  onMemberNickUpdate?(member: Member): Promise<any>;
+  onMemberNickUpdate?(member: Member): Promise<boolean>;
 
   /**
    * Handles any members joining the guild
    * @param member The member
    */
-  onMemberJoin?(member: Member): Promise<any>;
+  onMemberJoin?(member: Member): Promise<boolean>;
 
   /**
    * Handles any message updates or creation
    * @param message The message
    */
-  onMessage?(message: Message<TextChannel>): Promise<any>;
+  onMessage?(message: Message<TextChannel>): Promise<boolean>;
 
   /**
    * The name for this [Automod] class.
