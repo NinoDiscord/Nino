@@ -70,6 +70,7 @@
 - Auto Moderation: **Prevents raids, spam, ads, and much more!**
 - Advanced warning system and automated punishments: **Automically punish who commit offenses!**
 - Simplicity: **Simplicity is key to any discord bot, and Nino makes sure of it! All commands are tailored to be simple yet powerful.**
+
 ...and much more!
 
 ## Support
