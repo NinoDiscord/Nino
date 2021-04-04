@@ -1,10 +1,10 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-echo 'husky - ❓ lint ~ ❓ project - checking eslint for errors'
+echo 'nino - ❓ lint ~ ❓ project - checking eslint for errors'
 eslint src --ext .ts # `--fix` would normally be here but it should only print and not fix
 
-echo 'husky - ✔ lint ~ ❓ project - compiling project for errors'
+echo 'nino - ✔ lint ~ ❓ project - compiling project for errors'
 tsc --noEmit
 
-echo 'husky - ✔ lint ~ ✔ project - we are done here'
+echo 'nino - ✔ lint ~ ✔ project - we are done here'
