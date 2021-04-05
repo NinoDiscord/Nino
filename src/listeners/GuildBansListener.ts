@@ -22,23 +22,24 @@
 
 import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, User } from 'eris';
+import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
-import { Inject } from '@augu/lilith';
+import ListenerService from '../services/ListenerService';
 import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 import app from '../container';
 
+@LinkParent(ListenerService)
 export default class GuildBansListener {
+  @Inject
+  private punishments!: PunishmentService;
+
   @Inject
   private database!: Database;
 
   @Inject
   private discord!: Discord;
-
-  private get punishments(): PunishmentService {
-    return app.$ref<any>(PunishmentService);
-  }
 
   @Subscribe('guildBanAdd')
   async onGuildBanAdd(guild: Guild, user: User) {

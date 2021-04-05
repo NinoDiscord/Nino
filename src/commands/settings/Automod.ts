@@ -21,10 +21,12 @@
  */
 
 import { Command, CommandMessage, Subcommand, EmbedBuilder } from '../../structures';
+import { Inject, LinkParent } from '@augu/lilith';
 import { Categories, Color } from '../../util/Constants';
-import { Inject } from '@augu/lilith';
+import CommandService from '../../services/CommandService';
 import Database from '../../components/Database';
 
+@LinkParent(CommandService)
 export default class AutomodCommand extends Command {
   @Inject
   private database!: Database;

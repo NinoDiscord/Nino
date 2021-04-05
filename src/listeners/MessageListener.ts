@@ -21,10 +21,11 @@
  */
 
 import { Constants, Message, OldMessage, TextChannel } from 'eris';
+import { Inject, LinkParent } from '@augu/lilith';
 import { LoggingEvents } from '../entities/LoggingEntity';
 import { EmbedBuilder } from '../structures';
+import ListenerService from '../services/ListenerService';
 import CommandService from '../services/CommandService';
-import { Inject } from '@augu/lilith';
 import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
@@ -32,15 +33,20 @@ import { Color } from '../util/Constants';
 
 const HTTP_REGEX = /^https?:\/\/(.*)/;
 
+@LinkParent(ListenerService)
 export default class MessageListener {
+  @Inject
+  private commands!: CommandService;
+
   @Inject
   private database!: Database;
 
   @Inject
   private discord!: Discord;
 
-  private get commands(): CommandService {
-    return app.$ref<any>(CommandService);
+  @Subscribe('messageCreate')
+  onMessageCreate(msg: Message<TextChannel>) {
+    return this.commands.handleCommand(msg);
   }
 
   @Subscribe('messageDelete')
@@ -123,7 +129,7 @@ export default class MessageListener {
       return;
 
     if (msg.content !== old.content)
-      await this.commands['handler'].onMessageEdit(msg, old);
+      await this.commands.handleCommand(msg);
 
     // await this.automod.onMessageUpdate(msg, old);
     const settings = await this.database.logging.get(msg.channel.guild.id);

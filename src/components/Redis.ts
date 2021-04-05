@@ -25,10 +25,12 @@ import { Logger } from 'tslog';
 import IORedis from 'ioredis';
 import Config from './Config';
 
-export default class Redis implements Component {
-  public priority: number = 1;
+@Component({
+  priority: 1,
+  name: 'redis'
+})
+export default class Redis {
   public client!: IORedis.Redis;
-  public name: string = 'Redis';
 
   @Inject
   private logger!: Logger;
@@ -40,7 +42,7 @@ export default class Redis implements Component {
     this.logger.info('Connecting to Redis...');
 
     const redis = this.config.getProperty('redis')!;
-    const config: IORedis.RedisOptions = (redis.sentinels ?? []).length > 0 ? {
+    const config = (redis.sentinels ?? []).length > 0 ? {
       enableReadyCheck: true,
       connectionName: 'Nino',
       lazyConnect: true,

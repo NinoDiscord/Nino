@@ -21,11 +21,13 @@
  */
 
 import { Command, Subcommand, CommandMessage } from '../../structures';
+import { Inject, LinkParent } from '@augu/lilith';
 import { Categories } from '../../util/Constants';
-import { Inject } from '@augu/lilith';
+import CommandService from '../../services/CommandService';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 
+@LinkParent(CommandService)
 export default class MutedRoleCommand extends Command {
   @Inject
   private database!: Database;

@@ -66,42 +66,11 @@ export default class Permissions {
   }
 
   /**
-   * Calculate the bitfield of a role in a channel
-   */
-  static permissionsOf(role: Role, channel: GuildChannel) {
-    let permission = role.permissions.allow;
-
-    if (permission & Constants.Permissions.administrator)
-      return new Permission(Constants.Permissions.administrator, 0);
-
-    let overwrite = channel.permissionOverwrites.get(channel.guild.id);
-    if (overwrite !== undefined)
-      permission = (permission & ~overwrite.deny) | overwrite.allow;
-
-    let denied = 0;
-    let allowed = 0;
-
-    const roleIDs = channel.guild.roles
-      .filter(r => r.position <= role.position)
-      .map(role => role.id);
-
-    for (const roleID of roleIDs) {
-      if ((overwrite = channel.permissionOverwrites.get(roleID))) {
-        denied |= overwrite.deny;
-        allowed |= overwrite.allow;
-      }
-    }
-
-    permission = (permission & ~denied) | allowed;
-    return new Permission(permission, 0);
-  }
-
-  /**
    * Shows a string representation of all of the permissions
    * @param bits The permission bitfield
    */
-  static stringify(permission: number) {
-    const permissions = new Permission(permission, 0).json;
+  static stringify(permission: bigint) {
+    const permissions = new Permission(Number(permission), 0).json;
     const names: string[] = [];
 
     for (const key of Object.keys(Constants.Permissions)) {

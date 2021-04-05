@@ -21,9 +21,10 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
+import { Inject, LinkParent } from '@augu/lilith';
+import CommandService from '../../services/CommandService';
 import { firstUpper } from '@augu/utils';
 import type { Shard } from 'eris';
-import { Inject } from '@augu/lilith';
 import { Color } from '../../util/Constants';
 import Discord from '../../components/Discord';
 
@@ -46,6 +47,7 @@ interface ShardInfo {
   id: number;
 }
 
+@LinkParent(CommandService)
 export default class ShardInfoCommand extends Command {
   @Inject
   private discord!: Discord;

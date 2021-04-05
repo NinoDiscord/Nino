@@ -24,11 +24,11 @@
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
 import { Color, version, commitHash } from '../../util/Constants';
+import { Inject, LinkParent } from '@augu/lilith';
 import { firstUpper, humanize } from '@augu/utils';
 import CommandService from '../../services/CommandService';
 import { formatSize } from '../../util';
 import Kubernetes from '../../components/Kubernetes';
-import { Inject } from '@augu/lilith';
 import Stopwatch from '../../util/Stopwatch';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
@@ -90,9 +90,9 @@ interface RedisServerInfo {
   io_threads_active: string;
 }
 
+@LinkParent(CommandService)
 export default class StatisticsCommand extends Command {
-  @Inject
-  private service!: CommandService;
+  private parent!: CommandService;
 
   @Inject
   private discord!: Discord;
@@ -171,8 +171,8 @@ export default class StatisticsCommand extends Command {
         {
           name: '❯ Discord',
           value: [
-            `• **Commands Executed (session)**\n${this.service.commandsExecuted.toLocaleString()}`,
-            `• **Messages Seen (session)**\n${this.service.messagesSeen.toLocaleString()}`,
+            `• **Commands Executed (session)**\n${this.parent.commandsExecuted.toLocaleString()}`,
+            `• **Messages Seen (session)**\n${this.parent.messagesSeen.toLocaleString()}`,
             `• **Shards [C / T]**\n${msg.guild.shard.id} / ${this.discord.client.shards.size} (${avgPing}ms avg.)`,
             `• **Channels**\n${channels}`,
             `• **Guilds**\n${guilds}`,

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import type PunishmentService from '../../services/PunishmentService';
+import PunishmentService from '../../services/PunishmentService';
 import { Component, Inject } from '@augu/lilith';
 import * as types from './types';
 import { Logger } from 'tslog';
@@ -28,7 +28,11 @@ import WebSocket from 'ws';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
 
-export default class TimeoutsManager implements Component {
+@Component({
+  priority: 1,
+  name: 'timeouts'
+})
+export default class TimeoutsManager {
   protected _readyPromise?: { resolve(value: any): void };
   public priority: number = 69;
   private socket!: WebSocket;

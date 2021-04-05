@@ -87,10 +87,12 @@ interface APIConfig {
 // eslint-disable-next-line
 interface RedisSentinelConfig extends Pick<RedisConfig, 'host' | 'port'> {}
 
-export default class Config implements Component {
+@Component({
+  priority: 0,
+  name: 'config'
+})
+export default class Config {
   private config!: Configuration;
-  public priority: number = 0;
-  public name: string = 'Config';
 
   @Inject
   private logger!: Logger;

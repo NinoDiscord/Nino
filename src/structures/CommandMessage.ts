@@ -21,22 +21,23 @@
  */
 
 import type { AdvancedMessageContent, Message, TextChannel } from 'eris';
-import { NotInjectable } from '@augu/lilith';
 import type GuildEntity from '../entities/GuildEntity';
 import { EmbedBuilder } from '.';
 import type UserEntity from '../entities/UserEntity';
 import type Locale from './Locale';
 import Discord from '../components/Discord';
 import app from '../container';
+import { Inject } from '@augu/lilith';
 
-@NotInjectable()
 export default class CommandMessage {
   public userSettings: UserEntity;
   public settings: GuildEntity;
   private _flags: any = {};
   public locale: Locale;
-
   #message: Message<TextChannel>;
+
+  @Inject
+  private discord!: Discord;
 
   constructor(message: Message<TextChannel>, locale: Locale, settings: GuildEntity, userSettings: UserEntity) {
     this.userSettings = userSettings;
@@ -62,9 +63,7 @@ export default class CommandMessage {
   }
 
   get self() {
-    // @ts-expect-error (fuck you)
-    const discord = app.$ref<Discord>(Discord);
-    return this.guild.members.get(discord.client.user.id);
+    return this.guild.members.get(this.discord.client.user.id);
   }
 
   flags<T extends object>(): T {

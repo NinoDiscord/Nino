@@ -26,10 +26,12 @@ import { Logger } from 'tslog';
 import * as k8s from '@kubernetes/client-node';
 import Config from './Config';
 
-export default class K8SClient implements Component {
+@Component({
+  priority: 1,
+  name: 'kubernetes'
+})
+export default class Kubernetes {
   private kubeConfig: k8s.KubeConfig = new k8s.KubeConfig();
-  public priority: number = 1;
-  public name: string = 'k8s';
 
   @Inject
   private logger!: Logger;

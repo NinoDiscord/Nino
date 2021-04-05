@@ -21,11 +21,13 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
+import { Inject, LinkParent } from '@augu/lilith';
 import { calculateHRTime } from '@augu/utils';
-import { Inject } from '@augu/lilith';
+import CommandService from '../../services/CommandService';
 import Discord from '../../components/Discord';
 import K8s from '../../components/Kubernetes';
 
+@LinkParent(CommandService)
 export default class PingCommand extends Command {
   @Inject
   private discord!: Discord;

@@ -21,10 +21,11 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
+import { Inject, LinkParent } from '@augu/lilith';
 import { Categories, Color } from '../../util/Constants';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
+import CommandService from '../../services/CommandService';
 import { firstUpper } from '@augu/utils';
-import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import ms = require('ms');
 
@@ -36,6 +37,7 @@ interface Flags {
   s?: string | true;
 }
 
+@LinkParent(CommandService)
 export default class PunishmentsCommand extends Command {
   @Inject
   private database!: Database;

@@ -29,22 +29,19 @@ import API from './api/API';
 import app from './container';
 
 (async() => {
-  logger.info('Verifying application state...');
+  logger.info('Loading...');
   try {
-    await app.verify();
+    await app.load();
   } catch(ex) {
-    logger.fatal('Unable to verify application state');
+    logger.fatal('Unable to load container');
     console.error(ex);
     process.exit(1);
   }
 
-  const api = new API();
-  const timeouts = new Timeouts();
+  await app.addComponent(new Timeouts());
+  await app.addComponent(new API());
 
-  await app.addComponent(api);
-  await app.addComponent(timeouts);
-
-  logger.info('Application state has been verified! :D');
+  logger.info('✔ Nino has started successfully');
   process.on('SIGINT', () => {
     logger.warn('Received CTRL+C call!');
 

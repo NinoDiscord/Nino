@@ -22,9 +22,10 @@
 
 import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import type { AnyGuildChannel, TextChannel, User } from 'eris';
+import { Inject, LinkParent } from '@augu/lilith';
 import { Categories, Color } from '../../util/Constants';
 import { LoggingEvents } from '../../entities/LoggingEntity';
-import { Inject } from '@augu/lilith';
+import CommandService from '../../services/CommandService';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 
@@ -37,6 +38,7 @@ const humanizedEvents = {
   [LoggingEvents.MessageDeleted]: 'Message Deleted'
 };
 
+@LinkParent(CommandService)
 export default class ModLogCommand extends Command {
   @Inject
   private database!: Database;

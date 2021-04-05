@@ -21,17 +21,15 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
+import { Inject, LinkParent } from '@augu/lilith';
 import { Categories } from '../../util/Constants';
+import CommandService from '../../services/CommandService';
 import { inspect } from 'util';
-import { Inject } from '@augu/lilith';
 import Stopwatch from '../../util/Stopwatch';
-import Discord from '../../components/Discord';
 import Config from '../../components/Config';
 
+@LinkParent(CommandService)
 export default class EvalCommand extends Command {
-  @Inject
-  private discord!: Discord;
-
   @Inject
   private config!: Config;
 
@@ -122,7 +120,6 @@ export default class EvalCommand extends Command {
       ...(rawConfig.redis.sentinels?.map(r => r.host) ?? []),
       rawConfig.database.username,
       rawConfig.database.password,
-      this.discord.client.token,
       rawConfig.redis.password,
       rawConfig.database.host,
       rawConfig.database.url,

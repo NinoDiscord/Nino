@@ -26,13 +26,15 @@ import { Logger } from 'tslog';
 import Config from './Config';
 import prom from 'prom-client';
 
-export default class Prometheus implements Component {
+@Component({
+  priority: 1,
+  name: 'prometheus'
+})
+export default class Prometheus {
   public commandsExecuted!: prom.Counter<string>;
   public messagesSeen!: prom.Counter<string>;
   public rawWSEvents!: prom.Counter<string>;
   public guildCount!: prom.Gauge<string>;
-  public priority: number = 1;
-  public name: string = 'Prometheus';
   #server!: ReturnType<typeof createServer>; // yes
 
   @Inject

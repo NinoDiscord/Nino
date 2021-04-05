@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-import { NotInjectable } from '@augu/lilith';
 import { isObject } from '@augu/utils';
 
 const NOT_FOUND_SYMBOL = Symbol.for('$nino::localization::not_found');
@@ -57,7 +56,6 @@ interface Localization {
 
 const KEY_REGEX = /[$]\{([\w\.]+)\}/g;
 
-@NotInjectable()
 export default class Locale {
   public contributors: string[];
   public translator: string;

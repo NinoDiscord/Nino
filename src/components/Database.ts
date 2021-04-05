@@ -45,18 +45,20 @@ import GuildEntity from '../entities/GuildEntity';
 import CaseEntity from '../entities/CaseEntity';
 import UserEntity from '../entities/UserEntity';
 
-export default class Database implements Component {
+@Component({
+  priority: 1,
+  name: 'database'
+})
+export default class Database {
   public punishments!: PunishmentsController;
   public blacklists!: BlacklistController;
   public connection!: Connection;
   public warnings!: WarningsController;
   public logging!: LoggingController;
-  public priority: number = 1;
   public automod!: AutomodController;
   public guilds!: GuildSettingsController;
   public cases!: CasesController;
   public users!: UserSettingsController;
-  public name: string = 'Database';
 
   @Inject
   private logger!: Logger;

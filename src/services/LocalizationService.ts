@@ -28,10 +28,13 @@ import { join } from 'path';
 import Locale from '../structures/Locale';
 import Config from '../components/Config';
 
-export default class LocalizationService implements Service {
+@Service({
+  priority: 0,
+  name: 'localization'
+})
+export default class LocalizationService {
   public defaultLocale!: Locale;
   public locales: Collection<string, Locale> = new Collection();
-  public name: string = 'localization';
 
   @Inject
   private logger!: Logger;
@@ -53,7 +56,7 @@ export default class LocalizationService implements Service {
     for (let i = 0; i < files.length; i++) {
       const lang = require(files[i]);
 
-      this.logger.info(`Found language ${lang.meta.full} (${lang.meta.code}) by ${lang.meta.translator}`);
+      this.logger.info(`✔ Found language ${lang.meta.full} (${lang.meta.code}) by ${lang.meta.translator}`);
       this.locales.set(lang.meta.code, new Locale(lang));
     }
 

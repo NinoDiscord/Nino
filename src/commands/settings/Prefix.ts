@@ -21,8 +21,9 @@
  */
 
 import { Command, Subcommand, CommandMessage, EmbedBuilder } from '../../structures';
+import { Inject, LinkParent } from '@augu/lilith';
 import { Categories, Color } from '../../util/Constants';
-import { Inject } from '@augu/lilith';
+import CommandService from '../../services/CommandService';
 import Database from '../../components/Database';
 import Config from '../../components/Config';
 
@@ -31,6 +32,7 @@ interface Flags {
   u?: string | true;
 }
 
+@LinkParent(CommandService)
 export default class PrefixCommand extends Command {
   @Inject
   private database!: Database;

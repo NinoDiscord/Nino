@@ -21,8 +21,11 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
+import { LinkParent } from '@augu/lilith';
 import { humanize } from '@augu/utils';
+import CommandService from '../../services/CommandService';
 
+@LinkParent(CommandService)
 export default class UptimeCommand extends Command {
   constructor() {
     super({

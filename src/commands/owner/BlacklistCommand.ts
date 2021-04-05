@@ -21,13 +21,15 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
+import { Inject, LinkParent } from '@augu/lilith';
 import { Categories, Color } from '../../util/Constants';
+import CommandService from '../../services/CommandService';
 import { BlacklistType } from '../../entities/BlacklistEntity';
-import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
 
+@LinkParent(CommandService)
 export default class BlacklistCommand extends Command {
   @Inject
   private database!: Database;

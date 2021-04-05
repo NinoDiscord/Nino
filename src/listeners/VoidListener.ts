@@ -20,11 +20,13 @@
  * SOFTWARE.
  */
 
+import { Inject, LinkParent } from '@augu/lilith';
 import type { RawPacket } from 'eris';
-import { Inject } from '@augu/lilith';
+import ListenerService from '../services/ListenerService';
 import Subscribe from '../structures/decorators/Subscribe';
 import Prom from '../components/Prometheus';
 
+@LinkParent(ListenerService)
 export default class VoidListener {
   @Inject
   private prometheus!: Prom;

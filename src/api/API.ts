@@ -32,7 +32,11 @@ interface RouterCtor {
   default: ConstructorReturnType<Ctor<Router>>;
 }
 
-export default class API implements Component {
+@Component({
+  priority: 2,
+  name: 'api'
+})
+export default class API {
   private server!: HttpServer;
   public priority: number = 2;
   public name: string = 'API';
@@ -47,7 +51,7 @@ export default class API implements Component {
     const api = this.config.getProperty('api');
     if (api === undefined) {
       this.logger.info('API is not gonna be enabled.');
-      return Promise.resolve(); // resolve the promise idfk
+      return Promise.resolve();
     }
 
     this.logger.info('Now launching API...');

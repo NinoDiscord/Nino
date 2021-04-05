@@ -20,20 +20,16 @@
  * SOFTWARE.
  */
 
-import { Application } from '@augu/lilith';
+import { Container } from '@augu/lilith';
 
 declare global {
-  type DeepPartial<T> = {
-    [P in keyof T]?: DeepPartial<T[P]>;
-  }
-
-  /** The current application instance */
-  var app: Application;
+  /** The current Lilith container */
+  var app: Container;
 
   namespace NodeJS {
     interface Global {
-      /** The current application instance */
-      app: Application;
+      /** The current Lilith container */
+      app: Container;
     }
   }
 }

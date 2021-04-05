@@ -120,9 +120,11 @@ const emojis: { [P in PunishmentEntryType]: string } = {
   [PunishmentEntryType.Muted]: ':mute:'
 };
 
-export default class PunishmentService implements Service {
-  public name: string = 'punishments';
-
+@Service({
+  priority: 1,
+  name: 'punishments'
+})
+export default class PunishmentService {
   @Inject
   private database!: Database;
 
@@ -140,7 +142,7 @@ export default class PunishmentService implements Service {
         : (rest ? await this.discord.client.getRESTGuildMember(member.guild.id, member.id) : new Member({ id: member.id }, member.guild, this.discord.client));
   }
 
-  permissionsFor(type: PunishmentType): number {
+  permissionsFor(type: PunishmentType) {
     switch (type) {
       case PunishmentType.Unmute:
       case PunishmentType.Mute:
@@ -162,7 +164,7 @@ export default class PunishmentService implements Service {
         return Constants.Permissions.kickMembers;
 
       default:
-        return 0;
+        return 0n;
     }
   }
 
@@ -277,7 +279,7 @@ export default class PunishmentService implements Service {
 
     if (
       (member instanceof Member && !Permissions.isMemberAbove(self, member)) ||
-      (self.permissions.allow & this.permissionsFor(type)) === 0
+      (BigInt(self.permissions.allow) & this.permissionsFor(type)) === 0n
     ) return;
 
     const user = await this.resolveMember(member, type !== PunishmentType.Ban);

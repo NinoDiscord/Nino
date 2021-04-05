@@ -20,50 +20,39 @@
  * SOFTWARE.
  */
 
-import { Service, Inject, getInjectables } from '@augu/lilith';
+import { Service, Inject, FindChildrenIn } from '@augu/lilith';
 import { getSubscriptionsIn } from '../structures/decorators/Subscribe';
-import { readdirSync, Ctor } from '@augu/utils';
-import { Collection } from '@augu/collections';
 import { Logger } from 'tslog';
 import { join } from 'path';
 import Discord from '../components/Discord';
-import app from '../container';
 
-export default class ListenerService implements Service {
-  public events: Collection<string, any> = new Collection();
-  public name = 'Listeners';
-
+@Service({
+  priority: 0,
+  name: 'listeners'
+})
+@FindChildrenIn(join(process.cwd(), 'listeners'))
+export default class ListenerService {
   @Inject
   private logger!: Logger;
 
   @Inject
   private discord!: Discord;
 
-  async load() {
-    this.logger.info('Initializing all event listeners...');
+  onChildLoad(listener: any) {
+    const subscriptions = getSubscriptionsIn(listener);
+    for (let i = 0; i < subscriptions.length; i++) {
+      const sub = subscriptions[i];
+      const handler = sub.run.bind(listener);
 
-    const files = readdirSync(join(__dirname, '..', 'listeners'));
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const ctor: Ctor<any> = await import(file);
-      const listener = new ctor.default!();
+      this.discord.client.on(sub.event, async (...args: any[]) => {
+        try {
+          await handler(...args);
+        } catch(ex) {
+          this.logger.error(`Unable to handle event ${sub.event}`, ex);
+        }
+      });
 
-      app.inject(getInjectables(listener), listener);
-
-      const subscriptions = getSubscriptionsIn(listener);
-      for (const sub of subscriptions) {
-        const handler = sub.run.bind(listener);
-        this.discord.client.on(sub.event, async (...args: any[]) => {
-          try {
-            await handler(...args);
-          } catch(ex) {
-            this.logger.error(`Unable to handle event ${sub.event}:`, ex);
-          }
-        });
-      }
-
-      this.events.set(listener.constructor.name.replace('Guild', '').replace('Listener', '').trim().toLowerCase(), listener);
-      this.logger.info(`Initialized ${subscriptions.length} events on listener (${subscriptions.map(r => r.event).join(', ')})`);
+      this.logger.info(`✔ Loaded event ${sub.event}`);
     }
   }
 }

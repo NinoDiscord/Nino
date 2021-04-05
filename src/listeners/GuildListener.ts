@@ -21,8 +21,9 @@
  */
 
 import type { Guild, TextChannel } from 'eris';
+import { Inject, LinkParent } from '@augu/lilith';
 import { EmbedBuilder } from '../structures';
-import { Inject } from '@augu/lilith';
+import ListenerService from '../services/ListenerService';
 import { Logger } from 'tslog';
 import { Color } from '../util/Constants';
 import Subscribe from '../structures/decorators/Subscribe';
@@ -30,6 +31,7 @@ import Database from '../components/Database';
 import Discord from '../components/Discord';
 import Prom from '../components/Prometheus';
 
+@LinkParent(ListenerService)
 export default class VoidListener {
   @Inject
   private prometheus!: Prom;

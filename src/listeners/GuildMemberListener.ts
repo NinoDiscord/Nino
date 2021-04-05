@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-import { Inject } from '@augu/lilith';
+import { Inject, LinkParent } from '@augu/lilith';
+import ListenerService from '../services/ListenerService';
 import Subscribe from '../structures/decorators/Subscribe';
 
+@LinkParent(ListenerService)
 export default class GuildMemberListener {}

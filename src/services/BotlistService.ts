@@ -22,6 +22,8 @@
 
 import { Service } from '@augu/lilith';
 
-export default class BotlistsService implements Service {
-  public name: string = 'botlists';
-}
+@Service({
+  priority: 1,
+  name: 'botlists'
+})
+export default class BotlistsService {}

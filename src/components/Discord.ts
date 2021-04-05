@@ -27,11 +27,13 @@ import Prometheus from './Prometheus';
 import { Logger } from 'tslog';
 import Config from './Config';
 
-export default class Discord implements Component {
+@Component({
+  priority: 1,
+  name: 'discord'
+})
+export default class Discord {
   public mentionRegex!: RegExp;
-  public priority: number = 2;
   public client!: Client;
-  public name: string = 'Discord';
 
   @Inject
   private prometheus!: Prometheus;

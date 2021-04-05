@@ -27,10 +27,11 @@ import { Logger } from 'tslog';
 import sentry from '@sentry/node';
 import Config from './Config';
 
-export default class Sentry implements Component {
-  public priority: number = 1;
-  public name: string = 'Sentry';
-
+@Component({
+  priority: 1,
+  name: 'sentry'
+})
+export default class Sentry {
   @Inject
   private logger!: Logger;
 

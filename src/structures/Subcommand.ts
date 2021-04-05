@@ -21,7 +21,6 @@
  */
 
 import type CommandMessage from './CommandMessage';
-import { NotInjectable } from '@augu/lilith';
 import type Command from './Command';
 
 export interface SubcommandInfo {
@@ -31,7 +30,6 @@ export interface SubcommandInfo {
   usage: string;
 }
 
-@NotInjectable()
 export default class Subcommand {
   public usage: string;
   public name: string;

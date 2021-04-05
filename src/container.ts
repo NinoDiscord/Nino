@@ -20,25 +20,22 @@
  * SOFTWARE.
  */
 
-import { Application } from '@augu/lilith';
+import { Container } from '@augu/lilith';
 import { join } from 'path';
 import logger from './singletons/Logger';
 import http from './singletons/Http';
 
-const app = new Application()
-  .findComponentsIn(join(__dirname, 'components'))
-  .findServicesIn(join(__dirname, 'services'));
+const app = new Container({
+  componentsDir: join(__dirname, 'components'),
+  servicesDir: join(__dirname, 'services'),
+  singletons: [http, logger]
+});
 
-app.on('component.initializing', component => logger.debug(`Component ${component.name} is being initialized...`));
-app.on('component.loaded', component => logger.info(`Component ${component.name} has been initialized successfully!`));
-
-app.on('service.initializing', service => logger.debug(`Service ${service.name} is being initialized...`));
-app.on('service.loaded', service => logger.info(`Service ${service.name} has been initialized!`));
-
-app.on('debug', message => logger.debug(`Lilith: ${message}`));
-
-app.addSingleton(logger);
-app.addSingleton(http);
+app.on('onBeforeChildInit', (cls, child) => logger.debug(`>> ${cls.name}->${child.constructor.name}: initializing...`));
+app.on('onAfterChildInit', (cls, child) => logger.debug(`>> ✔ ${cls.name}->${child.constructor.name}: initialized`));
+app.on('onBeforeInit', cls => logger.debug(`>> ${cls.name}: initializing...`));
+app.on('onAfterInit', cls => logger.debug(`>> ✔ ${cls.name}: initialized`));
+app.on('debug', message => logger.debug(`lilith: ${message}`));
 
 (global as any).app = app;
 export default app;

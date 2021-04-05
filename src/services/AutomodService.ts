@@ -20,16 +20,23 @@
  * SOFTWARE.
  */
 
+import { FindChildrenIn, Inject, Service } from '@augu/lilith';
 import type { Automod } from '../structures';
 import { Collection } from '@augu/collections';
-import { Service } from '@augu/lilith';
-import Shortlinks from '../automod/Shortlinks';
+import { Logger } from 'tslog';
+import { join } from 'path';
 
-export default class AutomodService extends Collection<string, Automod> implements Service {
-  public name: string = 'automod';
+@Service({
+  priority: 1,
+  name: 'automod'
+})
+@FindChildrenIn(join(process.cwd(), 'automod'))
+export default class AutomodService extends Collection<string, Automod> {
+  @Inject
+  private logger!: Logger;
 
-  load() {
-    // todo: do this with readdir
-    this.set('shortlinks', new Shortlinks());
+  onChildLoad(automod: Automod) {
+    this.logger.info(`✔ Loaded automod ${automod.name}!`);
+    this.set(automod.name, automod);
   }
 }

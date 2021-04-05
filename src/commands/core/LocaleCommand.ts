@@ -22,7 +22,8 @@
 
 import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import LocalizationService from '../../services/LocalizationService';
-import { Inject } from '@augu/lilith';
+import { Inject, LinkParent } from '@augu/lilith';
+import CommandService from '../../services/CommandService';
 import { Color } from '../../util/Constants';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
@@ -32,6 +33,7 @@ interface Flags {
   u?: string | true;
 }
 
+@LinkParent(CommandService)
 export default class LocaleCommand extends Command {
   @Inject
   private languages!: LocalizationService;

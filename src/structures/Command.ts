@@ -23,7 +23,6 @@
 import { getSubcommandsIn } from './decorators/Subcommand';
 import type CommandMessage from './CommandMessage';
 import type { Constants } from 'eris';
-import { NotInjectable } from '@augu/lilith';
 import { Categories } from '../util/Constants';
 import Subcommand from './Subcommand';
 
@@ -42,7 +41,6 @@ interface CommandInfo {
   name: string;
 }
 
-@NotInjectable()
 export default abstract class NinoCommand {
   public userPermissions: PermissionField[];
   public botPermissions:  PermissionField[];
