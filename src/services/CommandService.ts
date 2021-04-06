@@ -22,9 +22,10 @@
 
 import { Service, Inject, FindChildrenIn } from '@augu/lilith';
 import { EmbedBuilder, CommandMessage } from '../structures';
-import type { Message, OldMessage, TextChannel } from 'eris';
+import type { Message, TextChannel } from 'eris';
 import LocalizationService from './LocalizationService';
 import type NinoCommand from '../structures/Command';
+import AutomodService from './AutomodService';
 import { Collection } from '@augu/collections';
 import Subcommand from '../structures/Subcommand';
 import Prometheus from '../components/Prometheus';
@@ -33,6 +34,7 @@ import Database from '../components/Database';
 import { join } from 'path';
 import Discord from '../components/Discord';
 import Config from '../components/Config';
+
 
 const FLAG_REGEX = /(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi;
 
@@ -62,6 +64,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
   private prometheus!: Prometheus;
 
   @Inject
+  private automod!: AutomodService;
+
+  @Inject
   private localization!: LocalizationService;
 
   onChildLoad(command: NinoCommand) {
@@ -72,6 +77,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
   async handleCommand(msg: Message<TextChannel>) {
     this.prometheus.messagesSeen?.inc();
     this.messagesSeen++;
+
+    if ((await this.automod.run('message', msg)) === true)
+      return;
 
     if (msg.author.bot) return;
     if (![0, 5].includes(msg.channel.type)) return;

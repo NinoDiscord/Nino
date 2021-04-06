@@ -50,7 +50,7 @@ export default class Shortlinks implements Automod {
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      msg.member !== undefined &&
+      msg.member !== null &&
       (!PermissionUtil.isMemberAbove(nino, msg.member) ||
       !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
@@ -62,6 +62,7 @@ export default class Shortlinks implements Automod {
       return false;
 
     if (msg.content.match(Constants.SHORT_LINK_REGEX)) {
+      await msg.delete();
       await msg.channel.createMessage('Hey, can you not send shady links? I know if they are shady or not, so don\'t be slick...');
       await this.punishments.createWarning(msg.member, `[Automod] Sending shady links in #${msg.channel.name}`);
 

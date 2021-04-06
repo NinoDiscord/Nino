@@ -42,6 +42,10 @@ export default class WarningsController {
     return this.repository.findOne({ guildID, userID });
   }
 
+  getAll(guildID: string, userID?: string) {
+    return this.repository.find({ guildID, userID });
+  }
+
   create({ guildID, userID, reason, amount }: CreateWarningOptions) {
     if (amount < 0)
       throw new RangeError('amount index out of bounds');

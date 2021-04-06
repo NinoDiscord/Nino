@@ -205,11 +205,11 @@ export default class PunishmentService {
       guildID: member.guild.id,
       reason,
       soft: false,
-      type: PunishmentType.WarningRemoved
+      type: PunishmentType.WarningAdded
     });
 
     return results.length ? Promise.resolve() : this.publishToModLog({
-      warningsAdded: count,
+      warningsAdded: (amount ?? 0) + 1,
       moderator: self.user,
       victim: member.user,
       guild: member.guild,

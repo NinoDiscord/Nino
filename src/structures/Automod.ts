@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import type { Member, Message, TextChannel } from 'eris';
+import type { Member, Message, TextChannel, User } from 'eris';
 
 /**
  * Interface to implement as a [Automod] action.
@@ -31,6 +31,11 @@ export interface Automod {
    * @param member The member
    */
   onMemberNickUpdate?(member: Member): Promise<boolean>;
+
+  /**
+   * Handles any user updates
+   */
+  onUserUpdate?(user: User): Promise<boolean>;
 
   /**
    * Handles any members joining the guild

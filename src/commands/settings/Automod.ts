@@ -53,6 +53,7 @@ export default class AutomodCommand extends Command {
     const embed = new EmbedBuilder()
       .setColor(Color)
       .setDescription([
+        `• ${settings!.shortLinks ? checkmark : xmark} **Short Links** (\`${msg.settings.prefixes[0]}automod shortlinks\`)`,
         `• ${settings!.blacklist ? checkmark : xmark} **Blacklist Words** (\`${msg.settings.prefixes[0]}automod blacklist\`)`,
         `• ${settings!.mentions ? checkmark : xmark} **Mentions** (\`${msg.settings.prefixes[0]}automod mentions\`)`,
         `• ${settings!.dehoist ? checkmark : xmark} **Dehoisting** (\`${msg.settings.prefixes[0]}automod dehoist\`)`,
@@ -62,6 +63,18 @@ export default class AutomodCommand extends Command {
       ]);
 
     return msg.reply(embed);
+  }
+
+  @Subcommand()
+  async shortlinks(msg: CommandMessage) {
+    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
+    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
+    const settings = await this.database.automod.get(msg.guild.id);
+    const result = await this.database.automod.update(msg.guild.id, {
+      shortLinks: !settings!.shortLinks
+    });
+
+    return msg.reply(result.affected === 1 ? checkmark : xmark);
   }
 
   @Subcommand('[...words]')

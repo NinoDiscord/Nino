@@ -26,10 +26,11 @@ import { LoggingEvents } from '../entities/LoggingEntity';
 import { EmbedBuilder } from '../structures';
 import ListenerService from '../services/ListenerService';
 import CommandService from '../services/CommandService';
+import AutomodService from '../services/AutomodService';
+import { Color } from '../util/Constants';
 import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
-import { Color } from '../util/Constants';
 
 const HTTP_REGEX = /^https?:\/\/(.*)/;
 
@@ -37,6 +38,9 @@ const HTTP_REGEX = /^https?:\/\/(.*)/;
 export default class MessageListener {
   @Inject
   private commands!: CommandService;
+
+  @Inject
+  private automod!: AutomodService;
 
   @Inject
   private database!: Database;
@@ -118,6 +122,8 @@ export default class MessageListener {
 
   @Subscribe('messageUpdate')
   async onMessageUpdate(msg: Message<TextChannel>, old: OldMessage | null) {
+    await this.automod.run('message', msg);
+
     if (old === null)
       return;
 
