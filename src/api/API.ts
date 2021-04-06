@@ -21,8 +21,10 @@
  */
 
 import { ConstructorReturnType, Ctor, firstUpper, readdirSync } from '@augu/utils';
+import { Component, Inject, PendingInjectDefinition } from '@augu/lilith';
 import { HttpServer, middleware, Router } from '@augu/http';
-import { Component, Inject } from '@augu/lilith';
+import type { RouteDefinition } from './decorators';
+import { MetadataKeys } from '../util/Constants';
 import { Logger } from 'tslog';
 import { join } from 'path';
 import express from 'express';
@@ -68,7 +70,29 @@ export default class API {
       const path = routers[i];
       const ctor: RouterCtor = await import(path);
 
-      this.server.router(ctor.default);
+      // TODO(auguwu): make this as a function in @augu/lilith
+      const injections = Reflect.getMetadata<PendingInjectDefinition[]>('$lilith::api::injections::pending', global) ?? [];
+      for (const inject of injections) app.inject(inject);
+
+      // @ts-ignore
+      const router: Router = new ctor.default!();
+      const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, router) ?? [];
+      this.logger.info(`Found ${routes.length} routes for router ${router.prefix}`);
+      for (const route of routes) {
+        router[route.method](route.path, async (req, res) => {
+          try {
+            await route.run.call(router, req, res);
+          } catch(ex) {
+            this.logger.error(`Unable to run route "${route.method.toUpperCase()} ${route.path}"`, ex);
+            return res.status(500).json({
+              message: `An unexpected error has occured while running "${route.method.toUpperCase()} ${route.path}". Contact the owners in #support under the Nino category at discord.gg/ATmjFH9kMH if this continues.`
+            });
+          }
+        });
+      }
+
+      this.logger.info(`✔ Initialized ${routes.length} routes to router ${router.prefix}`);
+      this.server.router(router);
     }
 
     this.server.on('listening', (networks) =>

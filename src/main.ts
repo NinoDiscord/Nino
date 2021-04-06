@@ -25,21 +25,20 @@ import 'reflect-metadata';
 
 import Timeouts from './structures/timeouts/TimeoutsManager';
 import logger from './singletons/Logger';
-import API from './api/API';
+import Api from './api/API';
 import app from './container';
 
 (async() => {
   logger.info('Loading...');
   try {
     await app.load();
+    await app.addComponent(Timeouts);
+    await app.addComponent(Api);
   } catch(ex) {
     logger.fatal('Unable to load container');
     console.error(ex);
     process.exit(1);
   }
-
-  await app.addComponent(Timeouts);
-  await app.addComponent(API);
 
   logger.info('✔ Nino has started successfully');
   process.on('SIGINT', () => {

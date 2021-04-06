@@ -69,5 +69,6 @@ export const enum Categories {
  */
 export const enum MetadataKeys {
   Subcommand = '$nino::subcommands',
-  Subscribe  = '$nino::subscriptions'
+  Subscribe  = '$nino::subscriptions',
+  APIRoute   = '$nino::api-route'
 }
