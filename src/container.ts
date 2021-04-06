@@ -37,5 +37,8 @@ app.on('onBeforeInit', cls => logger.debug(`>> ${cls.name}: initializing...`));
 app.on('onAfterInit', cls => logger.debug(`>> ✔ ${cls.name}: initialized`));
 app.on('debug', message => logger.debug(`lilith: ${message}`));
 
+app.on('initError', console.error);
+app.on('childInitError', console.error);
+
 (global as any).app = app;
 export default app;

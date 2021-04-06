@@ -36,7 +36,7 @@
     "@augu/collections": "1.0.5",
     "@augu/dotenv": "1.3.0",
     "@augu/http": "1.2.0",
-    "@augu/lilith": "2.2.0",
+    "@augu/lilith": "2.2.5",
     "@augu/orchid": "2.2.3",
     "@augu/utils": "1.4.2",
     "@kubernetes/client-node": "0.14.1",
@@ -50,7 +50,7 @@
     "reflect-metadata": "0.1.13",
     "source-map-support": "0.5.19",
     "tslog": "3.1.2",
-    "typeorm": "0.2.32",
+    "typeorm": "0.2.31",
     "ws": "7.4.4"
   },
   "devDependencies": {

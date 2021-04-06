@@ -38,8 +38,8 @@ import app from './container';
     process.exit(1);
   }
 
-  await app.addComponent(new Timeouts());
-  await app.addComponent(new API());
+  await app.addComponent(Timeouts);
+  await app.addComponent(API);
 
   logger.info('✔ Nino has started successfully');
   process.on('SIGINT', () => {
