@@ -23,8 +23,13 @@
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import type Database from '../components/Database';
 import GuildEntity from '../entities/GuildEntity';
+import { Inject } from '@augu/lilith';
+import Config from '../components/Config';
 
 export default class GuildSettingsController {
+  @Inject
+  private config!: Config;
+
   constructor(private database: Database) {}
 
   get repository() {
@@ -43,7 +48,7 @@ export default class GuildSettingsController {
 
   async create(id: string) {
     const entry = new GuildEntity();
-    entry.prefixes = [];
+    entry.prefixes = this.config.getProperty('prefixes') ?? [];
     entry.language = 'en_US';
     entry.guildID = id;
 
