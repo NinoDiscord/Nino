@@ -33,7 +33,9 @@ import Config from '../../components/Config';
   name: 'timeouts'
 })
 export default class TimeoutsManager {
-  protected _readyPromise?: { resolve(value: any): void };
+  protected _connectTimeout?: NodeJS.Timeout;
+  protected _readyPromise?: { resolve(): void, reject(error: Error): void; };
+
   public priority: number = 69;
   private socket!: WebSocket;
   public state: types.SocketState = types.SocketState.Unknown;
@@ -52,12 +54,32 @@ export default class TimeoutsManager {
   private config!: Config;
 
   load() {
-    return new Promise<void>(resolve => {
-      //this._readyPromise = { resolve };
+    return new Promise<void>((resolve, reject) => {
+      this._readyPromise = { resolve, reject };
       this.state = types.SocketState.Connecting;
-      //this.logger.info('Connecting to the timeouts service!');
+      this.logger.info('Connecting to the timeouts service!');
 
-      resolve(); // just resolve it for now
+      const timeouts = this.config.getProperty('timeouts');
+      if (timeouts === undefined)
+        return reject('Missing `timeouts` configuration, refer to the Process section: https://github.com/NinoDiscord/Nino#config-timeouts');
+
+      this.socket = new WebSocket(`ws://${timeouts.host ?? 'localhost'}:${timeouts.port}`, {
+        headers: {
+          Authorization: timeouts.auth
+        }
+      });
+
+      this.socket.on('open', this._onOpen.bind(this));
+      this.socket.on('error', this._onError.bind(this));
+      this.socket.on('close', this._onClose.bind(this));
+      this.socket.on('message', this._onMessage.bind(this));
+
+      this._connectTimeout = setTimeout(() => {
+        delete this._connectTimeout;
+        delete this._readyPromise;
+
+        return reject(new Error('Connection to timeouts service took too long.'));
+      }, 15000);
     });
   }
 
@@ -73,6 +95,11 @@ export default class TimeoutsManager {
   private _onOpen() {
     this.logger.info('Established a connection with the timeouts service.');
     this.state = types.SocketState.Connected;
+
+    if (this._connectTimeout !== undefined) clearTimeout(this._connectTimeout);
+    this._readyPromise?.resolve();
+
+    delete this._readyPromise;
   }
 
   private _onError(error: Error) {

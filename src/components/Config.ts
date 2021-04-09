@@ -39,6 +39,7 @@ interface Configuration {
   environment: 'development' | 'production';
   sentryDsn?: string;
   botlists?: BotlistConfig;
+  timeouts: TimeoutsConfig;
   database: DatabaseConfig;
   prefixes: string[];
   owners: string[];
@@ -81,6 +82,12 @@ interface KubernetesConfig {
 
 interface APIConfig {
   secret: string;
+  port: number;
+}
+
+interface TimeoutsConfig {
+  host?: string;
+  auth: string;
   port: number;
 }
 
@@ -127,6 +134,7 @@ export default class Config {
       sentryDsn: config.sentryDsn,
       botlists: config.botlists,
       database: config.database,
+      timeouts: config.timeouts,
       prefixes: config.prefixes,
       owners: config.owners,
       ksoft: config.ksoft,
@@ -158,6 +166,7 @@ export default class Config {
   getProperty<K extends keyof RedisConfig>(key: `redis.${K}`): RedisConfig[K] | undefined;
   getProperty<K extends keyof KubernetesConfig>(key: `k8s.${K}`): KubernetesConfig[K] | undefined;
   getProperty<K extends keyof APIConfig>(key: `api.${K}`): APIConfig[K] | undefined;
+  getProperty<K extends keyof TimeoutsConfig>(key: `timeouts.${K}`): TimeoutsConfig[K] | undefined;
   getProperty(key: string) {
     const nodes = key.split('.');
     let value: any = this.config;
