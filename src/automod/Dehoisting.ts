@@ -25,13 +25,17 @@ import type { Member } from 'eris';
 import AutomodService from '../services/AutomodService';
 import { Automod } from '../structures';
 import Database from '../components/Database';
+import Discord from '../components/Discord';
 
 @LinkParent(AutomodService)
 export default class Dehoisting implements Automod {
   public name: string = 'dehoisting';
 
   @Inject
-  private database!: Database
+  private database!: Database;
+
+  @Inject
+  private discord!: Discord;
 
   async onMemberNickUpdate(member: Member) {
     const settings = await this.database.automod.get(member.guild.id);
@@ -39,6 +43,9 @@ export default class Dehoisting implements Automod {
       return false;
 
     if (member.nick === null)
+      return false;
+
+    if (!member.guild.members.get(this.discord.client.user.id)?.permissions.has('manageNicknames'))
       return false;
 
     if (member.nick[0] < '0') {

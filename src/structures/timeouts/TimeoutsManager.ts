@@ -55,31 +55,32 @@ export default class TimeoutsManager {
 
   load() {
     return new Promise<void>((resolve, reject) => {
-      this._readyPromise = { resolve, reject };
+      //this._readyPromise = { resolve, reject };
       this.state = types.SocketState.Connecting;
       this.logger.info('Connecting to the timeouts service!');
+      resolve();
 
-      const timeouts = this.config.getProperty('timeouts');
-      if (timeouts === undefined)
-        return reject('Missing `timeouts` configuration, refer to the Process section: https://github.com/NinoDiscord/Nino#config-timeouts');
+      //const timeouts = this.config.getProperty('timeouts');
+      //if (timeouts === undefined)
+      //  return reject('Missing `timeouts` configuration, refer to the Process section: https://github.com/NinoDiscord/Nino#config-timeouts');
+      //
+      //this.socket = new WebSocket(`ws://${timeouts.host ?? 'localhost'}:${timeouts.port}`, {
+      //  headers: {
+      //    Authorization: timeouts.auth
+      //  }
+      //});
 
-      this.socket = new WebSocket(`ws://${timeouts.host ?? 'localhost'}:${timeouts.port}`, {
-        headers: {
-          Authorization: timeouts.auth
-        }
-      });
+      //this.socket.on('open', this._onOpen.bind(this));
+      //this.socket.on('error', this._onError.bind(this));
+      //this.socket.on('close', this._onClose.bind(this));
+      //this.socket.on('message', this._onMessage.bind(this));
 
-      this.socket.on('open', this._onOpen.bind(this));
-      this.socket.on('error', this._onError.bind(this));
-      this.socket.on('close', this._onClose.bind(this));
-      this.socket.on('message', this._onMessage.bind(this));
-
-      this._connectTimeout = setTimeout(() => {
-        delete this._connectTimeout;
-        delete this._readyPromise;
-
-        return reject(new Error('Connection to timeouts service took too long.'));
-      }, 15000);
+      //this._connectTimeout = setTimeout(() => {
+      //  delete this._connectTimeout;
+      //  delete this._readyPromise;
+      //
+      //  return reject(new Error('Connection to timeouts service took too long.'));
+      //}, 15000);
     });
   }
 

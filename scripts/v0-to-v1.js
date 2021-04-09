@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
+const { calculateHRTime, readdir } = require('@augu/utils');
 const { LoggerWithoutCallSite } = require('tslog');
 const { createConnection } = require('typeorm');
-const { calculateHRTime, readdir } = require('@augu/utils');
 const { parse } = require('@augu/dotenv');
 const { exec } = require('child_process');
 const { join } = require('path');
@@ -46,16 +46,6 @@ const logger = new LoggerWithoutCallSite({
   name: 'scripts'
 });
 
-const getFlags = (content) => {
-  const record = {};
-  content.replaceAll(/(?:--?|—)([\w]+)(=| ?(\w+|['"].*['"]))?/gi, (_, key, value) => {
-    record[key.trim()] = value ? value.replaceAll(/(^[='"]+|['"]+$)/g, '').trim() : true;
-    return value;
-  });
-
-  return record;
-};
-
 const execAsync = (command, options) => new Promise((resolve, reject) => {
   const child = exec(command, options);
 
@@ -75,10 +65,9 @@ const startTimer = process.hrtime();
   logger.info('This script takes care of converting the Mongo database to the PostgreSQL one!');
 
   const args = process.argv.slice(2);
-  const flags = getFlags(args.join(' '));
-  const directory = flags['dir'] || flags['d'];
+  const directory = args[0];
 
-  if (!directory) {
+  if (!directory || directory === true) {
     logger.warn('Assuming we should load in from Mongo itself...');
     const config = parse({
       delimiter: ',',
@@ -252,6 +241,7 @@ const startTimer = process.hrtime();
       process.exit(1);
     }
 
+    const bsonTimer = process.hrtime();
     try {
       await import('bson');
     } catch(ex) {
@@ -260,6 +250,12 @@ const startTimer = process.hrtime();
       await execAsync('npm i bson');
       logger.info('This script will now exit, re-run this with the `--directory` flag!');
       process.exit(0);
+    }
+
+    logger.info(`Checked and loaded for library \`bson\` in ~${calculateHRTime(bsonTimer)}ms`);
+    const bson = await import('bson');
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
     }
   }
 })();

@@ -20,8 +20,10 @@
  * SOFTWARE.
  */
 
+import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, Member } from 'eris';
 import { Inject, LinkParent } from '@augu/lilith';
+import { PunishmentType } from '../entities/PunishmentsEntity';
 import ListenerService from '../services/ListenerService';
 import AutomodService from '../services/AutomodService';
 import Subscribe from '../structures/decorators/Subscribe';
@@ -38,6 +40,9 @@ interface OldMember {
 @LinkParent(ListenerService)
 export default class GuildMemberListener {
   @Inject
+  private punishments!: PunishmentService;
+
+  @Inject
   private database!: Database;
 
   @Inject
@@ -50,12 +55,16 @@ export default class GuildMemberListener {
     if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
       return undefined;
 
-    const audits = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_ROLE_UPDATE);
-    return audits.entries.sort((a, b) => b.createdAt - a.createdAt).find(entry =>
-      entry.user.id !== this.discord.client.user.id && // Check if the user that did it was not Nino
-      entry.targetID === member.id && // Check if the target ID is the member
-      entry.user.id !== member.id  // Check if the user isn't thereselves
-    );
+    try {
+      const audits = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_ROLE_UPDATE);
+      return audits.entries.sort((a, b) => b.createdAt - a.createdAt).find(entry =>
+        entry.user.id !== this.discord.client.user.id && // Check if the user that did it was not Nino
+        entry.targetID === member.id && // Check if the target ID is the member
+        entry.user.id !== member.id  // Check if the user isn't thereselves
+      );
+    } catch {
+      return undefined;
+    }
   }
 
   @Subscribe('guildMemberUpdate')
@@ -63,10 +72,10 @@ export default class GuildMemberListener {
     const settings = await this.database.automod.get(guild.id);
     const gSettings = await this.database.guilds.get(guild.id);
 
-    if (settings !== undefined && settings.dehoist === false)
-      return;
-
     if (member.nick !== old.nick) {
+      if (settings !== undefined && settings.dehoist === false)
+        return;
+
       if ((await this.automod.run('memberNick', member)) === true)
         return;
     }
@@ -80,44 +89,80 @@ export default class GuildMemberListener {
     // taken away
     if (!member.roles.includes(gSettings.mutedRoleID) && old.roles.includes(gSettings.mutedRoleID)) {
       const entry = await this.findAuditLog(guild, member);
+      if (!entry)
+        return;
+
+      await this.punishments.apply({
+        moderator: entry.user,
+        member,
+        reason: '[Automod] Moderator has removed the Muted role',
+        type: PunishmentType.Unmute
+      });
+    }
+
+    if (member.roles.includes(gSettings.mutedRoleID) && !old.roles.includes(gSettings.mutedRoleID)) {
+      const entry = await this.findAuditLog(guild, member);
+      if (!entry)
+        return;
+
+      await this.punishments.apply({
+        moderator: entry.user,
+        member,
+        reason: '[Automod] Moderator has removed the Muted role',
+        type: PunishmentType.Mute
+      });
     }
   }
+
+  @Subscribe('guildMemberAdd')
+  async onGuildMemberJoin(guild: Guild, member: Member) {
+    if ((await this.automod.run('memberJoin', member)) === true)
+      return;
+
+    const cases = await this.database.cases.getAll(guild.id);
+    const all = cases.filter(c => c.victimID === member.id).sort(c => c.index);
+
+    if (all.length > 0 && all[all.length - 1]?.type === PunishmentType.Mute) {
+      await this.punishments.apply({
+        moderator: this.discord.client.user,
+        member,
+        reason: '[Automod] Mute Evading',
+        type: PunishmentType.Mute
+      });
+    }
+  }
+
+  @Subscribe('guildMemberRemove')
+  async onGuildMemberRemove(guild: Guild, member: Member) {
+    const logs = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_KICK).catch(() => undefined);
+    if (logs === undefined)
+      return;
+
+    if (!logs.entries.length)
+      return;
+
+    const entry = logs.entries.find(entry =>
+      entry.targetID === member.id &&
+      entry.user.id !== this.discord.client.user.id
+    );
+
+    if (!entry)
+      return;
+
+    const model = await this.database.cases.create({
+      moderatorID: entry.user.id,
+      victimID: entry.targetID,
+      guildID: guild.id,
+      reason: '[Automod] User was kicked by moderator',
+      type: PunishmentType.Kick
+    });
+
+    await this.punishments['publishToModLog']({
+      moderator: entry.user,
+      victim: this.discord.client.users.get(entry.targetID)!,
+      reason: `[Automod] Automatic kick: ${entry.reason ?? 'unknown'}`,
+      guild,
+      type: PunishmentEntryType.Kicked
+    }, model);
+  }
 }
-
-/*
-    // Muted role was taken away
-    if (!member.roles.includes(settings.mutedRole) && old.roles.includes(settings.mutedRole)) {
-      const entries = logs.entries.filter(entry => entry.targetID === member.id).sort((a, b) => b.createdAt - a.createdAt);
-
-      const entry = entries[0];
-      if (!entry || entry.user.id === this.client.user.id) return;
-
-      const punishment = new Punishment(PunishmentType.Unmute, {
-        moderator: entry.user
-      });
-
-      const caseModel = await this.punishmentService.createCase(member, punishment, '[Automod] Moderator removed the Muted role');
-
-      await this.punishmentService.postToModLog(caseModel);
-    }
-
-    // Muted role was added
-    if (member.roles.includes(settings.mutedRole) && !old.roles.includes(settings.mutedRole)) {
-      const entries = logs.entries.filter(entry =>
-        // Find the removal of the mute without it being by the bot
-        entry.actionType === Constants.AuditLogActions.MEMBER_ROLE_UPDATE && entry.targetID === member.id
-      ).sort((a, b) => b.createdAt - a.createdAt);
-
-      const entry = entries[0];
-
-      if (!entry || entry.user.id === this.client.user.id) return;
-
-      const punishment = new Punishment(PunishmentType.Mute, {
-        moderator: entry.user
-      });
-
-      const caseModel = await this.punishmentService.createCase(member, punishment, '[Automod] Moderator added the Muted role');
-
-      await this.punishmentService.postToModLog(caseModel);
-    }
-*/
