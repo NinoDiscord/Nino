@@ -44,7 +44,7 @@
   - [x] Sentry
 
 - Automod
-  - [] Short Links
+  - [x] Short Links
   - [] Dehoisting
   - [] Blacklist
   - [] Mentions

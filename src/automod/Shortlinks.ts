@@ -30,6 +30,9 @@ import { Automod } from '../structures';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
+// tfw ice the adorable fluff does all the regex for u :woeme:
+const LINK_REGEX = /(https?:\/\/)?(\w*\.\w*)/gi;
+
 @LinkParent(AutomodService)
 export default class Shortlinks implements Automod {
   public name: string = 'shortlinks';
@@ -51,22 +54,36 @@ export default class Shortlinks implements Automod {
 
     if (
       msg.member !== null &&
-      (!PermissionUtil.isMemberAbove(nino, msg.member) ||
+      !PermissionUtil.isMemberAbove(nino, msg.member) ||
       !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
-      msg.channel.permissionsOf(msg.author.id).has('manageMessages'))
+      msg.channel.permissionsOf(msg.author.id).has('manageMessages')
     ) return false;
 
     const settings = await this.database.automod.get(msg.author.id);
     if (settings !== undefined && settings.shortLinks === false)
       return false;
 
-    if (msg.content.match(Constants.SHORT_LINK_REGEX)) {
-      await msg.delete();
-      await msg.channel.createMessage('Hey, can you not send shady links? I know if they are shady or not, so don\'t be slick...');
-      await this.punishments.createWarning(msg.member, `[Automod] Sending shady links in #${msg.channel.name}`);
+    const matches = msg.content.match(LINK_REGEX);
+    if (matches === null)
+      return false;
 
-      return true;
+    // Why not use .find/.filter?
+    // Because, it should traverse *all* matches, just not one match.
+    //
+    // So for an example:
+    // "haha scam thing!!! floofy.dev bit.ly/jnksdjklsdsj"
+    //
+    // In the string, if `.find`/`.filter` was the solution here,
+    // it'll only match "owo.com" and not "bit.ly"
+    for (let i = 0; i < matches.length; i++) {
+      if (Constants.SHORT_LINKS.includes(matches[i])) {
+        await msg.delete();
+        await msg.channel.createMessage('yo bro wtf dont send links like that >:(');
+        await this.punishments.createWarning(msg.member, `[Automod] Sending a blacklisted URL in ${msg.channel.mention}`);
+
+        return true;
+      }
     }
 
     return false;

@@ -211,6 +211,7 @@ export default class PunishmentService {
     return results.length ? Promise.resolve() : this.publishToModLog({
       warningsAdded: (amount ?? 0) + 1,
       moderator: self.user,
+      reason,
       victim: member.user,
       guild: member.guild,
       type: PunishmentEntryType.WarningAdded

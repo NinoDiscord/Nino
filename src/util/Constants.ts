@@ -52,8 +52,6 @@ export const QUOTE_REGEX = /['"]/;
 export const ROLE_REGEX = /^<@&([0-9]+)>/gi;
 export const ID_REGEX = /\d{15,21}/;
 
-export const SHORT_LINK_REGEX = new RegExp(`(http(s)?:\\/\\/(www.)?)?(${SHORT_LINKS.join('|')})\/\\w+`);
-
 /**
  * List of categories available to commands
  */
