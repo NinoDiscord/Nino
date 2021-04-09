@@ -45,7 +45,7 @@
 
 - Automod
   - [x] Short Links
-  - [] Dehoisting
+  - [x] Dehoisting
   - [] Blacklist
   - [] Mentions
   - [] Invites
