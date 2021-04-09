@@ -22,7 +22,7 @@
     "clean:node_modules": "rm -rf node_modules/**/node_modules && rm -rf node_modules/@types/**/node_modules && rm -rf node_modules/@augu/**/node_modules",
     "docker:build:edge": "docker build . -t auguwu/nino:edge",
     "clean:win:tar": "cp node_modules/@augu/collections/build/index.js.* node_modules/@augu/collections/build/index.js && rm node_modules/@augu/collections/build/index.js.*",
-    "husky:install": "husky install",
+    "husky:install": "husky install && rm .husky/.gitignore",
     "docker:build": "docker build . -t auguwu/nino:latest",
     "migrations": "npm run build && typeorm migration:run && typeorm schema:sync",
     "shortlinks": "node scripts/shortlinks.js",
