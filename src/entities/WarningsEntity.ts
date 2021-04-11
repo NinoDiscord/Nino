@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'warnings' })
 export default class WarningsEntity {
@@ -35,4 +35,7 @@ export default class WarningsEntity {
 
   @Column({ name: 'user_id' })
   public userID!: string;
+
+  @PrimaryGeneratedColumn()
+  public id!: number;
 }

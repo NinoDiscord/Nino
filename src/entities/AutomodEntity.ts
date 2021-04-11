@@ -24,10 +24,10 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'automod' })
 export default class AutomodEntity {
-  @Column({ array: true, type: 'text' })
+  @Column({ array: true, type: 'text', name: 'blacklist_words', default: '{}' })
   public blacklistWords!: string[];
 
-  @Column({ default: false })
+  @Column({ default: false, name: 'short_links' })
   public shortLinks!: boolean;
 
   @Column({ default: false })

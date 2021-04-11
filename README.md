@@ -47,7 +47,7 @@
 - Automod
   - [x] Short Links
   - [x] Dehoisting
-  - [] Blacklist
+  - [x] Blacklist
   - [] Mentions
   - [] Invites
   - [] Raid

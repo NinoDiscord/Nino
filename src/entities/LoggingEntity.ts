@@ -32,10 +32,10 @@ export enum LoggingEvents {
 
 @Entity({ name: 'logging' })
 export default class LoggingEntity {
-  @Column({ default: '{}', array: true, type: 'text' })
+  @Column({ default: '{}', array: true, type: 'text', name: 'ignore_channels' })
   public ignoreChannels!: string[];
 
-  @Column({ default: '{}', array: true, type: 'text' })
+  @Column({ default: '{}', array: true, type: 'text', name: 'ignore_users' })
   public ignoreUsers!: string[];
 
   @Column({ name: 'channel_id', nullable: true })
