@@ -24,7 +24,7 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'warnings' })
 export default class WarningsEntity {
-  @Column({ name: 'guild_id' })
+  @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
 
   @Column({ default: undefined, nullable: true })
@@ -33,6 +33,6 @@ export default class WarningsEntity {
   @Column({ default: 0 })
   public amount!: number;
 
-  @PrimaryColumn({ name: 'user_id' })
+  @Column({ name: 'user_id' })
   public userID!: string;
 }

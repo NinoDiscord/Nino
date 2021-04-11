@@ -43,7 +43,8 @@ export default class WarningsController {
   }
 
   getAll(guildID: string, userID?: string) {
-    return this.repository.find({ guildID, userID });
+    const filter = userID !== undefined ? { guildID, userID } : { guildID };
+    return this.repository.find(filter);
   }
 
   create({ guildID, userID, reason, amount }: CreateWarningOptions) {

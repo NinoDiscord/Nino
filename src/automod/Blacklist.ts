@@ -23,9 +23,11 @@
 import type { Message, TextChannel } from 'eris';
 import { Inject, LinkParent } from '@augu/lilith';
 import PunishmentService from '../services/PunishmentService';
+import PermissionUtil from '../util/Permissions';
 import AutomodService from '../services/AutomodService';
 import { Automod } from '../structures';
 import Database from '../components/Database';
+import Discord from '../components/Discord';
 
 @LinkParent(AutomodService)
 export default class BlacklistAutomod implements Automod {
@@ -37,7 +39,38 @@ export default class BlacklistAutomod implements Automod {
   @Inject
   private database!: Database;
 
+  @Inject
+  private discord!: Discord;
+
   async onMessage(msg: Message<TextChannel>) {
-    return true;
+    const settings = await this.database.automod.get(msg.guildID);
+    if (settings === undefined || settings.blacklist === false)
+      return false;
+
+    if (!msg || msg === null)
+      return false;
+
+    const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
+
+    if (
+      msg.member !== null &&
+      !PermissionUtil.isMemberAbove(nino, msg.member) ||
+      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
+      msg.author.bot ||
+      msg.channel.permissionsOf(msg.author.id).has('banMembers')
+    ) return false;
+
+    const content = msg.content.toLowerCase().split(' ');
+    for (const word of settings.blacklistWords) {
+      if (content.filter(c => c === word.toLowerCase()).length > 0) {
+        await msg.channel.createMessage('hey, that\'s a word this server doesn\'t want you to say (☍﹏⁰)｡');
+        await msg.delete();
+        await this.punishments.createWarning(msg.member, '[Automod] User said a word that is blacklisted here (☍﹏⁰)｡');
+
+        return true;
+      }
+    }
+
+    return false;
   }
 }

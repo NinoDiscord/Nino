@@ -57,7 +57,7 @@ export default class Shortlinks implements Automod {
       !PermissionUtil.isMemberAbove(nino, msg.member) ||
       !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
-      msg.channel.permissionsOf(msg.author.id).has('manageMessages')
+      msg.channel.permissionsOf(msg.author.id).has('banMembers')
     ) return false;
 
     const settings = await this.database.automod.get(msg.author.id);
