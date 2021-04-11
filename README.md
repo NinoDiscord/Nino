@@ -10,6 +10,7 @@
     - [] warn
     - [] pardon
     - [] warnings
+    - [] mutelist
     - [] cases
     - [] unmute
     - [] unban
@@ -45,7 +46,7 @@
 
 - Automod
   - [x] Short Links
-  - [] Dehoisting
+  - [x] Dehoisting
   - [] Blacklist
   - [] Mentions
   - [] Invites
@@ -62,8 +63,7 @@
   - [x] User Banned
   - [x] User Unbanned
 
-- [] Timeouts Microservice
-- [] Frontend
+- [x] Timeouts Microservice :tada:
 - [] API
 
 ## Features

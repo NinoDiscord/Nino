@@ -98,6 +98,10 @@ export default class Discord {
   }
 
   async getUser(query: string) {
+    console.log('user mention', USER_MENTION_REGEX.test(query));
+    console.log('username#discriminator', USERNAME_DISCRIM_REGEX.test(query));
+    console.log('user id', ID_REGEX.test(query));
+
     if (USER_MENTION_REGEX.test(query)) {
       const match = query.match(USER_MENTION_REGEX)!;
       if (match === null)
@@ -106,6 +110,8 @@ export default class Discord {
       const user = this.client.users.get(match[1]);
       if (user !== undefined)
         return user;
+      else
+        return null;
     }
 
     if (USERNAME_DISCRIM_REGEX.test(query)) {

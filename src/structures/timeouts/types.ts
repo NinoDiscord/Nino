@@ -55,40 +55,31 @@ export interface DataPacket<T, OP extends OPCodes = OPCodes> {
   d: T;
 }
 
-interface ReadyPacketData {
-  timeouts: Timeout[]; // request packet data is the same so...
-}
-
-interface Timeout {
+export interface Timeout {
+  moderator: string;
   expired: number;
   issued: number;
+  reason: string | null;
   guild: string;
   user: string;
-  type: Exclude<PunishmentType, PunishmentType.Kick | PunishmentType.WarningAdded | PunishmentType.WarningRemoved>;
-}
-
-interface ExtendedTimeout extends Timeout {
-  moderator: string;
-  reason?: string;
+  type: PunishmentTimeoutType;
 }
 
 /**
  * Represents that the service is ready and probably has
  * incoming timeouts to take action on
  */
-export type ReadyPacket = DataPacket<ReadyPacketData, OPCodes.Ready>;
+export type ReadyPacket = DataPacket<null, OPCodes.Ready>;
 
 /**
  * Represents what a request to send to the service
  */
-export type RequestPacket = DataPacket<ExtendedTimeout, OPCodes.Request>;
+export type RequestPacket = DataPacket<Timeout, OPCodes.Request>;
 
 /**
  * Represents the data payload when we acknowledged
  */
-export type AcknowledgedPacket = Omit<DataPacket<never, OPCodes.Acknowledged>, 'd'>;
+export type AcknowledgedPacket = DataPacket<Timeout[]>;
 
-/**
- * Represents what action to take forth
- */
-export type ApplyPacket = DataPacket<ExtendedTimeout, OPCodes.Apply>;
+export type ApplyPacket = DataPacket<Timeout>;
+export type PunishmentTimeoutType = Exclude<PunishmentType, PunishmentType.Kick | PunishmentType.WarningAdded | PunishmentType.WarningRemoved | PunishmentType.Mute | PunishmentType.Ban | PunishmentType.VoiceMute | PunishmentType.VoiceDeafen>;

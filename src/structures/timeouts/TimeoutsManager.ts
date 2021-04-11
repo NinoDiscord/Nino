@@ -27,6 +27,16 @@ import { Logger } from 'tslog';
 import WebSocket from 'ws';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
+import Redis from '../../components/Redis';
+
+interface ApplyTimeoutOptions {
+  moderator: string;
+  reason?: string;
+  victim: string;
+  guild: string;
+  time: number;
+  type: types.PunishmentTimeoutType;
+}
 
 @Component({
   priority: 1,
@@ -49,6 +59,9 @@ export default class TimeoutsManager {
 
   @Inject
   private logger!: Logger;
+
+  @Inject
+  private redis!: Redis;
 
   @Inject
   private config!: Config;
@@ -82,13 +95,39 @@ export default class TimeoutsManager {
     });
   }
 
+  dispose() {
+    return this.socket.close();
+  }
+
   send(op: types.OPCodes.Request, data: types.RequestPacket['d']): void;
-  send(op: types.OPCodes.Acknowledged): void;
+  send(op: types.OPCodes.Acknowledged, data: types.AcknowledgedPacket['d']): void;
   send(op: types.OPCodes, d?: any) {
     this.socket.send(JSON.stringify({
       op,
       d
     }));
+  }
+
+  async apply({
+    moderator,
+    reason,
+    victim,
+    guild,
+    time,
+    type
+  }: ApplyTimeoutOptions) {
+    const list = await this.redis.client.hget('nino:timeouts', guild).then(val => val === null ? [] : JSON.parse<types.Timeout[]>(val));
+    list.push({
+      moderator,
+      reason: reason === undefined ? null : reason,
+      expired: Date.now() + time,
+      issued: Date.now(),
+      guild,
+      user: victim,
+      type
+    });
+
+    await this.redis.client.hmset('nino:timeouts', [guild, JSON.stringify(list)]);
   }
 
   private _onOpen() {
@@ -114,26 +153,11 @@ export default class TimeoutsManager {
     const data: types.DataPacket<any> = JSON.parse(message);
     switch (data.op) {
       case types.OPCodes.Ready: {
-        const packet = data as types.ReadyPacket;
-        this.logger.info(`Authenicated successfully! We have ${packet.d.timeouts.length} timeouts to handle.`);
-        for (let i = 0; i < packet.d.timeouts.length; i++) {
-          const timeout = packet.d.timeouts[i];
-          const guild = this.discord.client.guilds.get(timeout.guild);
-          if (guild === undefined) {
-            this.logger.warn(`Guild ${timeout.guild} has pending timeouts but Nino isn't in the guild? Skipping...`);
-            continue;
-          }
+        this.logger.info('Authenicated successfully, now sending timeouts...');
+        const timeouts = await this.redis.client.hvals('nino:timeouts').then(val => val.map(v => JSON.parse<types.Timeout>(v)).flat());
+        this.logger.info(`Received ${timeouts.length} timeouts to relay`);
 
-          await this.punishments.apply({
-            moderator: this.discord.client.users.get(this.discord.client.user.id)!,
-            reason: 'Time is up.',
-            member: { id: timeout.user, guild },
-            type: timeout.type
-          });
-        }
-
-        this.logger.info('Successfully applied packets.');
-        this.send(types.OPCodes.Acknowledged);
+        this.send(types.OPCodes.Acknowledged, timeouts);
       } break;
 
       case types.OPCodes.Apply: {
@@ -148,7 +172,7 @@ export default class TimeoutsManager {
 
         await this.punishments.apply({
           moderator: this.discord.client.users.get(packet.d.moderator)!,
-          reason: packet.d.reason,
+          reason: packet.d.reason === null ? undefined : packet.d.reason,
           member: { id: packet.d.user, guild },
           type: packet.d.type
         });
