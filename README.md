@@ -89,6 +89,7 @@ We will not provide support on how to self-host Nino, use at your own risk! If y
 ### Prerequisites
 Before running your own instance of Nino, you will need the following tools:
 
+- [Timeouts Service](https://github.com/NinoDiscord/timeouts) (Used for mutes and such or it'll not work!)
 - [Node.js](https://nodejs.org) (Latest is always used in development, but LTS is recommended)
 - [PostgreSQL](https://postgresql.org) (12 is used in development but anything above 10 should fairly work!)
 - [Redis](https://redis.io) (6.2 is used in development but above v5 should work)
@@ -117,6 +118,7 @@ This step isn't finished due to the rewrite not being stable.
 - Replace `<host>` (under `database`) with your PostgreSQL database host, if running locally, just use `localhost` or `database` if on Docker
 - Replace `<port>` with your PostgreSQL database port it's running, if running locally, set it to `5432`
 - Replace `<host>` (under `redis`) with your Redis connection host, if running locally, just use `localhost` or `redis` if on Docker
+- Replace `<auth>` with the authenication token you set in the [timeouts](https://github.com/NinoDiscord/timeouts) relay service.
 
 ```yml
 environment: development
@@ -131,6 +133,10 @@ database:
 redis:
   host: <host>
   port: 6379
+
+timeouts:
+  port: 4025
+  auth: <auth>
 ```
 
 ## Maintainers
