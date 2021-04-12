@@ -28,9 +28,11 @@ import AutomodService from '../services/AutomodService';
 import { Automod } from '../structures';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
+import { Collection } from '@augu/collections';
 
 @LinkParent(AutomodService)
 export default class Mentions implements Automod {
+  private cache: Collection<string, Collection<string, number[]>> = new Collection();
   public name: string = 'mentions';
 
   @Inject
@@ -60,14 +62,46 @@ export default class Mentions implements Automod {
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
     ) return false;
 
-    if (msg.mentions.length >= 4) {
-      await msg.channel.createMessage('o(╥﹏╥)o i dont think that\'s gonna get their attention...');
-      await msg.delete();
-      await this.punishments.createWarning(msg.member, `[Automod] Spamming(?) 4 or more mentions in ${msg.channel.mention}`);
-
-      return true;
-    }
-
     return false;
   }
+
+  private clean(guildID: string) {
+    const now = Date.now();=
+    const buckets = this.cache.get(guildID);
+
+    // Let's just not do anything if there is no spam cache for this guild
+    if (buckets === undefined)
+      return;
+  }
 }
+
+// old code
+/*
+  __cleanUp(guildId: string) {
+    let now = Date.now();
+    let ids: (string | number)[] = [];
+    this.buckets.get(guildId)!.forEach((v, k) => {
+      let diff = now - v[v.length-1];
+      if (now - v[v.length - 1] >= 5000) {
+        ids.push(k);
+      }
+    });
+    ids.forEach(element => {
+      this.buckets.delete(element);
+    });
+  }
+
+  __getQueue(guildId: string, userId: string): number[] {
+    if (!this.buckets.has(guildId)) {
+      this.buckets.set(guildId, new Collection<number[]>());
+    }
+    if (!this.buckets.get(guildId)!.has(userId)) {
+      this.buckets.get(guildId)!.set(userId, []);
+    }
+    return this.buckets.get(guildId)!.get(userId)!;
+  }
+
+  __clearQueue(guildId: string, userId: string) {
+    this.buckets.get(guildId)!.delete(userId);
+  }
+*/
