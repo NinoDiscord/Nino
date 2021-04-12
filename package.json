@@ -48,7 +48,7 @@
     "wumpfetch": "0.3.1"
   },
   "devDependencies": {
-    "@augu/eslint-config": "1.10.0",
+    "@augu/eslint-config": "2.0.2",
     "@types/common-tags": "1.8.0",
     "@types/ioredis": "4.22.3",
     "@types/jest": "26.0.22",
