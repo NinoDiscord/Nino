@@ -66,7 +66,7 @@ export default class Mentions implements Automod {
   }
 
   private clean(guildID: string) {
-    const now = Date.now();=
+    const now = Date.now();
     const buckets = this.cache.get(guildID);
 
     // Let's just not do anything if there is no spam cache for this guild
