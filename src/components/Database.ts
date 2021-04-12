@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { createConnection, Connection, Repository, ConnectionOptions } from 'typeorm';
+import { createConnection, Connection, ConnectionOptions } from 'typeorm';
 import { Component, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import Config from './Config';

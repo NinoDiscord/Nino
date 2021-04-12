@@ -48,9 +48,8 @@
   - [x] Short Links
   - [x] Dehoisting
   - [x] Blacklist
-  - [] Mentions
-  - [] Invites
-  - [] Raid
+  - [x] Mentions
+  - [x] Invites
   - [] Spam
 
 - Logging :tada:

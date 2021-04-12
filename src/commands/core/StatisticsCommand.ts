@@ -24,12 +24,13 @@
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
 import { Color, version, commitHash } from '../../util/Constants';
-import { Inject, LinkParent } from '@augu/lilith';
 import { firstUpper, humanize } from '@augu/utils';
+import { Inject, LinkParent } from '@augu/lilith';
 import CommandService from '../../services/CommandService';
 import { formatSize } from '../../util';
 import Kubernetes from '../../components/Kubernetes';
 import Stopwatch from '../../util/Stopwatch';
+import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
 import Redis from '../../components/Redis';
@@ -95,6 +96,9 @@ export default class StatisticsCommand extends Command {
   private parent!: CommandService;
 
   @Inject
+  private database!: Database;
+
+  @Inject
   private discord!: Discord;
 
   @Inject
@@ -147,7 +151,32 @@ export default class StatisticsCommand extends Command {
     };
   }
 
+  async getDatabaseStatistics() {
+    const stopwatch = new Stopwatch();
+    stopwatch.start();
+    await this.database.connection.query('SELECT * FROM guilds');
+    const ping = stopwatch.end();
+
+    // collect shit
+    const data = await Promise.all([
+      this.database.connection.query('SELECT tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted FROM pg_stat_database WHERE datname = \'nino\';'),
+      this.database.connection.query('SELECT version();'),
+      this.database.connection.query('SELECT extract(epoch FROM current_timestamp - pg_postmaster_start_time()) AS uptime;')
+    ]);
+
+    return {
+      inserted: Number(data[0][0].tup_inserted),
+      updated: Number(data[0][0].tup_updated),
+      deleted: Number(data[0][0].tup_deleted),
+      fetched: Number(data[0][0].tup_fetched),
+      version: data[1][0].version.split(', ').shift().replace('PostgreSQL ', '').trim(),
+      uptime: humanize(Math.floor(data[2][0].uptime * 1000), true),
+      ping
+    };
+  }
+
   async run(msg: CommandMessage) {
+    const database = await this.getDatabaseStatistics();
     const redis = await this.getRedisInfo();
     const guilds = this.discord.client.guilds.size.toLocaleString();
     const users = this.discord.client.guilds.reduce((a, b) => a + b.memberCount, 0).toLocaleString();
@@ -198,7 +227,16 @@ export default class StatisticsCommand extends Command {
             `• **Ops/s**\n${redis.stats.instantaneous_ops_per_sec.toLocaleString()}`,
             `• **Ping**\n${redis.ping}`
           ].join('\n'),
-          inline: false
+          inline: true
+        },
+        {
+          name: `❯ PostgreSQL v${database.version}`,
+          value: [
+            `• **Insert / Delete / Update / Fetched**:\n${database.inserted.toLocaleString()} / ${database.deleted.toLocaleString()} / ${database.updated.toLocaleString()} / ${database.fetched.toLocaleString()}`,
+            `• **Uptime**\n${database.uptime}`,
+            `• **Ping**\n${database.ping}`
+          ].join('\n'),
+          inline: true
         }
       ])
       .setFooter(`Owners: ${owners.map((user) => `${user.username}#${user.discriminator}`).join(', ')}`);
