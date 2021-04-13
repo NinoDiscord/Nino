@@ -23,12 +23,12 @@
 import type { Message, TextChannel } from 'eris';
 import { Inject, LinkParent } from '@augu/lilith';
 import PunishmentService from '../services/PunishmentService';
+import { Collection } from '@augu/collections';
 import PermissionUtil from '../util/Permissions';
 import AutomodService from '../services/AutomodService';
 import { Automod } from '../structures';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
-import { Collection } from '@augu/collections';
 
 @LinkParent(AutomodService)
 export default class Mentions implements Automod {
@@ -62,6 +62,23 @@ export default class Mentions implements Automod {
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
     ) return false;
 
+    const queue = this.get(msg.guildID, msg.author.id);
+    queue.push(msg.timestamp);
+
+    if (queue.length >= 5) {
+      const old = queue.shift()!;
+      if (msg.editedTimestamp && msg.editedTimestamp > msg.timestamp)
+        return false;
+
+      if (msg.timestamp - old <= 3000) {
+        this.clear(msg.guildID, msg.author.id);
+        await msg.channel.createMessage('o(╥﹏╥)o pls don\'t spam...');
+        await this.punishments.createWarning(msg.member, `[Automod] Spamming in ${msg.channel.mention} o(╥﹏╥)o`);
+        return true;
+      }
+    }
+
+    this.clean(msg.guildID);
     return false;
   }
 
@@ -72,36 +89,23 @@ export default class Mentions implements Automod {
     // Let's just not do anything if there is no spam cache for this guild
     if (buckets === undefined)
       return;
+
+    const ids = buckets.filterKeys(val => now - val[val.length - 1] >= 5000);
+    for (const id of ids)
+      this.cache.delete(id);
+  }
+
+  private get(guildID: string, userID: string) {
+    if (!this.cache.has(guildID))
+      this.cache.set(guildID, new Collection());
+
+    if (!this.cache.get(guildID)!.has(userID))
+      this.cache.get(guildID)!.set(userID, []);
+
+    return this.cache.get(guildID)!.get(userID)!;
+  }
+
+  private clear(guildID: string, userID: string) {
+    this.cache.get(guildID)!.delete(userID);
   }
 }
-
-// old code
-/*
-  __cleanUp(guildId: string) {
-    let now = Date.now();
-    let ids: (string | number)[] = [];
-    this.buckets.get(guildId)!.forEach((v, k) => {
-      let diff = now - v[v.length-1];
-      if (now - v[v.length - 1] >= 5000) {
-        ids.push(k);
-      }
-    });
-    ids.forEach(element => {
-      this.buckets.delete(element);
-    });
-  }
-
-  __getQueue(guildId: string, userId: string): number[] {
-    if (!this.buckets.has(guildId)) {
-      this.buckets.set(guildId, new Collection<number[]>());
-    }
-    if (!this.buckets.get(guildId)!.has(userId)) {
-      this.buckets.get(guildId)!.set(userId, []);
-    }
-    return this.buckets.get(guildId)!.get(userId)!;
-  }
-
-  __clearQueue(guildId: string, userId: string) {
-    this.buckets.get(guildId)!.delete(userId);
-  }
-*/

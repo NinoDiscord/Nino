@@ -170,10 +170,9 @@ export default class PunishmentService {
 
   async createWarning(member: Member, reason?: string, amount?: number) {
     const self = member.guild.members.get(this.discord.client.user.id)!;
-    const warnings = await this.database.warnings.get(member.guild.id, member.id);
-    const count = warnings
-      ? (amount !== undefined ? warnings.amount + amount : warnings.amount + 1)
-      : (amount !== undefined ? amount : 1);
+    const warnings = await this.database.warnings.getAll(member.guild.id, member.id);
+    const current = warnings.reduce((acc, curr) => acc + curr.amount, 0);
+    const count = amount !== undefined ? current + amount : current + 1;
 
     if (count < 0)
       throw new RangeError('amount out of bounds');
@@ -184,7 +183,7 @@ export default class PunishmentService {
     await this.database.warnings.create({
       guildID: member.guild.id,
       reason,
-      amount: count,
+      amount: amount ?? 1,
       userID: member.id
     });
 
@@ -208,7 +207,7 @@ export default class PunishmentService {
       type: PunishmentType.WarningAdded
     });
 
-    return results.length ? Promise.resolve() : this.publishToModLog({
+    return results.length > 0 ? Promise.resolve() : this.publishToModLog({
       warningsAdded: (amount ?? 0) + 1,
       moderator: self.user,
       reason,
@@ -220,10 +219,12 @@ export default class PunishmentService {
 
   async removeWarning(member: Member, reason?: string, amount?: number | 'all') {
     const self = member.guild.members.get(this.discord.client.user.id)!;
-    const warnings = await this.database.warnings.get(member.guild.id, member.id);
-    if (warnings === undefined)
+    const warnings = await this.database.warnings.getAll(member.guild.id, member.id);
+
+    if (warnings.length === 0)
       throw new SyntaxError('user doesn\'t have any punishments to be removed');
 
+    const count = warnings.reduce((acc, curr) => acc + curr.amount, 0);
     if (amount === 'all') {
       await this.database.warnings.clean(member.guild.id, member.id);
       const model = await this.database.cases.create({
@@ -243,7 +244,6 @@ export default class PunishmentService {
         type: PunishmentEntryType.WarningRemoved
       }, model);
     } else {
-      const count = amount !== undefined ? (warnings.amount - amount) : (warnings.amount - 1);
       const model = await this.database.cases.create({
         moderatorID: this.discord.client.user.id,
         victimID: member.id,

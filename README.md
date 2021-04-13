@@ -44,13 +44,13 @@
   - [x] Redis
   - [x] Sentry
 
-- Automod
+- Automod :tada:
   - [x] Short Links
   - [x] Dehoisting
   - [x] Blacklist
   - [x] Mentions
   - [x] Invites
-  - [] Spam
+  - [x] Spam
 
 - Logging :tada:
   - [x] Message Bulk Delete
