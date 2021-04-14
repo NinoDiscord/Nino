@@ -10,10 +10,10 @@
     - [] warn
     - [] pardon
     - [] warnings
-    - [] mutelist
-    - [] cases
+    - [x] case
     - [] unmute
     - [] unban
+    - [] reason
   - [x] Core :tada:
     - [x] help
     - [x] invite

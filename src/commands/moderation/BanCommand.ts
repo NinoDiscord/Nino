@@ -20,16 +20,16 @@
  * SOFTWARE.
  */
 
-import { Command, CommandMessage } from '../../structures';
 import { DiscordRESTError, Member, User } from 'eris';
+import { Command, CommandMessage } from '../../structures';
 import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
 import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import Permissions from '../../util/Permissions';
 import Discord from '../../components/Discord';
 import ms = require('ms');
-import Permissions from '../../util/Permissions';
 
 interface BanFlags {
   soft?: string | true;

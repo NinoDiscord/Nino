@@ -23,8 +23,9 @@
 /* eslint-disable camelcase */
 
 import type { APIEmbedAuthor, APIEmbedField, APIEmbedFooter, APIEmbedImage, APIEmbedThumbnail } from 'discord-api-types';
-import type { EmbedOptions } from 'eris';
 import { omitUndefinedOrNull } from '@augu/utils';
+import type { EmbedOptions } from 'eris';
+import { Color } from '../util/Constants';
 
 export default class EmbedBuilder {
   public description?: string;
@@ -169,6 +170,11 @@ export default class EmbedBuilder {
   setFooter(text: string, iconUrl?: string) {
     this.footer = { text, icon_url: iconUrl };
     return this;
+  }
+
+  static create() {
+    return new EmbedBuilder()
+      .setColor(Color);
   }
 
   build() {

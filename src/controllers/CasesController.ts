@@ -38,7 +38,7 @@ interface CreateCaseOptions {
 export default class CasesController {
   constructor(private database: Database) {}
 
-  private get repository() {
+  get repository() {
     return this.database.connection.getRepository(CaseEntity);
   }
 
