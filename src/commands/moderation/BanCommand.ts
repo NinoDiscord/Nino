@@ -106,13 +106,9 @@ export default class BanCommand extends Command {
         return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
     }
 
-    try {
-      const ban = await msg.guild.getBan(user.id);
-      if (ban !== undefined)
-        return msg.reply(`${user.bot ? 'Bot' : 'User'} was previously banned for ${ban.reason ?? '*(no reason provided)*'}`);
-    } catch(ex) {
-      // ignore
-    }
+    const ban = await msg.guild.getBan(user.id).catch(() => null);
+    if (ban !== null)
+      return msg.reply(`${user.bot ? 'Bot' : 'User'} was previously banned for ${ban.reason ?? '*(no reason provided)*'}`);
 
     let reason = args.length > 2 ? args.slice(1).join(' ') : undefined;
     let time: string | null = null;
