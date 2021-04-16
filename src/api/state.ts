@@ -20,45 +20,49 @@
  * SOFTWARE.
  */
 
-import { Component, Inject } from '@augu/lilith';
-import { hostname } from 'os';
+import { Inject, Service } from '@augu/lilith';
 import { Logger } from 'tslog';
-import * as k8s from '@kubernetes/client-node';
-import Config from './Config';
+import Config from '../components/Config';
+import Redis from '../components/Redis';
 
-@Component({
-  priority: 2,
-  name: 'kubernetes'
+type InviteStateLocation = 'bots.gg' | 'top.gg' | 'bfd' | 'dlist' | 'delly' | 'dservices' | 'boats' | 'command' | 'website';
+interface InviteOAuth2State {
+  location: InviteStateLocation;
+  code: string;
+}
+
+/**
+ * External class to handle Discord OAuth2 state for authorization
+ */
+@Service({
+  priority: 9,
+  name: 'oauth2'
 })
-export default class Kubernetes {
-  private kubeConfig: k8s.KubeConfig = new k8s.KubeConfig();
 
+// since this class is just for handling where Nino was invited
+// this won't be initialized unless `allowState: true` is enabled
+// under the "api" configuration.
+export default class OAuth2StateService {
   @Inject
   private logger!: Logger;
 
   @Inject
   private config!: Config;
 
-  load() {
-    const environment = this.config.getProperty('environment') ?? 'development';
-    if (environment !== 'production')
-      return;
+  @Inject
+  private redis!: Redis;
 
-    this.logger.info('Attempting to load kubeconfig...');
-    this.kubeConfig.loadFromDefault();
-  }
+  async load() {
+    const api = this.config.getProperty('api');
+    if (api?.allowState === false) {
+      this.logger.warn('api.allowState is not set to `true` or "api" config block is missing, this isn\'t recommended for private instances');
+      return Promise.resolve();
+    }
 
-  async getCurrentNode() {
-    const environment = this.config.getProperty('environment') ?? 'development';
-    if (environment !== 'production')
-      return;
-
-    const api = this.kubeConfig.makeApiClient(k8s.CoreV1Api);
-    const ns = this.config.getProperty('k8s.namespace');
-    if (ns === undefined)
-      return;
-
-    const pod = await api.listNamespacedPod(ns);
-    return pod.body.items.find(pod => pod.metadata!.name! === hostname())?.spec!.nodeName;
+    const botlists = await this
+      .redis
+      .client
+      .hvals('nino:oauth2:states:invites')
+      .then(val => val.map(v => JSON.parse<InviteOAuth2State>(v)).flat());
   }
 }

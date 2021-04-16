@@ -26,7 +26,7 @@ import IORedis from 'ioredis';
 import Config from './Config';
 
 @Component({
-  priority: 1,
+  priority: 4,
   name: 'redis'
 })
 export default class Redis {

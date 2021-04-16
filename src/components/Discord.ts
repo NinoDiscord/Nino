@@ -28,7 +28,7 @@ import { Logger } from 'tslog';
 import Config from './Config';
 
 @Component({
-  priority: 1,
+  priority: 6,
   name: 'discord'
 })
 export default class Discord {
@@ -122,7 +122,6 @@ export default class Discord {
     }
 
     if (ID_REGEX.test(query)) {
-      query = query.replace('<@!', '').replace('>', '');
       const user = this.client.users.get(query);
       if (user !== undefined)
         return user;
@@ -188,7 +187,7 @@ export default class Discord {
   }
 
   private onShardDisconnect(error: any, id: number) {
-    this.logger.fatal(`Shard #${id} has disconnected from the universe`, error || new Error('Connection has been reset by peer'));
+    this.logger.fatal(`Shard #${id} has disconnected from the universe`, error || 'Connection has been reset by peer.');
   }
 
   private onShardResume(id: number) {

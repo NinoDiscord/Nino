@@ -29,7 +29,7 @@ export default class SourceCommand extends Command {
   constructor() {
     super({
       description: 'descriptions.source',
-      aliases: ['git', 'github', 'sauce'],
+      aliases: ['git', 'github', 'sauce', 'oss'],
       name: 'source'
     });
   }

@@ -81,6 +81,7 @@ interface KubernetesConfig {
 }
 
 interface APIConfig {
+  allowState: boolean;
   secret: string;
   port: number;
 }

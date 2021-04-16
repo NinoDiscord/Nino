@@ -192,8 +192,6 @@ export default class CommandService extends Collection<string, NinoCommand> {
       rawArgs.shift();
 
     message['_flags'] = this.parseFlags(rawArgs.join(' '));
-
-    // Sanatize command args
     if (command.name !== 'eval') {
       rawArgs = rawArgs.filter(arg => !FLAG_REGEX.test(arg));
     }
@@ -224,7 +222,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
         .setColor(0xDAA2C6)
         .setDescription([
           `${subcommand !== undefined ? `Subcommand **${methodName}** (parent **${command.name}**)` : `Command **${command.name}**`} has failed to execute.`,
-          `If this is a re-occuring issue, contact ${contact} at <https://discord.gg/JjHGR6vhcG>, under the <#747522228714733610> channel.`,
+          `If this is a re-occuring issue, contact ${contact} at <https://discord.gg/ATmjFH9kMH>, under the <#747522228714733610> channel.`,
           '',
           '```js',
           ex.stack ?? '<... no stacktrace? ...>',
@@ -233,10 +231,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
         .build();
 
       await msg.channel.createMessage({ embed });
-
-      // hacky way for "TypeError  Cannot set property name of  which has only a getter"
-      this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute`);
-      console.error(ex.stack);
+      this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute`, ex.stack);
     }
   }
 

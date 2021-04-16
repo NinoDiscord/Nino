@@ -28,7 +28,7 @@ import sentry from '@sentry/node';
 import Config from './Config';
 
 @Component({
-  priority: 1,
+  priority: 5,
   name: 'sentry'
 })
 export default class Sentry {

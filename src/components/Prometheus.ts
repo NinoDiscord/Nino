@@ -27,7 +27,7 @@ import Config from './Config';
 import prom from 'prom-client';
 
 @Component({
-  priority: 1,
+  priority: 3,
   name: 'prometheus'
 })
 export default class Prometheus {

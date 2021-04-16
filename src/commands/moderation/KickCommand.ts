@@ -31,14 +31,8 @@ import Permissions from '../../util/Permissions';
 import Discord from '../../components/Discord';
 import ms = require('ms');
 
-interface BanFlags {
-  soft?: string | true;
-  days?: string | true;
-  d?: string | true;
-}
-
 @LinkParent(CommandService)
-export default class BanCommand extends Command {
+export default class KickCommand extends Command {
   @Inject
   private punishments!: PunishmentService;
 
@@ -47,27 +41,23 @@ export default class BanCommand extends Command {
 
   constructor() {
     super({
-      userPermissions: ['banMembers'],
-      botPermissions: ['banMembers'],
-      description: 'descriptions.ban',
+      userPermissions: 'kickMembers',
+      botPermissions: 'kickMembers',
+      description: 'descriptions.kick',
       category: Categories.Moderation,
       examples: [
-        'ban @Nino',
-        'ban @Nino some reason!',
-        'ban @Nino some reason! | 1d',
-        'ban @Nino some reason! | 1d -d 7'
+        'kick @Nino get yeeted!'
       ],
-      aliases: ['banne', 'bent', 'bean'],
-      usage: '<user> [reason [| time]]',
-      name: 'ban'
+      aliases: ['yeet', 'yeetafluff', 'yeetfluff', 'boot'],
+      usage: '<user> [reason]',
+      name: 'kick'
     });
   }
 
-  async run(msg: CommandMessage, args: string[]) {
-    if (args.length < 1)
+  async run(msg: CommandMessage, [userID, ...reason]: string[]) {
+    if (!userID)
       return msg.reply('No bot or user was specified.');
 
-    const userID = args[0];
     let user!: User | null;
     try {
       user = await this.discord.getUser(userID);
@@ -88,61 +78,36 @@ export default class BanCommand extends Command {
     if (user === null)
       return msg.reply('Bot or user was not found.');
 
-    const member = msg.guild.members.get(user.id) ?? { id: user.id, guild: msg.guild };
+    if (!msg.guild.members.has(user.id))
+      return msg.reply('Cannot kick members outside the server.');
+
+    const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
-      return msg.reply('I don\'t think I can perform this action due to you banning the owner, you idiot.');
+      return msg.reply('I don\'t think I can perform this action due to you kicking the owner, you idiot.');
 
     if (member.id === this.discord.client.user.id)
-      return msg.reply(';w; why would you ban me from here? **(／。＼)**');
+      return msg.reply(';w; why would you kick me from here? **(／。＼)**');
 
-    if (member instanceof Member) { // this won't work for banning members not in this guild
-      if (!member.permissions.has('administrator') && !member.permissions.has('banMembers'))
-        return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
+    if (!member.permissions.has('administrator') && !member.permissions.has('banMembers'))
+      return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
 
-      if (!Permissions.isMemberAbove(msg.member, member))
-        return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above you.`);
+    if (!Permissions.isMemberAbove(msg.member, member))
+      return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above as you.`);
 
-      if (!Permissions.isMemberAbove(msg.self, member))
-        return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
-    }
-
-    const ban = await msg.guild.getBan(user.id).catch(() => null);
-    if (ban !== null)
-      return msg.reply(`${user.bot ? 'Bot' : 'User'} was previously banned for ${ban.reason ?? '*(no reason provided)*'}`);
-
-    let reason = args.length > 2 ? args.slice(1).join(' ') : undefined;
-    let time: string | null = null;
-
-    if (reason !== undefined) {
-      const [r, t] = reason.split(' | ');
-      reason = r;
-      time = t ?? null;
-    }
-
-    const flags = msg.flags<BanFlags>();
-    if (typeof flags.days === 'boolean' || typeof flags.d === 'boolean')
-      return msg.reply('The `--days` flag must have a value appended. Example: `--days=7` or `-d 7`');
-
-    const days = flags.days ?? flags.d ?? 7;
-    if (Number(days) > 7)
-      return msg.reply('You can only concat 7 days worth of messages');
-
-    if (flags.soft !== undefined)
-      await msg.reply('Flag `--soft` is deprecated and will be removed in a future release, use the `softban` command.');
+    if (!Permissions.isMemberAbove(msg.self, member))
+      return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
 
     try {
       await this.punishments.apply({
         moderator: msg.author,
         publish: true,
-        reason,
-        member: msg.guild.members.get(user.id) || { id: user.id, guild: msg.guild },
-        soft: flags.soft === true,
-        type: PunishmentType.Ban,
-        days: Number(days),
-        time: time !== null ? ms(time) : undefined
+        reason: reason.length ? reason.join(' ') : undefined,
+        member: msg.guild.members.get(user.id)!,
+        soft: false,
+        type: PunishmentType.Kick
       });
 
-      return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been banned${reason ? ` *for ${reason}${time !== null ? ` in ${ms(time)}` : ''}` : '.'}*`);
+      return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been kicked${reason.length ? ` *for ${reason.join(' ')}*` : '.'}`);
     } catch(ex) {
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',

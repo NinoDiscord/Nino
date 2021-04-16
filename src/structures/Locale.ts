@@ -103,7 +103,7 @@ export default class Locale {
     }
   }
 
-  private stringify(value: any, rawArgs?: { [x: string]: any } | any[]) {
+  private stringify(value: any, rawArgs?: { [x: string]: any } | (string | number)[]) {
     // If no arguments are provided, best to assume to return the string
     if (!rawArgs)
       return value;
@@ -117,7 +117,7 @@ export default class Locale {
 
     return (value as string).replace(regex, (_, key) => {
       if (Array.isArray(rawArgs)) {
-        return rawArgs[i++];
+        return String(rawArgs[i++]);
       } else {
         const value = String(rawArgs[key]);
         if (value === '')

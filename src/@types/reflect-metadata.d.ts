@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+/** */
 declare namespace Reflect {
   /**
    * Gets the metadata value for the provided metadata key on the target object or its prototype chain.

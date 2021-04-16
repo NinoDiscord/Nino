@@ -20,25 +20,29 @@
  * SOFTWARE.
  */
 
-/**
- * Metadata for a locale, this is used in the "meta" object
- */
-export interface LocalizationMeta {
-  /** List of contributors (by user ID) who helped translate or fix minor issues with this Locale */
-  contributors: string[];
+export {};
+/** */
+declare global {
+  /**
+   * Metadata for a locale, this is used in the "meta" object
+   */
+  interface LocalizationMeta {
+    /** List of contributors (by user ID) who helped translate or fix minor issues with this Locale */
+    contributors: string[];
 
-  /** The translator's ID */
-  translator: string;
+    /** The translator's ID */
+    translator: string;
 
-  /** Any additional aliases to use when setting or resetting a locale */
-  aliases: string[];
+    /** Any additional aliases to use when setting or resetting a locale */
+    aliases: string[];
 
-  /** The flag's emoji (example: `:flag_us:`) */
-  flag: string;
+    /** The flag's emoji (example: `:flag_us:`) */
+    flag: string;
 
-  /** The full name of the Locale (i.e `English (UK)`) */
-  full: string;
+    /** The full name of the Locale (i.e `English (UK)`) */
+    full: string;
 
-  /** The locale's code (i.e `en_US`) */
-  code: string;
+    /** The locale's code (i.e `en_US`) */
+    code: string;
+  }
 }
