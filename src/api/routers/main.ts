@@ -22,10 +22,11 @@
 
 import type { Request, Response } from 'express';
 import { Inject, LinkParent } from '@augu/lilith';
+import TimeoutsManager from '../../structures/timeouts/TimeoutsManager';
 import { Router } from '@augu/http';
-import { Get } from '../decorators';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
+import { Get } from '../decorators';
 import Redis from '../../components/Redis';
 import Api from '../API';
 
@@ -39,6 +40,9 @@ const statuses = {
 
 @LinkParent(Api)
 export default class CasesRouter extends Router {
+  @Inject
+  private timeouts!: TimeoutsManager;
+
   @Inject
   private database!: Database;
 
@@ -62,6 +66,7 @@ export default class CasesRouter extends Router {
   async health(_: Request, res: Response) {
     return res.status(200).json({
       database: this.database.connection.isConnected,
+      timeouts: this.timeouts.state === 'connected',
       shards: this.discord.client.shards.map(shard => ({ [shard.id]: statuses[shard.status] })),
       redis: this.redis.client.status === 'ready',
       bot: this.discord.client.ready

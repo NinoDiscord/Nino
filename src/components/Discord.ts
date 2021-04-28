@@ -126,7 +126,7 @@ export default class Discord {
       if (user !== undefined)
         return user;
       else
-        return this.client.getRESTUser(query);
+        return this.client.getRESTUser(query.replace('<@!', '').replace('>', ''));
     }
 
     return null;

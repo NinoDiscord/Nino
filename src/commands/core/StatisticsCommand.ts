@@ -220,6 +220,11 @@ export default class StatisticsCommand extends Command {
           inline: true
         },
         {
+          name: '\u200b',
+          value: '\u200b',
+          inline: true
+        },
+        {
           name: `❯ Redis v${redis.server.redis_version} [${firstUpper(redis.server.redis_mode)}]`,
           value: [
             `• **Network I/O**\n${formatSize(redis.stats.total_net_input_bytes)} / ${formatSize(redis.stats.total_net_output_bytes)}`,

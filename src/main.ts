@@ -49,5 +49,5 @@ import app from './container';
   });
 })();
 
-process.on('unhandledRejection', error => console.error('Unhandled promise rejection has occured\n', error));
-process.on('uncaughtException', error => console.error('Uncaught exception has occured\n', error));
+process.on('unhandledRejection', error => logger.fatal('Unhandled promise rejection has occured\n', error));
+process.on('uncaughtException', error => logger.fatal('Uncaught exception has occured\n', error));

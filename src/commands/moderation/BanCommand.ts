@@ -96,7 +96,7 @@ export default class BanCommand extends Command {
       return msg.reply(';w; why would you ban me from here? **(／。＼)**');
 
     if (member instanceof Member) { // this won't work for banning members not in this guild
-      if (!member.permissions.has('administrator') && !member.permissions.has('banMembers'))
+      if (member.permissions.has('administrator') && member.permissions.has('banMembers'))
         return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
 
       if (!Permissions.isMemberAbove(msg.member, member))
