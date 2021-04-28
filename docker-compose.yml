@@ -1,1 +1,67 @@
-# coming soon near you
+version: '3.8'
+services:
+  bot:
+    container_name: nino
+    restart: always
+    build: .
+    depends_on:
+      - postgresql
+      - prometheus
+      - timeouts
+      - redis
+    networks:
+      - nino
+    volumes:
+      - /opt/Nino/config.yml:config.yml:ro # Read-only
+
+  redis:
+    container_name: redis
+    restart: always
+    image: redis:latest
+    ports:
+      - 6379:6379
+    networks:
+      - nino
+    volumes:
+      - redis:/data
+
+  postgresql:
+    container_name: postgres
+    restart: always
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    networks:
+      - nino
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+
+  prometheus:
+    container_name: prometheus
+    build: ./docker/prometheus
+    restart: always
+    networks:
+      - default
+
+  timeouts:
+    container_name: timeouts
+    restart: always
+    image: docker.pkg.github.com/ninodiscord/timeouts/timeouts:latest
+    ports:
+      - 4025:4025
+    networks:
+      - nino
+    environment:
+      AUTH: ${TIMEOUTS_AUTH}
+    
+volumes:
+  redis:
+  postgres:
+
+networks:
+  nino:
+    internal: true
