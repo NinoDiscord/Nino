@@ -9,5 +9,6 @@ RUN apk add --no-cache git
 RUN npm i -g typescript eslint typeorm
 RUN npm ci && npm run build
 RUN rm -rf src
+RUN npm cache clean --force
 
 ENTRYPOINT [ "npm", "run", "start" ]
