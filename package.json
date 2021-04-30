@@ -50,7 +50,7 @@
   "devDependencies": {
     "@augu/eslint-config": "2.0.3",
     "@types/common-tags": "1.8.0",
-    "@types/ioredis": "4.26.0",
+    "@types/ioredis": "4.26.1",
     "@types/jest": "26.0.23",
     "@types/js-yaml": "3.12.4",
     "@types/mongoose": "5.10.1",
