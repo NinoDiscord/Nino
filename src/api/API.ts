@@ -70,9 +70,8 @@ export default class API {
       const path = routers[i];
       const ctor: RouterCtor = await import(path);
 
-      // TODO(auguwu): make this as a function in @augu/lilith
-      const injections = Reflect.getMetadata<PendingInjectDefinition[]>('$lilith::api::injections::pending', global) ?? [];
-      for (const inject of injections) app.inject(inject);
+      // Run the injections
+      app.runInjections();
 
       // @ts-ignore
       const router: Router = new ctor.default!();
@@ -100,7 +99,7 @@ export default class API {
     );
 
     this.server.on('request', (props) =>
-      this.logger.debug(`API: ${props.method} ${props.path} (${props.status}) | ${props.time}ms`)
+      this.logger.debug(`API: ${props.method} ${props.path} (${props.status}) | ~${props.time}ms`)
     );
 
     this.server.on('debug', message => this.logger.debug(`API: ${message}`));

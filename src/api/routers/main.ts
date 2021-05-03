@@ -72,4 +72,9 @@ export default class CasesRouter extends Router {
       bot: this.discord.client.ready
     });
   }
+
+  @Get('/favicon.ico')
+  favicon(_: Request, res: Response) {
+    return res.status(404).send('Cannot GET /favicon.ico');
+  }
 }

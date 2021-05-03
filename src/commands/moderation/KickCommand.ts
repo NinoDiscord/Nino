@@ -88,7 +88,7 @@ export default class KickCommand extends Command {
     if (member.id === this.discord.client.user.id)
       return msg.reply(';w; why would you kick me from here? **(／。＼)**');
 
-    if (member.permissions.has('administrator') && member.permissions.has('banMembers'))
+    if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
       return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
 
     if (!Permissions.isMemberAbove(msg.member, member))

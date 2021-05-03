@@ -99,15 +99,16 @@ export default class Discord {
 
   async getUser(query: string) {
     if (USER_MENTION_REGEX.test(query)) {
-      const match = query.match(USER_MENTION_REGEX)!;
+      const match = USER_MENTION_REGEX.exec(query);
       if (match === null)
         return null;
 
       const user = this.client.users.get(match[1]);
-      if (user !== undefined)
+      if (user !== undefined) {
         return user;
-      else
-        return null;
+      } else {
+        return this.client.getRESTUser(match[1]).catch(() => null);
+      }
     }
 
     if (USERNAME_DISCRIM_REGEX.test(query)) {
@@ -187,7 +188,7 @@ export default class Discord {
   }
 
   private onShardDisconnect(error: any, id: number) {
-    this.logger.fatal(`Shard #${id} has disconnected from the universe`, error || 'Connection has been reset by peer.');
+    this.logger.fatal(`Shard #${id} has disconnected from the universe\n`, error || 'Connection has been reset by peer.');
   }
 
   private onShardResume(id: number) {
