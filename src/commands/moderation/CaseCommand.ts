@@ -83,7 +83,7 @@ export default class CaseCommand extends Command {
     };
 
     const embed = EmbedBuilder.create()
-      .setAuthor(`[ Case #${caseModel.index} | ${victim.username}#${victim.discriminator} ${caseModel.victimID}]`, undefined, victim.dynamicAvatarURL?.('png', 1024)) // dynamicAvatarURL might not exist since partials
+      .setAuthor(`[ Case #${caseModel.index} | ${victim.username}#${victim.discriminator} (${caseModel.victimID})]`, undefined, victim.dynamicAvatarURL?.('png', 1024)) // dynamicAvatarURL might not exist since partials
       .setDescription([
         `${caseModel.reason ? `**${caseModel.reason}**` : `*Unknown, use \`${msg.settings.prefixes[0]}reason ${caseModel.index} <reason>\` to set a reason*`}`,
         '',

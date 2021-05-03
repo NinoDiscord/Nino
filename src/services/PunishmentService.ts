@@ -26,6 +26,7 @@ import { PunishmentType } from '../entities/PunishmentsEntity';
 import { EmbedBuilder } from '../structures';
 import type GuildEntity from '../entities/GuildEntity';
 import type CaseEntity from '../entities/CaseEntity';
+import TimeoutsManager from '../components/timeouts/Timeouts';
 import Permissions from '../util/Permissions';
 import { Logger } from 'tslog';
 import Database from '../components/Database';
@@ -72,6 +73,7 @@ interface PublishModLogOptions {
 }
 
 interface ApplyGenericMuteOptions extends ApplyActionOptions {
+  moderator: User;
   settings: GuildEntity;
 }
 
@@ -85,9 +87,11 @@ interface ApplyActionOptions {
 
 interface ApplyGenericVoiceAction extends Exclude<ApplyActionOptions, 'guild' | 'time' | 'self'> {
   statement: PublishModLogOptions;
+  moderator: User;
 }
 
 interface ApplyBanActionOptions extends ApplyActionOptions {
+  moderator: User;
   soft: boolean;
   days: number;
 }
@@ -140,6 +144,10 @@ export default class PunishmentService {
       : member.guild.members.has(member.id)
         ? member.guild.members.get(member.id)!
         : (rest ? await this.discord.client.getRESTGuildMember(member.guild.id, member.id) : new Member({ id: member.id }, member.guild, this.discord.client));
+  }
+
+  get timeouts(): TimeoutsManager {
+    return app.$ref(TimeoutsManager);
   }
 
   permissionsFor(type: PunishmentType) {
@@ -283,7 +291,7 @@ export default class PunishmentService {
       (BigInt(self.permissions.allow) & this.permissionsFor(type)) === 0n
     ) return;
 
-    const user = await this.resolveMember(member, type !== PunishmentType.Ban);
+    const user = await this.resolveMember(member, type === PunishmentType.Unban);
     const modlogStatement: PublishModLogOptions = {
       moderator,
       reason,
@@ -296,6 +304,7 @@ export default class PunishmentService {
     switch (type) {
       case PunishmentType.Ban:
         await this.applyBan({
+          moderator,
           member: user,
           reason,
           guild: member.guild,
@@ -312,6 +321,7 @@ export default class PunishmentService {
 
       case PunishmentType.Mute:
         await this.applyMute({
+          moderator,
           settings,
           member: user,
           reason,
@@ -328,6 +338,7 @@ export default class PunishmentService {
 
       case PunishmentType.Unmute:
         await this.applyUnmute({
+          moderator,
           settings,
           member: user,
           reason,
@@ -340,6 +351,7 @@ export default class PunishmentService {
 
       case PunishmentType.VoiceMute:
         await this.applyVoiceMute({
+          moderator,
           statement: modlogStatement,
           member: user,
           reason,
@@ -352,6 +364,7 @@ export default class PunishmentService {
 
       case PunishmentType.VoiceDeafen:
         await this.applyVoiceDeafen({
+          moderator,
           statement: modlogStatement,
           member: user,
           reason,
@@ -364,6 +377,7 @@ export default class PunishmentService {
 
       case PunishmentType.VoiceUnmute:
         await this.applyVoiceUnmute({
+          moderator,
           statement: modlogStatement,
           member: user,
           reason,
@@ -375,6 +389,7 @@ export default class PunishmentService {
 
       case PunishmentType.VoiceUndeafen:
         await this.applyVoiceUndeafen({
+          moderator,
           statement: modlogStatement,
           member: user,
           reason,
@@ -401,6 +416,7 @@ export default class PunishmentService {
   }
 
   private async applyBan({
+    moderator,
     reason,
     member,
     guild,
@@ -411,8 +427,16 @@ export default class PunishmentService {
     await guild.banMember(member.id, days, reason);
     if (soft) await guild.unbanMember(member.id, reason);
     if (!soft && time !== undefined && time > 0) {
-      // do something
-      // this.timeouts;
+      if (this.timeouts.state !== 'connected')
+        this.logger.warn('Timeouts service is not connected! Will relay once done...');
+
+      await this.timeouts.apply({
+        moderator: moderator.id,
+        victim: member.id,
+        guild: guild.id,
+        type: PunishmentType.Unban,
+        time
+      });
     }
   }
 
@@ -427,7 +451,7 @@ export default class PunishmentService {
       await member.removeRole(role.id, reason ? encodeURIComponent(reason) : 'No reason was specified.');
   }
 
-  private async applyMute({ settings, reason, member, guild, time }: ApplyGenericMuteOptions) {
+  private async applyMute({ moderator, settings, reason, member, guild, time }: ApplyGenericMuteOptions) {
     const roleID = await this.getOrCreateMutedRole(guild, settings);
 
     if (reason) reason = encodeURIComponent(reason);
@@ -436,25 +460,57 @@ export default class PunishmentService {
     }
 
     if (time !== undefined && time > 0) {
-      // do something
-      // this.timeouts;
+      if (this.timeouts.state !== 'connected')
+        this.logger.warn('Timeouts service is not connected! Will relay once done...');
+
+      await this.timeouts.apply({
+        moderator: moderator.id,
+        victim: member.id,
+        guild: guild.id,
+        type: PunishmentType.Unmute,
+        time
+      });
     }
   }
 
-  private async applyVoiceMute({ reason, member, statement }: ApplyGenericVoiceAction) {
+  private async applyVoiceMute({ moderator, reason, member, guild, statement, time }: ApplyGenericVoiceAction) {
     if (reason) reason = encodeURIComponent(reason);
     if (member.voiceState !== undefined && !member.voiceState.mute)
       await member.edit({ mute: true }, reason ?? 'No reason was specified.');
 
     statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
+    if (time !== undefined && time > 0) {
+      if (this.timeouts.state !== 'connected')
+        this.logger.warn('Timeouts service is not connected! Will relay once done...');
+
+      await this.timeouts.apply({
+        moderator: moderator.id,
+        victim: member.id,
+        guild: guild.id,
+        type: PunishmentType.VoiceUnmute,
+        time
+      });
+    }
   }
 
-  private async applyVoiceDeafen({ reason, member, statement }: ApplyGenericVoiceAction) {
+  private async applyVoiceDeafen({ moderator, reason, member, guild, statement, time }: ApplyGenericVoiceAction) {
     if (reason) reason = encodeURIComponent(reason);
     if (member.voiceState !== undefined && !member.voiceState.deaf)
       await member.edit({ deaf: true }, reason ?? 'No reason was specified.');
 
     statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
+    if (time !== undefined && time > 0) {
+      if (this.timeouts.state !== 'connected')
+        this.logger.warn('Timeouts service is not connected! Will relay once done...');
+
+      await this.timeouts.apply({
+        moderator: moderator.id,
+        victim: member.id,
+        guild: guild.id,
+        type: PunishmentType.VoiceUndeafen,
+        time
+      });
+    }
   }
 
   private async applyVoiceUnmute({ reason, member, statement }: ApplyGenericVoiceAction) {

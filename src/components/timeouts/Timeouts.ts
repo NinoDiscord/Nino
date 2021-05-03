@@ -39,7 +39,7 @@ interface ApplyTimeoutOptions {
 }
 
 @Component({
-  priority: 1,
+  priority: 6,
   name: 'timeouts'
 })
 export default class TimeoutsManager {
@@ -128,6 +128,17 @@ export default class TimeoutsManager {
     });
 
     await this.redis.client.hmset('nino:timeouts', [guild, JSON.stringify(list)]);
+    this.send(types.OPCodes.Request, {
+      moderator,
+      reason: reason === undefined ? null : reason,
+      expired: Date.now() + time,
+      issued: Date.now(),
+      guild,
+      user: victim,
+      type
+    });
+
+    return Promise.resolve();
   }
 
   private _onOpen() {
@@ -170,8 +181,10 @@ export default class TimeoutsManager {
           break;
         }
 
+        // TODO: remove timeouts
         await this.punishments.apply({
           moderator: this.discord.client.users.get(packet.d.moderator)!,
+          publish: true,
           reason: packet.d.reason === null ? undefined : packet.d.reason,
           member: { id: packet.d.user, guild },
           type: packet.d.type

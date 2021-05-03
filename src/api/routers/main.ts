@@ -22,7 +22,7 @@
 
 import type { Request, Response } from 'express';
 import { Inject, LinkParent } from '@augu/lilith';
-import TimeoutsManager from '../../structures/timeouts/TimeoutsManager';
+import TimeoutsManager from '../../components/timeouts/Timeouts';
 import { Router } from '@augu/http';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';

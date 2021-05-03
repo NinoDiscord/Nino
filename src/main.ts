@@ -23,7 +23,6 @@
 import 'source-map-support/register';
 import 'reflect-metadata';
 
-import Timeouts from './structures/timeouts/TimeoutsManager';
 import logger from './singletons/Logger';
 import Api from './api/API';
 import app from './container';
@@ -32,7 +31,6 @@ import app from './container';
   logger.info('Loading...');
   try {
     await app.load();
-    await app.addComponent(Timeouts);
     await app.addComponent(Api);
   } catch(ex) {
     logger.fatal('Unable to load container');
@@ -49,5 +47,5 @@ import app from './container';
   });
 })();
 
-process.on('unhandledRejection', error => logger.fatal('Unhandled promise rejection has occured\n', error));
+process.on('unhandledRejection', error => logger.fatal('Unhandled promise rejection has occured\n', (error as any).stack ?? '(none provided)'));
 process.on('uncaughtException', error => logger.fatal('Uncaught exception has occured\n', error));

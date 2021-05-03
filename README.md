@@ -5,7 +5,7 @@
 - Commands
   - [] Moderation
     - [x] ban
-    - [] kick
+    - [x] kick
     - [] mute
     - [] warn
     - [] pardon
