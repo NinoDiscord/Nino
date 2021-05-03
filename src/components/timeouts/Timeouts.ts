@@ -181,7 +181,15 @@ export default class TimeoutsManager {
           break;
         }
 
-        // TODO: remove timeouts
+        const timeouts = await this.redis.client.hget('nino:timeouts', packet.d.guild)
+          .then((value) => value !== null ? JSON.parse<types.Timeout[]>(value) : [])
+          .catch(() => [] as types.Timeout[]);
+
+        const available = timeouts.filter(pkt =>
+          packet.d.user !== pkt.user && packet.d.type.toLowerCase() !== pkt.type.toLowerCase()
+        );
+
+        await this.redis.client.hmset('nino:timeouts', [guild.id, JSON.stringify(available)]);
         await this.punishments.apply({
           moderator: this.discord.client.users.get(packet.d.moderator)!,
           publish: true,

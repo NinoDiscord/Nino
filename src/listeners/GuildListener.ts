@@ -47,6 +47,9 @@ export default class VoidListener {
 
   @Subscribe('guildCreate')
   async onGuildCreate(guild: Guild) {
+    if (guild.name === undefined)
+      return;
+
     this.logger.info(`✔ New Guild: ${guild.name} (${guild.id})`);
     await this.database.guilds.create(guild.id);
     this.prometheus.guildCount.inc();
@@ -61,7 +64,7 @@ export default class VoidListener {
         .setColor(Color)
         .setAuthor(`[ Joined ${guild.name} (${guild.id}) ]`, undefined, this.discord.client.user.dynamicAvatarURL('png', 1024))
         .setDescription([
-          `• **Members [B / T]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${guild.large ? 'Yes' : 'No'})`,
+          `• **Members [Bots / Total]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${guild.large ? 'Yes' : 'No'})`,
           `• **Owner**: ${owner ? `${owner.username}#${owner.discriminator} (${owner.id})` : 'Not cached'}`
         ])
         .setFooter(`✔ Now at ${this.discord.client.guilds.size.toLocaleString()} Guilds`);
@@ -72,6 +75,9 @@ export default class VoidListener {
 
   @Subscribe('guildDelete')
   async onGuildDelete(guild: Guild) {
+    if (guild.name === undefined)
+      return;
+
     this.logger.info(`❌ Left Guild: ${guild.name} (${guild.id})`);
     await this.database.guilds.delete(guild.id);
     this.prometheus.guildCount.dec();
@@ -86,7 +92,7 @@ export default class VoidListener {
         .setColor(Color)
         .setAuthor(`[ Left ${guild.name} (${guild.id}) ]`, undefined, this.discord.client.user.dynamicAvatarURL('png', 1024))
         .setDescription([
-          `• **Members [B / T]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${guild.large ? 'Yes' : 'No'})`,
+          `• **Members [Bots / Total]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${guild.large ? 'Yes' : 'No'})`,
           `• **Owner**: ${owner ? `${owner.username}#${owner.discriminator} (${owner.id})` : 'Not cached'}`
         ])
         .setFooter(`✔ Now at ${this.discord.client.guilds.size.toLocaleString()} Guilds`);

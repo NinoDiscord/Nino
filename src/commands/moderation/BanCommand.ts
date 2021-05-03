@@ -142,7 +142,7 @@ export default class BanCommand extends Command {
         time: time !== null ? ms(time) : undefined
       });
 
-      return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been banned${reason ? ` *for ${reason}${time !== null ? ` in ${ms(time)}` : ''}` : '.'}*`);
+      return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been banned${reason ? ` *for ${reason}${time !== null ? ` in ${time}` : ''}` : '.'}*`);
     } catch(ex) {
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',

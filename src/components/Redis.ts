@@ -21,6 +21,7 @@
  */
 
 import { Component, Inject } from '@augu/lilith';
+import type { Timeout } from './timeouts/types';
 import { Logger } from 'tslog';
 import IORedis from 'ioredis';
 import Config from './Config';
@@ -72,5 +73,11 @@ export default class Redis {
 
   dispose() {
     return this.client.disconnect();
+  }
+
+  getTimeouts(guild: string) {
+    return this.client.hget('nino:timeouts', guild)
+      .then(value => value !== null ? JSON.parse<Timeout[]>(value) : [])
+      .catch(() => [] as Timeout[]);
   }
 }

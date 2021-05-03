@@ -47,7 +47,8 @@ export default class SoftbanCommand extends Command {
     super({
       userPermissions: 'banMembers',
       botPermissions: 'banMembers',
-      description: 'Softly bans a user for optionally, a short period of time',
+      description: 'descriptions.softban',
+      category: Categories.Moderation,
       examples: [
         'softban 154254569632587456',
         'softban 154254569632587456 bad!',
@@ -60,7 +61,7 @@ export default class SoftbanCommand extends Command {
     });
   }
 
-  async run(msg: CommandMessage, [userID, ...reason]: [string, string]) {
+  async run(msg: CommandMessage, [userID, ...reason]: [string, ...string[]]) {
     if (!userID)
       return msg.reply('No bot or user was specified.');
 
@@ -117,7 +118,7 @@ export default class SoftbanCommand extends Command {
       await this.punishments.apply({
         moderator: msg.author,
         publish: true,
-        reason: reason.join(' '),
+        reason: reason.join(' ') || 'No reason was provided.',
         member: msg.guild.members.get(user.id) || { id: user.id, guild: msg.guild },
         soft: true,
         type: PunishmentType.Ban,

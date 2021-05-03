@@ -24,11 +24,11 @@ import { hostname } from 'os';
 import { Logger } from 'tslog';
 
 const logger = new Logger({
-  displayFunctionName: true,
+  displayFunctionName: false,
   exposeErrorCodeFrame: true,
   displayInstanceName: true,
+  dateTimePattern: '[hour:minute:second @ day/month/year]',
   displayFilePath: 'hideNodeModulesOnly',
-  dateTimePattern: '[ day-month-year / hour:minute:second ]',
   displayTypes: false,
   instanceName: hostname(),
   name: 'Nino'

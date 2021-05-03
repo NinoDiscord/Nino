@@ -14,6 +14,8 @@
     - [] unmute
     - [] unban
     - [] reason
+    - [x] softban
+    - [x] timeouts
   - [x] Core :tada:
     - [x] help
     - [x] invite

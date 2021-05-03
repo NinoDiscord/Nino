@@ -291,7 +291,7 @@ export default class PunishmentService {
       (BigInt(self.permissions.allow) & this.permissionsFor(type)) === 0n
     ) return;
 
-    const user = await this.resolveMember(member, type === PunishmentType.Unban);
+    const user = await this.resolveMember(member, type !== PunishmentType.Unban);
     const modlogStatement: PublishModLogOptions = {
       moderator,
       reason,
