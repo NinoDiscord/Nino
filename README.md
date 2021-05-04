@@ -104,7 +104,8 @@ There is tools that are optional but are mostly recommended in some cases:
 - [Git](https://git-scm.com) - Useful for fetching new updates easily.
 
 ### Setting up
-There are 2 ways to setup Nino: using Docker or just doing shit yourself. For self-hosting, Docker isn't required to be used in any environment, it's just there if you really want to use Docker and in Production, we utilize Kubernetes. ┐\_(ツ)\_┌━☆ﾟ.*･｡ﾟ
+There are 2 ways to setup Nino: using Docker or just doing shit yourself. Doing it yourself can very tedious
+of how much Nino uses from v0 to v1 since Nino utilizes microservices! **☆♬○♩●♪✧♩((ヽ( ᐛ )ﾉ))♩✧♪●♩○♬☆**
 
 ### Docker
 This step isn't finished due to the rewrite not being stable.
