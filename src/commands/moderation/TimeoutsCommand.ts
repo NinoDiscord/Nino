@@ -25,9 +25,9 @@ import { Inject, LinkParent } from '@augu/lilith';
 import type { Timeout } from '../../components/timeouts/types';
 import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import { firstUpper } from '@augu/utils';
 import Discord from '../../components/Discord';
 import Redis from '../../components/Redis';
-import { firstUpper } from '@augu/utils';
 
 @LinkParent(CommandService)
 export default class TimeoutsCommand extends Command {
@@ -79,7 +79,7 @@ export default class TimeoutsCommand extends Command {
         name: `❯ #${idx + 1}: User ${user!.username}#${user!.discriminator}`,
         value: [
           `• **Issued At**: ${issuedAt.toUTCString()}`,
-          `• **Expires At**: ${new Date(pkt.expired).toDateString()}`,
+          `• **Expires At**: ${new Date(pkt.expired).toUTCString()}`,
           `• **Moderator**: ${moderator.username}#${moderator.discriminator}`,
           `• **Reason**: ${pkt.reason ?? '*No reason was defined.*'}`
         ].join('\n'),

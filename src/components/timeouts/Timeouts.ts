@@ -116,7 +116,7 @@ export default class TimeoutsManager {
     time,
     type
   }: ApplyTimeoutOptions) {
-    const list = await this.redis.client.hget('nino:timeouts', guild).then(val => val === null ? [] : JSON.parse<types.Timeout[]>(val));
+    const list = await this.redis.getTimeouts(guild);
     list.push({
       moderator,
       reason: reason === undefined ? null : reason,
@@ -165,7 +165,7 @@ export default class TimeoutsManager {
     switch (data.op) {
       case types.OPCodes.Ready: {
         this.logger.info('Authenicated successfully, now sending timeouts...');
-        const timeouts = await this.redis.client.hvals('nino:timeouts').then(val => val.map(v => JSON.parse<types.Timeout>(v)).flat());
+        const timeouts = await this.redis.client.hvals('nino:timeouts').then((value) => value[0] !== '' ? value.map(val => JSON.parse<types.Timeout>(val)).flat() : [] as types.Timeout[]);
         this.logger.info(`Received ${timeouts.length} timeouts to relay`);
 
         this.send(types.OPCodes.Acknowledged, timeouts);
@@ -181,10 +181,7 @@ export default class TimeoutsManager {
           break;
         }
 
-        const timeouts = await this.redis.client.hget('nino:timeouts', packet.d.guild)
-          .then((value) => value !== null ? JSON.parse<types.Timeout[]>(value) : [])
-          .catch(() => [] as types.Timeout[]);
-
+        const timeouts = await this.redis.getTimeouts(packet.d.guild);
         const available = timeouts.filter(pkt =>
           packet.d.user !== pkt.user && packet.d.type.toLowerCase() !== pkt.type.toLowerCase()
         );

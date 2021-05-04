@@ -127,7 +127,7 @@ export default class Discord {
       if (user !== undefined)
         return user;
       else
-        return this.client.getRESTUser(query.replace('<@!', '').replace('>', ''));
+        return this.client.getRESTUser(query);
     }
 
     return null;
@@ -135,22 +135,24 @@ export default class Discord {
 
   getChannel<T extends AnyChannel = AnyChannel>(query: string, guild?: Guild) {
     return new Promise<T | null>(resolve => {
-      if (ID_REGEX.test(query)) {
-        query = query.replace('<#', '').replace('>', '');
-        if (guild) {
-          return resolve(guild.channels.has(query) ? guild.channels.get(query)! as T : null);
-        } else {
-          const channel = query in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[query])?.channels.get(query);
-          return resolve(channel as T || null);
-        }
-      }
-
       if (CHANNEL_REGEX.test(query)) {
-        const match = query.match(CHANNEL_REGEX)!;
+        const match = CHANNEL_REGEX.exec(query);
+        if (match === null)
+          return resolve(null);
+
         if (guild) {
           return resolve(guild.channels.has(match[1]) ? guild.channels.get(match[1])! as T : null);
         } else {
           const channel = match[1] in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[match[1]])?.channels.get(match[1]);
+          return resolve(channel as T || null);
+        }
+      }
+
+      if (ID_REGEX.test(query)) {
+        if (guild) {
+          return resolve(guild.channels.has(query) ? guild.channels.get(query)! as T : null);
+        } else {
+          const channel = query in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[query])?.channels.get(query);
           return resolve(channel as T || null);
         }
       }
@@ -169,7 +171,10 @@ export default class Discord {
   getRole(query: string, guild: Guild) {
     return new Promise<Role | null>(resolve => {
       if (ROLE_REGEX.test(query)) {
-        const match = query.match(ROLE_REGEX)!;
+        const match = ROLE_REGEX.exec(query)!;
+        if (match === null)
+          return resolve(null);
+
         const role = guild.roles.get(match[1]);
 
         if (role !== undefined)

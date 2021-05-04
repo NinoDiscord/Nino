@@ -47,9 +47,9 @@ export const Color = 0xDAA2C6;
 export const USERNAME_DISCRIM_REGEX = /^(.+)#(\d{4})$/;
 export const DISCORD_INVITE_REGEX = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg)\/\w+/;
 export const USER_MENTION_REGEX = /^<@!?([0-9]+)>$/;
-export const CHANNEL_REGEX = /<#([0-9]+)>/gi;
+export const CHANNEL_REGEX = /<#([0-9]+)>$/;
 export const QUOTE_REGEX = /['"]/;
-export const ROLE_REGEX = /^<@&([0-9]+)>/gi;
+export const ROLE_REGEX = /^<@&([0-9]+)>$/;
 export const ID_REGEX = /^\d+$/;
 
 /**
