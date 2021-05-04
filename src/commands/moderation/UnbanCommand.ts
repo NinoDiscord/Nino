@@ -21,22 +21,17 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { DiscordRESTError, User } from 'eris';
 import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
 import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
-import Discord from '../../components/Discord';
 import Redis from '../../components/Redis';
 
 @LinkParent(CommandService)
 export default class UnbanCommand extends Command {
   @Inject
   private punishments!: PunishmentService;
-
-  @Inject
-  private discord!: Discord;
 
   @Inject
   private redis!: Redis;
