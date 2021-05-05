@@ -22,7 +22,16 @@
 
 import { hostname } from 'os';
 import { Logger } from 'tslog';
+import { parse } from '@augu/dotenv';
+import { join } from 'path';
 
+const env = parse<Record<string, any>>({
+  file: join(__dirname, '..', '..', '.env'),
+  populate: false,
+  delimiter: ','
+});
+
+process.env.NODE_ENV = env.NODE_ENV ?? 'production';
 const logger = new Logger({
   displayFunctionName: false,
   exposeErrorCodeFrame: true,
@@ -33,5 +42,17 @@ const logger = new Logger({
   instanceName: hostname(),
   name: 'Nino'
 });
+
+// Monkey-patch for not logging debug events
+// in production
+const originalDebug = logger.debug;
+
+// @ts-ignore
+logger.debug = (...args: any[]) => {
+  if (process.env.NODE_ENV !== 'development')
+    return;
+
+  return originalDebug(...args);
+};
 
 export default logger;

@@ -12,7 +12,7 @@
     - [] warnings
     - [x] case
     - [] unmute
-    - [] unban
+    - [x] unban
     - [] reason
     - [x] softban
     - [x] timeouts

@@ -35,7 +35,6 @@ import { join } from 'path';
 import Discord from '../components/Discord';
 import Config from '../components/Config';
 
-
 const FLAG_REGEX = /(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi;
 
 @Service({
