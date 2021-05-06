@@ -104,8 +104,10 @@ function stringifyDBType(type: PunishmentType): PunishmentEntryType | null {
     case PunishmentType.VoiceMute: return PunishmentEntryType.VoiceMute;
     case PunishmentType.Unmute: return PunishmentEntryType.Unmuted;
     case PunishmentType.Unban: return PunishmentEntryType.Unban;
+    case PunishmentType.Mute: return PunishmentEntryType.Muted;
     case PunishmentType.Kick: return PunishmentEntryType.Kicked;
     case PunishmentType.Ban: return PunishmentEntryType.Banned;
+
     default: return null; // shouldn't come here but oh well
   }
 }

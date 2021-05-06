@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-import { Command, CommandMessage } from '../../structures';
-import { DiscordRESTError, User } from 'eris';
+import { DiscordRESTError, Member, User } from 'eris';
+import { Command, CommandMessage, EmbedBuilder } from '../../structures';
 import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
@@ -29,9 +29,10 @@ import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
 import Permissions from '../../util/Permissions';
 import Discord from '../../components/Discord';
+import ms = require('ms');
 
 @LinkParent(CommandService)
-export default class KickCommand extends Command {
+export default class MuteCommand extends Command {
   @Inject
   private punishments!: PunishmentService;
 
@@ -40,20 +41,20 @@ export default class KickCommand extends Command {
 
   constructor() {
     super({
-      userPermissions: 'kickMembers',
-      botPermissions: 'kickMembers',
-      description: 'descriptions.kick',
+      botPermissions: 'manageMessages',
+      description: 'descriptions.mute',
       category: Categories.Moderation,
       examples: [
-        'kick @Nino get yeeted!'
+        'mute @Nino',
+        'mute @Nino bap!',
+        'mute @Nino bap bap | 1d'
       ],
-      aliases: ['yeet', 'yeetafluff', 'yeetfluff', 'boot'],
-      usage: '<user> [reason]',
-      name: 'kick'
+      usage: '<user> [reason [|time]]',
+      name: 'mute'
     });
   }
 
-  async run(msg: CommandMessage, [userID, ...reason]: string[]) {
+  async run(msg: CommandMessage, [userID, ...reason]: [string, ...string[]]) {
     if (!userID)
       return msg.reply('No bot or user was specified.');
 
@@ -96,17 +97,36 @@ export default class KickCommand extends Command {
     if (!Permissions.isMemberAbove(msg.self, member))
       return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
 
+    const areason = reason.join(' ');
+    let actualReason: string | undefined = undefined;
+    let time: number | undefined = undefined;
+
+    if (areason !== '') {
+      const [r, t] = areason.split(' | ');
+      actualReason = r;
+      time = ms(t);
+    }
+
     try {
       await this.punishments.apply({
         moderator: msg.author,
         publish: true,
-        reason: reason.length ? reason.join(' ') : undefined,
-        member: msg.guild.members.get(user.id)!,
-        soft: false,
-        type: PunishmentType.Kick
+        reason: actualReason,
+        member,
+        type: PunishmentType.Mute,
+        time
       });
 
-      return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been kicked${reason.length ? ` *for ${reason.join(' ')}*` : '.'}`);
+      const embed = EmbedBuilder.create()
+        .setTitle(`	｡･ﾟﾟ\*(>д<)\*ﾟﾟ･｡	Member ${member.username}#${member.discriminator} has been muted`);
+
+      if (actualReason !== undefined)
+        embed.addField('• Reason', `**${actualReason}**`, true);
+
+      if (time !== undefined && ms(time) !== undefined)
+        embed.addField('• Time', `**${ms(time, { long: true })}**`, true);
+
+      return msg.reply(embed);
     } catch(ex) {
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',

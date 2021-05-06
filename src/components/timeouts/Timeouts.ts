@@ -190,7 +190,7 @@ export default class TimeoutsManager {
         await this.punishments.apply({
           moderator: this.discord.client.users.get(packet.d.moderator)!,
           publish: true,
-          reason: packet.d.reason === null ? undefined : packet.d.reason,
+          reason: packet.d.reason === null ? '[Automod] Time is up.' : packet.d.reason,
           member: { id: packet.d.user, guild },
           type: packet.d.type
         });

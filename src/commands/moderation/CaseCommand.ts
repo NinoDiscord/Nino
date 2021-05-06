@@ -21,7 +21,6 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
-import { DiscordRESTError, User } from 'eris';
 import { Inject, LinkParent } from '@augu/lilith';
 import PunishmentService from '../../services/PunishmentService';
 import CommandService from '../../services/CommandService';

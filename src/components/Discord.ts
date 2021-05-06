@@ -184,7 +184,12 @@ export default class Discord {
       if (ID_REGEX.test(query))
         return resolve(guild.roles.has(query) ? guild.roles.get(query)! : null);
 
-      resolve(null);
+      const roles = guild.roles.filter(role =>
+        role.name.toLowerCase() === query.toLowerCase()
+      );
+
+      // TODO: pagination?
+      resolve(roles.length > 0 ? roles[0] : null);
     });
   }
 
