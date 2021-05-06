@@ -79,7 +79,7 @@ export default class MuteCommand extends Command {
       return msg.reply('Bot or user was not found.');
 
     if (!msg.guild.members.has(user.id))
-      return msg.reply('Cannot kick members outside the server.');
+      return msg.reply('Cannot mute members outside the server.');
 
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
