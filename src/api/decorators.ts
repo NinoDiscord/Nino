@@ -25,7 +25,7 @@ import { MetadataKeys } from '../util/Constants';
 
 export interface RouteDefinition {
   run(req: Request, res: Response): any;
-  method: 'get' | 'patch' | 'delete';
+  method: 'get' | 'patch' | 'put' | 'delete';
   path: string;
 }
 
@@ -60,6 +60,19 @@ export function Delete(path: string): MethodDecorator {
     const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, target) ?? [];
     routes.push({
       method: 'delete',
+      path,
+      run: descriptor.value
+    });
+
+    Reflect.defineMetadata(MetadataKeys.APIRoute, routes, target);
+  };
+}
+
+export function Put(path: string): MethodDecorator {
+  return (target: any, _, descriptor: TypedPropertyDescriptor<any>) => {
+    const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, target) ?? [];
+    routes.push({
+      method: 'put',
       path,
       run: descriptor.value
     });

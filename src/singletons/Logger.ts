@@ -43,16 +43,4 @@ const logger = new Logger({
   name: 'Nino'
 });
 
-// Monkey-patch for not logging debug events
-// in production
-const originalDebug = logger.debug;
-
-// @ts-ignore
-logger.debug = (...args: any[]) => {
-  if (process.env.NODE_ENV !== 'development')
-    return;
-
-  return originalDebug(...args);
-};
-
 export default logger;
