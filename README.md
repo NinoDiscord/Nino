@@ -6,7 +6,7 @@
   - [] Moderation
     - [x] ban
     - [x] kick
-    - [] mute
+    - [x] mute
     - [] warn
     - [] pardon
     - [] warnings
