@@ -13,9 +13,13 @@
     - [x] case
     - [] unmute
     - [x] unban
-    - [] reason
+    - [x] reason
     - [x] softban
     - [x] timeouts
+    - [] vcmute
+    - [] vcdeafen
+    - [] vcundeaf
+    - [] vcunmute
   - [x] Core :tada:
     - [x] help
     - [x] invite
