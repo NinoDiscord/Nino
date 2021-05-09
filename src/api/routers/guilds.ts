@@ -22,7 +22,7 @@
 
 /* eslint-disable camelcase */
 
-import { Get, Patch, Put, Delete } from '../decorators';
+import { Get, Patch, Put, Delete, Post } from '../decorators';
 import type { Request, Response } from 'express';
 import { Inject, LinkParent } from '@augu/lilith';
 import { Router } from '@augu/http';
@@ -112,16 +112,11 @@ export default class GuildsRouter extends Router {
     return res.status(204).end();
   }
 
-  @Put('/:id/automod')
+  @Post('/:id/automod')
   enableAutomod(_: Request, res: Response) {
     // requires `name` param
     return res.status(400).json({
       message: `Requires \`name\` parameter (i.e: /guilds/${_.params.id}/automod/spam)`
     });
-  }
-
-  @Put('/:id/automod/:name')
-  enableSpecificAutomod(req: Request, res: Response) {
-    // todo: this
   }
 }

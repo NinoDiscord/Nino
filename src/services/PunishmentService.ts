@@ -571,6 +571,16 @@ export default class PunishmentService {
   }
 
   editModLog(model: CaseEntity, message: Message) {
+    const warningRemovedField = message.embeds[0].fields?.find(field => field.name.includes('Warnings Removed'));
+    const warningsAddField = message.embeds[0].fields?.find(field => field.name.includes('Warnings Added'));
+
+    const obj: Record<string, any> = {};
+    if (warningsAddField !== undefined)
+      obj.warningsAdded = Number(warningsAddField.value);
+
+    if (warningRemovedField !== undefined)
+      obj.warningsRemoved = warningRemovedField.value === 'All' ? 'All' : Number(warningRemovedField.value);
+
     return message.edit({
       content: `**[** ${emojis[stringifyDBType(model.type)!] ?? ':question:'} ~ Case #**${model.index}** (${stringifyDBType(model.type) ?? '... unknown ...'}) **]**`,
       embed: this.getModLogEmbed(model.index, {
@@ -579,7 +589,9 @@ export default class PunishmentService {
         reason: model.reason,
         guild: this.discord.client.guilds.get(model.guildID)!,
         time: model.time,
-        type: stringifyDBType(model.type)!
+        type: stringifyDBType(model.type)!,
+
+        ...obj
       }).build()
     });
   }
@@ -637,7 +649,8 @@ export default class PunishmentService {
       .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${moderator.id})`, true);
 
     embed.setDescription([
-      reason !== undefined ? `**${reason}**` : '**No reason was specified**',
+      // wat???
+      reason !== undefined ? `**${Array.isArray(reason) ? reason.join(' ') : reason}**` : '**No reason was specified**',
       reason === undefined ? `• Use **\`reason ${caseID} <reason>\`** to update the reason` : '',
       time === undefined && [PunishmentEntryType.VoiceDeaf, PunishmentEntryType.VoiceMute, PunishmentEntryType.Muted, PunishmentEntryType.Banned].includes(type)
         ? `• Use **\`ut ${caseID} <time>\`** to update the time of this case.`
