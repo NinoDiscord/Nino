@@ -12,7 +12,7 @@ services:
     networks:
       - nino
     volumes:
-      - /opt/Nino/config.yml:config.yml:ro # Read-only
+      - ./config.yml:/opt/Nino/config.yml:ro # Read-only
 
   redis:
     container_name: redis
