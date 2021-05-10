@@ -21,14 +21,13 @@
  */
 
 import type { Request, Response } from 'express';
-import { Inject, LinkParent } from '@augu/lilith';
+import { Inject } from '@augu/lilith';
 import TimeoutsManager from '../../components/timeouts/Timeouts';
 import { Router } from '@augu/http';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import { Get } from '../decorators';
 import Redis from '../../components/Redis';
-import Api from '../API';
 
 const statuses = {
   disconnected: 'Disconnected',
@@ -38,7 +37,6 @@ const statuses = {
   ready: 'Ready'
 };
 
-@LinkParent(Api)
 export default class CasesRouter extends Router {
   @Inject
   private timeouts!: TimeoutsManager;

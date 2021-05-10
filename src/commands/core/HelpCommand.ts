@@ -22,8 +22,8 @@
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
 import { Constants as ErisConstants } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import { firstUpper } from '@augu/utils';
+import { Inject } from '@augu/lilith';
 import * as Constants from '../../util/Constants';
 import CommandService from '../../services/CommandService';
 import Permissions from '../../util/Permissions';
@@ -34,12 +34,9 @@ interface CommandCategories {
   general?: Command[];
 }
 
-@LinkParent(CommandService)
 export default class HelpCommand extends Command {
   private categories!: CommandCategories;
-
-  @Inject
-  private service!: CommandService;
+  private parent!: CommandService;
 
   constructor() {
     super({
@@ -66,7 +63,7 @@ export default class HelpCommand extends Command {
     if (this.categories === undefined) {
       this.categories = {};
 
-      const commands = this.service.filter(cmd => !cmd.ownerOnly);
+      const commands = this.parent.filter(cmd => !cmd.ownerOnly);
       for (let i = 0; i < commands.length; i++) {
         const command = commands[i];
         (this.categories[command.category] ??= []).push(command);
@@ -80,7 +77,7 @@ export default class HelpCommand extends Command {
         `:pencil2: **For more documentation of a command or module, run \`${prefix}help <cmdOrMod>\` with \`<cmdOrMod>\` with the command or module you want to look up.**`,
         '',
         'You can browse the [website](https://nino.floofy.dev) for more information and a prettier UI for this help command.',
-        `There are currently **${this.service.size}** commands available.`
+        `There are currently **${this.parent.size}** commands available.`
       ]);
 
     for (const cat in (this.categories as Required<CommandCategories>)) {
@@ -92,7 +89,7 @@ export default class HelpCommand extends Command {
   }
 
   private async renderDoc(msg: CommandMessage, cmdOrMod: string) {
-    const command = this.service.filter(cmd => !cmd.hidden && cmd.name === cmdOrMod || cmd.aliases.includes(cmdOrMod))[0];
+    const command = this.parent.filter(cmd => !cmd.hidden && cmd.name === cmdOrMod || cmd.aliases.includes(cmdOrMod))[0];
     const prefix = msg.settings.prefixes[msg.settings.prefixes.length - 1];
 
     if (command !== undefined) {
@@ -147,7 +144,7 @@ export default class HelpCommand extends Command {
 
       return msg.reply(embed);
     } else {
-      const mod = this.service.filter(cmd => cmd.category.toLowerCase() === cmdOrMod.toLowerCase());
+      const mod = this.parent.filter(cmd => cmd.category.toLowerCase() === cmdOrMod.toLowerCase());
       if (mod.length > 0) {
         const longestName = this._calculateLength(mod.sort((a, b) => this._calculateLength(b) - this._calculateLength(a))[0]);
         const embed = new EmbedBuilder()

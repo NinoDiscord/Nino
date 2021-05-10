@@ -21,10 +21,9 @@
  */
 
 import { Constants, Message, OldMessage, TextChannel } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import { LoggingEvents } from '../entities/LoggingEntity';
 import { EmbedBuilder } from '../structures';
-import ListenerService from '../services/ListenerService';
+import { Inject } from '@augu/lilith';
 import CommandService from '../services/CommandService';
 import AutomodService from '../services/AutomodService';
 import { Color } from '../util/Constants';
@@ -34,7 +33,6 @@ import Discord from '../components/Discord';
 
 const HTTP_REGEX = /^https?:\/\/(.*)/;
 
-@LinkParent(ListenerService)
 export default class MessageListener {
   @Inject
   private commands!: CommandService;

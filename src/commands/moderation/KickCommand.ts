@@ -22,15 +22,13 @@
 
 import { Command, CommandMessage } from '../../structures';
 import { DiscordRESTError, User } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
-import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Permissions from '../../util/Permissions';
 import Discord from '../../components/Discord';
 
-@LinkParent(CommandService)
 export default class KickCommand extends Command {
   @Inject
   private punishments!: PunishmentService;

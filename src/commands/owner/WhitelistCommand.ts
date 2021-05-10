@@ -21,20 +21,14 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
-import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
-import Discord from '../../components/Discord';
 import Config from '../../components/Config';
 
-@LinkParent(CommandService)
 export default class WhitelistCommand extends Command {
   @Inject
   private database!: Database;
-
-  @Inject
-  private discord!: Discord;
 
   @Inject
   private config!: Config;

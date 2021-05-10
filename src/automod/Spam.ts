@@ -21,16 +21,14 @@
  */
 
 import type { Message, TextChannel } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import PunishmentService from '../services/PunishmentService';
 import { Collection } from '@augu/collections';
 import PermissionUtil from '../util/Permissions';
-import AutomodService from '../services/AutomodService';
 import { Automod } from '../structures';
+import { Inject } from '@augu/lilith';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
-@LinkParent(AutomodService)
 export default class Mentions implements Automod {
   private cache: Collection<string, Collection<string, number[]>> = new Collection();
   public name: string = 'mentions';

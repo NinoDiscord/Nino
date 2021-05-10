@@ -21,19 +21,17 @@
  */
 
 import type { Message, TextChannel } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import PunishmentService from '../services/PunishmentService';
 import * as Constants from '../util/Constants';
 import PermissionUtil from '../util/Permissions';
-import AutomodService from '../services/AutomodService';
 import { Automod } from '../structures';
+import { Inject } from '@augu/lilith';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
 // tfw ice the adorable fluff does all the regex for u :woeme:
 const LINK_REGEX = /(https?:\/\/)?(\w*\.\w*)/gi;
 
-@LinkParent(AutomodService)
 export default class Shortlinks implements Automod {
   public name: string = 'shortlinks';
 

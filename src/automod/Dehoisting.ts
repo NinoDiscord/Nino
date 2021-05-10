@@ -20,14 +20,12 @@
  * SOFTWARE.
  */
 
-import { Inject, LinkParent } from '@augu/lilith';
 import type { Member } from 'eris';
-import AutomodService from '../services/AutomodService';
 import { Automod } from '../structures';
+import { Inject } from '@augu/lilith';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
-@LinkParent(AutomodService)
 export default class Dehoisting implements Automod {
   public name: string = 'dehoisting';
 

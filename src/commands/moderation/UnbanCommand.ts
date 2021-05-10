@@ -21,14 +21,12 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
-import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Redis from '../../components/Redis';
 
-@LinkParent(CommandService)
 export default class UnbanCommand extends Command {
   @Inject
   private punishments!: PunishmentService;

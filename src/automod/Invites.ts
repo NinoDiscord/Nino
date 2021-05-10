@@ -21,16 +21,14 @@
  */
 
 import { DiscordRESTError, Invite, Message, TextChannel } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import PunishmentService from '../services/PunishmentService';
 import * as Constants from '../util/Constants';
 import PermissionUtil from '../util/Permissions';
-import AutomodService from '../services/AutomodService';
 import { Automod } from '../structures';
+import { Inject } from '@augu/lilith';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
-@LinkParent(AutomodService)
 export default class Invites implements Automod {
   public name: string = 'invites';
 

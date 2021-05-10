@@ -20,18 +20,16 @@
  * SOFTWARE.
  */
 
-import { DiscordRESTError, Member, User } from 'eris';
+import { DiscordRESTError, User } from 'eris';
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
-import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Permissions from '../../util/Permissions';
 import Discord from '../../components/Discord';
 import ms = require('ms');
 
-@LinkParent(CommandService)
 export default class MuteCommand extends Command {
   @Inject
   private punishments!: PunishmentService;

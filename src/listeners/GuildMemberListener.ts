@@ -22,9 +22,8 @@
 
 import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, Member } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
-import ListenerService from '../services/ListenerService';
+import { Inject } from '@augu/lilith';
 import AutomodService from '../services/AutomodService';
 import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
@@ -37,7 +36,6 @@ interface OldMember {
   roles: string[];
 }
 
-@LinkParent(ListenerService)
 export default class GuildMemberListener {
   @Inject
   private punishments!: PunishmentService;
@@ -56,7 +54,7 @@ export default class GuildMemberListener {
       return undefined;
 
     try {
-      const audits = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_ROLE_UPDATE);
+      const audits = await guild.getAuditLog({ limit: 3, actionType: Constants.AuditLogActions.MEMBER_ROLE_UPDATE });
       return audits.entries.sort((a, b) => b.createdAt - a.createdAt).find(entry =>
         entry.user.id !== this.discord.client.user.id && // Check if the user that did it was not Nino
         entry.targetID === member.id && // Check if the target ID is the member

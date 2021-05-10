@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-import { FindChildrenIn, Inject, Service } from '@augu/lilith';
 import type { Member, Message, TextChannel, User } from 'eris';
+import { Inject, Service } from '@augu/lilith';
 import type { Automod } from '../structures';
 import { Collection } from '@augu/collections';
 import { Logger } from 'tslog';
@@ -29,9 +29,9 @@ import { join } from 'path';
 
 @Service({
   priority: 1,
+  children: join(process.cwd(), 'automod'),
   name: 'automod'
 })
-@FindChildrenIn(join(process.cwd(), 'automod'))
 export default class AutomodService extends Collection<string, Automod> {
   @Inject
   private logger!: Logger;

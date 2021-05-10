@@ -25,9 +25,9 @@
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
 import { Color, version, commitHash } from '../../util/Constants';
 import { firstUpper, humanize } from '@augu/utils';
-import { Inject, LinkParent } from '@augu/lilith';
 import CommandService from '../../services/CommandService';
 import { formatSize } from '../../util';
+import { Inject } from '@augu/lilith';
 import Kubernetes from '../../components/Kubernetes';
 import Stopwatch from '../../util/Stopwatch';
 import Database from '../../components/Database';
@@ -91,7 +91,6 @@ interface RedisServerInfo {
   io_threads_active: string;
 }
 
-@LinkParent(CommandService)
 export default class StatisticsCommand extends Command {
   private parent!: CommandService;
 

@@ -21,10 +21,7 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { LinkParent } from '@augu/lilith';
-import CommandService from '../../services/CommandService';
 
-@LinkParent(CommandService)
 export default class SourceCommand extends Command {
   constructor() {
     super({

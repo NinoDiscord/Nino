@@ -21,11 +21,9 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
-import CommandService from '../../services/CommandService';
 import { firstUpper } from '@augu/utils';
 import type { Shard } from 'eris';
-import { Color } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Discord from '../../components/Discord';
 
 type ShardStatus = Shard['status'];
@@ -47,7 +45,6 @@ interface ShardInfo {
   id: number;
 }
 
-@LinkParent(CommandService)
 export default class ShardInfoCommand extends Command {
   @Inject
   private discord!: Discord;
@@ -71,8 +68,7 @@ export default class ShardInfoCommand extends Command {
       id: shard.id
     }));
 
-    const embed = new EmbedBuilder()
-      .setColor(Color)
+    const embed = EmbedBuilder.create()
       .addFields(shards.map(shard => ({
         name: `❯ Shard #${shard.id}`,
         value: [

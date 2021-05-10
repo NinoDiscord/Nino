@@ -22,10 +22,9 @@
 
 import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import type { AnyGuildChannel, TextChannel, User } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
-import { Categories, Color } from '../../util/Constants';
 import { LoggingEvents } from '../../entities/LoggingEntity';
-import CommandService from '../../services/CommandService';
+import { Categories } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 
@@ -38,7 +37,6 @@ const humanizedEvents = {
   [LoggingEvents.MessageDeleted]: 'Message Deleted'
 };
 
-@LinkParent(CommandService)
 export default class ModLogCommand extends Command {
   @Inject
   private database!: Database;
@@ -105,8 +103,7 @@ export default class ModLogCommand extends Command {
     const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.logging.get(msg.guild.id);
 
-    const embed = new EmbedBuilder()
-      .setColor(Color)
+    const embed = EmbedBuilder.create()
       .setDescription([
         `• **Channels Ignored**: ${settings.ignoreChannels.length}`,
         `• **Users Ignored**: ${settings.ignoreUsers.length}`,

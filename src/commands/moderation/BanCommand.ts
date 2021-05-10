@@ -22,11 +22,10 @@
 
 import { DiscordRESTError, Member, User } from 'eris';
 import { Command, CommandMessage } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
-import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Permissions from '../../util/Permissions';
 import Discord from '../../components/Discord';
 import ms = require('ms');
@@ -37,7 +36,6 @@ interface BanFlags {
   d?: string | true;
 }
 
-@LinkParent(CommandService)
 export default class BanCommand extends Command {
   @Inject
   private punishments!: PunishmentService;
@@ -47,8 +45,8 @@ export default class BanCommand extends Command {
 
   constructor() {
     super({
-      userPermissions: ['banMembers'],
-      botPermissions: ['banMembers'],
+      userPermissions: 'banMembers',
+      botPermissions: 'banMembers',
       description: 'descriptions.ban',
       category: Categories.Moderation,
       examples: [

@@ -21,14 +21,12 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
 import { Categories } from '../../util/Constants';
-import CommandService from '../../services/CommandService';
 import { inspect } from 'util';
+import { Inject } from '@augu/lilith';
 import Stopwatch from '../../util/Stopwatch';
 import Config from '../../components/Config';
 
-@LinkParent(CommandService)
 export default class EvalCommand extends Command {
   @Inject
   private config!: Config;

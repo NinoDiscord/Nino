@@ -21,15 +21,13 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
 import type { Timeout } from '../../components/timeouts/types';
-import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
 import { firstUpper } from '@augu/utils';
+import { Inject } from '@augu/lilith';
 import Discord from '../../components/Discord';
 import Redis from '../../components/Redis';
 
-@LinkParent(CommandService)
 export default class TimeoutsCommand extends Command {
   @Inject
   private discord!: Discord;

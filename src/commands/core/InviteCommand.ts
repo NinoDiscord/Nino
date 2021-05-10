@@ -21,11 +21,9 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
-import CommandService from '../../services/CommandService';
+import { Inject } from '@augu/lilith';
 import Discord from '../../components/Discord';
 
-@LinkParent(CommandService)
 export default class InviteCommand extends Command {
   @Inject
   private discord!: Discord;

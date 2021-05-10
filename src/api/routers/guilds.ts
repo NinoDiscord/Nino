@@ -24,13 +24,11 @@
 
 import { Get, Patch, Put, Delete, Post } from '../decorators';
 import type { Request, Response } from 'express';
-import { Inject, LinkParent } from '@augu/lilith';
+import { Inject } from '@augu/lilith';
 import { Router } from '@augu/http';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
-import Api from '../API';
 
-@LinkParent(Api)
 export default class GuildsRouter extends Router {
   @Inject
   private database!: Database;

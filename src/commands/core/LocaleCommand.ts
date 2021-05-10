@@ -22,9 +22,7 @@
 
 import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import LocalizationService from '../../services/LocalizationService';
-import { Inject, LinkParent } from '@augu/lilith';
-import CommandService from '../../services/CommandService';
-import { Color } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 
@@ -33,7 +31,6 @@ interface Flags {
   u?: string | true;
 }
 
-@LinkParent(CommandService)
 export default class LocaleCommand extends Command {
   @Inject
   private languages!: LocalizationService;
@@ -61,9 +58,8 @@ export default class LocaleCommand extends Command {
   }
 
   run(msg: CommandMessage) {
-    const embed = new EmbedBuilder()
+    const embed = EmbedBuilder.create()
       .setTitle('[ Localization ]')
-      .setColor(Color)
       .setDescription([
         '> **Current Settings**',
         '```apache',
@@ -87,8 +83,7 @@ export default class LocaleCommand extends Command {
     });
 
     return msg.reply(
-      new EmbedBuilder()
-        .setColor(Color)
+      EmbedBuilder.create()
         .setTitle('[ Languages ]')
         .setDescription(languages)
     );

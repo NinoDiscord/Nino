@@ -22,13 +22,11 @@
 
 import { Command, CommandMessage, Subcommand } from '../../structures';
 import type { TextChannel } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import { Categories } from '../../util/Constants';
-import CommandService from '../../services/CommandService';
+import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 
-@LinkParent(CommandService)
 export default class ModLogCommand extends Command {
   @Inject
   private database!: Database;

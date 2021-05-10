@@ -21,15 +21,13 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
 import PunishmentService from '../../services/PunishmentService';
-import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import ms from 'ms';
 
-@LinkParent(CommandService)
 export default class CaseCommand extends Command {
   @Inject
   private punishments!: PunishmentService;

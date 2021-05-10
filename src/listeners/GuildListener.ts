@@ -21,17 +21,14 @@
  */
 
 import type { Guild, TextChannel } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import { EmbedBuilder } from '../structures';
-import ListenerService from '../services/ListenerService';
 import { Logger } from 'tslog';
-import { Color } from '../util/Constants';
+import { Inject } from '@augu/lilith';
 import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 import Prom from '../components/Prometheus';
 
-@LinkParent(ListenerService)
 export default class VoidListener {
   @Inject
   private prometheus!: Prom;
@@ -60,8 +57,7 @@ export default class VoidListener {
     const humans = guild.members.filter(r => !r.bot).length;
 
     if (channel !== undefined && channel.type === 0) {
-      const embed = new EmbedBuilder()
-        .setColor(Color)
+      const embed = EmbedBuilder.create()
         .setAuthor(`[ Joined ${guild.name} (${guild.id}) ]`, undefined, this.discord.client.user.dynamicAvatarURL('png', 1024))
         .setDescription([
           `• **Members [Bots / Total]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${guild.large ? 'Yes' : 'No'})`,
@@ -88,8 +84,7 @@ export default class VoidListener {
     const humans = guild.members.filter(r => !r.bot).length;
 
     if (channel !== undefined && channel.type === 0) {
-      const embed = new EmbedBuilder()
-        .setColor(Color)
+      const embed = EmbedBuilder.create()
         .setAuthor(`[ Left ${guild.name} (${guild.id}) ]`, undefined, this.discord.client.user.dynamicAvatarURL('png', 1024))
         .setDescription([
           `• **Members [Bots / Total]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${guild.large ? 'Yes' : 'No'})`,

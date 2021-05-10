@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-import { Service, Inject, FindChildrenIn } from '@augu/lilith';
 import { EmbedBuilder, CommandMessage } from '../structures';
 import type { Message, TextChannel } from 'eris';
+import { Service, Inject } from '@augu/lilith';
 import LocalizationService from './LocalizationService';
 import type NinoCommand from '../structures/Command';
 import AutomodService from './AutomodService';
@@ -39,9 +39,9 @@ const FLAG_REGEX = /(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi;
 
 @Service({
   priority: 0,
+  children: join(process.cwd(), 'commands'),
   name: 'commands'
 })
-@FindChildrenIn(join(process.cwd(), 'commands'))
 export default class CommandService extends Collection<string, NinoCommand> {
   public commandsExecuted: number = 0;
   public messagesSeen: number = 0;
@@ -69,6 +69,11 @@ export default class CommandService extends Collection<string, NinoCommand> {
   private localization!: LocalizationService;
 
   onChildLoad(command: NinoCommand) {
+    if (!command.name) {
+      this.logger.warn(`Unfinished command: ${command.constructor.name}`);
+      return;
+    }
+
     this.logger.info(`✔ Loaded command ${command.name}!`);
     this.set(command.name, command);
   }

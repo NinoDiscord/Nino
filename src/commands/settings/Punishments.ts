@@ -21,11 +21,10 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
-import { Categories, Color } from '../../util/Constants';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
-import CommandService from '../../services/CommandService';
+import { Categories } from '../../util/Constants';
 import { firstUpper } from '@augu/utils';
+import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import ms = require('ms');
 
@@ -37,7 +36,6 @@ interface Flags {
   s?: string | true;
 }
 
-@LinkParent(CommandService)
 export default class PunishmentsCommand extends Command {
   @Inject
   private database!: Database;
@@ -65,8 +63,7 @@ export default class PunishmentsCommand extends Command {
       if (!punishments.length)
         return msg.reply('There are no punishments setup in this guild.');
 
-      const embed = new EmbedBuilder()
-        .setColor(Color)
+      const embed = EmbedBuilder.create()
         .setTitle(`:pencil2: ~ Punishments for ${msg.guild.name}`)
         .addFields(punishments.map(punishment => ({
           name: `❯ Punishment #${punishment.index}`,

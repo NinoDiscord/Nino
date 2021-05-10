@@ -20,17 +20,17 @@
  * SOFTWARE.
  */
 
-import { Service, Inject, FindChildrenIn } from '@augu/lilith';
 import { getSubscriptionsIn } from '../structures/decorators/Subscribe';
+import { Service, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import { join } from 'path';
 import Discord from '../components/Discord';
 
 @Service({
   priority: 0,
+  children: join(process.cwd(), 'listeners'),
   name: 'listeners'
 })
-@FindChildrenIn(join(process.cwd(), 'listeners'))
 export default class ListenerService {
   @Inject
   private logger!: Logger;

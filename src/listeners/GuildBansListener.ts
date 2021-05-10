@@ -22,15 +22,12 @@
 
 import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, User } from 'eris';
-import { Inject, LinkParent } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
-import ListenerService from '../services/ListenerService';
+import { Inject } from '@augu/lilith';
 import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
-import app from '../container';
 
-@LinkParent(ListenerService)
 export default class GuildBansListener {
   @Inject
   private punishments!: PunishmentService;
@@ -47,7 +44,11 @@ export default class GuildBansListener {
       return;
     }
 
-    const audits = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_BAN_ADD);
+    const audits = await guild.getAuditLog({
+      actionType: Constants.AuditLogActions.MEMBER_BAN_ADD,
+      limit: 3
+    });
+
     const entry = audits.entries.find(entry => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
 
     if (entry === undefined)
@@ -75,7 +76,11 @@ export default class GuildBansListener {
     if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
       return;
 
-    const audits = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_BAN_ADD);
+    const audits = await guild.getAuditLog({
+      actionType: Constants.AuditLogActions.MEMBER_BAN_REMOVE,
+      limit: 3
+    });
+
     const entry = audits.entries.find(entry => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
 
     if (entry === undefined)

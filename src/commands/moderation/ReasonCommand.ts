@@ -21,17 +21,15 @@
  */
 
 import { Command, CommandMessage, Subcommand } from '../../structures';
-import { Inject, LinkParent } from '@augu/lilith';
 import type { TextChannel } from 'eris';
 import PunishmentService from '../../services/PunishmentService';
 import type CaseEntity from '../../entities/CaseEntity';
-import CommandService from '../../services/CommandService';
 import { Categories } from '../../util/Constants';
+import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import ms from 'ms';
 
-@LinkParent(CommandService)
 export default class ReasonCommand extends Command {
   @Inject
   private punishments!: PunishmentService;

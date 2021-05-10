@@ -20,9 +20,8 @@
  * SOFTWARE.
  */
 
-import { Inject, LinkParent } from '@augu/lilith';
-import ListenerService from '../services/ListenerService';
+
+import { Inject } from '@augu/lilith';
 import Subscribe from '../structures/decorators/Subscribe';
 
-@LinkParent(ListenerService)
 export default class UserListener {}
