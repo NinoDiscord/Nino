@@ -11,7 +11,7 @@
     - [x] pardon
     - [x] warnings
     - [x] case
-    - [] unmute
+    - [x] unmute
     - [x] unban
     - [x] reason
     - [x] softban

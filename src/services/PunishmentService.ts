@@ -658,10 +658,7 @@ export default class PunishmentService {
     embed.setDescription([
       // wat???
       reason !== undefined ? `**${Array.isArray(reason) ? reason.join(' ') : reason}**` : '**No reason was specified**',
-      reason === undefined ? `• Use **\`reason ${caseID} <reason>\`** to update the reason` : '',
-      time === undefined && [PunishmentEntryType.VoiceDeaf, PunishmentEntryType.VoiceMute, PunishmentEntryType.Muted, PunishmentEntryType.Banned].includes(type)
-        ? `• Use **\`ut ${caseID} <time>\`** to update the time of this case.`
-        : ''
+      reason === undefined ? `• Use **\`reason ${caseID} <reason>\`** to update the reason` : ''
     ]);
 
     if (warningsRemoved !== undefined)

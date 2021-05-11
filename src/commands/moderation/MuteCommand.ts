@@ -21,7 +21,7 @@
  */
 
 import { DiscordRESTError, User } from 'eris';
-import { Command, CommandMessage, EmbedBuilder } from '../../structures';
+import { Command, CommandMessage } from '../../structures';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
@@ -84,7 +84,7 @@ export default class MuteCommand extends Command {
       return msg.reply('I don\'t think I can perform this action due to you kicking the owner, you idiot.');
 
     if (member.id === this.discord.client.user.id)
-      return msg.reply(';w; why would you kick me from here? **(／。＼)**');
+      return msg.reply('I don\'t have the Muted role.');
 
     if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
       return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
@@ -97,13 +97,16 @@ export default class MuteCommand extends Command {
 
     const areason = reason.join(' ');
     let actualReason: string | undefined = undefined;
-    let time: number | undefined = undefined;
+    let time: string | undefined = undefined;
 
     if (areason !== '') {
       const [r, t] = areason.split(' | ');
       actualReason = r;
-      time = ms(t);
+      time = t;
     }
+
+    if (msg.settings.mutedRoleID !== undefined && member.roles.includes(msg.settings.mutedRoleID))
+      return msg.reply('Member is already muted.');
 
     try {
       await this.punishments.apply({
@@ -112,19 +115,10 @@ export default class MuteCommand extends Command {
         reason: actualReason,
         member,
         type: PunishmentType.Mute,
-        time
+        time: time !== undefined ? ms(time) : undefined
       });
 
-      const embed = EmbedBuilder.create()
-        .setTitle(`	｡･ﾟﾟ\*(>д<)\*ﾟﾟ･｡	Member ${member.username}#${member.discriminator} has been muted`);
-
-      if (actualReason !== undefined)
-        embed.addField('• Reason', `**${actualReason}**`, true);
-
-      if (time !== undefined && ms(time) !== undefined)
-        embed.addField('• Time', `**${ms(time, { long: true })}**`, true);
-
-      return msg.reply(embed);
+      return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been banned${actualReason ? ` *for ${actualReason}${time !== null ? ` in ${time}` : ''}` : '.'}*`);
     } catch(ex) {
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',
