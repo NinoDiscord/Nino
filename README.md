@@ -3,7 +3,7 @@
 
 ## Checklist
 - Commands
-  - [] Moderation
+  - [x] Moderation :tada:
     - [x] ban
     - [x] kick
     - [x] mute
@@ -16,10 +16,6 @@
     - [x] reason
     - [x] softban
     - [x] timeouts
-    - [] vcmute
-    - [] vcdeafen
-    - [] vcundeaf
-    - [] vcunmute
   - [x] Core :tada:
     - [x] help
     - [x] invite
