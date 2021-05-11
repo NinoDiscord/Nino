@@ -28,6 +28,7 @@ import Permissions from '../../util/Permissions';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
+import { pluralize } from '@augu/utils';
 
 export default class WarnCommand extends Command {
   @Inject
@@ -98,8 +99,10 @@ export default class WarnCommand extends Command {
     try {
       await this.punishments.createWarning(msg.guild.members.get(user.id)!, reason.join(' ') || 'No reason was provided.', 1);
 
-      const warnings = await this.database.warnings.getAll(msg.guild.id, user.id);
-      return msg.reply(`:thumbsup: Warned **${user.username}#${user.discriminator}**${reason.length > 0 ? ` for **${reason.join(' ')}**` : ' '}, they now have **${warnings.length}** warnings.`);
+      const warnings = await this.database.warnings.getAll(msg.guild.id, user.id).then(warnings => warnings.filter(warns => warns.amount > 0));
+      const count = warnings.reduce((acc, curr) => acc + curr.amount, 0);
+
+      return msg.reply(`:thumbsup: Warned **${user.username}#${user.discriminator}**${reason.length > 0 ? ` for **${reason.join(' ')}**` : ' '}, they now have **${count}** ${pluralize('warning', count)}.`);
     } catch(ex) {
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',

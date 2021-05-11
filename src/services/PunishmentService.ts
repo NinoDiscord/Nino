@@ -262,6 +262,13 @@ export default class PunishmentService {
         type: PunishmentType.WarningRemoved
       });
 
+      await this.database.warnings.create({
+        guildID: member.guild.id,
+        userID: member.user.id,
+        amount: -1,
+        reason
+      });
+
       return this.publishToModLog({
         warningsRemoved: count,
         moderator: self.user,

@@ -8,7 +8,7 @@
     - [x] kick
     - [x] mute
     - [x] warn
-    - [] pardon
+    - [x] pardon
     - [x] warnings
     - [x] case
     - [] unmute

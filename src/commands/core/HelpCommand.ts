@@ -144,6 +144,34 @@ export default class HelpCommand extends Command {
 
       return msg.reply(embed);
     } else {
+      if (cmdOrMod === 'usage') {
+        const embed = EmbedBuilder.create()
+          .setTitle('Command Usage')
+          .setDescription([
+            'So, if you\'re not familar with my command usage, here\'s a breakdown:',
+            '',
+            `A simple command usage might be like: \`${msg.settings.prefixes[0]}help [cmdOrMod]\``,
+            '',
+            '```',
+            'x!       help     [cmdOrMod]',
+            '^         ^           ^',
+            '|         |           |',
+            '|         |           |',
+            '|         |           |',
+            'prefix  command   parameter(s)',
+            '```',
+            '',
+            'The parameters section is easy to understand! The name of it doesn\'t matter too much, but it\'s what you should provide.',
+            '',
+            '- A parameter wrapped in `[]` means it\'s optional, but you can add additional arguments to make it run something else',
+            '- A parameter wrapped in `<>` means it\'s required, which means *you* have to add that argument to make the command perform correctly.',
+            '',
+            ':question: **Still stuck? There is always examples in the command\'s short overview to show how you can run that specific command.**'
+          ]);
+
+        return msg.reply(embed);
+      }
+
       const mod = this.parent.filter(cmd => cmd.category.toLowerCase() === cmdOrMod.toLowerCase());
       if (mod.length > 0) {
         const longestName = this._calculateLength(mod.sort((a, b) => this._calculateLength(b) - this._calculateLength(a))[0]);

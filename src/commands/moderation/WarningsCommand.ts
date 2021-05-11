@@ -86,7 +86,7 @@ export default class WarningsCommand extends Command {
     if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
       return msg.reply('Moderators or administrators don\'t have warnings attached to them.');
 
-    const warnings = await this.database.warnings.getAll(msg.guild.id, user.id);
+    const warnings = await this.database.warnings.getAll(msg.guild.id, user.id).then(warnings => warnings.filter(warn => warn.amount > 0));
     if (warnings.length === 0)
       return msg.reply(`User **${user.username}#${user.discriminator}** doesn't have any warnings attached to them.`);
 

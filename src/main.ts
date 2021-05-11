@@ -23,6 +23,7 @@
 import 'source-map-support/register';
 import 'reflect-metadata';
 
+import Discord from './components/Discord';
 import logger from './singletons/Logger';
 import Api from './api/API';
 import app from './container';
@@ -48,4 +49,13 @@ import app from './container';
 })();
 
 process.on('unhandledRejection', error => logger.fatal('Unhandled promise rejection has occured\n', (error as any).stack ?? '(none provided)'));
-process.on('uncaughtException', error => logger.fatal('Uncaught exception has occured\n', error));
+process.on('uncaughtException', error => {
+  if ((error as any).code !== undefined && (error as any).code === 1006) {
+    logger.fatal('Disconnected due to peer to peer connection ended, restarting client...');
+
+    const discord = app.$ref<typeof Discord, Discord>(Discord);
+    discord.client.disconnect({ reconnect: 'auto' });
+  } else {
+    logger.fatal('Uncaught exception has occured\n', error);
+  }
+});
