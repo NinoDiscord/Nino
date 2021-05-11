@@ -1,96 +1,91 @@
-import { injectable, unmanaged } from 'inversify';
-import { stripIndents } from 'common-tags';
-import { Module } from '../util';
-import Context from './Context';
-import Client from './Bot';
-import 'reflect-metadata';
-import { createEmptyEmbed } from '../util/EmbedUtils';
+/**
+ * Copyright (c) 2019-2021 Nino
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-export interface CommandInfo {
-  name: string;
-  description: string | ((client: Client) => string);
-  usage?: string;
-  category?: Module;
-  aliases?: string[];
-  guildOnly?: boolean;
+import { getSubcommandsIn } from './decorators/Subcommand';
+import type CommandMessage from './CommandMessage';
+import type { Constants } from 'eris';
+import { Categories } from '../util/Constants';
+import Subcommand from './Subcommand';
+
+type PermissionField = keyof Constants['Permissions'];
+interface CommandInfo {
+  userPermissions?: PermissionField | PermissionField[];
+  botPermissions?: PermissionField | PermissionField[];
+  description?: string;
   ownerOnly?: boolean;
-  disabled?: boolean;
-  hidden?: boolean;
+  examples?: string[];
+  category?: Categories;
   cooldown?: number;
-  botPermissions?: number;
-  userPermissions?: number;
+  aliases?: string[];
+  hidden?: boolean;
+  usage?: string;
+  name: string;
 }
 
-@injectable()
 export default abstract class NinoCommand {
-  public bot: Client;
-  public name: string;
-  public description: string;
-  public usage: string;
-  public category: Module;
-  public aliases: string[];
-  public guildOnly: boolean;
-  public ownerOnly: boolean;
-  public disabled: boolean;
-  public hidden: boolean;
-  public cooldown: number;
-  public botPermissions: number;
-  public userPermissions: number;
+  public userPermissions: PermissionField[];
+  public botPermissions:  PermissionField[];
+  public description:     string;
+  public ownerOnly:       boolean;
+  public examples:        string[];
+  public category:        Categories;
+  public cooldown:        number;
+  public aliases:         string[];
+  public hidden:          boolean;
+  public usage:           string;
+  public name:            string;
 
-  constructor(client: Client, @unmanaged() info: CommandInfo) {
-    this.bot = client;
-    this.name = info.name;
-    this.description =
-      typeof info.description === 'function'
-        ? info.description(client)
-        : info.description;
-    this.usage = info.usage || '';
-    this.category = info.category || Module.Generic;
-    this.aliases = info.aliases || [];
-    this.guildOnly = info.guildOnly || false;
-    this.ownerOnly = info.ownerOnly || false;
-    this.disabled = info.disabled || false;
-    this.hidden = info.hidden || false;
-    this.cooldown = info.cooldown || 5;
-    this.botPermissions = info.botPermissions || 0;
-    this.userPermissions = info.userPermissions || 0;
+  constructor(info: CommandInfo) {
+    this.userPermissions = typeof info.userPermissions === 'string'
+      ? [info.userPermissions]
+      : Array.isArray(info.userPermissions)
+        ? info.userPermissions
+        : [];
+
+    this.botPermissions = typeof info.botPermissions === 'string'
+      ? [info.botPermissions]
+      : Array.isArray(info.botPermissions)
+        ? info.botPermissions
+        : [];
+
+    this.description  = info.description ?? 'No description is available for this command.';
+    this.ownerOnly    = info.ownerOnly ?? false;
+    this.examples     = info.examples ?? [];
+    this.category     = info.category ?? Categories.General;
+    this.cooldown     = info.cooldown ?? 5;
+    this.aliases      = info.aliases ?? [];
+    this.hidden       = info.hidden ?? false;
+    this.usage        = info.usage ?? '';
+    this.name         = info.name;
   }
 
-  public abstract run(ctx: Context, ...args: any[]): Promise<any>;
-
-  format() {
-    return `${this.bot.config.discord.prefix}${this.name}${this.usage ? ` ${this.usage}` : ''}`;
+  get subcommands() {
+    return getSubcommandsIn(this).map(sub => new Subcommand(sub));
   }
 
-  async help(ctx: Context) {
-    const getPart = (type:
-      'title' |
-      'name' |
-      'syntax' |
-      'category' |
-      'aliases' |
-      'guildOnly' |
-      'ownerOnly' |
-      'cooldown'
-    ) => ctx.translate(`commands.generic.help.command.${type}`);
-
-    const getGlobalPart = (type: 'yes' | 'no') => ctx.translate(`global.${type}`);
-
-    const embed = createEmptyEmbed()
-      .setTitle(ctx.translate('commands.generic.help.command.title', { command: this.name }))
-      .setDescription(stripIndents`
-        **${this.description}**
-
-        \`\`\`apache
-        ${getPart('name')}:       ${this.name}
-        ${getPart('syntax')}:     ${this.format()}
-        ${this.aliases.length ? `${getPart('aliases')}:    ${this.aliases.join(', ')}` : `${getPart('aliases')}:    None`}
-        ${getPart('guildOnly')}: ${this.guildOnly ? getGlobalPart('yes') : getGlobalPart('no')}
-        ${getPart('ownerOnly')}: ${this.ownerOnly ? getGlobalPart('yes') : getGlobalPart('no')}
-        ${getPart('cooldown')}:   ${this.cooldown} second${this.cooldown > 1 ? 's' : ''}
-        \`\`\`
-      `);
-
-    return embed.build();
+  get format() {
+    const subcommands = this.subcommands.map(sub => `[${sub.name} ${sub.usage}]`.trim()).join(' | ');
+    return `${this.name}${this.usage !== '' ? ` ${this.usage}` : ''} ${subcommands}`;
   }
+
+  abstract run(msg: CommandMessage, ...args: any[]): any;
 }

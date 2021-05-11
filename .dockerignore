@@ -12,3 +12,4 @@ renovate.json
 *.lock
 *.log
 application.yml
+config.yml

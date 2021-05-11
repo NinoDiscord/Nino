@@ -1,50 +1,46 @@
-import { User, EmbedOptions } from 'eris';
-import { execSync } from 'child_process';
+/**
+ * Copyright (c) 2019-2021 Nino
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-export const commitHash = execSync('git rev-parse HEAD', { encoding: 'utf8' }).slice(0, 8);
-export function humanize(ms: number, long: boolean = false) {
-  const months = Math.floor(ms / 1000 / 60 / 60 / 24 / 7 / 12);
-  ms -= months * 1000 * 60 * 60 * 24 * 7 * 12;
+import { QUOTE_REGEX } from './Constants';
 
-  const weeks = Math.floor(ms / 1000 / 60 / 60 / 24 / 7);
-  ms -= weeks * 1000 * 60 * 60 * 24 * 7;
-
-  const days = Math.floor(ms / 1000 / 60 / 60 / 24);
-  ms -= days * 1000 * 60 * 60 * 24;
-
-  const hours = Math.floor(ms / 1000 / 60 / 60);
-  ms -= hours * 1000 * 60 * 60;
-
-  const mins = Math.floor(ms / 1000 / 60);
-  ms -= mins * 1000 * 60;
-
-  const sec = Math.floor(ms / 1000);
-
-  let humanized = '';
-  if (long) {
-    if (months > 0) humanized += `${months} months, `;
-    if (weeks > 0) humanized += `${weeks} weeks, `;
-    if (days > 0) humanized += `${days} days, `;
-    if (hours > 0) humanized += `${hours} hours, `;
-    if (mins > 0) humanized += `${mins} minutes, `;
-    if (sec > 0) humanized += `${sec} seconds`;
-  } else {
-    if (months > 0) humanized += `${months}mo`;
-    if (weeks > 0) humanized += `${weeks}w`;
-    if (days > 0) humanized += `${days}d`;
-    if (hours > 0) humanized += `${hours}h`;
-    if (mins > 0) humanized += `${mins}m`;
-    if (sec > 0) humanized += `${sec}s`;
+/**
+ * Iterator function to provide a tuple of `[index, item]` in a Array.
+ * @param arr The array to run this iterator function
+ * @example
+ * ```ts
+ * const arr = ['str', 'uwu', 'owo'];
+ * for (const [index, item] of withIndex(arr)) {
+ *    console.log(`${index}: ${item}`);
+ *    // prints out:
+ *    // 0: str
+ *    // 1: uwu
+ *    // 2: owo
+ * }
+ * ```
+ */
+export function* withIndex<T extends any[]>(arr: T): Generator<[index: number, item: T[any]]> {
+  for (let i = 0; i < arr.length; i++) {
+    yield [i, arr[i]];
   }
-
-  return humanized;
-}
-
-// TODO: Add more content
-export function replaceMessage(text: string, user: User) {
-  return text
-    .replace(/%author%/, `${user.username}#${user.discriminator}`)
-    .replace(/%author.mention%/, user.mention);
 }
 
 export function formatSize(bytes: number) {
@@ -57,44 +53,37 @@ export function formatSize(bytes: number) {
   else return `${giga.toFixed(1)}GB`;
 }
 
-export enum Module {
-  Moderation = 'Moderation',
-  Generic = 'Generic',
-  System = 'System Administration'
-}
+// credit: Ice (https://github.com/IceeMC)
+export function getQuotedStrings(content: string) {
+  const parsed: string[] = [];
+  let curr = '';
+  let opened = false;
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i];
+    if (char === ' ' && !opened) {
+      opened = false;
+      if (curr.length > 0) parsed.push(curr);
 
-export function unembedify(embed: EmbedOptions) {
-  let text = '';
-
-  function getTime(now: number) {
-    const date = new Date(now);
-    const escape = (value) => `0${value}`.slice(-2);
-    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
-
-    return `${date.getMonth()}/${date.getDate()}/${date.getFullYear()} at ${escape(date.getHours())}:${escape(date.getMinutes())}:${escape(date.getSeconds())}${ampm}`;
-  }
-
-  if (embed.title) text += `__**${embed.title}**__`;
-  if (embed.description) text += `\n${embed.description.includes('> ') ? embed.description : `> **${embed.description}**`}`;
-  if (embed.fields) {
-    text += '\n';
-    for (const field of embed.fields) text += `\n- ${field.name}: ${field.value}`;
-  }
-  if (embed.footer) {
-    let field = `\n\n**${embed.footer.text}`;
-
-    if (embed.timestamp) {
-      const time = embed.timestamp instanceof Date ? getTime(embed.timestamp.getTime()) : embed.timestamp;
-      field += `at ${time}`;
+      curr = '';
     }
 
-    text += `${field}**`;
+    if (QUOTE_REGEX.test(char)) {
+      if (opened) {
+        opened = false;
+        if (curr.length > 0) parsed.push(curr);
+
+        curr = '';
+        continue;
+      }
+
+      opened = true;
+      continue;
+    }
+
+    if (!opened && char === ' ') continue;
+    curr += char;
   }
 
-  return text;
-}
-
-export function firstUpper(text: string) {
-  const arr = text.split(' ');
-  return arr.map((t) => `${t.charAt(0).toUpperCase()}${t.slice(1)}`).join(' ');
+  if (curr.length > 0) parsed.push(curr);
+  return parsed;
 }
