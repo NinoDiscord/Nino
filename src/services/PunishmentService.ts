@@ -218,7 +218,7 @@ export default class PunishmentService {
     });
 
     return results.length > 0 ? Promise.resolve() : this.publishToModLog({
-      warningsAdded: (amount ?? 0) + 1,
+      warningsAdded: amount ?? 1,
       moderator: self.user,
       reason,
       victim: member.user,

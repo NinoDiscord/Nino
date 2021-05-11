@@ -27,15 +27,18 @@ export interface SubcommandInfo {
   run(this: Command, msg: CommandMessage): Promise<any>;
 
   methodName: string;
+  aliases?: string[];
   usage: string;
 }
 
 export default class Subcommand {
+  public aliases: string[];
   public usage: string;
   public name: string;
   public run: (this: Command, msg: CommandMessage) => Promise<any>;
 
   constructor(info: SubcommandInfo) {
+    this.aliases = info.aliases ?? [];
     this.usage = info.usage;
     this.name = info.methodName;
     this.run = info.run;

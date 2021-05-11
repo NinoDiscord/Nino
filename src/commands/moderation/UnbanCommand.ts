@@ -59,7 +59,7 @@ export default class UnbanCommand extends Command {
         moderator: msg.author,
         publish: true,
         reason: reason.join(' ') || 'No description was provided.',
-        member: msg.guild.members.get(userID) || { id: userID, guild: msg.guild },
+        member: { id: userID, guild: msg.guild },
         type: PunishmentType.Unban
       });
 

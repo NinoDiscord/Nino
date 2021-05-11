@@ -7,9 +7,9 @@
     - [x] ban
     - [x] kick
     - [x] mute
-    - [] warn
+    - [x] warn
     - [] pardon
-    - [] warnings
+    - [x] warnings
     - [x] case
     - [] unmute
     - [x] unban

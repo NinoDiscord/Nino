@@ -184,11 +184,18 @@ export default class CommandService extends Collection<string, NinoCommand> {
     let methodName = 'run';
     let subcommand: Subcommand | undefined = undefined;
     for (const arg of rawArgs) {
-      if (command.subcommands.length && command.subcommands.find(r => r.name === arg) !== undefined) {
-        subcommand = command.subcommands.find(r => r.name === arg)!;
-        methodName = subcommand.name;
+      if (command.subcommands.length > 0) {
+        if (command.subcommands.find(r => r.aliases.includes(arg)) !== undefined) {
+          subcommand = command.subcommands.find(r => r.aliases.includes(arg))!;
+          methodName = subcommand.name;
+          break;
+        }
 
-        break;
+        if (command.subcommands.find(r => r.name === arg) !== undefined) {
+          subcommand = command.subcommands.find(r => r.name === arg)!;
+          methodName = subcommand.name;
+          break;
+        }
       }
     }
 

@@ -91,13 +91,7 @@ export default class ReasonCommand extends Command {
     return msg.reply('Unable to edit case due to no mod-log channel or that case didn\'t create a message in the mod-log.');
   }
 
-  // TODO: add subcommand aliases
-  @Subcommand('<...reason>')
-  async l(msg: CommandMessage, args: string[]) {
-    return this.latest(msg, args);
-  }
-
-  @Subcommand('<...reason>')
+  @Subcommand('<...reason>', ['l'])
   async latest(msg: CommandMessage, reason: string[]) {
     const latestCases = await this.database.cases.getAll(msg.guild.id);
     if (!latestCases.length)

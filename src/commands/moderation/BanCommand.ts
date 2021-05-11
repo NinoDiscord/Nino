@@ -25,8 +25,8 @@ import { Command, CommandMessage } from '../../structures';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
-import { Inject } from '@augu/lilith';
 import Permissions from '../../util/Permissions';
+import { Inject } from '@augu/lilith';
 import Discord from '../../components/Discord';
 import ms = require('ms');
 
