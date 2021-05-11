@@ -69,7 +69,6 @@
   - [x] User Unbanned
 
 - [x] Timeouts Microservice :tada:
-- [] API
 
 ## Features
 - Auto Moderation: **Prevents raids, spam, ads, and much more!**
