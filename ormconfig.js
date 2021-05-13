@@ -1,33 +1,26 @@
-const { parse } = require('@augu/dotenv');
-const { join } = require('path');
+const yaml = require('js-yaml');
+const config = yaml.load(require('fs').readFileSync('./config.yml', 'utf-8'));
 
-const config = parse({
-  populate: false,
-  file: join(__dirname, '.env'),
-
-  schema: {
-    DATABASE_USERNAME: 'string',
-    DATABASE_PASSWORD: 'string',
-    DATABASE_NAME: 'string',
-    DATABASE_HOST: 'string',
-    DATABASE_PORT: 'int',
-    NODE_ENV: {
-      type: 'string',
-      default: ['development', 'production']
-    }
-  }
-});
-
-module.exports = {
+module.exports = config.url !== undefined ? {
   migrations: ['./build/migrations/*.js'],
-  username: config.DATABASE_USERNAME,
-  password: config.DATABASE_PASSWORD,
   entities: ['./build/entities/*.js'],
-  database: config.DATABASE_NAME,
   logging: false, // enable this when the deprecated message is gone
   type: 'postgres',
-  host: config.DATABASE_HOST,
-  port: config.DATABASE_PORT,
+  url: config.database.url,
+
+  cli: {
+    migrationsDir: 'src/migrations'
+  }
+} : {
+  migrations: ['./build/migrations/*.js'],
+  username: config.database.username,
+  password: config.database.password,
+  entities: ['./build/entities/*.js'],
+  database: config.database.name,
+  logging: false, // enable this when the deprecated message is gone
+  type: 'postgres',
+  host: config.database.host,
+  port: config.database.port,
 
   cli: {
     migrationsDir: 'src/migrations'
