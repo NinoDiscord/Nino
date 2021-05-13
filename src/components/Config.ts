@@ -71,6 +71,7 @@ interface DatabaseConfig {
 interface RedisConfig {
   sentinels?: RedisSentinelConfig[];
   password?: string;
+  master?: string;
   index?: number;
   host: string;
   port: number;

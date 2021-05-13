@@ -49,6 +49,7 @@ export default class Redis {
       lazyConnect: true,
       sentinels: redis.sentinels,
       password: redis.password,
+      master: redis.master,
       db: redis.index
     } : {
       enableReadyCheck: true,
