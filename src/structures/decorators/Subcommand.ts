@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-
 import type { SubcommandInfo } from '../Subcommand';
 import { MetadataKeys } from '../../util/Constants';
 
