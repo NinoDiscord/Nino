@@ -28,7 +28,6 @@ import { firstUpper, humanize } from '@augu/utils';
 import CommandService from '../../services/CommandService';
 import { formatSize } from '../../util';
 import { Inject } from '@augu/lilith';
-import Kubernetes from '../../components/Kubernetes';
 import Stopwatch from '../../util/Stopwatch';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
@@ -106,9 +105,6 @@ export default class StatisticsCommand extends Command {
   @Inject
   private redis!: Redis;
 
-  @Inject
-  private k8s!: Kubernetes;
-
   constructor() {
     super({
       description: 'descriptions.statistics',
@@ -182,7 +178,7 @@ export default class StatisticsCommand extends Command {
     const channels = Object.keys(this.discord.client.channelGuildMap).length.toLocaleString();
     const memoryUsage = process.memoryUsage();
     const avgPing = this.discord.client.shards.reduce((a, b) => a + b.latency, 0);
-    const node = await this.k8s.getCurrentNode();
+    const node = process.env.REGION ?? 'unknown';
     const ownerIDs = this.config.getProperty('owners') ?? [];
     const owners = await Promise.all(ownerIDs.map(id => {
       const user = this.discord.client.users.get(id);

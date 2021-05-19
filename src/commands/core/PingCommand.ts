@@ -24,14 +24,10 @@ import { Command, CommandMessage } from '../../structures';
 import { calculateHRTime } from '@augu/utils';
 import { Inject } from '@augu/lilith';
 import Discord from '../../components/Discord';
-import K8s from '../../components/Kubernetes';
 
 export default class PingCommand extends Command {
   @Inject
   private discord!: Discord;
-
-  @Inject
-  private k8s!: K8s;
 
   constructor() {
     super({
@@ -46,7 +42,7 @@ export default class PingCommand extends Command {
     const startedAt = process.hrtime();
     const message = await msg.reply('What did you want me to respond to?');
     const ping = calculateHRTime(startedAt);
-    const node = await this.k8s.getCurrentNode();
+    const node = process.env.REGION ?? 'unknown';
 
     const deleteMsg = process.hrtime();
     await message.delete();
