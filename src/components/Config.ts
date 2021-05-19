@@ -60,10 +60,12 @@ interface BotlistConfig {
 }
 
 interface DatabaseConfig {
-  username?: string;
-  password?: string;
-  url: string;
-  db?: string;
+  username: string;
+  password: string;
+  database: string;
+  host: string;
+  port: number;
+  url?: string;
 }
 
 interface RedisConfig {
