@@ -37,7 +37,7 @@
     "@augu/http": "1.2.1",
     "@augu/lilith": "3.0.2",
     "@augu/orchid": "3.0.3",
-    "@augu/utils": "1.5.1",
+    "@augu/utils": "1.5.3",
     "@sentry/node": "6.3.5",
     "eris": "github:abalabahaha/eris#dev",
     "express": "4.17.1",
