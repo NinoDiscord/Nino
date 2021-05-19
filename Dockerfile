@@ -15,8 +15,6 @@ RUN rm -rf build
 # Override --sourceMap in the container
 # so this doesn't happen: SyntaxError: Unexpected token ':'
 RUN tsc --sourceMap false
-
-RUN rm -rf src
 RUN npm cache clean --force
 
 ENTRYPOINT [ "npm", "run", "start" ]
