@@ -3,6 +3,7 @@ node_modules/
 .vscode/
 data/
 dist/
+.husky/
 
 .travis.yml
 **.md

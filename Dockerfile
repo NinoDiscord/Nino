@@ -17,4 +17,7 @@ RUN rm -rf build
 RUN tsc --sourceMap false
 RUN npm cache clean --force
 
-ENTRYPOINT [ "npm", "run", "start" ]
+# Give it executable permissions
+RUN chmod +x ./scripts/run-docker.sh
+
+ENTRYPOINT [ "sh", "./scripts/run-docker.sh" ]

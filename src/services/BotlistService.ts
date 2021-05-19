@@ -48,15 +48,13 @@ export default class BotlistsService {
   #interval?: NodeJS.Timer;
 
   async load() {
-    const environment = this.config.getProperty('environment');
-    if (environment !== 'production' && this.discord.client.user.id !== '531613242473054229') {
-      this.logger.warn('Bot is not in production OR it\'s not the production bot, don\'t worry, you don\'t need to do this.');
+    const botlists = this.config.getProperty('botlists');
+    if (botlists === undefined) {
+      this.logger.warn('`botlists` is missing, please add it!');
       return Promise.resolve();
     }
 
     this.logger.info('Built scheduler for posting to botlists!');
-    await this.post();
-
     this.#interval = setInterval(this.post.bind(this), 86400000).unref();
   }
 
