@@ -56,7 +56,7 @@
     "@augu/eslint-config": "2.0.3",
     "@augu/tsconfig": "1.1.0",
     "@types/express": "4.17.11",
-    "@types/ioredis": "4.26.3",
+    "@types/ioredis": "4.26.4",
     "@types/js-yaml": "4.0.1",
     "@types/ms": "0.7.31",
     "@types/node": "15.0.3",
