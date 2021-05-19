@@ -64,200 +64,169 @@ const startTimer = process.hrtime();
   logger.info('Welcome to the database conversion script!');
   logger.info('This script takes care of converting the Mongo database to the PostgreSQL one!');
 
-  const args = process.argv.slice(2);
-  const directory = args[0];
+  const config = parse({
+    delimiter: ',',
+    populate: false,
+    file: join(__dirname, '..', '.env')
+  });
 
-  if (!directory || directory === true) {
-    logger.warn('Assuming we should load in from Mongo itself...');
-    const config = parse({
-      delimiter: ',',
-      populate: false,
-      file: join(__dirname, '..', '.env')
-    });
+  const mongoTimer = process.hrtime();
+  try {
+    await import('mongodb');
+  } catch(ex) {
+    logger.info('Assuming you ran this script once, now installing...');
 
-    const mongoTimer = process.hrtime();
-    try {
-      await import('mongodb');
-    } catch(ex) {
-      logger.info('Assuming you ran this script once, now installing...');
+    await installMongo();
+    logger.info('This script will exit, please re-run it using `npm run migrate`!');
+    process.exit(0);
+  }
 
-      await installMongo();
-      logger.info('This script will exit, please re-run it using `npm run migrate`!');
-      process.exit(0);
-    }
+  logger.info(`Took ~${calculateHRTime(mongoTimer)}ms to fetch MongoDB dependency`);
+  logger.info('Assuming you reloaded the script, now converting...');
+  const [client, connection] = await connectToDbs(config);
 
-    logger.info(`Took ~${calculateHRTime(mongoTimer)}ms to fetch MongoDB dependency`);
-    logger.info('Assuming you reloaded the script, now converting...');
-    const [client, connection] = await connectToDbs(config);
+  const db = client.db(config.MONGO_DB);
+  const guilds = db.collection('guilds');
+  const cases = db.collection('cases');
+  const users = db.collection('users');
+  const warnings = db.collection('warnings');
+  const repositories = getRepositories(connection);
 
-    const db = client.db(config.MONGO_DB);
-    const guilds = db.collection('guilds');
-    const cases = db.collection('cases');
-    const users = db.collection('users');
-    const warnings = db.collection('warnings');
-    const repositories = getRepositories(connection);
+  // Load in guilds
+  const guildDocs = await guilds.find({}).toArray();
+  const guildTimer = process.hrtime();
 
-    // Load in guilds
-    const guildDocs = await guilds.find({}).toArray();
-    const guildTimer = process.hrtime();
+  for (const guild of guildDocs) {
+    logger.info(`Found guild ${guild.guildID} to convert to!`);
 
-    for (const guild of guildDocs) {
-      logger.info(`Found guild ${guild.guildID} to convert to!`);
+    // keep these as a variable
+    const { punishments, automod } = guild;
 
-      // keep these as a variable
-      const { punishments, automod } = guild;
+    const entry = new GuildEntity();
+    entry.language = guild.locale;
+    entry.prefixes = [guild.prefix];
+    entry.guildID = guild.guildID;
 
-      const entry = new GuildEntity();
-      entry.language = guild.locale;
-      entry.prefixes = [guild.prefix];
-      entry.guildID = guild.guildID;
+    if (guild.modlog !== undefined)
+      entry.modlogChannelID = guild.modlog;
 
-      if (guild.modlog !== undefined)
-        entry.modlogChannelID = guild.modlog;
+    if (guild.mutedRole !== undefined)
+      entry.mutedRoleID = guild.mutedRole;
 
-      if (guild.mutedRole !== undefined)
-        entry.mutedRoleID = guild.mutedRole;
+    const available = await repositories.guilds.findOne({ guildID: guild.guildID });
+    if (!available)
+      await repositories.guilds.save(entry);
 
-      const available = await repositories.guilds.findOne({ guildID: guild.guildID });
-      if (!available)
-        await repositories.guilds.save(entry);
-
-      logger.info(`Converting ${punishments.length} punishments...`);
-      for (const punishment of punishments) {
-        if (punishment.type === 'unrole' || punishment.type === 'role') {
-          logger.warn('Removing legacy punishment...', punishment);
-          continue;
-        }
-
-        const entry = new PunishmentsEntity();
-        entry.warnings = punishment.warnings;
-        entry.guildID = guild.guildID;
-        entry.soft = punishment.soft === true;
-        entry.type = figureOutType(punishment.type);
-
-        if (punishment.temp !== null)
-          entry.time = punishment.temp;
-
-        const available = await repositories.punishments.findOne({ guildID: guild.guildID, warnings: punishment.warnings });
-        if (!available)
-          await repositories.punishments.save(entry);
+    logger.info(`Converting ${punishments.length} punishments...`);
+    for (const punishment of punishments) {
+      if (punishment.type === 'unrole' || punishment.type === 'role') {
+        logger.warn('Removing legacy punishment...', punishment);
+        continue;
       }
 
-      logger.info('Converting automod actions...');
-      const automodEntry = new AutomodEntity();
-      automodEntry.blacklistWords = automod.badwords.wordlist;
-      automodEntry.blacklist = automod.badwords.enabled;
-      automodEntry.mentions = automod.mention;
-      automodEntry.invites = automod.invites;
-      automodEntry.dehoist = automod.dehoist;
-      automodEntry.guildID = guild.guildID;
-      automodEntry.spam = automod.spam;
-      automodEntry.raid = automod.raid;
+      const entry = new PunishmentsEntity();
+      entry.warnings = punishment.warnings;
+      entry.guildID = guild.guildID;
+      entry.soft = punishment.soft === true;
+      entry.type = figureOutType(punishment.type);
 
-      const aeiou = await repositories.automod.findOne({ guildID: guild.guildID });
-      if (!aeiou)
-        await repositories.automod.save(automodEntry);
-    }
+      if (punishment.temp !== null)
+        entry.time = punishment.temp;
 
-    logger.info(`Took ~${calculateHRTime(guildTimer)}ms to convert guild entries!`);
-    logger.info('Now converting user entries...');
-
-    const userTimer = process.hrtime();
-    const userDocs = await users.find({}).toArray();
-
-    for (const user of userDocs) {
-      logger.info(`Found user ${user.userID}!`);
-      const entry = new UserEntity();
-
-      entry.prefixes = [];
-      entry.language = entry.locale;
-      entry.id = user.userID;
-
-      const available = await repositories.users.findOne({ id: user.userID });
+      const available = await repositories.punishments.findOne({ guildID: guild.guildID, warnings: punishment.warnings });
       if (!available)
-        await repositories.users.save(entry);
+        await repositories.punishments.save(entry);
     }
 
-    logger.info(`Took ~${calculateHRTime(userTimer)}ms to populate all user entries`);
-    logger.info('Now converting all cases...');
+    logger.info('Converting automod actions...');
+    const automodEntry = new AutomodEntity();
+    automodEntry.blacklistWords = automod.badwords.wordlist;
+    automodEntry.blacklist = automod.badwords.enabled;
+    automodEntry.mentions = automod.mention;
+    automodEntry.invites = automod.invites;
+    automodEntry.dehoist = automod.dehoist;
+    automodEntry.guildID = guild.guildID;
+    automodEntry.spam = automod.spam;
+    automodEntry.raid = automod.raid;
 
-    const casesTimer = process.hrtime();
-    const caseDocs = await cases.find({}).toArray();
-
-    for (const c of caseDocs) {
-      const entry = new CaseEntity();
-
-      entry.moderatorID = c.moderator;
-      entry.messageID = c.message;
-      entry.victimID = c.victim;
-      entry.guildID = c.guild;
-      entry.index = c.id;
-      entry.type = figureOutType(c.type) ?? c.type;
-      entry.soft = c.soft === true;
-
-      if (c.reason !== null)
-        entry.reason = c.reason;
-
-      if (c.time !== undefined)
-        entry.time = c.time;
-
-      const available = await repositories.cases.findOne({ guildID: c.guild, index: c.id });
-      if (!available)
-        await repositories.cases.save(entry);
-    }
-
-    logger.info(`Took ~${calculateHRTime(casesTimer)} to convert all cases!`);
-    logger.info('Now converting warnings...');
-
-    const warningDocs = await warnings.find({}).toArray();
-    const warningTimer = process.hrtime();
-
-    for (const warning of warningDocs) {
-      const entry = new WarningsEntity();
-
-      entry.amount = 1; // no amount is specified, assuming it's just 1
-      entry.guildID = warning.guild;
-      entry.userID = warning.user;
-
-      if (typeof warning.reason === 'string')
-        entry.reason = warning.reason;
-    }
-
-    logger.info(`Took ~${calculateHRTime(warningTimer)}ms to convert all warnings.`);
-    logger.info('Looks like I\'m done here, so I\'ll be going now...');
-    logger.info('Before I do that, let me uninstall Mongo...');
-
-    await execAsync('npm uninstall --save mongodb');
-
-    await cleanup([client, connection]);
-    logger.info(`Took ~${calculateHRTime(startTimer)}ms to run this script.`);
-    process.exit(0);
-  } else {
-    logger.info('Attempting to read the directory...');
-
-    const files = await readdir(join(directory));
-    if (!files.length) {
-      logger.fatal('No files were found in this directory?');
-      process.exit(1);
-    }
-
-    const bsonTimer = process.hrtime();
-    try {
-      await import('bson');
-    } catch(ex) {
-      logger.info('Assuming you never ran this script, installing `bson`...');
-
-      await execAsync('npm i bson');
-      logger.info('This script will now exit, re-run this with the `--directory` flag!');
-      process.exit(0);
-    }
-
-    logger.info(`Checked and loaded for library \`bson\` in ~${calculateHRTime(bsonTimer)}ms`);
-    const bson = await import('bson');
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-    }
+    const aeiou = await repositories.automod.findOne({ guildID: guild.guildID });
+    if (!aeiou)
+      await repositories.automod.save(automodEntry);
   }
+
+  logger.info(`Took ~${calculateHRTime(guildTimer)}ms to convert guild entries!`);
+  logger.info('Now converting user entries...');
+
+  const userTimer = process.hrtime();
+  const userDocs = await users.find({}).toArray();
+
+  for (const user of userDocs) {
+    logger.info(`Found user ${user.userID}!`);
+    const entry = new UserEntity();
+
+    entry.prefixes = [];
+    entry.language = entry.locale;
+    entry.id = user.userID;
+
+    const available = await repositories.users.findOne({ id: user.userID });
+    if (!available)
+      await repositories.users.save(entry);
+  }
+
+  logger.info(`Took ~${calculateHRTime(userTimer)}ms to populate all user entries`);
+  logger.info('Now converting all cases...');
+
+  const casesTimer = process.hrtime();
+  const caseDocs = await cases.find({}).toArray();
+
+  for (const c of caseDocs) {
+    const entry = new CaseEntity();
+
+    entry.moderatorID = c.moderator;
+    entry.messageID = c.message;
+    entry.victimID = c.victim;
+    entry.guildID = c.guild;
+    entry.index = c.id;
+    entry.type = figureOutType(c.type) ?? c.type;
+    entry.soft = c.soft === true;
+
+    if (c.reason !== null)
+      entry.reason = c.reason;
+
+    if (c.time !== undefined)
+      entry.time = c.time;
+
+    const available = await repositories.cases.findOne({ guildID: c.guild, index: c.id });
+    if (!available)
+      await repositories.cases.save(entry);
+  }
+
+  logger.info(`Took ~${calculateHRTime(casesTimer)} to convert all cases!`);
+  logger.info('Now converting warnings...');
+
+  const warningDocs = await warnings.find({}).toArray();
+  const warningTimer = process.hrtime();
+
+  for (const warning of warningDocs) {
+    const entry = new WarningsEntity();
+
+    entry.amount = 1; // no amount is specified, assuming it's just 1
+    entry.guildID = warning.guild;
+    entry.userID = warning.user;
+
+    if (typeof warning.reason === 'string')
+      entry.reason = warning.reason;
+  }
+
+  logger.info(`Took ~${calculateHRTime(warningTimer)}ms to convert all warnings.`);
+  logger.info('Looks like I\'m done here, so I\'ll be going now...');
+  logger.info('Before I do that, let me uninstall Mongo...');
+
+  await execAsync('npm uninstall --save mongodb');
+
+  await cleanup([client, connection]);
+  logger.info(`Took ~${calculateHRTime(startTimer)}ms to run this script.`);
+  process.exit(0);
 })();
 
 const installMongo = async () => {
