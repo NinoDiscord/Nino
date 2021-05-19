@@ -56,9 +56,19 @@ export default class Kubernetes {
     const api = this.kubeConfig.makeApiClient(k8s.CoreV1Api);
     const ns = this.config.getProperty('k8s.namespace');
     if (ns === undefined)
-      return;
+      return 'unknown';
 
-    const pod = await api.listNamespacedPod(ns);
-    return pod.body.items.find(pod => pod.metadata!.name! === hostname())?.spec!.nodeName;
+    try {
+      const pod = await api.listNamespacedPod(ns);
+      return pod.body.items.find(pod => pod.metadata!.name! === hostname())?.spec?.nodeName ?? 'unknown';
+    } catch(ex) {
+      if (ex instanceof k8s.HttpError) {
+        this.logger.error('Unable to retrieve current node status:', ex.body);
+        return 'unknown';
+      } else {
+        this.logger.fatal('Unknown error when retrieving node status:', ex);
+        return 'unknown';
+      }
+    }
   }
 }
