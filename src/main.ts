@@ -48,13 +48,19 @@ import app from './container';
   });
 })();
 
+const ReconnectCodes = [
+  1001, // Going Away (re-connect now)
+  1006  // 
+];
+
 process.on('unhandledRejection', error => logger.fatal('Unhandled promise rejection has occured\n', (error as any).stack ?? '(none provided)'));
-process.on('uncaughtException', error => {
-  if ((error as any).code !== undefined && (error as any).code === 1006) {
+process.on('uncaughtException', async error => {
+  if ((error as any).code !== undefined && ReconnectCodes.includes((error as any).code)) {
     logger.fatal('Disconnected due to peer to peer connection ended, restarting client...');
 
     const discord = app.$ref<typeof Discord, Discord>(Discord);
-    discord.client.disconnect({ reconnect: 'auto' });
+    discord.client.disconnect({ reconnect: false });
+    await discord.client.connect();
   } else {
     logger.fatal('Uncaught exception has occured\n', error);
   }
