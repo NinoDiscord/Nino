@@ -81,7 +81,7 @@ export default class Discord {
       const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
       const status = this.config.getProperty('status') ?? {
         type: 0,
-        status: '',
+        status: '$prefix$help in $guilds$ $plural$',
         presence: 'online'
       };
 
