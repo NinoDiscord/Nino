@@ -166,10 +166,10 @@ export default class StatisticsCommand extends Command {
     ]);
 
     return {
-      inserted: Number(data[0][0].tup_inserted),
-      updated: Number(data[0][0].tup_updated),
-      deleted: Number(data[0][0].tup_deleted),
-      fetched: Number(data[0][0].tup_fetched),
+      inserted: Number(data[0]?.[0]?.tup_inserted ?? 0),
+      updated: Number(data[0]?.[0]?.tup_updated ?? 0),
+      deleted: Number(data[0]?.[0]?.tup_deleted ?? 0),
+      fetched: Number(data[0]?.[0]?.tup_fetched ?? 0),
       version: data[1][0].version.split(', ').shift().replace('PostgreSQL ', '').trim(),
       uptime: humanize(Math.floor(data[2][0].uptime * 1000), true),
       ping

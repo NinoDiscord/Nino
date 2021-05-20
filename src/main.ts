@@ -28,6 +28,10 @@ import logger from './singletons/Logger';
 import Api from './api/API';
 import app from './container';
 
+const region = process.env.REGION;
+if (region !== undefined)
+  logger.info(`Running under node "${region}"!`);
+
 (async() => {
   logger.info('Loading...');
   try {
