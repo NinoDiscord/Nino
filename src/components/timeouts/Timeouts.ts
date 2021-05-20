@@ -72,13 +72,17 @@ export default class TimeoutsManager {
       this.state = types.SocketState.Connecting;
       this.logger.info('Connecting to the timeouts service!');
 
-      const timeouts = this.config.getProperty('timeouts');
-      if (timeouts === undefined)
+      const host = this.config.getProperty('timeouts.host');
+      const port = this.config.getProperty('timeouts.port');
+      const auth = this.config.getProperty('timeouts.auth');
+
+      // @ts-ignore yes
+      if (this.config.getProperty('timeouts') === undefined)
         return reject('Missing `timeouts` configuration, refer to the Process section: https://github.com/NinoDiscord/Nino#config-timeouts');
 
-      this.socket = new WebSocket(`ws://${timeouts.host ?? 'localhost'}:${timeouts.port}`, {
+      this.socket = new WebSocket(`ws://${host ?? 'localhost'}:${port}`, {
         headers: {
-          Authorization: timeouts.auth
+          Authorization: auth
         }
       });
 

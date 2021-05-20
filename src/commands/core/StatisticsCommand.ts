@@ -123,21 +123,23 @@ export default class StatisticsCommand extends Command {
 
     // stole this from donny
     // Credit: https://github.com/FurryBotCo/FurryBot/blob/master/src/commands/information/stats-cmd.ts#L22
-    const stats = await this.redis.client.info('stats').then(info =>
-      info
-        .split(/\n\r?/)
-        .slice(1, -1)
-        .map(item => ({ [item.split(':')[0]]: item.split(':')[1].trim() }))
-        .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisInfo
-    );
+    const [stats, server] = await Promise.all([
+      this.redis.client.info('stats').then(info =>
+        info
+          .split(/\n\r?/)
+          .slice(1, -1)
+          .map(item => ({ [item.split(':')[0]]: item.split(':')[1].trim() }))
+          .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisInfo
+      ),
 
-    const server = await this.redis.client.info('server').then(info =>
-      info
-        .split(/\n\r?/)
-        .slice(1, -1)
-        .map(item => ({ [item.split(':')[0]]: item.split(':')[1].trim() }))
-        .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisServerInfo
-    );
+      this.redis.client.info('server').then(info =>
+        info
+          .split(/\n\r?/)
+          .slice(1, -1)
+          .map(item => ({ [item.split(':')[0]]: item.split(':')[1].trim() }))
+          .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisServerInfo
+      )
+    ]);
 
     return {
       server,
@@ -152,9 +154,13 @@ export default class StatisticsCommand extends Command {
     await this.database.connection.query('SELECT * FROM guilds');
     const ping = stopwatch.end();
 
+    const dbName = this.config.getProperty('database.url') !== undefined
+      ? this.config.getProperty('database.url') ?? 'nino'
+      : this.config.getProperty('database.database') ?? 'nino';
+
     // collect shit
     const data = await Promise.all([
-      this.database.connection.query('SELECT tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted FROM pg_stat_database WHERE datname = \'nino\';'),
+      this.database.connection.query(`SELECT tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted FROM pg_stat_database WHERE datname = '${dbName}';`),
       this.database.connection.query('SELECT version();'),
       this.database.connection.query('SELECT extract(epoch FROM current_timestamp - pg_postmaster_start_time()) AS uptime;')
     ]);

@@ -50,7 +50,7 @@ export default class BotlistsService {
   async load() {
     const botlists = this.config.getProperty('botlists');
     if (botlists === undefined) {
-      this.logger.warn('`botlists` is missing, please add it!');
+      this.logger.warn('`botlists` is missing, don\'t need to add it if running privately.');
       return Promise.resolve();
     }
 
@@ -64,6 +64,8 @@ export default class BotlistsService {
   }
 
   async post() {
+    const successful: { name: 'Discord Services' | 'Discord Boats' | 'Discord Bots' | 'top.gg' | 'Delly' | 'Bots for Discord', success: boolean; }[] = [];
+
     const botlists = this.config.getProperty('botlists')!;
     if (botlists.dservices !== undefined) {
       this.logger.info('Found Discord Services token, now posting...');
@@ -83,6 +85,11 @@ export default class BotlistsService {
       });
 
       const level = res.statusCode === 200 ? 'info' : 'warn';
+      successful.push({
+        name: 'Discord Services',
+        success: res.statusCode === 200
+      });
+
       this.logger[level](`Posted statistics to Discord Services (${res.statusCode})`, res.json());
     }
 
@@ -103,6 +110,11 @@ export default class BotlistsService {
       });
 
       const level = res.statusCode === 200 ? 'info' : 'warn';
+      successful.push({
+        name: 'Discord Boats',
+        success: res.statusCode === 200
+      });
+
       this.logger[level](`Posted statistics to Discord Boats (${res.statusCode})`, res.json());
     }
 
@@ -124,6 +136,11 @@ export default class BotlistsService {
       });
 
       const level = res.statusCode === 200 ? 'info' : 'warn';
+      successful.push({
+        name: 'Discord Bots',
+        success: res.statusCode === 200
+      });
+
       this.logger[level](`Posted statistics to Discord Bots (${res.statusCode})`, res.json());
     }
 
@@ -145,6 +162,11 @@ export default class BotlistsService {
       });
 
       const level = res.statusCode === 200 ? 'info' : 'warn';
+      successful.push({
+        name: 'top.gg',
+        success: res.statusCode === 200
+      });
+
       this.logger[level](`Posted statistics to top.gg (${res.statusCode})`, res.json());
     }
 
@@ -167,6 +189,11 @@ export default class BotlistsService {
       });
 
       const level = res.statusCode === 200 ? 'info' : 'warn';
+      successful.push({
+        name: 'Delly',
+        success: res.statusCode === 200
+      });
+
       this.logger[level](`Posted statistics to Discord Extreme List (${res.statusCode})`, res.json());
     }
 
@@ -187,7 +214,15 @@ export default class BotlistsService {
       });
 
       const level = res.statusCode === 200 ? 'info' : 'warn';
-      this.logger[level](`Posted statistics to Discord Extreme List (${res.statusCode})`, res.json());
+      successful.push({
+        name: 'Bots for Discord',
+        success: res.statusCode === 200
+      });
+
+      this.logger[level](`Posted statistics to Bots for Discord (${res.statusCode})`, res.json());
     }
+
+    const successRate = successful.reduce((_, curr) => curr.success ? 1 : 0, 0);
+    this.logger.info(`Successfully posted to ${successful.length} botlists! (${((successful.length / 5) / 100).toFixed(2)}% of botlists; ${((successRate / successful.length) / 100).toFixed(2)}% success)`, successful.map(botlist => `${botlist.success === true ? '✔' : '❌'} ${botlist.name}`));
   }
 }

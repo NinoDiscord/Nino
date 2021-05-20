@@ -50,7 +50,7 @@ import app from './container';
 
 const ReconnectCodes = [
   1001, // Going Away (re-connect now)
-  1006  // 
+  1006  // Connection reset by peer
 ];
 
 process.on('unhandledRejection', error => logger.fatal('Unhandled promise rejection has occured\n', (error as any).stack ?? '(none provided)'));

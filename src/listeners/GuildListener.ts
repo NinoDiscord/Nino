@@ -22,6 +22,7 @@
 
 import type { Guild, TextChannel } from 'eris';
 import { EmbedBuilder } from '../structures';
+import BotlistsService from '../services/BotlistService';
 import { Logger } from 'tslog';
 import { Inject } from '@augu/lilith';
 import Subscribe from '../structures/decorators/Subscribe';
@@ -31,13 +32,16 @@ import Prom from '../components/Prometheus';
 
 export default class VoidListener {
   @Inject
-  private prometheus!: Prom;
+  private prometheus?: Prom;
 
   @Inject
   private database!: Database;
 
   @Inject
   private discord!: Discord;
+
+  @Inject
+  private readonly botlists?: BotlistsService;
 
   @Inject
   private logger!: Logger;
@@ -49,7 +53,8 @@ export default class VoidListener {
 
     this.logger.info(`✔ New Guild: ${guild.name} (${guild.id})`);
     await this.database.guilds.create(guild.id);
-    this.prometheus.guildCount.inc();
+    this.prometheus?.guildCount.inc();
+    await this.botlists?.post();
 
     const channel = this.discord.client.getChannel('760587940535205899') as TextChannel;
     const owner = this.discord.client.users.get(guild.ownerID);
@@ -76,7 +81,8 @@ export default class VoidListener {
 
     this.logger.info(`❌ Left Guild: ${guild.name} (${guild.id})`);
     await this.database.guilds.delete(guild.id);
-    this.prometheus.guildCount.dec();
+    this.prometheus?.guildCount.dec();
+    await this.botlists?.post();
 
     const channel = this.discord.client.getChannel('760587940535205899') as TextChannel;
     const owner = this.discord.client.users.get(guild.ownerID);

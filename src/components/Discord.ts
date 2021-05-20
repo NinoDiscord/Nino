@@ -23,6 +23,7 @@
 import { USER_MENTION_REGEX, USERNAME_DISCRIM_REGEX, ID_REGEX, CHANNEL_REGEX, ROLE_REGEX } from '../util/Constants';
 import { Client, Role, Guild, AnyChannel } from 'eris';
 import { Component, Inject } from '@augu/lilith';
+import { pluralize } from '@augu/utils';
 import Prometheus from './Prometheus';
 import { Logger } from 'tslog';
 import Config from './Config';
@@ -36,13 +37,13 @@ export default class Discord {
   public client!: Client;
 
   @Inject
-  private prometheus!: Prometheus;
+  private readonly prometheus?: Prometheus;
 
   @Inject
-  private config!: Config;
+  private readonly config!: Config;
 
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
 
   load() {
     if (this.client !== undefined) {
@@ -74,13 +75,22 @@ export default class Discord {
       this.logger.info(`Connected as ${this.client.user.username}#${this.client.user.discriminator} (ID: ${this.client.user.id})`);
       this.logger.info(`Guilds: ${this.client.guilds.size.toLocaleString()} | Users: ${this.client.users.size.toLocaleString()}`);
 
-      this.prometheus.guildCount.set(this.client.guilds.size);
+      this.prometheus?.guildCount.set(this.client.guilds.size);
       this.mentionRegex = new RegExp(`^<@!?${this.client.user.id}> `);
 
       const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
-      this.client.editStatus('online', {
-        name: `${prefixes[Math.floor(Math.random() * prefixes.length)]}help in ${this.client.guilds.size.toLocaleString()} Guilds`,
-        type: 2
+      const status = this.config.getProperty('status') ?? {
+        type: 0,
+        status: '',
+        presence: 'online'
+      };
+
+      this.client.editStatus(status.presence ?? 'online', {
+        name: status.status
+          .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
+          .replace('$guilds$', this.client.guilds.size.toLocaleString())
+          .replace('$plural$', pluralize('Guild', this.client.guilds.size)),
+        type: status.type
       });
     });
 

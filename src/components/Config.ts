@@ -42,6 +42,7 @@ interface Configuration {
   timeouts: TimeoutsConfig;
   database: DatabaseConfig;
   prefixes: string[];
+  status?: StatusConfig;
   owners: string[];
   ksoft?: string;
   redis: RedisConfig;
@@ -93,6 +94,12 @@ interface TimeoutsConfig {
   port: number;
 }
 
+interface StatusConfig {
+  presence?: 'online' | 'idle' | 'dnd' | 'offline';
+  status: string;
+  type: 0 | 1 | 2 | 3 | 5;
+}
+
 // eslint-disable-next-line
 interface RedisSentinelConfig extends Pick<RedisConfig, 'host' | 'port'> {}
 
@@ -139,6 +146,10 @@ export default class Config {
       timeouts: config.timeouts,
       prefixes: config.prefixes,
       owners: config.owners,
+      status: {
+        type: 2,
+        status: '$prefix$help | $guilds$ Guild$plural$'
+      },
       ksoft: config.ksoft,
       redis: config.redis,
       token: config.token,
@@ -162,14 +173,7 @@ export default class Config {
     return Promise.resolve();
   }
 
-  getProperty<K extends keyof Configuration>(key: K): Configuration[K] | undefined;
-  getProperty<K extends keyof DatabaseConfig>(key: `database.${K}`): DatabaseConfig[K] | undefined;
-  getProperty<K extends keyof BotlistConfig>(key: `botlists.${K}`): BotlistConfig[K] | undefined;
-  getProperty<K extends keyof RedisConfig>(key: `redis.${K}`): RedisConfig[K] | undefined;
-  getProperty<K extends keyof KubernetesConfig>(key: `k8s.${K}`): KubernetesConfig[K] | undefined;
-  getProperty<K extends keyof APIConfig>(key: `api.${K}`): APIConfig[K] | undefined;
-  getProperty<K extends keyof TimeoutsConfig>(key: `timeouts.${K}`): TimeoutsConfig[K] | undefined;
-  getProperty(key: string) {
+  getProperty<K extends ObjectKeysWithSeperator<Configuration>>(key: K): KeyToPropType<Configuration, K> | undefined {
     const nodes = key.split('.');
     let value: any = this.config;
 

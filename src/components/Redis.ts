@@ -42,23 +42,29 @@ export default class Redis {
   async load() {
     this.logger.info('Connecting to Redis...');
 
-    const redis = this.config.getProperty('redis')!;
-    const config = (redis.sentinels ?? []).length > 0 ? {
+    const sentinels = this.config.getProperty('redis.sentinels');
+    const password = this.config.getProperty('redis.password');
+    const masterName = this.config.getProperty('redis.master');
+    const index = this.config.getProperty('redis.index');
+    const host = this.config.getProperty('redis.host');
+    const port = this.config.getProperty('redis.port');
+
+    const config = (sentinels ?? []).length > 0 ? {
       enableReadyCheck: true,
       connectionName: 'Nino',
       lazyConnect: true,
-      sentinels: redis.sentinels,
-      password: redis.password,
-      name: redis.master,
-      db: redis.index
+      sentinels,
+      password: password,
+      name: masterName,
+      db: index
     } : {
       enableReadyCheck: true,
       connectionName: 'Nino',
       lazyConnect: true,
-      password: redis.password,
-      host: redis.host,
-      port: redis.port,
-      db: redis.index
+      password: password,
+      host: host,
+      port: port,
+      db: index
     };
 
     this.client = new IORedis(config);
