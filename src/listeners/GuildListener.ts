@@ -53,7 +53,7 @@ export default class VoidListener {
 
     this.logger.info(`✔ New Guild: ${guild.name} (${guild.id})`);
     await this.database.guilds.create(guild.id);
-    this.prometheus?.guildCount.inc();
+    this.prometheus?.guildCount?.inc();
     await this.botlists?.post();
 
     const channel = this.discord.client.getChannel('760587940535205899') as TextChannel;
@@ -81,7 +81,7 @@ export default class VoidListener {
 
     this.logger.info(`❌ Left Guild: ${guild.name} (${guild.id})`);
     await this.database.guilds.delete(guild.id);
-    this.prometheus?.guildCount.dec();
+    this.prometheus?.guildCount?.dec();
     await this.botlists?.post();
 
     const channel = this.discord.client.getChannel('760587940535205899') as TextChannel;

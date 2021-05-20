@@ -75,7 +75,7 @@ export default class Discord {
       this.logger.info(`Connected as ${this.client.user.username}#${this.client.user.discriminator} (ID: ${this.client.user.id})`);
       this.logger.info(`Guilds: ${this.client.guilds.size.toLocaleString()} | Users: ${this.client.users.size.toLocaleString()}`);
 
-      this.prometheus?.guildCount.set(this.client.guilds.size);
+      this.prometheus?.guildCount?.set(this.client.guilds.size);
       this.mentionRegex = new RegExp(`^<@!?${this.client.user.id}> `);
 
       const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
