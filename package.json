@@ -39,7 +39,7 @@
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
     "@sentry/node": "6.4.1",
-    "bson": "^4.4.0",
+    "bson": "4.4.0",
     "eris": "github:abalabahaha/eris#dev",
     "express": "4.17.1",
     "ioredis": "4.27.2",
