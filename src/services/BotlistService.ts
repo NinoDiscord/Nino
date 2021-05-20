@@ -89,8 +89,6 @@ export default class BotlistsService {
         name: 'Discord Services',
         success: res.statusCode === 200
       });
-
-      this.logger[level](`Posted statistics to Discord Services (${res.statusCode})`, res.json());
     }
 
     if (botlists.dboats !== undefined) {
@@ -114,8 +112,6 @@ export default class BotlistsService {
         name: 'Discord Boats',
         success: res.statusCode === 200
       });
-
-      this.logger[level](`Posted statistics to Discord Boats (${res.statusCode})`, res.json());
     }
 
     if (botlists.dbots !== undefined) {
@@ -140,8 +136,6 @@ export default class BotlistsService {
         name: 'Discord Bots',
         success: res.statusCode === 200
       });
-
-      this.logger[level](`Posted statistics to Discord Bots (${res.statusCode})`, res.json());
     }
 
     if (botlists.topgg !== undefined) {
@@ -166,8 +160,6 @@ export default class BotlistsService {
         name: 'top.gg',
         success: res.statusCode === 200
       });
-
-      this.logger[level](`Posted statistics to top.gg (${res.statusCode})`, res.json());
     }
 
     // Ice is a cute boyfriend btw <3
@@ -193,8 +185,6 @@ export default class BotlistsService {
         name: 'Delly',
         success: res.statusCode === 200
       });
-
-      this.logger[level](`Posted statistics to Discord Extreme List (${res.statusCode})`, res.json());
     }
 
     if (botlists.bfd !== undefined) {
@@ -218,8 +208,6 @@ export default class BotlistsService {
         name: 'Bots for Discord',
         success: res.statusCode === 200
       });
-
-      this.logger[level](`Posted statistics to Bots for Discord (${res.statusCode})`, res.json());
     }
 
     const successRate = successful.reduce((_, curr) => curr.success ? 1 : 0, 0);
