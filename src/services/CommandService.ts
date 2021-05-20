@@ -91,11 +91,22 @@ export default class CommandService extends Collection<string, NinoCommand> {
     const settings = await this.database.guilds.get(msg.channel.guild.id);
     const userSettings = await this.database.users.get(msg.author.id);
 
-    // remove duplicates
-    const prefixes = [...new Set([`${this.discord.mentionRegex}`].concat(settings.prefixes, userSettings.prefixes, this.config.getProperty('prefixes')!).filter(Boolean))];
-    if (this.discord.client.user.id === '531613242473054229')
-      prefixes.push('nino ');
+    const _prefixes = ([] as string[]).concat(
+      settings.prefixes,
+      userSettings.prefixes,
+      this.config.getProperty('prefixes')!
+    ).filter(Boolean);
 
+    const mention = this.discord.mentionRegex.exec(msg.content);
+    if (mention !== null)
+      _prefixes.push(`${mention}`);
+
+    // remove duplicates
+    if (this.discord.client.user.id === '531613242473054229')
+      _prefixes.push('nino ');
+
+    // Removes any duplicates
+    const prefixes = [...new Set(_prefixes)];
     const prefix = prefixes.find(prefix => msg.content.startsWith(prefix));
     if (prefix === undefined)
       return;
