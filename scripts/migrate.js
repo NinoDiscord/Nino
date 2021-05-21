@@ -72,10 +72,29 @@ async function main() {
   logger.info('Creating PostgreSQL instance...');
   const connection = await createConnection();
 
+  const startTime = process.hrtime();
   const guilds = files.find(file => file.endsWith('guilds.json'));
   const guildData = await readFile(guilds, 'utf-8');
   const guildDocs = JSON.parse(guildData);
   await convertGuilds(connection, guildDocs);
+
+  const users = files.find(file => file.endsWith('users.json'));
+  const userData = await readFile(users, 'utf-8');
+  const userDocs = JSON.parse(userData);
+  await convertUsers(connection, userDocs);
+
+  const warnings = files.find(file => file.endsWith('warnings.json'));
+  const warningData = await readFile(warnings, 'utf-8');
+  const warningDocs = JSON.parse(warningData);
+  await convertWarnings(connection, warningDocs);
+
+  const cases = files.find(file => file.endsWith('cases.json'));
+  const caseData = await readFile(cases, 'utf-8');
+  const caseDocs = JSON.parse(caseData);
+  await convertCases(connection, caseDocs);
+
+  logger.info(`Converted ${userDocs.length} users, ${guildDocs.length} guilds, ${warningDocs.length} warnings, and ${caseDocs.length} cases in ~${calculateHRTime(startTime)}ms.`);
+  process.exit(0);
 }
 
 async function convertGuilds(connection, documents) {
@@ -168,7 +187,86 @@ async function convertGuilds(connection, documents) {
     }
   }
 
-  logger.info(`Hopefully migrated ${documents.length} documents (~${calculateHRTime(start).toFixed(2)}ms)`);
+  logger.info(`Hopefully migrated ${documents.length} guild documents (~${calculateHRTime(start).toFixed(2)}ms)`);
+}
+
+async function convertUsers(connection, documents) {
+  logger.info(`Found ${documents.length} users to convert.`);
+  const { users } = getRepositories(connection);
+
+  const startTime = process.hrtime();
+  for (let i = 0; i < documents.length; i++) {
+    const document = documents[i];
+    logger.info(`User Entry: ${document.userID} (${i + 1}/${documents.length})`);
+
+    const entry = new UserEntity();
+    entry.language = document.locale;
+    entry.prefixes = [];
+    entry.id = document.userID;
+
+    const user = await users.find({ id: document.userID });
+    if (!user)
+      await users.save(entry);
+  }
+
+  logger.info(`Hopefully migrated ${documents.length} user documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
+}
+
+async function convertWarnings(connection, documents) {
+  logger.info(`Found ${documents.length} warnings to convert.`);
+  const { warnings } = getRepositories(connection);
+
+  const startTime = process.hrtime();
+  for (let i = 0; i < documents.length; i++) {
+    logger.info(`Warning Entry: ${documents[i].guild} | ${documents[i].user} (${i + 1}/${documents.length})`);
+
+    const document = documents[i];
+    const entry = new WarningsEntity();
+
+    entry.amount = document.amount;
+    entry.guildID = document.guild;
+    entry.userID = document.user;
+    if (typeof document.reason === 'string')
+      entry.reason = document.reason;
+
+    const aeiou = await warnings.findOne({ guildID: document.guild, userID: document.user });
+    if (!aeiou)
+      await warnings.save(entry);
+  }
+
+  logger.info(`Hopefully migrated ${documents.length} warning documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
+}
+
+async function convertCases(connection, documents) {
+  logger.info(`Found ${documents.length} cases to convert.`);
+  const { cases } = getRepositories(connection);
+
+  const startTime = process.hrtime();
+  for (let i = 0; i < documents.length; i++) {
+    const document = documents[i];
+    logger.info(`Case Entry: ${document.guild}, ${document.victim}, #${document.id}`);
+
+    const entry = new CaseEntity();
+    entry.moderatorID = document.moderator;
+    entry.messageID = document.message;
+    entry.victimID = document.victim;
+    entry.guildID = document.guild;
+    entry.index = document.id;
+    entry.type = determineCaseType(document.type) ?? document.type;
+    entry.soft = document.soft === true;
+
+    if (document.reason !== null)
+      entry.reason = document.reason;
+
+    if (document.time !== undefined)
+      entry.time = document.time;
+
+    const available = await cases.findOne({ guildID: document.guild, index: document.index });
+    if (!available)
+      await cases.save(entry);
+  }
+
+  logger.info(`Hopefully migrated ${documents.length} case documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
 }
 
 main()
