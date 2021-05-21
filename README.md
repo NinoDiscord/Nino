@@ -29,7 +29,7 @@ Before running your own instance of Nino, you will need the following tools:
 - [PostgreSQL](https://postgresql.org) (12 is used in development but anything above 10 should fairly work!)
 - [Redis](https://redis.io) (6.2 is used in development but above v5 should work)
 
-If you're moving from v0 to v1, you will need your MongoDB instance before to port the database!
+If you're moving from v0 to v1, you will need your MongoDB instance before to port the database and [Rei](https://github.com/NinoDiscord/Rei) installed on your system.
 
 There is tools that are optional but are mostly recommended in some cases:
 
@@ -46,6 +46,12 @@ This step isn't finished due to the rewrite not being stable.
 
 ### Normal
 This step isn't finished due to the rewrite not being stable.
+
+### Migrating from v0.x -> v1.x
+If you used v0.x in the past, this is the process on how to migrate:
+
+- 1. Run `rei convert ...` to convert the documents into JSON, this process should take a while if there is a lot of cases or warnings.
+- 2. Run `node scripts/migrate.js <directory>`, where `<directory>` is the directory Rei converted your database to.
 
 ## Example `config.yml` file
 - Replace `<discord token>` with your Discord bot's token

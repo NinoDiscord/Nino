@@ -19,3 +19,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+const { PunishmentType } = require('../../build/entities/PunishmentsEntity');
+
+/**
+ * Determines the type from v0.x to v1.x
+ * @param {'warning remove' | 'warning add' | 'unmute' | 'kick' | 'mute' | 'ban'} type The type to serialize
+ * @returns {string} The punishment type
+ */
+module.exports = (type) => {
+  switch (type) {
+    case 'warning remove':
+      return PunishmentType.WarningRemoved;
+
+    case 'warning add':
+      return PunishmentType.WarningAdded;
+
+    case 'unmute':
+      return PunishmentType.Unmute;
+
+    case 'kick':
+      return PunishmentType.Kick;
+
+    case 'mute':
+      return PunishmentType.Mute;
+
+    case 'ban':
+      return PunishmentType.Ban;
+  }
+};
