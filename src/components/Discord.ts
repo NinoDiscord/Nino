@@ -81,15 +81,14 @@ export default class Discord {
       const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
       const status = this.config.getProperty('status') ?? {
         type: 0,
-        status: '$prefix$help in $plural$',
+        status: '$prefix$help | $guilds$ Guilds',
         presence: 'online'
       };
 
       this.client.editStatus(status.presence ?? 'online', {
         name: status.status
           .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
-          .replace('$guilds$', this.client.guilds.size.toLocaleString())
-          .replace('$plural$', pluralize('Guild', this.client.guilds.size)),
+          .replace('$guilds$', this.client.guilds.size.toLocaleString()),
         type: status.type
       });
     });
