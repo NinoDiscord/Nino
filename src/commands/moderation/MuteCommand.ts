@@ -92,7 +92,7 @@ export default class MuteCommand extends Command {
     if (!Permissions.isMemberAbove(msg.member, member))
       return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above as you.`);
 
-    if (!Permissions.isMemberAbove(msg.self, member))
+    if (!Permissions.isMemberAbove(msg.self!, member))
       return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
 
     const areason = reason.join(' ');

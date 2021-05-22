@@ -24,8 +24,14 @@ import Eris from 'eris';
 
 declare module 'eris' {
   interface Collection<T> extends Map<string | number, T> {
-    get(key: string | number): T;
+    get(key: string | number): T | undefined;
     get<V extends { id: string | number }>(key: string | number): V;
+
+    values(): IterableIterator<T>;
+    values<V extends { id: string | number }>(): IterableIterator<V>;
+
+    filter(func: (i: T) => boolean): T[];
+    filter<V extends { id: string | number }>(func: (i: V) => boolean): V[];
   }
 
   interface Guild {

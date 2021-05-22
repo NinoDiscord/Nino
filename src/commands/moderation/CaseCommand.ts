@@ -80,13 +80,13 @@ export default class CaseCommand extends Command {
     };
 
     const embed = EmbedBuilder.create()
-      .setAuthor(`[ Case #${caseModel.index} | ${victim.username}#${victim.discriminator} (${caseModel.victimID})]`, undefined, victim.dynamicAvatarURL?.('png', 1024)) // dynamicAvatarURL might not exist since partials
+      .setAuthor(`[ Case #${caseModel.index} | ${victim.username}#${victim.discriminator} (${caseModel.victimID})]`, undefined, (victim as any).dynamicAvatarURL?.('png', 1024)) // dynamicAvatarURL might not exist since partials
       .setDescription([
         `${caseModel.reason ? `**${caseModel.reason}**` : `*Unknown, use \`${msg.settings.prefixes[0]}reason ${caseModel.index} <reason>\` to set a reason*`}`,
         '',
         caseModel.messageID !== null ? `[**\`[Jump Here]\`**](https://discord.com/channels/${msg.guild.id}/${msg.settings.modlogChannelID}/${caseModel.messageID})` : ''
       ])
-      .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${moderator.id})`, true)
+      .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${(moderator as any).id ?? '(unknown)'})`, true)
       .addField('• Type', caseModel.type, true);
 
     if (caseModel.time !== null)

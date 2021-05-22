@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
+import { ComponentOrServiceHooks, Inject, Service } from '@augu/lilith';
 import type { Member, Message, TextChannel, User } from 'eris';
-import { Inject, Service } from '@augu/lilith';
 import type { Automod } from '../structures';
 import { Collection } from '@augu/collections';
 import { Logger } from 'tslog';
@@ -32,7 +32,7 @@ import { join } from 'path';
   children: join(process.cwd(), 'automod'),
   name: 'automod'
 })
-export default class AutomodService extends Collection<string, Automod> {
+export default class AutomodService extends Collection<string, Automod> implements ComponentOrServiceHooks<Automod> {
   @Inject
   private logger!: Logger;
 

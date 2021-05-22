@@ -100,7 +100,7 @@ export default class BanCommand extends Command {
       if (!Permissions.isMemberAbove(msg.member, member))
         return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above you.`);
 
-      if (!Permissions.isMemberAbove(msg.self, member))
+      if (!Permissions.isMemberAbove(msg.self!, member))
         return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
     }
 
