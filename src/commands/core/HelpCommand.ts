@@ -23,9 +23,10 @@
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
 import { Constants as ErisConstants } from 'eris';
 import { firstUpper } from '@augu/utils';
-import * as Constants from '../../util/Constants';
 import CommandService from '../../services/CommandService';
 import Permissions from '../../util/Permissions';
+import { Inject } from '@augu/lilith';
+import Discord from '../../components/Discord';
 
 interface CommandCategories {
   moderation?: Command[];
@@ -37,25 +38,22 @@ export default class HelpCommand extends Command {
   private categories!: CommandCategories;
   private parent!: CommandService;
 
+  @Inject
+  private discord!: Discord;
+
   constructor() {
     super({
       description: 'descriptions.help',
       examples: ['help', 'help help', 'help General'],
       cooldown: 2,
       aliases: ['halp', 'h', 'cmds', 'commands'],
+      usage: '[cmdOrMod | "usage"]',
       name: 'help'
     });
   }
 
   run(msg: CommandMessage, [command]: [string]) {
-    if (!command)
-      return this.renderHelpCommand(msg);
-    else
-      return this.renderDoc(msg, command);
-  }
-
-  private _calculateLength(a: Command) {
-    return a.name.length;
+    return command !== undefined ? this.renderDoc(msg, command) : this.renderHelpCommand(msg);
   }
 
   private async renderHelpCommand(msg: CommandMessage) {
@@ -69,19 +67,14 @@ export default class HelpCommand extends Command {
       }
     }
 
-    const prefix = msg.settings.prefixes[msg.settings.prefixes.length - 1];
-    const embed = new EmbedBuilder()
-      .setColor(Constants.Color)
-      .setDescription([
-        `:pencil2: **For more documentation of a command or module, run \`${prefix}help <cmdOrMod>\` with \`<cmdOrMod>\` with the command or module you want to look up.**`,
-        '',
-        'You can browse the [website](https://nino.floofy.dev) for more information and a prettier UI for this help command.',
-        `There are currently **${this.parent.size}** commands available.`
-      ]);
+    const prefix = msg.settings.prefixes[Math.floor(Math.random() * msg.settings.prefixes.length)];
+    const embed = EmbedBuilder.create()
+      .setTitle(msg.locale.translate('commands.help.embed.title', [`${this.discord.client.user.username}#${this.discord.client.user.discriminator}`]))
+      .setDescription(msg.locale.translate('commands.help.embed.description', [prefix, this.parent.size]));
 
     for (const cat in (this.categories as Required<CommandCategories>)) {
       const commands = (this.categories[cat] as Command[]);
-      embed.addField(`• ${firstUpper(cat)} [${this.categories[cat].length}]`, commands.map(cmd => `**\`${cmd.name}\`**`).join(', '), false);
+      embed.addField(msg.locale.translate(`commands.help.embed.fields.${cat}` as any, [this.categories[cat].length]), commands.map(cmd => `**\`${cmd.name}\`**`).join(', '), false);
     }
 
     return msg.reply(embed);
@@ -92,49 +85,49 @@ export default class HelpCommand extends Command {
     const prefix = msg.settings.prefixes[msg.settings.prefixes.length - 1];
 
     if (command !== undefined) {
-      const embed = new EmbedBuilder()
-        .setColor(Constants.Color)
-        .setTitle(`[ :pencil2: Command ${command.name} ]`)
-        .setDescription(`> **${command.description}**`)
+      const description = msg.locale.translate(command.description as any);
+      const embed = EmbedBuilder.create()
+        .setTitle(msg.locale.translate('commands.help.command.embed.title', [command.name]))
+        .setDescription(msg.locale.translate('commands.help.command.embed.description', [description]))
         .addFields(
           [
             {
-              name: '• Syntax',
+              name: msg.locale.translate('commands.help.command.embed.fields.syntax'),
               value: `**\`${prefix}${command.format}\`**`,
               inline: false
             },
             {
-              name: '• Category',
+              name: msg.locale.translate('commands.help.command.embed.fields.category'),
               value: firstUpper(command.category),
               inline: true
             },
             {
-              name: '• Aliases',
+              name: msg.locale.translate('commands.help.command.embed.fields.aliases'),
               value: command.aliases.join(', ') || 'No aliases available',
               inline: true
             },
             {
-              name: '• Owner Only',
+              name: msg.locale.translate('commands.help.command.embed.fields.owner_only'),
               value: command.ownerOnly ? 'Yes' : 'No',
               inline: true
             },
             {
-              name: '• Cooldown',
+              name: msg.locale.translate('commands.help.command.embed.fields.cooldown'),
               value: `${command.cooldown} Seconds`,
               inline: true
             },
             {
-              name: '• User Permissions',
+              name: msg.locale.translate('commands.help.command.embed.fields.user_perms'),
               value: Permissions.stringify(command.userPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0n)) || 'None',
               inline: true
             },
             {
-              name: '• Bot Permissions',
+              name: msg.locale.translate('commands.help.command.embed.fields.bot_perms'),
               value: Permissions.stringify(command.botPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0n)) || 'None',
               inline: true
             },
             {
-              name: '• Examples',
+              name: msg.locale.translate('commands.help.command.embed.fields.examples'),
               value: command.examples.map(example => `• **${prefix}${example}**`).join('\n') || 'No examples are available.',
               inline: false
             }
@@ -145,45 +138,23 @@ export default class HelpCommand extends Command {
     } else {
       if (cmdOrMod === 'usage') {
         const embed = EmbedBuilder.create()
-          .setTitle('Command Usage')
-          .setDescription([
-            'So, if you\'re not familar with my command usage, here\'s a breakdown:',
-            '',
-            `A simple command usage might be like: \`${msg.settings.prefixes[0]}help [cmdOrMod]\``,
-            '',
-            '```',
-            'x!       help     [cmdOrMod]',
-            '^         ^           ^',
-            '|         |           |',
-            '|         |           |',
-            '|         |           |',
-            'prefix  command   parameter(s)',
-            '```',
-            '',
-            'The parameters section is easy to understand! The name of it doesn\'t matter too much, but it\'s what you should provide.',
-            '',
-            '- A parameter wrapped in `[]` means it\'s optional, but you can add additional arguments to make it run something else',
-            '- A parameter wrapped in `<>` means it\'s required, which means *you* have to add that argument to make the command perform correctly.',
-            '',
-            ':question: **Still stuck? There is always examples in the command\'s short overview to show how you can run that specific command.**'
-          ]);
+          .setTitle(msg.locale.translate('commands.help.usage_title'))
+          .setDescription(msg.locale.translate('commands.help.usage', [msg.settings.prefixes[0]]));
 
         return msg.reply(embed);
       }
 
       const mod = this.parent.filter(cmd => cmd.category.toLowerCase() === cmdOrMod.toLowerCase());
       if (mod.length > 0) {
-        const longestName = this._calculateLength(mod.sort((a, b) => this._calculateLength(b) - this._calculateLength(a))[0]);
-        const embed = new EmbedBuilder()
-          .setColor(Constants.Color)
-          .setAuthor(`[ Module ${firstUpper(cmdOrMod)} ]`)
+        const embed = EmbedBuilder.create()
+          .setAuthor(msg.locale.translate('commands.help.module.embed.title', [firstUpper(cmdOrMod)]))
           .setDescription(mod.map(command =>
-            `**\`${prefix}${command.name}\`** ~  \u200b \u200b${command.description}`
+            `**\`${prefix}${command.format}\`** ~  \u200b \u200b**${msg.locale.translate(command.description as any)}**`
           ));
 
         return msg.reply(embed);
       } else {
-        return msg.reply(`:x: Command or module **${cmdOrMod}** was not found.`);
+        return msg.reply(msg.locale.translate('commands.help.command.not_found', [cmdOrMod]));
       }
     }
   }

@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+/* eslint-disable camelcase */
+
 export {};
 /** */
 declare global {
@@ -44,5 +46,105 @@ declare global {
 
     /** The locale's code (i.e `en_US`) */
     code: string;
+  }
+
+  interface LocalizationStrings {
+    descriptions: LocalizationStrings.Descriptions;
+    commands: LocalizationStrings.Commands;
+    automod: LocalizationStrings.Automod;
+    generic: LocalizationStrings.Generic;
+    errors: LocalizationStrings.Errors;
+  }
+
+  namespace LocalizationStrings {
+    export interface Descriptions {
+      // Core
+      help: string;
+      invite: string;
+      locale: string;
+      ping: string;
+      shardinfo: string;
+      source: string;
+      statistics: string;
+      uptime: string;
+
+      // Moderation
+      ban: string;
+      case: string;
+      kick: string;
+      mute: string;
+      pardon: string;
+      reason: string;
+      softban: string;
+      timeouts: string;
+      unban: string;
+      unmute: string;
+      warn: string;
+      warnings: string;
+
+      // Settings
+      automod: string;
+      logging: string;
+      modlog: string;
+      muted_role: string;
+      prefix: string;
+      punishments: string;
+    }
+
+    export interface Commands {
+      help: {
+        embed: {
+          title: string;
+          description: string[];
+          fields: {
+            moderation: string;
+            core: string;
+            settings: string;
+          }
+        };
+
+        command: {
+          not_found: string;
+          embed: {
+            title: string;
+            description: string;
+            fields: {
+              syntax: string;
+              category: string;
+              aliases: string;
+              owner_only: string;
+              cooldown: string;
+              user_perms: string;
+              bot_perms: string;
+              examples: string;
+            };
+          }
+        };
+
+        module: {
+          embed: {
+            title: string;
+          }
+        };
+
+        usage_title: string;
+        usage: string[];
+      };
+    }
+
+    // eslint-disable-next-line
+    export interface Automod {
+
+    }
+
+    // eslint-disable-next-line
+    export interface Generic {
+
+    }
+
+    // eslint-disable-next-line
+    export interface Errors {
+
+    }
   }
 }

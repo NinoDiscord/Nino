@@ -24,34 +24,9 @@ import { isObject } from '@augu/utils';
 
 const NOT_FOUND_SYMBOL = Symbol.for('$nino::localization::not_found');
 
-/**
- * Metadata for a locale, this is used in the "meta" object
- */
- interface LocalizationMeta {
-  /** List of contributors (by user ID) who helped translate or fix minor issues with this Locale */
-  contributors: string[];
-
-  /** The translator's ID */
-  translator: string;
-
-  /** Any additional aliases to use when setting or resetting a locale */
-  aliases: string[];
-
-  /** The flag's emoji (example: `:flag_us:`) */
-  flag: string;
-
-  /** The full name of the Locale (i.e `English (UK)`) */
-  full: string;
-
-  /** The locale's code (i.e `en_US`) */
-  code: string;
-}
-
 interface Localization {
   meta: LocalizationMeta;
-  strings: {
-    [x: string]: DeepPartial<string | string[] | Record<string, string | string[]>>;
-  }
+  strings: LocalizationStrings;
 }
 
 const KEY_REGEX = /[$]\{([\w\.]+)\}/g;
@@ -64,7 +39,7 @@ export default class Locale {
   public full: string;
   public code: string;
 
-  #strings: Localization['strings'];
+  #strings: LocalizationStrings;
 
   constructor({ meta, strings }: Localization) {
     this.contributors = meta.contributors;
@@ -76,8 +51,10 @@ export default class Locale {
     this.code         = meta.code;
   }
 
-  // todo: type safety?
-  translate(key: string, args?: { [x: string]: any } | any[]) {
+  translate<K extends ObjectKeysWithSeperator<LocalizationStrings>, R = KeyToPropType<LocalizationStrings, K>>(
+    key: K,
+    args?: { [x: string]: any } | any[]
+  ): R extends string[] ? string : string {
     const nodes = key.split('.');
     let value: any = this.#strings;
 
@@ -97,7 +74,7 @@ export default class Locale {
       throw new TypeError(`Node '${key}' is a object!`);
 
     if (Array.isArray(value)) {
-      return value.map(val => this.stringify(val, args)).join('\n');
+      return value.map(val => this.stringify(val, args)).join('\n') as unknown as any;
     } else {
       return this.stringify(value, args);
     }
@@ -112,19 +89,30 @@ export default class Locale {
     if (typeof value !== 'string')
       value = String(value);
 
-    let i = 0;
-    const regex = Array.isArray(rawArgs) ? /%s|%d/g : KEY_REGEX;
+    let _i = 0;
+    if (Array.isArray(rawArgs)) {
+      const matches = /%s|%d/g.exec(value);
+      if (matches === null)
+        return value;
 
-    return (value as string).replace(regex, (_, key) => {
-      if (Array.isArray(rawArgs)) {
-        return String(rawArgs[i++]);
-      } else {
-        const value = String(rawArgs[key]);
-        if (value === '')
-          return '';
-        else
-          return value || '?';
+      for (let i = 0; i < matches.length; i++) {
+        const match = matches[i];
+        if (match === '%s') {
+          _i++;
+          return value.replace(/%s/g, () => String(rawArgs.shift()));
+        } else if (match === '%d') {
+          _i++;
+          if (isNaN(Number(rawArgs[_i])))
+            throw new TypeError(`Value "${rawArgs[_i]}" was not a number (index: ${_i})`);
+
+          return value.replace(/%d/g, () => String(rawArgs.shift()));
+        }
       }
-    });
+    } else {
+      return (value as string).replace(KEY_REGEX, (_, key) => {
+        const value = String(rawArgs[key]);
+        return value === '' ? '?' : value || '?';
+      });
+    }
   }
 }

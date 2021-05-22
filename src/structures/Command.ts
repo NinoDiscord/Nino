@@ -70,7 +70,7 @@ export default abstract class NinoCommand {
     this.description  = info.description ?? 'No description is available for this command.';
     this.ownerOnly    = info.ownerOnly ?? false;
     this.examples     = info.examples ?? [];
-    this.category     = info.category ?? Categories.General;
+    this.category     = info.category ?? Categories.Core;
     this.cooldown     = info.cooldown ?? 5;
     this.aliases      = info.aliases ?? [];
     this.hidden       = info.hidden ?? false;
@@ -83,8 +83,8 @@ export default abstract class NinoCommand {
   }
 
   get format() {
-    const subcommands = this.subcommands.map(sub => `[${sub.name} ${sub.usage}]`.trim()).join(' | ');
-    return `${this.name}${this.usage !== '' ? ` ${this.usage}` : ''} ${subcommands}`;
+    const subcommands = this.subcommands.map(sub => `[${sub.name} ${sub.usage.trim()}]`.trim()).join(' | ');
+    return `${this.name}${this.usage !== '' ? ` ${this.usage.trim()}` : ''} ${subcommands}`;
   }
 
   abstract run(msg: CommandMessage, ...args: any[]): any;
