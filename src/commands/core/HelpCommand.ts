@@ -23,7 +23,6 @@
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
 import { Constants as ErisConstants } from 'eris';
 import { firstUpper } from '@augu/utils';
-import { Inject } from '@augu/lilith';
 import * as Constants from '../../util/Constants';
 import CommandService from '../../services/CommandService';
 import Permissions from '../../util/Permissions';

@@ -8,7 +8,36 @@
     "flag": ":flag_fr:"
   },
   "strings": {
-    "descriptions": {},
+    "descriptions": {
+      "help": "Returns a list of Nino's commands or documentation of a specific command or module.",
+      "invite": "Returns the invitation link to invite Nino into your guild! Also, support if you really need it.",
+      "locale": "Sets, resets, or views the current translations for Nino.",
+      "ping": "Returns the latency of anything that could cause me being... slighly un-usable...",
+      "shardinfo": "Returns shard information for Nino.",
+      "source": "Returns the source code URL of Nino, maybe to contribute or give a :star:?",
+      "statistics": "Returns nerd statistics related to Nino.",
+      "uptime": "How long I have been up for!",
+
+      "ban": "Bans a user from this guild or outside the guild.",
+      "case": "Returns a mini embed of the case you searched up.",
+      "kick": ":boot: Kicks a member from this guild.",
+      "mute": "Mutes a member from any textable channel.",
+      "pardon": "Removes one or multiple warnings from a user in this guild.",
+      "reason": "Changes the reason of a specific case.",
+      "softban": "Softly bans a user from this guild.",
+      "timeouts": "Returns a list of timeouts based on the type of action.",
+      "unban": "Unbans a user from this guild.",
+      "unmute": "Unmutes a user from this guild.",
+      "warn": "Warns a specific user.",
+      "warnings": "Shows a list of warnings from a specific user.",
+
+      "automod": "Enables, disables, or views any automod utility available.",
+      "logging": "Enables or disable the Logging feature.",
+      "modlog": "Set or reset the mod log channel.",
+      "muted_role": "Sets or resets the Muted role.",
+      "prefix": "View, change, or reset a guild or user prefix.",
+      "punishments": "View, change, or remove a guild punishment."
+    },
     "commands": {},
     "generic": {},
     "automod": {},
