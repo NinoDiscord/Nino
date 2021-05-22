@@ -154,9 +154,14 @@ export default class StatisticsCommand extends Command {
     await this.database.connection.query('SELECT * FROM guilds');
     const ping = stopwatch.end();
 
-    const dbName = this.config.getProperty('database.url') !== undefined
-      ? this.config.getProperty('database.url') ?? 'nino'
-      : this.config.getProperty('database.database') ?? 'nino';
+    let dbName: string = 'nino';
+    const url = this.config.getProperty('database.url');
+    if (url !== undefined) {
+      const parts = url.split('/');
+      dbName = parts[parts.length - 1];
+    } else {
+      dbName = this.config.getProperty('database.database') ?? 'nino';
+    }
 
     // collect shit
     const data = await Promise.all([
@@ -218,11 +223,6 @@ export default class StatisticsCommand extends Command {
             `• **Current Node**\n${node ?? 'Unknown'}`,
             `• **Uptime**\n${humanize(Math.floor(process.uptime() * 1000), true)}`
           ].join('\n'),
-          inline: true
-        },
-        {
-          name: '\u200b',
-          value: '\u200b',
           inline: true
         },
         {

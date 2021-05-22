@@ -128,7 +128,7 @@ export default class ModLogCommand extends Command {
     return msg.reply('Resetted the mod log successfully.');
   }
 
-  @Subcommand('<event>')
+  @Subcommand('<event>', ['events'])
   async event(msg: CommandMessage, [event]: string) {
     const settings = await this.database.logging.get(msg.guild.id);
 
