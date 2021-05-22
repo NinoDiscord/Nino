@@ -62,7 +62,7 @@ process.on('uncaughtException', async error => {
   if ((error as any).code !== undefined && ReconnectCodes.includes((error as any).code)) {
     logger.fatal('Disconnected due to peer to peer connection ended, restarting client...');
 
-    const discord = app.$ref<typeof Discord, Discord>(Discord);
+    const discord = app.$ref<Discord>(Discord);
     discord.client.disconnect({ reconnect: false });
     await discord.client.connect();
   } else {
