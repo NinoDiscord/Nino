@@ -128,12 +128,27 @@ export default class ModLogCommand extends Command {
     return msg.reply('Resetted the mod log successfully.');
   }
 
-  @Subcommand('<event>', ['events'])
+  @Subcommand('<event | "*" | "-*">', ['events'])
   async event(msg: CommandMessage, [event]: string) {
     const settings = await this.database.logging.get(msg.guild.id);
 
     if (!event)
       return msg.reply(`No event was listed, here is the list:\n\n\`\`\`apache\n${LOGGING_EVENTS.map(event => `${event} | ${msg.settings.prefixes[0]}logging event ${event}`).join('\n')}\`\`\``);
+
+    if (event === '*') {
+      const events = Object.values(LoggingEvents);
+      settings.events = events;
+      await this.database.logging['repository'].save(settings);
+
+      return msg.reply(`:thumbsup: **Enabled** all logging events, to disable all of them, do \`${msg.settings.prefixes[0]}logging events -*\`.`);
+    }
+
+    if (event === '-*') {
+      settings.events = [];
+      await this.database.logging['repository'].save(settings);
+
+      return msg.reply(':thumbsup: **Disabled** all logging events.');
+    }
 
     if (!LOGGING_EVENTS.includes(event))
       return msg.reply(`Invalid event **${event}**, here is the list:\n\n\`\`\`apache\n${LOGGING_EVENTS.map(event => `${event} | ${msg.settings.prefixes[0]}logging event ${event}`).join('\n')}\`\`\``);

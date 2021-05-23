@@ -44,7 +44,7 @@ interface CommandInfo {
 export default abstract class NinoCommand {
   public userPermissions: PermissionField[];
   public botPermissions:  PermissionField[];
-  public description:     string;
+  public description:     ObjectKeysWithSeperator<LocalizationStrings>;
   public ownerOnly:       boolean;
   public examples:        string[];
   public category:        Categories;
@@ -67,7 +67,7 @@ export default abstract class NinoCommand {
         ? info.botPermissions
         : [];
 
-    this.description  = info.description ?? 'No description is available for this command.';
+    this.description  = info.description as unknown as ObjectKeysWithSeperator<LocalizationStrings> ?? 'descriptions.unknown';
     this.ownerOnly    = info.ownerOnly ?? false;
     this.examples     = info.examples ?? [];
     this.category     = info.category ?? Categories.Core;

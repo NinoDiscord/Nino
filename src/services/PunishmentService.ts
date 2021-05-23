@@ -490,7 +490,7 @@ export default class PunishmentService {
 
   private async applyVoiceMute({ moderator, reason, member, guild, statement, time }: ApplyGenericVoiceAction) {
     if (reason) reason = encodeURIComponent(reason);
-    if (member.voiceState !== undefined && !member.voiceState.mute)
+    if (member.voiceState.channelID !== null && !member.voiceState.mute)
       await member.edit({ mute: true }, reason ?? 'No reason was specified.');
 
     statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;
@@ -510,7 +510,7 @@ export default class PunishmentService {
 
   private async applyVoiceDeafen({ moderator, reason, member, guild, statement, time }: ApplyGenericVoiceAction) {
     if (reason) reason = encodeURIComponent(reason);
-    if (member.voiceState !== undefined && !member.voiceState.deaf)
+    if (member.voiceState.channelID !== null && !member.voiceState.deaf)
       await member.edit({ deaf: true }, reason ?? 'No reason was specified.');
 
     statement.channel = await this.discord.client.getRESTChannel(member.voiceState.channelID!) as VoiceChannel;

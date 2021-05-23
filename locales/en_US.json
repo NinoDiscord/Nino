@@ -11,6 +11,8 @@
   },
   "strings": {
     "descriptions": {
+      "unknown": "This command doesn't have a description tied.",
+
       "help": "Returns a list of Nino's commands or documentation of a specific command or module.",
       "invite": "Returns the invitation link to invite Nino into your guild! Also, support if you really need it.",
       "locale": "Sets, resets, or views the current translations for Nino.",
@@ -32,6 +34,10 @@
       "unmute": "Unmutes a user from this guild.",
       "warn": "Warns a specific user.",
       "warnings": "Shows a list of warnings from a specific user.",
+      "voice_mute": "Mutes a person in the voice channel you're in.",
+      "voice_deafen": "Deafens a person in the voice channel you're in.",
+      "voice_undeafen": "Undeafens a person in the voice channel you're in.",
+      "voice_unmute": "Unmutes a person in the voice channel you're in.",
 
       "automod": "Enables, disables, or views any automod utility available.",
       "logging": "Enables or disable the Logging feature.",

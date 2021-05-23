@@ -58,6 +58,9 @@ declare global {
 
   namespace LocalizationStrings {
     export interface Descriptions {
+      // Unknown
+      unknown: string;
+
       // Core
       help: string;
       invite: string;
@@ -81,6 +84,10 @@ declare global {
       unmute: string;
       warn: string;
       warnings: string;
+      voice_mute: string;
+      voice_deafen: string;
+      voice_undeafen: string;
+      voice_unmute: string;
 
       // Settings
       automod: string;
