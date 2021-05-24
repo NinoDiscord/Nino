@@ -39,7 +39,8 @@ export default class MuteCommand extends Command {
 
   constructor() {
     super({
-      botPermissions: 'manageMessages',
+      userPermissions: 'manageMessages',
+      botPermissions: 'manageRoles',
       description: 'descriptions.mute',
       category: Categories.Moderation,
       examples: [
