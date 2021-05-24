@@ -262,8 +262,14 @@ async function convertCases(connection, documents) {
       entry.time = document.time;
 
     const available = await cases.findOne({ guildID: document.guild, index: document.index });
-    if (!available)
-      await cases.save(entry);
+    if (!available) {
+      try {
+        await cases.save(entry);
+      } catch(ex) {
+        logger.info(`Skipping on entity #${document.id}: `, ex);
+        continue;
+      }
+    }
   }
 
   logger.info(`Hopefully migrated ${documents.length} case documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
