@@ -90,7 +90,7 @@ export default class CaseCommand extends Command {
       .addField('• Type', caseModel.type, true);
 
     if (caseModel.time !== null)
-      embed.addField('• Time', ms(caseModel.time!, { long: true }), true);
+      embed.addField('• Time', ms(Number(caseModel.time!), { long: true }), true);
 
     return msg.reply(embed);
   }

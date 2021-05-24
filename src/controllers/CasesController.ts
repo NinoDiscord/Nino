@@ -74,7 +74,7 @@ export default class CasesController {
       entry.reason = reason;
 
     if (time !== undefined)
-      entry.time = time;
+      entry.time = String(time);
 
     return this.repository.save(entry);
   }

@@ -52,6 +52,6 @@ export default class CaseEntity {
   @Column({ default: false })
   public soft!: boolean;
 
-  @Column({ nullable: true, default: undefined })
-  public time?: number;
+  @Column({ nullable: true, default: undefined, type: 'bigint' })
+  public time?: string;
 }
