@@ -101,10 +101,10 @@ export default class Locale {
           _i++;
           return value.replace(/%s/g, () => String(rawArgs.shift()));
         } else if (match === '%d') {
-          _i++;
           if (isNaN(Number(rawArgs[_i])))
             throw new TypeError(`Value "${rawArgs[_i]}" was not a number (index: ${_i})`);
 
+          _i++;
           return value.replace(/%d/g, () => String(rawArgs.shift()));
         }
       }
