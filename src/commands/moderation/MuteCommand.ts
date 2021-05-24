@@ -119,7 +119,7 @@ export default class MuteCommand extends Command {
         time: time !== undefined ? ms(time) : undefined
       });
 
-      return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been banned${actualReason ? ` *for ${actualReason}${time !== null ? ` in ${time}` : ''}` : '.'}*`);
+      return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been muted${actualReason ? ` *for ${actualReason}${time !== null ? ` in ${time}*` : ''}` : '.'}`);
     } catch(ex) {
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',
