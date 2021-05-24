@@ -71,28 +71,6 @@ export default class Discord {
       ]
     });
 
-    this.client.on('ready', () => {
-      this.logger.info(`Connected as ${this.client.user.username}#${this.client.user.discriminator} (ID: ${this.client.user.id})`);
-      this.logger.info(`Guilds: ${this.client.guilds.size.toLocaleString()} | Users: ${this.client.users.size.toLocaleString()}`);
-
-      this.prometheus?.guildCount?.set(this.client.guilds.size);
-      this.mentionRegex = new RegExp(`^<@!?${this.client.user.id}> `);
-
-      const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
-      const status = this.config.getProperty('status') ?? {
-        type: 0,
-        status: '$prefix$help | $guilds$ Guilds',
-        presence: 'online'
-      };
-
-      this.client.editStatus(status.presence ?? 'online', {
-        name: status.status
-          .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
-          .replace('$guilds$', this.client.guilds.size.toLocaleString()),
-        type: status.type
-      });
-    });
-
     this
       .client
       .on('shardReady', this.onShardReady.bind(this))

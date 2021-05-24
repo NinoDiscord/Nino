@@ -42,7 +42,7 @@ interface Configuration {
   timeouts: TimeoutsConfig;
   database: DatabaseConfig;
   prefixes: string[];
-  status?: StatusConfig;
+  status: StatusConfig;
   owners: string[];
   ksoft?: string;
   redis: RedisConfig;
@@ -146,9 +146,10 @@ export default class Config {
       timeouts: config.timeouts,
       prefixes: config.prefixes,
       owners: config.owners,
-      status: {
-        type: 2,
-        status: '$prefix$help | $guilds$ Guild$plural$'
+      status: config.status ?? {
+        type: 0,
+        status: '$prefix$help | $guilds$ Guilds',
+        presence: 'online'
       },
       ksoft: config.ksoft,
       redis: config.redis,
