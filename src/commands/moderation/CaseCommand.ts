@@ -84,7 +84,7 @@ export default class CaseCommand extends Command {
       .setDescription([
         `${caseModel.reason ? `**${caseModel.reason}**` : `*Unknown, use \`${msg.settings.prefixes[0]}reason ${caseModel.index} <reason>\` to set a reason*`}`,
         '',
-        caseModel.messageID !== null ? `[**\`[Jump Here]\`**](https://discord.com/channels/${msg.guild.id}/${msg.settings.modlogChannelID}/${caseModel.messageID})` : ''
+        caseModel.messageID !== null || msg.settings.modlogChannelID !== null ? `[**\`[Jump Here]\`**](https://discord.com/channels/${msg.guild.id}/${msg.settings.modlogChannelID}/${caseModel.messageID})` : ''
       ])
       .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${(moderator as any).id ?? '(unknown)'})`, true)
       .addField('• Type', caseModel.type, true);
