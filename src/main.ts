@@ -23,30 +23,21 @@
 import 'source-map-support/register';
 import 'reflect-metadata';
 
+import { commitHash, version } from './util/Constants';
 import Discord from './components/Discord';
 import logger from './singletons/Logger';
 import Api from './api/API';
 import app from './container';
+import ts from 'typescript';
 
 const region = process.env.REGION;
 if (region !== undefined)
   logger.info(`Running under node "${region}"`);
 
 (async() => {
-  logger.info('Loading...');
-
-  const originalInject = app.inject.bind(app);
-  const originalAddSingleton = app.addSingleton;
-
-  app.addSingleton = (singleton) => {
-    console.log(singleton);
-    return originalAddSingleton.call(app, singleton);
-  };
-
-  app.inject = (pending) => {
-    console.log(`GET ${String(pending.prop)} ->`, pending.$ref);
-    return originalInject.call(app, pending);
-  };
+  logger.info(`Loading Nino v${version} (${commitHash ?? '<unknown>'})`);
+  logger.info(`-> TypeScript: ${ts.version}`);
+  logger.info(`-> Node.js:    ${process.version}`);
 
   try {
     await app.load();
@@ -57,7 +48,6 @@ if (region !== undefined)
     process.exit(1);
   }
 
-  app.addSingleton = originalAddSingleton.bind(app);
   logger.info('✔ Nino has started successfully');
   process.on('SIGINT', () => {
     logger.warn('Received CTRL+C call!');
