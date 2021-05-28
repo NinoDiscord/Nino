@@ -117,6 +117,10 @@ export default class UnmuteCommand extends Command {
       await this.redis.client.hmset('nino:timeouts', [msg.guild.id, available]);
       return msg.reply(`:thumbsup: Successfully unmuted **${user.username}#${user.discriminator}**${reason.length > 0 ? `, for **${reason.join(' ')}**` : '.'}`);
     } catch(ex) {
+      if (ex instanceof DiscordRESTError && ex.code === 10007) {
+        return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
+      }
+
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',
         'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',

@@ -104,6 +104,10 @@ export default class WarnCommand extends Command {
 
       return msg.reply(`:thumbsup: Warned **${user.username}#${user.discriminator}**${reason.length > 0 ? ` for **${reason.join(' ')}**` : ' '}, they now have **${count}** ${pluralize('warning', count)}.`);
     } catch(ex) {
+      if (ex instanceof DiscordRESTError && ex.code === 10007) {
+        return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
+      }
+
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',
         'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',

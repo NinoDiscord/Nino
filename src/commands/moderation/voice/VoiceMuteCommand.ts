@@ -129,6 +129,10 @@ export default class VoiceMuteCommand extends Command {
       this.discord.client.leaveVoiceChannel(msg.member.voiceState.channelID);
       return msg.reply(`:thumbsup: Member **${user.username}#${user.discriminator}** has been server muted in voice channels.${reason.length ? ` *for ${reason.join(' ')}${time !== undefined ? `, for ${time}*` : '*'}` : '.'}`);
     } catch(ex) {
+      if (ex instanceof DiscordRESTError && ex.code === 10007) {
+        return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
+      }
+
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',
         'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',

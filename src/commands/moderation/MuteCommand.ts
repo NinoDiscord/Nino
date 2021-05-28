@@ -121,6 +121,10 @@ export default class MuteCommand extends Command {
 
       return msg.reply(`${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been muted${actualReason ? ` *for ${actualReason}${time !== null ? ` in ${time}*` : ''}` : '.'}`);
     } catch(ex) {
+      if (ex instanceof DiscordRESTError && ex.code === 10007) {
+        return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
+      }
+
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',
         'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',

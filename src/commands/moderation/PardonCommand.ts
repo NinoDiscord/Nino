@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
+import { DiscordRESTError, User, Member } from 'eris';
 import { Command, CommandMessage } from '../../structures';
-import { DiscordRESTError, User } from 'eris';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
 import Permissions from '../../util/Permissions';
@@ -82,6 +82,9 @@ export default class PardonCommand extends Command {
       return msg.reply('Cannot warn members outside the server.');
 
     const member = msg.guild.members.get(user.id)!;
+    if (!(member instanceof Member))
+      return msg.reply('Cannot remove warnings from a member that isn\'t here.');
+
     if (member.id === msg.guild.ownerID)
       return msg.reply('I don\'t think I can perform this action due to you kicking the owner, you idiot.');
 
@@ -110,6 +113,10 @@ export default class PardonCommand extends Command {
     } catch(ex) {
       if (ex instanceof RangeError)
         return msg.reply('Cannot pardon member without any warnings attached.');
+
+      if (ex instanceof DiscordRESTError && ex.code === 10007) {
+        return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
+      }
 
       return msg.reply([
         'Uh-oh! An internal error has occured while running this.',
