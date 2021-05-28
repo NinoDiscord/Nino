@@ -30,10 +30,24 @@ import app from './container';
 
 const region = process.env.REGION;
 if (region !== undefined)
-  logger.info(`Running under node "${region}"!`);
+  logger.info(`Running under node "${region}"`);
 
 (async() => {
   logger.info('Loading...');
+
+  const originalInject = app.inject.bind(app);
+  const originalAddSingleton = app.addSingleton;
+
+  app.addSingleton = (singleton) => {
+    console.log(singleton);
+    return originalAddSingleton.call(app, singleton);
+  };
+
+  app.inject = (pending) => {
+    console.log(`GET ${String(pending.prop)} ->`, pending.$ref);
+    return originalInject.call(app, pending);
+  };
+
   try {
     await app.load();
     await app.addComponent(Api);
@@ -43,6 +57,7 @@ if (region !== undefined)
     process.exit(1);
   }
 
+  app.addSingleton = originalAddSingleton.bind(app);
   logger.info('✔ Nino has started successfully');
   process.on('SIGINT', () => {
     logger.warn('Received CTRL+C call!');
