@@ -8,13 +8,7 @@ COPY . .
 RUN apk add --no-cache git
 RUN npm i -g typescript eslint typeorm
 RUN npm ci
-RUN eslint src --ext .ts
-RUN rm -rf build
-
-# TODO: Fix this
-# Override --sourceMap in the container
-# so this doesn't happen: SyntaxError: Unexpected token ':'
-RUN tsc --sourceMap false
+RUN npm run build:no-lint
 RUN npm cache clean --force
 
 # Give it executable permissions
