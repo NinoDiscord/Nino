@@ -150,6 +150,8 @@ export default class CommandService extends Collection<string, NinoCommand> {
 
     const locale = this.localization.get(settings.language, userSettings.language);
     const message = new CommandMessage(msg, locale, settings, userSettings);
+    app.runInjections(message);
+
     const owners = this.config.getProperty('owners') ?? [];
     if (command.ownerOnly && !owners.includes(msg.author.id))
       return message.reply(`Command **${command.name}** is a developer-only command, nice try...`);
