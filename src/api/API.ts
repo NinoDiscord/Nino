@@ -70,11 +70,10 @@ export default class API {
       const path = routers[i];
       const ctor: RouterCtor = await import(path);
 
-      // Run the injections
-      app.runInjections();
-
       // @ts-ignore
       const router: Router = new ctor.default!();
+      app.runInjections(router);
+
       const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, router) ?? [];
       this.logger.info(`Found ${routes.length} routes for router ${router.prefix}`);
       for (const route of routes) {

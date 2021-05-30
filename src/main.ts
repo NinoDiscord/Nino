@@ -30,14 +30,12 @@ import Api from './api/API';
 import app from './container';
 import ts from 'typescript';
 
-const region = process.env.REGION;
-if (region !== undefined)
-  logger.info(`Running under node "${region}"`);
-
 (async() => {
   logger.info(`Loading Nino v${version} (${commitHash ?? '<unknown>'})`);
   logger.info(`-> TypeScript: ${ts.version}`);
-  logger.info(`-> Node.js:    ${process.version}`);
+  logger.info(`->    Node.js:    ${process.version}`);
+  if (process.env.REGION !== undefined)
+    logger.info(`->     Region: ${process.env.REGION}`);
 
   try {
     await app.load();
