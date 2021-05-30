@@ -108,7 +108,9 @@ export default class BanCommand extends Command {
     if (ban !== null)
       return msg.reply(`${user.bot ? 'Bot' : 'User'} was previously banned for ${ban.reason ?? '*(no reason provided)*'}`);
 
-    let reason = args.length > 2 ? args.slice(1).join(' ') : undefined;
+    args.shift(); // remove user ID
+
+    let reason = args.length > 0 ? args.join(' ') : undefined;
     let time: string | null = null;
 
     if (reason !== undefined) {
@@ -130,6 +132,7 @@ export default class BanCommand extends Command {
 
     try {
       await this.punishments.apply({
+        attachments: msg.attachments,
         moderator: msg.author,
         publish: true,
         reason,

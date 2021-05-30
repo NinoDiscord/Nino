@@ -148,6 +148,7 @@ export default class GuildMemberListener {
       return;
 
     const model = await this.database.cases.create({
+      attachments: [],
       moderatorID: entry.user.id,
       victimID: entry.targetID,
       guildID: guild.id,

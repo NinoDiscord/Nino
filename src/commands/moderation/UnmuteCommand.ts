@@ -102,6 +102,7 @@ export default class UnmuteCommand extends Command {
 
     try {
       await this.punishments.apply({
+        attachments: msg.attachments,
         moderator: msg.author,
         publish: true,
         reason: reason.join(' ') || 'No reason was provided',
@@ -111,7 +112,7 @@ export default class UnmuteCommand extends Command {
 
       const timeouts = await this.redis.getTimeouts(msg.guild.id);
       const available = timeouts.filter(pkt =>
-        pkt.type !== 'unmute' && pkt.user !== userID
+        pkt.type !== 'unmute' && pkt.user !== userID && pkt.guild === msg.guild.id
       );
 
       await this.redis.client.hmset('nino:timeouts', [msg.guild.id, available]);

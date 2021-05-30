@@ -114,6 +114,7 @@ export default class SoftbanCommand extends Command {
 
     try {
       await this.punishments.apply({
+        attachments: msg.attachments,
         moderator: msg.author,
         publish: true,
         reason: reason.join(' ') || 'No reason was provided.',

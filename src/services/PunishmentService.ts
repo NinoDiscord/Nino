@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Constants, Guild, Member, User, VoiceChannel, TextChannel, Message } from 'eris';
+import { Constants, Guild, Member, User, VoiceChannel, TextChannel, Message, Attachment } from 'eris';
 import { Inject, Service } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
 import { EmbedBuilder } from '../structures';
@@ -50,6 +50,7 @@ export enum PunishmentEntryType {
 }
 
 interface ApplyPunishmentOptions {
+  attachments?: Attachment[];
   moderator: User;
   publish?: boolean;
   reason?: string;
@@ -63,6 +64,7 @@ interface ApplyPunishmentOptions {
 interface PublishModLogOptions {
   warningsRemoved?: number | 'all';
   warningsAdded?: number;
+  attachments?: string[];
   moderator: User;
   channel?: VoiceChannel;
   reason?: string;
@@ -209,6 +211,7 @@ export default class PunishmentService {
     }
 
     const model = await this.database.cases.create({
+      attachments: [],
       moderatorID: this.discord.client.user.id,
       victimID: member.id,
       guildID: member.guild.id,
@@ -238,6 +241,7 @@ export default class PunishmentService {
     if (amount === 'all') {
       await this.database.warnings.clean(member.guild.id, member.id);
       const model = await this.database.cases.create({
+        attachments: [],
         moderatorID: this.discord.client.user.id,
         victimID: member.id,
         guildID: member.guild.id,
@@ -255,6 +259,7 @@ export default class PunishmentService {
       }, model);
     } else {
       const model = await this.database.cases.create({
+        attachments: [],
         moderatorID: this.discord.client.user.id,
         victimID: member.id,
         guildID: member.guild.id,
@@ -281,6 +286,7 @@ export default class PunishmentService {
   }
 
   async apply({
+    attachments,
     moderator,
     publish,
     reason,
@@ -416,6 +422,7 @@ export default class PunishmentService {
     }
 
     const model = await this.database.cases.create({
+      attachments: attachments?.slice(0, 5).map(v => v.url) ?? [],
       moderatorID: moderator.id,
       victimID: member.id,
       guildID: member.guild.id,
@@ -426,7 +433,10 @@ export default class PunishmentService {
     });
 
     if (publish) {
-      await this.publishToModLog(modlogStatement, model);
+      await this.publishToModLog(attachments !== undefined ? {
+        attachments: attachments.slice(0, 5).map(v => v.url) ?? [],
+        ...modlogStatement
+      } : modlogStatement, model);
     }
   }
 
@@ -548,6 +558,7 @@ export default class PunishmentService {
     warningsRemoved,
     warningsAdded,
     moderator,
+    attachments,
     channel,
     reason,
     victim,
@@ -567,7 +578,18 @@ export default class PunishmentService {
       !modlog.permissionsOf(this.discord.client.user.id).has('embedLinks')
     ) return;
 
-    const embed = this.getModLogEmbed(caseModel.index, { warningsRemoved, warningsAdded, moderator, channel, reason, victim, guild, time, type: stringifyDBType(caseModel.type)! }).build();
+    const embed = this.getModLogEmbed(caseModel.index, {
+      attachments,
+      warningsRemoved,
+      warningsAdded,
+      moderator,
+      channel,
+      reason,
+      victim,
+      guild,
+      time,
+      type: stringifyDBType(caseModel.type)!
+    }).build();
     const content = `**[** ${emojis[type] ?? ':question:'} **~** Case #**${caseModel.index}** (${type}) ]`;
     const message = await modlog.createMessage({
       embed,
@@ -577,7 +599,7 @@ export default class PunishmentService {
     await this.database.cases.update(guild.id, caseModel.index, { messageID: message.id });
   }
 
-  editModLog(model: CaseEntity, message: Message) {
+  async editModLog(model: CaseEntity, message: Message) {
     const warningRemovedField = message.embeds[0].fields?.find(field => field.name.includes('Warnings Removed'));
     const warningsAddField = message.embeds[0].fields?.find(field => field.name.includes('Warnings Added'));
 
@@ -643,22 +665,29 @@ export default class PunishmentService {
   getModLogEmbed(caseID: number, {
     warningsRemoved,
     warningsAdded,
+    attachments,
     moderator,
     channel,
     reason,
     victim,
-    time,
-    type
+    time
   }: PublishModLogOptions) {
     const embed = new EmbedBuilder()
       .setColor(0xDAA2C6)
       .setAuthor(`${victim.username}#${victim.discriminator} (${victim.id})`, undefined, victim.dynamicAvatarURL('png', 1024))
       .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${moderator.id})`, true);
 
+    const _reason = reason !== undefined ? (
+      Array.isArray(reason) ? reason.join(' ') : reason
+    ) : `
+      • No reason was provided. Use \`reason ${caseID} <reason>\` to update it!
+    `;
+
+    const _attachments = attachments?.map((url, index) => `• [**\`Attachment #${index}\`**](${url})`).join('\n') ?? '';
+
     embed.setDescription([
-      // wat???
-      reason !== undefined ? `**${Array.isArray(reason) ? reason.join(' ') : reason}**` : '**No reason was specified**',
-      reason === undefined ? `• Use **\`reason ${caseID} <reason>\`** to update the reason` : ''
+      _reason,
+      _attachments
     ]);
 
     if (warningsRemoved !== undefined)

@@ -26,6 +26,7 @@ import type Database from '../components/Database';
 import CaseEntity from '../entities/CaseEntity';
 
 interface CreateCaseOptions {
+  attachments: string[];
   moderatorID: string;
   victimID: string;
   guildID: string;
@@ -51,6 +52,7 @@ export default class CasesController {
   }
 
   async create({
+    attachments,
     moderatorID,
     victimID,
     guildID,
@@ -63,6 +65,7 @@ export default class CasesController {
     const index = (cases[cases.length - 1]?.index ?? 0) + 1;
 
     const entry = new CaseEntity();
+    entry.attachments = attachments;
     entry.moderatorID = moderatorID;
     entry.victimID = victimID;
     entry.guildID = guildID;

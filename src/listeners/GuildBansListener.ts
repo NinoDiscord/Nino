@@ -55,6 +55,7 @@ export default class GuildBansListener {
       return;
 
     const caseModel = await this.database.cases.create({
+      attachments: [],
       moderatorID: entry.user.id,
       victimID: entry.targetID,
       guildID: entry.guild.id,
@@ -87,6 +88,7 @@ export default class GuildBansListener {
       return;
 
     const caseModel = await this.database.cases.create({
+      attachments: [],
       moderatorID: entry.user.id,
       victimID: entry.targetID,
       guildID: entry.guild.id,

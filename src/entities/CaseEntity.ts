@@ -25,6 +25,9 @@ import { PunishmentType } from './PunishmentsEntity';
 
 @Entity({ name: 'cases' })
 export default class CaseEntity {
+  @Column({ default: '{}', array: true, type: 'text' })
+  public attachments!: string[];
+
   @Column({ name: 'moderator_id' })
   public moderatorID!: string;
 

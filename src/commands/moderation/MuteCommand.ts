@@ -111,6 +111,7 @@ export default class MuteCommand extends Command {
 
     try {
       await this.punishments.apply({
+        attachments: msg.attachments,
         moderator: msg.author,
         publish: true,
         reason: actualReason,

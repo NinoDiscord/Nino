@@ -46,6 +46,10 @@ export default class CommandMessage {
     this.locale = locale;
   }
 
+  get attachments() {
+    return this.#message.attachments;
+  }
+
   get channel() {
     return this.#message.channel;
   }

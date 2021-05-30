@@ -187,12 +187,14 @@ export default class TimeoutsManager {
 
         const timeouts = await this.redis.getTimeouts(packet.d.guild);
         const available = timeouts.filter(pkt =>
-          packet.d.user !== pkt.user && packet.d.type.toLowerCase() !== pkt.type.toLowerCase()
+          packet.d.user !== pkt.user &&
+          packet.d.type.toLowerCase() !== pkt.type.toLowerCase() &&
+          pkt.guild === packet.d.guild
         );
 
         await this.redis.client.hmset('nino:timeouts', [guild.id, JSON.stringify(available)]);
         await this.punishments.apply({
-          moderator: this.discord.client.users.get(packet.d.moderator)!,
+          moderator: this.discord.client.user,
           publish: true,
           reason: packet.d.reason === null ? '[Automod] Time is up.' : packet.d.reason,
           member: { id: packet.d.user, guild },
