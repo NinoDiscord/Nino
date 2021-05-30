@@ -102,7 +102,7 @@ export default class WarnCommand extends Command {
       const warnings = await this.database.warnings.getAll(msg.guild.id, user.id).then(warnings => warnings.filter(warns => warns.amount > 0));
       const count = warnings.reduce((acc, curr) => acc + curr.amount, 0);
 
-      return msg.reply(`:thumbsup: Warned **${user.username}#${user.discriminator}**${reason.length > 0 ? ` for **${reason.join(' ')}**` : ' '}, they now have **${count}** ${pluralize('warning', count)}.`);
+      return msg.reply(`:thumbsup: Warned **${user.username}#${user.discriminator}**${reason.length > 0 ? ` for **${reason.join(' ')}**` : ' '}, they now have **${pluralize('warning', count)}**.`);
     } catch(ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10007) {
         return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
