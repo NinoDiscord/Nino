@@ -32,7 +32,7 @@
     "dev": "cd src && ts-node --files --project ../tsconfig.json main.ts"
   },
   "dependencies": {
-    "@augu/collections": "1.0.10",
+    "@augu/collections": "1.0.11",
     "@augu/dotenv": "1.3.0",
     "@augu/http": "1.2.1",
     "@augu/lilith": "3.2.3",
