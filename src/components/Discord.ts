@@ -21,20 +21,21 @@
  */
 
 import { USER_MENTION_REGEX, USERNAME_DISCRIM_REGEX, ID_REGEX, CHANNEL_REGEX, ROLE_REGEX } from '../util/Constants';
+import { Component, Inject, ComponentAPI, Subscribe } from '@augu/lilith';
 import { Client, Role, Guild, AnyChannel } from 'eris';
-import { Component, Inject } from '@augu/lilith';
 import { pluralize } from '@augu/utils';
 import Prometheus from './Prometheus';
 import { Logger } from 'tslog';
 import Config from './Config';
 
 @Component({
-  priority: 6,
+  priority: 0,
   name: 'discord'
 })
 export default class Discord {
   public mentionRegex!: RegExp;
   public client!: Client;
+  api!: ComponentAPI;
 
   @Inject
   private readonly prometheus?: Prometheus;
@@ -71,11 +72,8 @@ export default class Discord {
       ]
     });
 
-    this
-      .client
-      .on('shardReady', this.onShardReady.bind(this))
-      .on('shardDisconnect', this.onShardDisconnect.bind(this))
-      .on('shardResume', this.onShardResume.bind(this));
+    this.api.container.addEmitter('discord', this.client);
+    this.api.forwardSubscriptions(this.client, this);
 
     return this.client.connect();
   }
@@ -180,14 +178,17 @@ export default class Discord {
     });
   }
 
+  @Subscribe('shardReady', 'discord')
   private onShardReady(id: number) {
     this.logger.info(`Shard #${id} is now ready.`);
   }
 
+  @Subscribe('shardDisconnect', 'discord')
   private onShardDisconnect(error: any, id: number) {
     this.logger.fatal(`Shard #${id} has disconnected from the universe\n`, error || 'Connection has been reset by peer.');
   }
 
+  @Subscribe('shardResume', 'discord')
   private onShardResume(id: number) {
     this.logger.info(`Shard #${id} has resumed it's connection!`);
   }

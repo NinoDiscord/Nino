@@ -20,10 +20,9 @@
  * SOFTWARE.
  */
 
+import { Inject, Subscribe } from '@augu/lilith';
 import type { RawPacket } from 'eris';
 import { Logger } from 'tslog';
-import { Inject } from '@augu/lilith';
-import Subscribe from '../structures/decorators/Subscribe';
 import Discord from '../components/Discord';
 import Config from '../components/Config';
 import Prom from '../components/Prometheus';
@@ -41,7 +40,7 @@ export default class VoidListener {
   @Inject
   private readonly config!: Config;
 
-  @Subscribe('rawWS')
+  @Subscribe('rawWS', 'discord')
   onRawWS(packet: RawPacket) {
     if (!packet.t)
       return;
@@ -49,7 +48,7 @@ export default class VoidListener {
     this.prometheus?.rawWSEvents?.labels(packet.t).inc();
   }
 
-  @Subscribe('ready')
+  @Subscribe('ready', 'discord')
   onReady() {
     this.logger.info(`Connected as ${this.discord.client.user.username}#${this.discord.client.user.discriminator} (ID: ${this.discord.client.user.id})`);
     this.logger.info(`Guilds: ${this.discord.client.guilds.size.toLocaleString()} | Users: ${this.discord.client.users.size.toLocaleString()}`);

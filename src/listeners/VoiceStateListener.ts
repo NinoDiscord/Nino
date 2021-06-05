@@ -21,9 +21,8 @@
  */
 
 import type { Member, TextChannel, VoiceChannel } from 'eris';
+import { Inject, Subscribe } from '@augu/lilith';
 import { LoggingEvents } from '../entities/LoggingEntity';
-import { Inject } from '@augu/lilith';
-import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 

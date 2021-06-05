@@ -70,7 +70,7 @@ export default class GuildMemberListener {
     const settings = await this.database.automod.get(guild.id);
     const gSettings = await this.database.guilds.get(guild.id);
 
-    if (member.nick !== old.nick) {
+    if ((old.nick !== undefined || old.nick !== null) && member.nick !== old.nick) {
       if (settings !== undefined && settings.dehoist === false)
         return;
 

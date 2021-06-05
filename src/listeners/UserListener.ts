@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-import { Inject } from '@augu/lilith';
-import Subscribe from '../structures/decorators/Subscribe';
+import { Inject, Subscribe } from '@augu/lilith';
 
 export default class UserListener {}

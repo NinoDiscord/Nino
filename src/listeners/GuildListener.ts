@@ -21,11 +21,10 @@
  */
 
 import type { Guild, TextChannel } from 'eris';
+import { Inject, Subscribe } from '@augu/lilith';
 import { EmbedBuilder } from '../structures';
 import BotlistsService from '../services/BotlistService';
 import { Logger } from 'tslog';
-import { Inject } from '@augu/lilith';
-import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 import Prom from '../components/Prometheus';
@@ -46,7 +45,7 @@ export default class VoidListener {
   @Inject
   private logger!: Logger;
 
-  @Subscribe('guildCreate')
+  @Subscribe('guildCreate', 'discord')
   async onGuildCreate(guild: Guild) {
     if (guild.name === undefined)
       return;
@@ -74,7 +73,7 @@ export default class VoidListener {
     }
   }
 
-  @Subscribe('guildDelete')
+  @Subscribe('guildDelete', 'discord')
   async onGuildDelete(guild: Guild) {
     if (guild.name === undefined)
       return;

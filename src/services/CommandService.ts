@@ -38,7 +38,7 @@ import Config from '../components/Config';
 const FLAG_REGEX = /(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi;
 
 @Service({
-  priority: 0,
+  priority: 1,
   children: join(process.cwd(), 'commands'),
   name: 'commands'
 })

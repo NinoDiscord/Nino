@@ -29,7 +29,7 @@ import Locale from '../structures/Locale';
 import Config from '../components/Config';
 
 @Service({
-  priority: 0,
+  priority: 1,
   name: 'localization'
 })
 export default class LocalizationService {

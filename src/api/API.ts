@@ -72,7 +72,7 @@ export default class API {
 
       // @ts-ignore
       const router: Router = new ctor.default!();
-      app.runInjections(router);
+      app.addInjections(router);
 
       const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, router) ?? [];
       this.logger.info(`Found ${routes.length} routes for router ${router.prefix}`);

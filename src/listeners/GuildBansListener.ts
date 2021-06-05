@@ -22,9 +22,8 @@
 
 import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, User } from 'eris';
+import { Inject, Subscribe } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
-import { Inject } from '@augu/lilith';
-import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
@@ -38,7 +37,7 @@ export default class GuildBansListener {
   @Inject
   private discord!: Discord;
 
-  @Subscribe('guildBanAdd')
+  @Subscribe('guildBanAdd', 'discord')
   async onGuildBanAdd(guild: Guild, user: User) {
     if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs')) {
       return;
@@ -72,7 +71,7 @@ export default class GuildBansListener {
     }, caseModel);
   }
 
-  @Subscribe('guildBanRemove')
+  @Subscribe('guildBanRemove', 'discord')
   async onGuildBanRemove(guild: Guild, user: User) {
     if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
       return;

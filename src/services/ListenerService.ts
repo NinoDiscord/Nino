@@ -20,11 +20,8 @@
  * SOFTWARE.
  */
 
-import { getSubscriptionsIn } from '../structures/decorators/Subscribe';
-import { Service, Inject } from '@augu/lilith';
-import { Logger } from 'tslog';
+import { Service, ServiceAPI } from '@augu/lilith';
 import { join } from 'path';
-import Discord from '../components/Discord';
 
 @Service({
   priority: 0,
@@ -32,27 +29,9 @@ import Discord from '../components/Discord';
   name: 'listeners'
 })
 export default class ListenerService {
-  @Inject
-  private logger!: Logger;
-
-  @Inject
-  private discord!: Discord;
+  api!: ServiceAPI;
 
   onChildLoad(listener: any) {
-    const subscriptions = getSubscriptionsIn(listener);
-    for (let i = 0; i < subscriptions.length; i++) {
-      const sub = subscriptions[i];
-      const handler = sub.run.bind(listener);
-
-      this.discord.client.on(sub.event, async (...args: any[]) => {
-        try {
-          await handler(...args);
-        } catch(ex) {
-          this.logger.error(`Unable to handle event ${sub.event}`, ex);
-        }
-      });
-
-      this.logger.info(`✔ Loaded event ${sub.event}`);
-    }
+    this.api.forwardSubscriptions(this.api.container.emitters.get('discord')!, listener);
   }
 }

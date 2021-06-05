@@ -21,13 +21,12 @@
  */
 
 import { Constants, Message, OldMessage, TextChannel } from 'eris';
+import { Inject, Subscribe } from '@augu/lilith';
 import { LoggingEvents } from '../entities/LoggingEntity';
 import { EmbedBuilder } from '../structures';
-import { Inject } from '@augu/lilith';
 import CommandService from '../services/CommandService';
 import AutomodService from '../services/AutomodService';
 import { Color } from '../util/Constants';
-import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
@@ -46,12 +45,12 @@ export default class MessageListener {
   @Inject
   private discord!: Discord;
 
-  @Subscribe('messageCreate')
+  @Subscribe('messageCreate', 'discord')
   onMessageCreate(msg: Message<TextChannel>) {
     return this.commands.handleCommand(msg);
   }
 
-  @Subscribe('messageDelete')
+  @Subscribe('messageDelete', 'discord')
   async onMessageDelete(msg: Message<TextChannel>) {
     if (!msg.author || ![0, 5].includes(msg.channel.type))
       return;
@@ -118,7 +117,7 @@ export default class MessageListener {
     });
   }
 
-  @Subscribe('messageUpdate')
+  @Subscribe('messageUpdate', 'discord')
   async onMessageUpdate(msg: Message<TextChannel>, old: OldMessage | null) {
     await this.automod.run('message', msg);
 
@@ -185,7 +184,7 @@ export default class MessageListener {
     });
   }
 
-  @Subscribe('messageDeleteBulk')
+  @Subscribe('messageDeleteBulk', 'discord')
   async onMessageDeleteBulk(messages: Message<TextChannel>[]) {
     const allMsgs = messages
       .filter(msg => msg.guildID !== undefined)
