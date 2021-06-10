@@ -20,93 +20,78 @@
  * SOFTWARE.
  */
 
-import { ConstructorReturnType, Ctor, firstUpper, readdirSync } from '@augu/utils';
-import { Component, Inject, PendingInjectDefinition } from '@augu/lilith';
-import { HttpServer, middleware, Router } from '@augu/http';
-import type { RouteDefinition } from './decorators';
-import { MetadataKeys } from '../util/Constants';
+import { Component, ComponentAPI, Container, Inject } from '@augu/lilith';
+import { HelloResolver } from './resolvers/HelloResolver';
+import { ApolloServer } from 'apollo-server-fastify';
+import { buildSchema } from 'type-graphql';
+import type Database from '../components/Database';
 import { Logger } from 'tslog';
 import { join } from 'path';
-import express from 'express';
 import Config from '../components/Config';
+import fastify from 'fastify';
 
-interface RouterCtor {
-  default: ConstructorReturnType<Ctor<Router>>;
+export interface NinoContext {
+  container: Container;
+  database: Database;
 }
 
 @Component({
   priority: 2,
+  children: join(process.cwd(), 'endpoints'),
   name: 'api'
 })
 export default class API {
-  private server!: HttpServer;
-  public priority: number = 2;
-  public name: string = 'API';
+  private readonly api!: ComponentAPI;
 
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
 
   @Inject
-  private config!: Config;
+  private readonly config!: Config;
+  #server!: ReturnType<typeof fastify>;
+  #apollo!: ApolloServer;
 
   async load() {
     const api = this.config.getProperty('api');
     if (api === undefined) {
-      this.logger.info('API is not gonna be enabled.');
+      this.logger.info('GraphQL API is not enabled, so not creating this component.');
       return Promise.resolve();
     }
 
-    this.logger.info('Now launching API...');
-    this.server = new HttpServer({
-      port: api.port
+    this.logger.info('Launching API...');
+    const schema = await buildSchema({
+      resolvers: [HelloResolver]
     });
 
-    this.server.app.use(express.json());
-    this.server.app.use(middleware.headers());
-    this.server.app.use(middleware.logging().bind(this.server));
+    this.#apollo = new ApolloServer({
+      schema,
+      context: () => ({
+        container: this.api.container,
+        database: this.api.getComponent('database')
+      })
+    });
 
-    const routers = readdirSync(join(process.cwd(), 'api', 'routers'));
-    for (let i = 0; i < routers.length; i++) {
-      const path = routers[i];
-      const ctor: RouterCtor = await import(path);
+    // API content
+    this.#server = fastify();
+    this.#server.register(require('fastify-cors')).register(require('fastify-no-icon'));
 
-      // @ts-ignore
-      const router: Router = new ctor.default!();
-      app.addInjections(router);
+    // Start apollo
+    await this.#apollo.start();
+    this.#server.register(this.#apollo.createHandler());
 
-      const routes = Reflect.getMetadata<RouteDefinition[]>(MetadataKeys.APIRoute, router) ?? [];
-      this.logger.info(`Found ${routes.length} routes for router ${router.prefix}`);
-      for (const route of routes) {
-        router[route.method](route.path, async (req, res) => {
-          try {
-            await route.run.call(router, req, res);
-          } catch(ex) {
-            this.logger.error(`Unable to run route "${route.method.toUpperCase()} ${route.path}"`, ex);
-            return res.status(500).json({
-              message: `An unexpected error has occured while running "${route.method.toUpperCase()} ${route.path}". Contact the owners in #support under the Nino category at discord.gg/ATmjFH9kMH if this continues.`
-            });
-          }
-        });
+    return this.#server.listen({
+      port: 3089
+    }, (error, address) => {
+      if (error) {
+        this.logger.fatal('Unable to listen on :3089\n', error);
+        process.exit(1);
       }
 
-      this.logger.info(`✔ Initialized ${routes.length} routes to router ${router.prefix}`);
-      this.server.router(router);
-    }
-
-    this.server.on('listening', (networks) =>
-      this.logger.info('API service is now listening on the following URLs:\n', networks.map(network => `• ${firstUpper(network.type)} | ${network.host}`).join('\n'))
-    );
-
-    this.server.on('request', (props) =>
-      this.logger.debug(`API: ${props.method} ${props.path} (${props.status}) | ~${props.time}ms`)
-    );
-
-    this.server.on('debug', message => this.logger.debug(`API: ${message}`));
-    this.server.on('error', error => this.logger.fatal(error));
-    return this.server.start();
+      this.logger.info(`🚀✨ API is now listening at ${address}`);
+    });
   }
 
   dispose() {
-    return this.server.close();
+    return this.#server.close();
   }
 }

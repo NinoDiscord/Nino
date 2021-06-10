@@ -21,6 +21,7 @@
  */
 
 import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
+import { Field, ObjectType, registerEnumType } from 'type-graphql';
 
 export enum PunishmentType {
   WarningRemoved = 'warning.removed',
@@ -35,6 +36,11 @@ export enum PunishmentType {
   Mute           = 'mute',
   Ban            = 'ban'
 }
+
+registerEnumType(PunishmentType, {
+  name: 'PunishmentType',
+  description: 'The punishment type that was executed on that user.'
+});
 
 @Entity({ name: 'punishments' })
 export default class PunishmentEntity {

@@ -29,18 +29,22 @@
     "build": "npm run lint && rm -rf build && tsc",
     "start": "cd build && node main.js",
     "lint": "eslint src --ext .ts --fix",
-    "dev": "cd src && ts-node --files --project ../tsconfig.json main.ts"
+    "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
   },
   "dependencies": {
     "@augu/collections": "1.0.12",
     "@augu/dotenv": "1.3.0",
-    "@augu/http": "1.2.1",
     "@augu/lilith": "4.1.0",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
     "@sentry/node": "6.5.1",
+    "apollo-server-fastify": "2.25.0",
+    "class-validator": "0.13.1",
     "eris": "github:abalabahaha/eris#dev",
-    "express": "4.17.1",
+    "fastify": "3.17.0",
+    "fastify-cors": "6.0.1",
+    "fastify-no-icon": "4.0.0",
+    "graphql": "15.5.0",
     "ioredis": "4.27.4",
     "js-yaml": "4.1.0",
     "luxon": "1.27.0",
@@ -50,6 +54,7 @@
     "reflect-metadata": "0.1.13",
     "source-map-support": "0.5.19",
     "tslog": "3.2.0",
+    "type-graphql": "1.1.1",
     "typeorm": "0.2.31",
     "ws": "7.4.6"
   },
@@ -68,6 +73,7 @@
     "discord-api-types": "0.18.1",
     "eslint": "7.28.0",
     "husky": "6.0.0",
+    "nodemon": "2.0.7",
     "ts-node": "10.0.0",
     "typescript": "4.3.2"
   }

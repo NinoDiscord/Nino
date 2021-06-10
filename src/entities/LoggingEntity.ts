@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+import { Field, ObjectType, registerEnumType } from 'type-graphql';
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 export enum LoggingEvents {
@@ -31,6 +32,11 @@ export enum LoggingEvents {
   MessageDeleted      = 'message_delete',
   MessageUpdated      = 'message_update'
 }
+
+registerEnumType(LoggingEvents, {
+  name: 'LogEvents',
+  description: 'The different types of events the guild has enabled.'
+});
 
 @Entity({ name: 'logging' })
 export default class LoggingEntity {

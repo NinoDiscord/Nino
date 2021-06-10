@@ -43,13 +43,12 @@ interface ApplyTimeoutOptions {
   name: 'timeouts'
 })
 export default class TimeoutsManager {
+  protected _reconnectTimeout?: NodeJS.Timeout;
   protected _connectTimeout?: NodeJS.Timeout;
   protected _readyPromise?: { resolve(): void, reject(error: Error): void; };
 
-  public priority: number = 69;
   private socket!: WebSocket;
   public state: types.SocketState = types.SocketState.Unknown;
-  public name: string = 'timeouts';
 
   @Inject
   private punishments!: PunishmentService;
@@ -70,7 +69,7 @@ export default class TimeoutsManager {
     return new Promise<void>((resolve, reject) => {
       this._readyPromise = { resolve, reject };
       this.state = types.SocketState.Connecting;
-      this.logger.info('Connecting to the timeouts service!');
+      this.logger.info(this._reconnectTimeout !== undefined ? 'Reconnecting to the timeouts service...' : 'Connecting to the timeouts service!');
 
       const host = this.config.getProperty('timeouts.host');
       const port = this.config.getProperty('timeouts.port');
@@ -86,12 +85,18 @@ export default class TimeoutsManager {
         }
       });
 
+      if (this._reconnectTimeout !== undefined)
+        clearTimeout(this._reconnectTimeout);
+
+      delete this._reconnectTimeout;
       this.socket.on('open', this._onOpen.bind(this));
       this.socket.on('error', this._onError.bind(this));
       this.socket.on('close', this._onClose.bind(this));
       this.socket.on('message', this._onMessage.bind(this));
 
       this._connectTimeout = setTimeout(() => {
+        clearTimeout(this._connectTimeout!);
+
         delete this._connectTimeout;
         delete this._readyPromise;
         return reject(new Error('Connection to timeouts service took too long.'));
@@ -161,7 +166,11 @@ export default class TimeoutsManager {
 
   private _onClose(code: number, reason: string) {
     this.logger.warn(`Timeouts service has closed our connection with "${code}: ${reason}"`);
-    // todo: reconnect?
+
+    this._reconnectTimeout = setTimeout(() => {
+      this.logger.info('Attempting to reconnect...');
+      this.load();
+    }, 2500);
   }
 
   private async _onMessage(message: string) {

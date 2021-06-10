@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Constants, Guild, Member, User, VoiceChannel, TextChannel, Message, Attachment } from 'eris';
+import { Constants, Guild, Member, User, VoiceChannel, TextChannel, Message, Attachment, DiscordRESTError } from 'eris';
 import { Inject, Service } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
 import { EmbedBuilder } from '../structures';
@@ -147,7 +147,10 @@ export default class PunishmentService {
       ? member
       : member.guild.members.has(member.id)
         ? member.guild.members.get(member.id)!
-        : (rest ? await this.discord.client.getRESTGuildMember(member.guild.id, member.id) : new Member({ id: member.id }, member.guild, this.discord.client));
+        : (
+          rest
+            ? await this.discord.client.getRESTGuildMember(member.guild.id, member.id).catch(() => new Member({ id: member.id }, member.guild, this.discord.client))
+            : new Member({ id: member.id }, member.guild, this.discord.client));
   }
 
   get timeouts(): TimeoutsManager {
@@ -307,13 +310,14 @@ export default class PunishmentService {
     ) return;
 
     let user!: Member;
-    if (type === PunishmentType.Unban) {
+    if (type === PunishmentType.Unban || (type === PunishmentType.Ban && member.guild.members.has(member.id))) {
       user = await this.resolveMember(member, false);
     } else {
       user = await this.resolveMember(member, true);
     }
 
     const modlogStatement: PublishModLogOptions = {
+      attachments: attachments?.map(s => s.url) ?? [],
       moderator,
       reason,
       victim: user.user,
@@ -433,10 +437,7 @@ export default class PunishmentService {
     });
 
     if (publish) {
-      await this.publishToModLog(attachments !== undefined ? {
-        attachments: attachments.slice(0, 5).map(v => v.url) ?? [],
-        ...modlogStatement
-      } : modlogStatement, model);
+      await this.publishToModLog(modlogStatement, model);
     }
   }
 
