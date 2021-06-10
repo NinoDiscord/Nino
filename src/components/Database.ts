@@ -21,7 +21,7 @@
  */
 
 import { createConnection, Connection, ConnectionOptions } from 'typeorm';
-import { Component, Inject } from '@augu/lilith';
+import { Component, ComponentAPI, Inject } from '@augu/lilith';
 import { Logger } from 'tslog';
 import Config from './Config';
 
@@ -61,10 +61,11 @@ export default class Database {
   public users!: UserSettingsController;
 
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
 
   @Inject
-  private config!: Config;
+  private readonly config!: Config;
+  private api!: ComponentAPI;
 
   async load() {
     this.logger.info('Now connecting to the database...');
@@ -130,7 +131,7 @@ export default class Database {
   }
 
   dispose() {
-    this.connection.close();
+    return this.connection.close();
   }
 
   private initRepos() {
@@ -142,5 +143,9 @@ export default class Database {
     this.guilds = new GuildSettingsController(this);
     this.cases = new CasesController(this);
     this.users = new UserSettingsController(this);
+
+    for (const controller of [this.punishments, this.blacklists, this.warnings, this.logging, this.automod, this.guilds, this.cases, this.users]) {
+      this.api.container.addInjections(controller);
+    }
   }
 }

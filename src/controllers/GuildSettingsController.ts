@@ -28,7 +28,7 @@ import Config from '../components/Config';
 
 export default class GuildSettingsController {
   @Inject
-  private config!: Config;
+  private readonly config!: Config;
 
   constructor(private database: Database) {}
 
