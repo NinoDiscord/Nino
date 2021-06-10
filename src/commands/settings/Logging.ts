@@ -80,6 +80,8 @@ export default class ModLogCommand extends Command {
     }
 
     const chan = await this.discord.getChannel<TextChannel>(channel, msg.guild);
+    const settings = await this.database.logging.get(msg.guild.id);
+
     if (chan === null)
       return msg.reply(`Channel "${channel}" doesn't exist.`);
 
@@ -90,11 +92,18 @@ export default class ModLogCommand extends Command {
     if (!perms.has('sendMessages') || !perms.has('readMessages') || !perms.has('embedLinks'))
       return msg.reply(`I am missing the following permissions: **Send Messages**, **Read Messages**, and **Embed Links** in #${chan.name}.`);
 
+    let updateEnabled = false;
+    // Enable on channel input (so it runs properly)
+    if (!settings.enabled) {
+      await this.database.logging.update(msg.guild.id, { enabled: true });
+      updateEnabled = true;
+    }
+
     await this.database.logging.update(msg.guild.id, {
       channelID: chan.id
     });
 
-    return msg.reply(`Logs will be shown in #${chan.name}!`);
+    return msg.reply(`Logs will be shown in #${chan.name}!${updateEnabled ? '\n:eyes: I saw it wasn\'t enabled. So, I enabled it myself.' : ''}`);
   }
 
   @Subcommand()
