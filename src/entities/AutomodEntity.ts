@@ -27,7 +27,7 @@ import { Field, ObjectType } from 'type-graphql';
 @ObjectType()
 export default class AutomodEntity {
   @Column({ array: true, type: 'text', name: 'blacklist_words', default: '{}' })
-  @Field()
+  @Field(() => [String])
   public blacklistWords!: string[];
 
   @Column({ default: false, name: 'short_links' })

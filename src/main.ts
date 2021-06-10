@@ -33,7 +33,7 @@ import ts from 'typescript';
 (async() => {
   logger.info(`Loading Nino v${version} (${commitHash ?? '<unknown>'})`);
   logger.info(`-> TypeScript: ${ts.version}`);
-  logger.info(`->    Node.js:    ${process.version}`);
+  logger.info(`->    Node.js: ${process.version}`);
   if (process.env.REGION !== undefined)
     logger.info(`->     Region: ${process.env.REGION}`);
 
