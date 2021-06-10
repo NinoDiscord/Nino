@@ -170,7 +170,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
       const permissions = msg.channel.permissionsOf(msg.author.id);
       const missing = command.userPermissions.filter(perm => !permissions.has(perm));
 
-      if (missing.length > 0)
+      if (missing.length > 0 && !owners.includes(msg.author.id))
         return message.reply(`You are missing the following permission: **${missing.join(', ')}**`);
     }
 
