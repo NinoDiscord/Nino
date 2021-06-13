@@ -24,7 +24,7 @@ import { Query, Resolver } from 'type-graphql';
 
 @Resolver()
 export class HelloResolver {
-  @Query(() => String)
+  @Query(() => String, { description: 'Tests out the GraphQL API.' })
   hello() {
     return 'world';
   }

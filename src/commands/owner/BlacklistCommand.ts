@@ -42,6 +42,7 @@ export default class BlacklistCommand extends Command {
     super({
       description: 'Blacklists a user or guild from Nino',
       category: Categories.Owner,
+      hidden: true,
       ownerOnly: true,
       aliases: ['bl'],
       usage: '["guild" | "user"] [id] [...reason]',

@@ -19,3 +19,45 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import { ObjectType, Field, registerEnumType } from 'type-graphql';
+import type { PermissionField } from '../../structures/Command';
+import { Categories } from '../../util/Constants';
+
+registerEnumType(Categories, {
+  name: 'CommandCategory',
+  description: 'The category of a specific command'
+});
+
+@ObjectType()
+export class CommandObject {
+  @Field(() => [String])
+  public userPermissions!: PermissionField[];
+
+  @Field(() => [String])
+  public botPermissions!: PermissionField[];
+
+  @Field(() => String)
+  public description!: ObjectKeysWithSeperator<LocalizationStrings>;
+
+  @Field()
+  public ownerOnly!: boolean;
+
+  @Field(() => [String])
+  public examples!: string[];
+
+  @Field(() => Categories)
+  public category!: Categories;
+
+  @Field()
+  public cooldown!: number;
+
+  @Field(() => [String])
+  public aliases!: string[];
+
+  @Field()
+  public usage!: string;
+
+  @Field()
+  public name!: string;
+}

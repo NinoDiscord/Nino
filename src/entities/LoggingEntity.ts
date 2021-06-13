@@ -39,22 +39,29 @@ registerEnumType(LoggingEvents, {
 });
 
 @Entity({ name: 'logging' })
+@ObjectType()
 export default class LoggingEntity {
   @Column({ default: '{}', array: true, type: 'text', name: 'ignore_channels' })
+  @Field(() => [String])
   public ignoreChannels!: string[];
 
   @Column({ default: '{}', array: true, type: 'text', name: 'ignore_users' })
+  @Field(() => [String])
   public ignoreUsers!: string[];
 
   @Column({ name: 'channel_id', nullable: true })
+  @Field()
   public channelID?: string;
 
   @Column({ default: false })
+  @Field()
   public enabled!: boolean;
 
   @Column({ type: 'enum', array: true, enum: LoggingEvents, default: '{}' })
+  @Field(() => [LoggingEvents])
   public events!: LoggingEvents[];
 
   @PrimaryColumn({ name: 'guild_id' })
+  @Field()
   public guildID!: string;
 }

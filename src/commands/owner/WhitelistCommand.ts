@@ -38,6 +38,7 @@ export default class WhitelistCommand extends Command {
       description: 'Whitelists a user or guild from Nino',
       category: Categories.Owner,
       ownerOnly: true,
+      hidden: true,
       aliases: ['wl'],
       usage: '["guild" | "user"] [id] [...reason]',
       name: 'whitelist'

@@ -21,19 +21,25 @@
  */
 
 import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Field, ObjectType } from 'type-graphql';
 
 @Entity({ name: 'guilds' })
+@ObjectType()
 export default class GuildEntity {
   @Column({ default: null, nullable: true, name: 'modlog_channel_id' })
+  @Field()
   public modlogChannelID?: string;
 
   @Column({ default: null, nullable: true, name: 'muted_role_id' })
+  @Field()
   public mutedRoleID?: string;
 
   @Column({ array: true, type: 'text' })
+  @Field(() => [String])
   public prefixes!: string[];
 
   @Column({ default: 'en_US' })
+  @Field()
   public language!: string;
 
   @PrimaryColumn({ name: 'guild_id' })

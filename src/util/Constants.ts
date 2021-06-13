@@ -55,7 +55,7 @@ export const ID_REGEX = /^\d+$/;
 /**
  * List of categories available to commands
  */
-export const enum Categories {
+export enum Categories {
   Moderation = 'moderation',
   Settings   = 'settings',
   Owner      = 'owner',

@@ -22,13 +22,15 @@
 
 import { Component, ComponentAPI, Container, Inject } from '@augu/lilith';
 import { HelloResolver } from './resolvers/HelloResolver';
-import { ApolloServer } from 'apollo-server-fastify';
+import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
+import type { Server } from 'http';
 import type Database from '../components/Database';
 import { Logger } from 'tslog';
-import { join } from 'path';
+import express from 'express';
 import Config from '../components/Config';
-import fastify from 'fastify';
+import cors from 'cors';
+import CommandsResolver from './resolvers/CommandsResolver';
 
 export interface NinoContext {
   container: Container;
@@ -37,7 +39,6 @@ export interface NinoContext {
 
 @Component({
   priority: 2,
-  children: join(process.cwd(), 'endpoints'),
   name: 'api'
 })
 export default class API {
@@ -48,7 +49,7 @@ export default class API {
 
   @Inject
   private readonly config!: Config;
-  #server!: ReturnType<typeof fastify>;
+  #server!: Server;
   #apollo!: ApolloServer;
 
   async load() {
@@ -60,35 +61,29 @@ export default class API {
 
     this.logger.info('Launching API...');
     const schema = await buildSchema({
-      resolvers: [HelloResolver]
+      resolvers: [
+        HelloResolver,
+        CommandsResolver
+      ]
     });
+
+    const context = {
+      container: this.api.container,
+      database: this.api.getComponent('database')
+    };
 
     this.#apollo = new ApolloServer({
       schema,
-      context: () => ({
-        container: this.api.container,
-        database: this.api.getComponent('database')
-      })
+      context
     });
 
-    // API content
-    this.#server = fastify();
-    this.#server.register(require('fastify-cors')).register(require('fastify-no-icon'));
+    const app = express()
+      .use(cors());
 
-    // Start apollo
     await this.#apollo.start();
-    this.#server.register(this.#apollo.createHandler());
+    this.#apollo.applyMiddleware({ app });
 
-    return this.#server.listen({
-      port: 3089
-    }, (error, address) => {
-      if (error) {
-        this.logger.fatal('Unable to listen on :3089\n', error);
-        process.exit(1);
-      }
-
-      this.logger.info(`🚀✨ API is now listening at ${address}`);
-    });
+    this.#server = app.listen(3089, () => this.logger.info('🚀✨ API is now listening on http://localhost:3089, view playground at http://localhost:3089/graphql'));
   }
 
   dispose() {

@@ -21,19 +21,25 @@
  */
 
 import { Entity, Column, PrimaryColumn, PrimaryGeneratedColumn } from 'typeorm';
+import { Field, ObjectType } from 'type-graphql';
 
 @Entity({ name: 'warnings' })
+@ObjectType()
 export default class WarningsEntity {
   @PrimaryColumn({ name: 'guild_id' })
+  @Field()
   public guildID!: string;
 
   @Column({ default: undefined, nullable: true })
+  @Field()
   public reason?: string;
 
   @Column({ default: 0 })
+  @Field()
   public amount!: number;
 
   @Column({ name: 'user_id' })
+  @Field()
   public userID!: string;
 
   @PrimaryGeneratedColumn()

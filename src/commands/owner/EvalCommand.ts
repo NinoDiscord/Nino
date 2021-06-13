@@ -35,6 +35,7 @@ export default class EvalCommand extends Command {
     super({
       description: 'Evaluates JavaScript code and return a clean output',
       ownerOnly: true,
+      hidden: true,
       category: Categories.Owner,
       aliases: ['evl', 'ev', 'js'],
       name: 'eval'

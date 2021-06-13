@@ -43,25 +43,32 @@ registerEnumType(PunishmentType, {
 });
 
 @Entity({ name: 'punishments' })
+@ObjectType()
 export default class PunishmentEntity {
   @Column({ default: 1 })
+  @Field()
   public warnings!: number;
 
   @PrimaryColumn({ name: 'guild_id' })
+  @Field()
   public guildID!: string;
 
   @PrimaryGeneratedColumn()
+  @Field()
   public index!: number;
 
   @Column({ default: false })
+  @Field()
   public soft!: boolean;
 
   @Column({ default: undefined, nullable: true })
+  @Field()
   public time?: number;
 
   @Column({
     type: 'enum',
     enum: PunishmentType
   })
+  @Field(() => PunishmentType)
   public type!: PunishmentType;
 }

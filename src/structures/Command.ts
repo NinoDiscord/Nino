@@ -26,7 +26,7 @@ import type { Constants } from 'eris';
 import { Categories } from '../util/Constants';
 import Subcommand from './Subcommand';
 
-type PermissionField = keyof Constants['Permissions'];
+export type PermissionField = keyof Constants['Permissions'];
 interface CommandInfo {
   userPermissions?: PermissionField | PermissionField[];
   botPermissions?: PermissionField | PermissionField[];
