@@ -19,3 +19,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import { Resolver, Arg, Ctx, Mutation, UseMiddleware, InputType, Field } from 'type-graphql';
+import type { NinoContext } from '../API';
+import IsAuthorized from '../middleware/isAuthorized';
+import LoginObject from '../objects/LoginObject';
+
+@InputType()
+class LoginInput {
+  @Field()
+  public state!: string;
+}
+
+@Resolver(LoginObject)
+export class LoginResolver {
+
+}

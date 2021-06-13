@@ -19,3 +19,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import { Resolver, Arg, Ctx, Query, Mutation, UseMiddleware } from 'type-graphql';
+import type { NinoContext } from '../API';
+import IsAuthorized from '../middleware/isAuthorized';
+import UserEntity from '../../entities/UserEntity';
+
+@Resolver(UserEntity)
+export class UserResolver {
+  @Query(() => UserEntity)
+  @UseMiddleware(IsAuthorized)
+  async user(
+    @Arg('id') userID: string,
+    @Ctx() { database }: NinoContext
+  ) {
+    return database.users.get(userID);
+  }
+}

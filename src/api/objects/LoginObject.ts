@@ -19,3 +19,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import type { APIUser } from 'discord-api-types';
+import { ObjectType, Field } from 'type-graphql';
+
+@ObjectType()
+export default class LoginObject {
+  @Field()
+  public token!: string;
+
+  @Field()
+  public data!: APIUser;
+}

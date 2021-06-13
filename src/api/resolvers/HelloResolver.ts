@@ -20,12 +20,21 @@
  * SOFTWARE.
  */
 
-import { Query, Resolver } from 'type-graphql';
+import { Ctx, Query, Resolver } from 'type-graphql';
+import type { NinoContext } from '../API';
+import StatisticsObject from '../objects/StatisticsObject';
 
 @Resolver()
 export class HelloResolver {
   @Query(() => String, { description: 'Tests out the GraphQL API.' })
   hello() {
     return 'world';
+  }
+
+  @Query(() => StatisticsObject)
+  async statistics(
+    @Ctx() { container }: NinoContext
+  ) {
+    // todo: this
   }
 }

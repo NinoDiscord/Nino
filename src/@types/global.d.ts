@@ -21,6 +21,8 @@
  */
 
 import { Container } from '@augu/lilith';
+import { APIUser } from 'discord-api-types';
+import { crypto } from '../api/encryption';
 
 declare global {
   /** The current Lilith container */
@@ -31,5 +33,13 @@ declare global {
       /** The current Lilith container */
       app: Container;
     }
+  }
+
+  interface APITokenResult extends crypto.EncryptedData {
+    refreshToken: string;
+    accessToken: string;
+    expiryDate: number;
+    data: APIUser;
+    id: string;
   }
 }

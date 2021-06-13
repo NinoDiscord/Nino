@@ -35,6 +35,8 @@ import CommandsResolver from './resolvers/CommandsResolver';
 export interface NinoContext {
   container: Container;
   database: Database;
+  res: express.Response;
+  req: express.Request;
 }
 
 @Component({
