@@ -51,6 +51,7 @@ export default class ReasonCommand extends Command {
         'reason latest another reason',
         'reason l another reason that is the recent case'
       ],
+      usage: '[caseID | "l" | "latest"] [...reason]',
       aliases: ['set-reason', 'r'],
       name: 'reason'
     });

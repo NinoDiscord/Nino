@@ -82,6 +82,10 @@ export default class Discord {
     return this.client.disconnect({ reconnect: false });
   }
 
+  get emojis() {
+    return this.client.guilds.map(guild => guild.emojis.map(emoji => `<${emoji.animated ? 'a:' : ':'}${emoji.name}:${emoji.id}>`)).flat();
+  }
+
   async getUser(query: string) {
     if (USER_MENTION_REGEX.test(query)) {
       const match = USER_MENTION_REGEX.exec(query);

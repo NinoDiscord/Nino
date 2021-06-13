@@ -49,7 +49,7 @@ export default class PardonCommand extends Command {
         'pardon 280158289667555328 1 yes'
       ],
       aliases: ['rmwarn', 'rmw'],
-      usage: '<user> [amount] [reason]',
+      usage: '<user> [amount] [...reason]',
       name: 'pardon'
     });
   }

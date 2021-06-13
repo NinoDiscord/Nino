@@ -77,6 +77,7 @@ declare global {
       kick: string;
       mute: string;
       pardon: string;
+      purge: string;
       reason: string;
       softban: string;
       timeouts: string;

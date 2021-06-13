@@ -28,6 +28,7 @@ import type Locale from './Locale';
 import Discord from '../components/Discord';
 import app from '../container';
 import { Inject } from '@augu/lilith';
+import { mergeSchemas } from 'apollo-server-express';
 
 export default class CommandMessage {
   public userSettings: UserEntity;
@@ -70,13 +71,20 @@ export default class CommandMessage {
     return this.guild.members.get(this.discord.client.user.id);
   }
 
+  get successEmote() {
+    return this.discord.emojis.find(e => e === '<:success:464708611260678145>') ?? ':black_check_mark:';
+  }
+
+  get errorEmote() {
+    return this.discord.emojis.find(e => e === '<:xmark:464708589123141634>') ?? ':x:';
+  }
+
   flags<T extends object>(): T {
     return this._flags;
   }
 
-  reply(content: string | EmbedBuilder) {
+  reply(content: string | EmbedBuilder, reference = true) {
     const payload: AdvancedMessageContent = {
-      messageReferenceID: this.#message.id,
       allowedMentions: {
         repliedUser: false,
         everyone: false,
@@ -84,6 +92,10 @@ export default class CommandMessage {
         users: false
       }
     };
+
+    if (reference) {
+      payload.messageReference = { messageID: this.#message.id };
+    }
 
     if (typeof content === 'string') {
       payload.content = content;
@@ -99,5 +111,13 @@ export default class CommandMessage {
         return this.channel.createMessage({ embed: content.build(), ...payload });
       }
     }
+  }
+
+  success(content: string) {
+    return this.reply(`${this.successEmote} **${content}**`);
+  }
+
+  error(content: string) {
+    return this.reply(`${this.errorEmote} **${content}**`);
   }
 }

@@ -203,6 +203,11 @@ export default class MessageListener {
     const buffers: Buffer[] = [];
     for (let i = 0; i < allMsgs.length; i++) {
       const msg = allMsgs[i];
+
+      // skip all that don't have an author
+      if (!msg.author)
+        continue;
+
       const contents = [
         `♥*♡∞:｡.｡  [ Message #${i + 1} / ${allMsgs.length} ]　｡.｡:∞♡*♥`,
         `❯ Created At: ${new Date(msg.createdAt).toUTCString()}`,
@@ -241,6 +246,10 @@ export default class MessageListener {
 
       buffers.push(Buffer.from(contents.join('\n')));
     }
+
+    // Don't do anything if we can't create a message
+    if (buffers.length > 0)
+      return;
 
     const buffer = Buffer.concat(buffers);
     const channel = msg.channel.guild.channels.get<TextChannel>(settings.channelID!);
