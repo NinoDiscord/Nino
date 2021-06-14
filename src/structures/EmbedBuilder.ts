@@ -1,136 +1,159 @@
-import { EmbedOptions } from 'eris';
+/**
+ * Copyright (c) 2019-2021 Nino
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 
-export interface Embed {
-  title?: string;
-  description?: string;
-  image?: EmbedImage;
-  author?: EmbedAuthor;
-  thumbnail?: EmbedThumbnail;
-  fields?: EmbedField[];
-  timestamp?: Date;
-  footer?: EmbedFooter;
-  color?: number;
-  type?: 'rich';
-  url?: string;
-}
+/* eslint-disable camelcase */
 
-export interface EmbedAuthor {
-  name: string;
-  url?: string;
-  // eslint-disable-next-line camelcase
-  icon_url?: string;
-}
-
-export interface EmbedThumbnail {
-  url?: string;
-}
-
-export interface EmbedImage {
-  url?: string;
-}
-
-export interface EmbedField {
-  name: string;
-  value: string;
-  inline?: boolean;
-}
-
-export interface EmbedFooter {
-  text: string;
-  // eslint-disable-next-line camelcase
-  icon_url?: string;
-}
-
-type StringResolvable = string | string[];
-function toString(str: StringResolvable): string {
-  if (str instanceof Array) return str.join('\n');
-  if (typeof str === 'string') return str;
-  return String(str);
-}
-
-function clone(obj: object) {
-  const object = Object.create(obj);
-  return Object.assign(obj, object);
-}
+import type { APIEmbedAuthor, APIEmbedField, APIEmbedFooter, APIEmbedImage, APIEmbedThumbnail } from 'discord-api-types';
+import { omitUndefinedOrNull } from '@augu/utils';
+import type { EmbedOptions } from 'eris';
+import { Color } from '../util/Constants';
 
 export default class EmbedBuilder {
-  public title: string | undefined;
-  public description: string | undefined;
-  public author: EmbedAuthor | undefined;
-  public thumbnail: EmbedThumbnail | undefined;
-  public image: EmbedImage | undefined;
-  public footer: EmbedFooter | undefined;
-  public color: number | undefined;
-  public fields: EmbedField[] | undefined;
-  public timestamp: Date | undefined;
-  public url: string | undefined;
+  public description?: string;
+  public timestamp?: string | Date;
+  public thumbnail?: APIEmbedThumbnail;
+  public author?: APIEmbedAuthor;
+  public footer?: APIEmbedFooter;
+  public fields?: APIEmbedField[];
+  public image?: APIEmbedImage;
+  public color?: number;
+  public title?: string;
+  public url?: string;
 
-  constructor(data: Embed = {}) {
-    this.title = data.title;
-    this.description = data.description;
-    this.author = data.author;
-    this.thumbnail = data.thumbnail;
-    this.image = data.image;
-    this.footer = data.footer;
-    this.color = data.color;
-    this.fields = data.fields ? data.fields.map(clone) : [];
-    this.timestamp = data.timestamp;
-    this.url = data.url;
+  constructor(data: EmbedOptions = {}) {
+    this.patch(data);
   }
 
-  setColor(color: number) {
-    this.color = color;
+  patch(data: EmbedOptions) {
+    if (data.description !== undefined)
+      this.description = data.description;
+
+    if (data.thumbnail !== undefined)
+      this.thumbnail = data.thumbnail;
+
+    if (data.timestamp !== undefined)
+      this.timestamp = data.timestamp;
+
+    if (data.author !== undefined)
+      this.author = data.author;
+
+    if (data.fields !== undefined)
+      this.fields = data.fields;
+
+    if (data.image !== undefined)
+      this.image = data.image;
+
+    if (data.color !== undefined)
+      this.color = data.color;
+
+    if (data.title !== undefined)
+      this.title = data.title;
+
+    if (data.url !== undefined)
+      this.url = data.url;
+  }
+
+  setDescription(description: string | string[]) {
+    this.description = Array.isArray(description) ? description.join('\n') : description;
     return this;
   }
 
-  setTitle(title: string) {
-    this.title = title;
+  setTimestamp(stamp: Date | number = new Date()) {
+    let timestamp!: number;
+
+    if (stamp instanceof Date)
+      timestamp = stamp.getTime();
+    else if (typeof stamp === 'number')
+      timestamp = stamp;
+
+    this.timestamp = String(timestamp);
     return this;
   }
 
-  setDescription(text: string) {
-    this.description = toString(text);
+  setThumbnail(thumb: string) {
+    this.thumbnail = { url: thumb };
     return this;
   }
 
-  setAuthor(name: string, url?: string, iconURL?: string) {
-    this.author = {
-      name,
-      url,
-      // eslint-disable-next-line camelcase
-      icon_url: iconURL,
-    };
-
-    return this;
-  }
-
-  setThumbnail(url: string) {
-    this.thumbnail = { url };
+  setAuthor(name: string, url?: string, iconUrl?: string) {
+    this.author = { name, url, icon_url: iconUrl };
     return this;
   }
 
   addField(name: string, value: string, inline: boolean = false) {
-    if (!name) throw new Error('Embed field doesn\'t have a name');
-    if (!value) throw new Error('Embed field doesn\'t include a value');
-    if (this.fields!.length > 25) throw new Error('Unable to add anymore fields. (FIELD_LIMIT_THRESHOLD)');
+    if (this.fields === undefined) this.fields = [];
+    if (this.fields.length > 25) throw new RangeError('Maximum amount of fields reached.');
 
-    this.fields!.push({ name, value: toString(value), inline });
+    this.fields.push({ name, value, inline });
     return this;
   }
 
-  setImage(url: string) {
-    this.image = { url };
+  addBlankField(inline: boolean = false) {
+    return this.addField('\u200b', '\u200b', inline);
+  }
+
+  addFields(fields: APIEmbedField[]) {
+    for (let i = 0; i < fields.length; i++) this.addField(fields[i].name, fields[i].value, fields[i].inline);
+
     return this;
   }
 
-  setTimestamp(t: Date = new Date()) {
-    this.timestamp = t;
-    return this;
+  setColor(color: string | number | [r: number, g: number, b: number] | 'random' | 'default') {
+    if (typeof color === 'number') {
+      this.color = color;
+      return this;
+    }
+
+    if (typeof color === 'string') {
+      if (color === 'default') {
+        this.color = 0;
+        return this;
+      }
+
+      if (color === 'random') {
+        this.color = Math.floor(Math.random() * (0xFFFFFF + 1));
+        return this;
+      }
+
+      const int = parseInt(color.replace('#', ''), 16);
+
+      this.color = (int << 16) + (int << 8) + int;
+      return this;
+    }
+
+    if (Array.isArray(color)) {
+      if (color.length > 2) throw new RangeError('RGB value cannot exceed to 3 or more elements');
+
+      const [r, g, b] = color;
+      this.color = (r << 16) + (g << 8) + b;
+
+      return this;
+    }
+
+    throw new TypeError(`'color' argument was not a hexadecimal, number, RGB value, 'random', or 'default' (${typeof color})`);
   }
 
-  setFooter(txt: string, iconURL?: string) {
-    // eslint-disable-next-line camelcase
-    this.footer = { text: txt, icon_url: iconURL };
+  setTitle(title: string) {
+    this.title = title;
     return this;
   }
 
@@ -139,30 +162,37 @@ export default class EmbedBuilder {
     return this;
   }
 
-  build(): EmbedOptions {
-    return {
-      title: this.title,
+  setImage(url: string) {
+    this.image = { url };
+    return this;
+  }
+
+  setFooter(text: string, iconUrl?: string) {
+    this.footer = { text, icon_url: iconUrl };
+    return this;
+  }
+
+  static create() {
+    return new EmbedBuilder()
+      .setColor(Color);
+  }
+
+  build() {
+    return omitUndefinedOrNull<EmbedOptions>({
       description: this.description,
+      thumbnail: this.thumbnail,
+      timestamp: this.timestamp,
+      footer: this.footer,
+      author: this.author ? {
+        name: this.author.name!,
+        url: this.author.url,
+        icon_url: this.author.icon_url
+      } : undefined,
       fields: this.fields,
-      author: this.author
-        ? {
-          name: this.author.name,
-          url: this.author.url,
-          // eslint-disable-next-line camelcase
-          icon_url: this.author.icon_url
-        }
-        : undefined,
-      image: this.image ? this.image : undefined,
-      footer: this.footer
-        ? {
-          text: this.footer.text,
-          // eslint-disable-next-line camelcase
-          icon_url: this.footer.icon_url
-        }
-        : undefined,
+      image: this.image,
       color: this.color,
-      url: this.url ? this.url : undefined,
-      timestamp: this.timestamp ? this.timestamp.toISOString() : undefined,
-    };
+      title: this.title,
+      url: this.url
+    });
   }
 }

@@ -3,6 +3,7 @@ node_modules/
 .vscode/
 data/
 dist/
+.husky/
 
 .travis.yml
 **.md
@@ -12,3 +13,4 @@ renovate.json
 *.lock
 *.log
 application.yml
+config.yml

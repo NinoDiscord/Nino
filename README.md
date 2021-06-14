@@ -1,76 +1,94 @@
-# Nino 
-[![Build Status](https://travis-ci.org/auguwu/Nino.svg?branch=master)](https://travis-ci.org/auguwu/Nino)
-
-> :hammer: **| Moderation-based Discord bot initally created for the Discord hackweek, now it is still regularly maintained.**
->
-> [Website](https://nino.augu.dev) **|** [Support Server](https://discord.gg/JjHGR6vhcG) **|** [Invite](https://discordapp.com/oauth2/authorize?client_id=531613242473054229&scope=bot)
-
-## How to use the bot?
-Check out the [wiki](https://github.com/NinoDiscord/Nino/wiki)!
-
-## Contributing
-First, check our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/CODE_OF_CONDUCT.md).
+# Nino
+> :hammer: **Advanced and cute moderation discord bot as an entry of Discord's Hack Week!**
 
 ## Features
+- Auto Moderation: **Prevents raids, spam, ads, and much more!**
+- Advanced warning system and automated punishments: **Automically punish who commit offenses!**
+- Simplicity: **Simplicity is key to any discord bot, and Nino makes sure of it! All commands are tailored to be simple yet powerful.**
 
-* Auto Moderation - Prevents raids, spam, ads and many more!
-* Lockdown command - locks one, multiple or all channels for a specific role downwards
-* Moderation commands - many moderation commands to simplify your moderators' work.
-* Moderation Log and Cases - easy and organized way of seeing the actions done by you and your mods! 
-* Advanced warning system and auto punishments - automatically punish those who commit offenses!
+...and much more!
 
-## Installation
-### Requirements
-* [Node.js](https://nodejs.org) (Node v14 or higher is supported!)
-* [Git](https://git-scm.com) (optional)
-* [MongoDB](https://www.mongodb.com)
-* [Redis](https://redis.io)
-* [Sentry](https://sentry.io) (optional)
-* [Docker](https://docker.com) (optional)
+## Support
+Need support related to Nino or any microservices under the organization? Join in the **Noelware** Discord server in #support under the **Nino** category:
 
-### Setting up the bot (normally)
-1. Clone the repository using Git: ``git clone https://github.com/NinoDiscord/Nino`` (If you don't have Git, just go to "Clone or download" and click "Download ZIP" then extract)
-2. Install dependencies with NPM (included in Node.js): ``npm i`` (or with [Yarn](https://yarnpkg.com) ``yarn``)
-3. Create an application.yml file in your working directory and fill it in (see the example for more information)
-4. Compile TypeScript (install TypeScript with ``npm i -g typescript`` or with Yarn ``yarn global add typescript``): ``tsc``
-5. Run the bot in the `dist` directory: ``node bot.js``
-6. Invite the bot to your server: ``https://discordapp.com/oauth2/authorize?client_id=BOTIDHERE&scope=bot`` (replace "BOTIDHERE" with your Discord bot's client id)
+[![discord embed owo](https://discord.com/api/v8/guilds/824066105102303232/widget.png?style=banner3)](https://discord.gg/ATmjFH9kMH)
 
-(4 and 5 can be bypassed by running ``npm run main``)
+## Contributing
+View our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/CODE_OF_CONDUCT.md) before contributing.
 
-Bot credentials (+ extra information) and personal touches are obviously your responsibility. You should know this by now, I hope.
+## Self-hosting
+Before attempting to self-host Nino, we didn't plan for users to be able to self-host their own instance of Nino. Most builds are usually buggy and untested as of late, we do have a "stable" branch but it can be buggy sometimes! If you want to use cutting edge features that are most likely not finished, view the [edge](https://github.com/NinoDiscord/Nino/tree/edge) branch for more details. The "stable" branch is master, so anything that should be stable will be added to the upstream.
 
-### Notes when using Docker
-1. Use the example application.yml but change ``localhost`` in the URL for the database to ``database`` and change the host for Redis to ``redis``
-2. Run ``docker-compose up -d``
+We will not provide support on how to self-host Nino, use at your own risk! If you do not want to bother hosting it, you can always invite the [public instance](https://discord.com/oauth2/authorize?client_id=531613242473054229&scope=bot) which will be the same experience if you hosted it or not.
 
-### Example application.yml
-```yaml
-environment: 'development'
-databaseUrl: 'mongodb://localhost:27017/database'
-sentryDSN: 'Your Sentry DSN'
-discord:
-  token: 'TOKEN'
-  prefix: 'x!'
+### Prerequisites
+Before running your own instance of Nino, you will need the following tools:
 
-# options from ioredis
-# read here: https://github.com/luin/ioredis/blob/master/API.md#new-redisport-host-options
+- [Timeouts Service](https://github.com/NinoDiscord/timeouts) (Used for mutes and such or it'll not work!)
+- [Node.js](https://nodejs.org) (Latest is always used in development, but LTS is recommended)
+- [PostgreSQL](https://postgresql.org) (12 is used in development but anything above 10 should fairly work!)
+- [Redis](https://redis.io) (6.2 is used in development but above v5 should work)
+
+If you're moving from v0 to v1, you will need your MongoDB instance before to port the database and [Rei](https://github.com/NinoDiscord/Rei) installed on your system.
+
+There is tools that are optional but are mostly recommended in some cases:
+
+- [Sentry](https://sentry.io) - Useful to find out where errors are in a pretty UI
+- [Docker](https://docker.com) - If you're a masochist and want to run a private instance with Docker
+- [Git](https://git-scm.com) - Useful for fetching new updates easily.
+
+### Setting up
+There are 2 ways to setup Nino: using Docker or just doing shit yourself. Doing it yourself can very tedious
+of how much Nino uses from v0 to v1 since Nino utilizes microservices! **☆♬○♩●♪✧♩((ヽ( ᐛ )ﾉ))♩✧♪●♩○♬☆**
+
+### Docker
+This step isn't finished due to the rewrite not being stable.
+
+### Normal
+This step isn't finished due to the rewrite not being stable.
+
+### Migrating from v0.x -> v1.x
+If you used v0.x in the past, this is the process on how to migrate:
+
+- 1. Run `rei convert ...` to convert the documents into JSON, this process should take a while if there is a lot of cases or warnings.
+- 2. Run `node scripts/migrate.js <directory>`, where `<directory>` is the directory Rei converted your database to.
+
+## Example `config.yml` file
+- Replace `<discord token>` with your Discord bot's token
+- Replace `<username>` with your PostgreSQL database username
+- Replace `<password>` with your PostgreSQL database password
+- Replace `<host>` (under `database`) with your PostgreSQL database host, if running locally, just use `localhost` or `database` if on Docker
+- Replace `<port>` with your PostgreSQL database port it's running, if running locally, set it to `5432`
+- Replace `<host>` (under `redis`) with your Redis connection host, if running locally, just use `localhost` or `redis` if on Docker
+- Replace `<auth>` with the authenication token you set in the [timeouts](https://github.com/NinoDiscord/timeouts) relay service.
+
+```yml
+environment: development
+token: <discord token>
+
+prefixes:
+  - !
+
+database:
+  url: postgres://<username>:<password>@<host>:<port>/<database>
+
 redis:
-  host: 'localhost'
+  host: <host>
   port: 6379
+
+timeouts:
+  port: 4025
+  auth: <auth>
 ```
 
-## Cloning/Using Source Code
-If you wish to use the source code for a project, please add proper crediting in your code using the LICENSE displayed [here](/LICENSE).
+## Maintainers
+* Ice#4710 (DevOps, Developer) ([GitHub](https://github.com/IceeMC))
+* Rodentman87#8787 (Frontend Developer) ([GitHub](https://github.com/Rodentman87))
+* August#5820 (Project Lead, Developer) ([GitHub](https://github.com/auguwu))
 
-## Credits
-### Maintainers
-* August#5820 (Lead) ([GitHub](https://github.com/auguwu))
-* dondish#8072 (Development Lead) ([GitHub](https://github.com/dondish))
-
-### Hackweek Participants
-* August#5820 (Owner) ([GitHub](https://github.com/auguwu))
-* dondish#8072 ([GitHub](https://github.com/dondish))
-* Imposed#9999 ([GitHub](https://github.com/scrap))
-* Wesselgame#0498 ([GitHub](https://github.com/Wessel))
-* ohlookitsderpy#9721 ([GitHub](https://github.com/ohlookitsderpy))
+## Hackweek Participants
+* Chris ([GitHub](https://github.com/auguwu))
+* dondish ([GitHub](https://github.com/dondish))
+* Kyle ([GitHub](https://github.com/scrap))
+* Wessel ([GitHub](https://github.com/Wessel))
+* David ([GitHub](https://github.com/davidjcralph))

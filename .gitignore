@@ -1,15 +1,18 @@
 # Folders
 node_modules/
-dist/
-data/
+old_locales/
+.husky/_/
+build/
 
 # Jest
 coverage/
 
 # Files
 application.yml
+config.yml
 *.lock
 *.log
+.env
 
 # Redis dumps, I run redis-server in the working directory :3
 *.rdb
@@ -17,3 +20,4 @@ launch.json
 
 # Ignore user-config
 .vscode/
+.idea/
