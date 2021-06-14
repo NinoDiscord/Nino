@@ -29,5 +29,5 @@ export * from './AutomodResolver';
 export * from './GuildsResolver';
 export * from './CasesResolver';
 export * from './LoginResolver';
-export * from './HelloResolver';
+export * from './BasicResolver';
 export * from './UserResolver';

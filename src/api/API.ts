@@ -21,7 +21,8 @@
  */
 
 import { Component, ComponentAPI, Container, Inject } from '@augu/lilith';
-import { HelloResolver } from './resolvers/HelloResolver';
+import CommandsResolver from './resolvers/CommandsResolver';
+import { BasicResolver } from './resolvers/BasicResolver';
 import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql';
 import type { Server } from 'http';
@@ -30,7 +31,6 @@ import { Logger } from 'tslog';
 import express from 'express';
 import Config from '../components/Config';
 import cors from 'cors';
-import CommandsResolver from './resolvers/CommandsResolver';
 
 export interface NinoContext {
   container: Container;
@@ -64,7 +64,7 @@ export default class API {
     this.logger.info('Launching API...');
     const schema = await buildSchema({
       resolvers: [
-        HelloResolver,
+        BasicResolver,
         CommandsResolver
       ]
     });
@@ -76,7 +76,11 @@ export default class API {
 
     this.#apollo = new ApolloServer({
       schema,
-      context
+      context: ({ req, res }) => ({
+        ...context,
+        req,
+        res
+      })
     });
 
     const app = express()

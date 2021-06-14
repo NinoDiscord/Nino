@@ -31,33 +31,53 @@ registerEnumType(Categories, {
 
 @ObjectType()
 export class CommandObject {
-  @Field(() => [String])
+  @Field(() => [String], {
+    description: 'Lists off the permissions required by the executor'
+  })
   public userPermissions!: PermissionField[];
 
-  @Field(() => [String])
+  @Field(() => [String], {
+    description: 'Lists off the permissions required by the bot.'
+  })
   public botPermissions!: PermissionField[];
 
-  @Field(() => String)
+  @Field(() => String, {
+    description: 'Returns the description of the command'
+  })
   public description!: ObjectKeysWithSeperator<LocalizationStrings>;
 
-  @Field()
+  @Field({
+    description: 'If the command is owner only or not (shouldn\'t be accessable but whatever)'
+  })
   public ownerOnly!: boolean;
 
-  @Field(() => [String])
+  @Field(() => [String], {
+    description: 'List of examples on how to execute the command'
+  })
   public examples!: string[];
 
-  @Field(() => Categories)
+  @Field(() => Categories, {
+    description: 'Identifier of the category this command belongs in'
+  })
   public category!: Categories;
 
-  @Field()
+  @Field({
+    description: 'How long you can execute this command'
+  })
   public cooldown!: number;
 
-  @Field(() => [String])
+  @Field(() => [String], {
+    description: 'Additional aliases you can execute the command after the bot prefix.'
+  })
   public aliases!: string[];
 
-  @Field()
+  @Field({
+    description: 'The command\'s usage, run `x!help usage` or visit the usage section in the wiki or website for more context.'
+  })
   public usage!: string;
 
-  @Field()
+  @Field({
+    description: 'Identifier of the command name'
+  })
   public name!: string;
 }

@@ -25,93 +25,90 @@ import type { Shard } from 'eris';
 
 @ObjectType()
 class ShardObject {
-  @Field(() => String)
+  @Field(() => String, { description: 'The shard\'s status' })
   status!: Shard['status'];
 
-  @Field(() => Int)
+  @Field(() => Int, { description: 'How many guilds this shard holds' })
   guilds!: number;
 
-  @Field(() => Int)
+  @Field(() => Int, { description: 'How many members in all guilds this shard holds' })
   users!: number;
 
-  @Field(() => Int)
+  @Field(() => Int, { description: 'Identifier of the shard.' })
   id!: number;
 }
 
 @ObjectType()
 class DatabaseObject {
-  @Field(() => Int)
-  uptime!: number;
+  @Field({ description: 'The uptime of the main database (PostgreSQL)' })
+  uptime!: string;
 
-  @Field(() => Int)
-  ping!: number;
+  @Field({ description: 'Latency between the main database (PostgreSQL) to the bot.' })
+  ping!: string;
 }
 
 @ObjectType()
 class RedisObject {
-  @Field(() => Int)
-  networkOutput!: number;
+  @Field({ description: 'The amount of bytes the network has received from the net -> bot.' })
+  networkOutput!: string;
 
-  @Field(() => Int)
-  networkInput!: number;
+  @Field({ description: 'The amount of bytes the network has recieved from the bot -> the network. ' })
+  networkInput!: string;
 
-  @Field(() => Int)
+  @Field(() => Int, { description: 'How many operations per second that is being executed.' })
   operations!: number;
 
-  @Field()
+  @Field({ description: 'The uptime of the server.' })
   uptime!: string;
 
-  @Field(() => Int)
-  ping!: number;
+  @Field({ description: 'The latency between Redis -> the bot.' })
+  ping!: string;
 }
 
 @ObjectType()
 class MemoryUsageObject {
-  @Field()
+  @Field({ description: 'How much object heap is being used' })
   heap!: string;
 
-  @Field()
+  @Field({ description: 'How much RSS (Residental Set Size) is being used.' })
   rss!: string;
-
-  @Field()
-  cpu!: string;
 }
 
 @ObjectType()
 class TimeoutsObject {
-  @Field()
+  @Field({ description: 'If the timeouts service is operating.' })
   online!: boolean;
 }
 
 @ObjectType()
 export default class StatisticsObject {
-  @Field(() => Int)
+  @Field(() => Int, { description: 'The average latency between all shards' })
   avgShardLatency!: number;
 
-  @Field()
+  @Field({ description: 'The memory usage on the bot process' })
   memoryUsage!: MemoryUsageObject;
 
-  @Field()
+  @Field({ description: 'Information about the timeouts microservice' })
   timeouts!: TimeoutsObject;
 
-  @Field()
+  @Field({ description: 'Information about the main database (PostgreSQL)' })
   database!: DatabaseObject;
 
-  @Field(() => Int)
+  @Field(() => Int, { description: 'How many channels Nino can see in all guilds.' })
   channels!: number;
 
-  @Field(() => [ShardObject])
-  shards!: ShardObject;
+  @Field(() => [ShardObject], { description: 'Information about the bot\'s shards.' })
+  shards!: ShardObject[];
 
-  @Field(() => Int)
+  @Field(() => Int, { description: 'How many guilds Nino is currently serving' })
   guilds!: number;
 
-  @Field(() => Int)
+  @Field(() => Int, { description: 'How many users Nino is currently serving' })
   users!: number;
 
-  @Field()
+  @Field({ description: 'Information about Redis.' })
   redis!: RedisObject;
 
-  @Field()
+  @Field({ description: 'The Kubernetes node Nino is operating on, will always returns `Unknown` if not in production.' })
   node!: string;
 }
