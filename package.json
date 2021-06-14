@@ -37,7 +37,7 @@
     "@augu/lilith": "4.1.0",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
-    "@sentry/node": "6.5.1",
+    "@sentry/node": "6.7.0",
     "apollo-server-express": "2.25.1",
     "class-validator": "0.13.1",
     "cors": "2.8.5",
