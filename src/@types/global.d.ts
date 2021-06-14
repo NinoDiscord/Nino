@@ -20,26 +20,83 @@
  * SOFTWARE.
  */
 
+/* eslint-disable camelcase */
+
 import { Container } from '@augu/lilith';
 import { APIUser } from 'discord-api-types';
 import { crypto } from '../api/encryption';
 
 declare global {
-  /** The current Lilith container */
+  /** The current container running */
   var app: Container;
 
   namespace NodeJS {
     interface Global {
-      /** The current Lilith container */
+      /** The current container running */
       app: Container;
     }
   }
 
-  interface APITokenResult extends crypto.EncryptedData {
+  interface APITokenResult extends Omit<crypto.EncryptedData, 'token'> {
     refreshToken: string;
     accessToken: string;
     expiryDate: number;
     data: APIUser;
     id: string;
+  }
+
+  interface RedisInfo {
+    total_connections_received: number;
+    total_commands_processed: number;
+    instantaneous_ops_per_sec: number;
+    total_net_input_bytes: number;
+    total_net_output_bytes: number;
+    instantaneous_input_kbps: number;
+    instantaneous_output_kbps: number;
+    rejected_connections: number;
+    sync_full: number;
+    sync_partial_ok: number;
+    sync_partial_err: number;
+    expired_keys: number;
+    expired_stale_perc: number;
+    expired_time_cap_reached_count: number;
+    evicted_keys: number;
+    keyspace_hits: number;
+    keyspace_misses: number;
+    pubsub_channels: number;
+    pubsub_patterns: number;
+    latest_fork_usec: number;
+    migrate_cached_sockets: number;
+    slave_expires_tracked_keys: number;
+    active_defrag_hits: number;
+    active_defrag_misses: number;
+    active_defrag_key_hits: number;
+    active_defrag_key_misses: number;
+  }
+
+  interface RedisServerInfo {
+    redis_version: string;
+    redis_git_sha1: string;
+    redis_git_dirty: string;
+    redis_build_id: string;
+    redis_mode: string;
+    os: string;
+    arch_bits: string;
+    multiplexing_api: string;
+    atomicvar_api: string;
+    gcc_version: string;
+    process_id: string;
+    process_supervised: string;
+    run_id: string;
+    tcp_port: string;
+    server_time_usec: string;
+    uptime_in_seconds: string;
+    uptime_in_days: string;
+    hz: string;
+    configured_hz: string;
+    lru_clock: string;
+    executable: string;
+    config_file: string;
+    io_threads_active: string;
   }
 }

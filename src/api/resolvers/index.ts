@@ -20,19 +20,14 @@
  * SOFTWARE.
  */
 
-import { Resolver, Query, Mutation, Arg, Ctx, UseMiddleware } from 'type-graphql';
-import type { NinoContext } from '../API';
-import AutomodEntity from '../../entities/AutomodEntity';
-import IsAuthorized from '../middleware/isAuthorized';
-
-@Resolver(AutomodEntity)
-export class AutomodResolver {
-  @Query(() => AutomodEntity)
-  @UseMiddleware(IsAuthorized)
-  automod(
-    @Arg('id') guildID: string,
-    @Ctx() { database }: NinoContext
-  ) {
-    // todo: this
-  }
-}
+export * from './PunishmentsResolver';
+export * from './CommandsResolver';
+export * from './BlacklistResolver';
+export * from './WarningResolver';
+export * from './LoggingResolver';
+export * from './AutomodResolver';
+export * from './GuildsResolver';
+export * from './CasesResolver';
+export * from './LoginResolver';
+export * from './HelloResolver';
+export * from './UserResolver';

@@ -22,6 +22,7 @@
 
 import { createConnection, Connection, ConnectionOptions } from 'typeorm';
 import { Component, ComponentAPI, Inject } from '@augu/lilith';
+import { humanize, Stopwatch } from '@augu/utils';
 import { Logger } from 'tslog';
 import Config from './Config';
 
@@ -132,6 +133,39 @@ export default class Database {
 
   dispose() {
     return this.connection.close();
+  }
+
+  async getStatistics() {
+    const stopwatch = new Stopwatch();
+    stopwatch.start();
+    await this.connection.query('SELECT * FROM guilds');
+    const ping = stopwatch.end();
+
+    let dbName: string = 'nino';
+    const url = this.config.getProperty('database.url');
+    if (url !== undefined) {
+      const parts = url.split('/');
+      dbName = parts[parts.length - 1];
+    } else {
+      dbName = this.config.getProperty('database.database') ?? 'nino';
+    }
+
+    // collect shit
+    const data = await Promise.all([
+      this.connection.query(`SELECT tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted FROM pg_stat_database WHERE datname = '${dbName}';`),
+      this.connection.query('SELECT version();'),
+      this.connection.query('SELECT extract(epoch FROM current_timestamp - pg_postmaster_start_time()) AS uptime;')
+    ]);
+
+    return {
+      inserted: Number(data[0]?.[0]?.tup_inserted ?? 0),
+      updated: Number(data[0]?.[0]?.tup_updated ?? 0),
+      deleted: Number(data[0]?.[0]?.tup_deleted ?? 0),
+      fetched: Number(data[0]?.[0]?.tup_fetched ?? 0),
+      version: data[1][0].version.split(', ').shift().replace('PostgreSQL ', '').trim(),
+      uptime: humanize(Math.floor(data[2][0].uptime * 1000), true),
+      ping
+    };
   }
 
   private initRepos() {

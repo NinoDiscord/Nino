@@ -19,20 +19,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import { Resolver, Query, Mutation, Arg, Ctx, UseMiddleware } from 'type-graphql';
-import type { NinoContext } from '../API';
-import AutomodEntity from '../../entities/AutomodEntity';
-import IsAuthorized from '../middleware/isAuthorized';
-
-@Resolver(AutomodEntity)
-export class AutomodResolver {
-  @Query(() => AutomodEntity)
-  @UseMiddleware(IsAuthorized)
-  automod(
-    @Arg('id') guildID: string,
-    @Ctx() { database }: NinoContext
-  ) {
-    // todo: this
-  }
-}

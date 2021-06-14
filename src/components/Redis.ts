@@ -22,6 +22,7 @@
 
 import { Component, Inject } from '@augu/lilith';
 import type { Timeout } from './timeouts/types';
+import { Stopwatch } from '@augu/utils';
 import { Logger } from 'tslog';
 import IORedis from 'ioredis';
 import Config from './Config';
@@ -86,5 +87,39 @@ export default class Redis {
     return this.client.hget('nino:timeouts', guild)
       .then(value => value !== null ? JSON.parse<Timeout[]>(value) : [])
       .catch(() => [] as Timeout[]);
+  }
+
+  async getStatistics() {
+    const stopwatch = new Stopwatch();
+    stopwatch.start();
+    await this.client.ping('Ice is cute as FUCK');
+
+    const ping = stopwatch.end();
+
+    // stole this from donny
+    // Credit: https://github.com/FurryBotCo/FurryBot/blob/master/src/commands/information/stats-cmd.ts#L22
+    const [stats, server] = await Promise.all([
+      this.client.info('stats').then(info =>
+        info
+          .split(/\n\r?/)
+          .slice(1, -1)
+          .map(item => ({ [item.split(':')[0]]: item.split(':')[1].trim() }))
+          .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisInfo
+      ),
+
+      this.client.info('server').then(info =>
+        info
+          .split(/\n\r?/)
+          .slice(1, -1)
+          .map(item => ({ [item.split(':')[0]]: item.split(':')[1].trim() }))
+          .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisServerInfo
+      )
+    ]);
+
+    return {
+      server,
+      stats,
+      ping
+    };
   }
 }

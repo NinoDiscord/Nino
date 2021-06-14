@@ -40,7 +40,11 @@ class ShardObject {
 
 @ObjectType()
 class DatabaseObject {
+  @Field(() => Int)
+  uptime!: number;
 
+  @Field(() => Int)
+  ping!: number;
 }
 
 @ObjectType()

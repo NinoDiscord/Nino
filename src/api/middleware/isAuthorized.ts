@@ -34,9 +34,6 @@ export default class IsAuthorized implements MiddlewareInterface<NinoContext> {
     if (!header)
       throw new TypeError('Missing `Authorization` header');
 
-    if (!context.req.headers['x-nino-user-id'])
-      throw new TypeError('Missing `X-Nino-User-Id` header');
-
     if (!header.startsWith('Bearer '))
       throw new TypeError('Authorization token must start with `Bearer ...`');
 
@@ -44,21 +41,18 @@ export default class IsAuthorized implements MiddlewareInterface<NinoContext> {
     if (token === undefined)
       throw new TypeError('Expected token after `Bearer ...`, but got nothing.');
 
-    const user = await redis.client.hget('nino:api:sessions', context.req.headers['x-nino-user-id'] as string)
+    const user = await redis.client.hget('nino:api:sessions', token)
       .then(value => value !== null ? JSON.parse<APITokenResult>(value) : null)
       .catch(() => null);
 
     if (user === null)
-      throw new Error(`User with ID "${context.req.headers['x-nino-user-id']}" is not logged in.`);
+      throw new Error('Couldn\'t identify token, is the user not logged in?');
 
-    if (user.id !== context.req.headers['x-nino-user-id'] as string)
-      throw new Error(`User "${context.req.headers['x-nino-user-id']}" is trying to access another user, not allowing.`);
+    if (user.expiryDate >= Date.now()) {
+      logger.info(`User ${user.id}'s token has expired`);
+      await redis.client.hdel('nino:api:sessions', token);
 
-    if (user.expiryDate > Date.now()) {
-      logger.info(`User ${context.req.headers['x-nino-user-id']}'s token has expired`);
-      await redis.client.hdel('nino:api:sessions', context.req.headers['x-nino-user-id'] as string);
-
-      throw new Error('Session has expired, relogin.');
+      throw new Error('Session has expired, please relogin.');
     }
 
     return next();
