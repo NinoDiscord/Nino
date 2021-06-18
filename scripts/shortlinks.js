@@ -87,29 +87,28 @@ const otherUrls = [
   '5.gp',
   'ur3.us',
   'kek.gg',
-  'waa.ai'
+  'waa.ai',
+  'steamcommunity.ru'
 ];
 
 const startTime = process.hrtime();
 (async() => {
-  logger.info('Now reading list from https://raw.githubusercontent.com/sambokai/ShortURL-Services-List/master/shorturl-services-list.txt...');
+  logger.info('Now reading list from https://raw.githubusercontent.com/sambokai/ShortURL-Services-List/master/shorturl-services-list.csv...');
 
   const requestTime = process.hrtime();
-  const res = await http.request({
-    method: 'GET',
-    url: 'https://raw.githubusercontent.com/sambokai/ShortURL-Services-List/master/shorturl-services-list.txt'
-  });
+  const res = await http.get('https://raw.githubusercontent.com/sambokai/ShortURL-Services-List/master/shorturl-services-list.csv');
 
   const requestEnd = calculateHRTime(requestTime);
-  logger.debug(`It took ~${requestEnd}ms to get a "${res.status}" response.`);
+  logger.debug(`It took ~${requestEnd}ms to get a "${res.statusCode}" response.`);
 
   const data = res.body().split(/\n\r?/);
-  const shortlinks = [...new Set([].concat(data, otherUrls))];
+  data.shift();
 
+  const shortlinks = [...new Set([].concat(data.map(s => s.slice(0, s.length - 1)), otherUrls))];
   if (!existsSync(join(__dirname, '..', 'assets')))
     await fs.mkdir(join(__dirname, '..', 'assets'));
 
-  await fs.writeFile(join(__dirname, '..', 'assets', 'shortlinks.json'), JSON.stringify(shortlinks, null, 4));
+  await fs.writeFile(join(__dirname, '..', 'assets', 'shortlinks.json'), `${JSON.stringify(shortlinks, null, '\t')}\n`);
   logger.info(`It took about ~${calculateHRTime(startTime)}ms to retrieve ${shortlinks.length} short-links.`);
   process.exit(0);
 })();
