@@ -44,7 +44,7 @@
     "eris": "github:abalabahaha/eris#dev",
     "express": "4.17.1",
     "express-session": "1.17.2",
-    "graphql": "15.5.0",
+    "graphql": "15.5.1",
     "ioredis": "4.27.6",
     "js-yaml": "4.1.0",
     "jsonwebtoken": "^8.5.1",
