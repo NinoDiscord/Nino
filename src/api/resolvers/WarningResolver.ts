@@ -19,3 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import { Resolver, Query, Mutation, Arg, Ctx, UseMiddleware } from 'type-graphql';
+import type { NinoContext } from '../API';
+import WarningEntity from '../../entities/WarningsEntity';
+
+@Resolver(WarningEntity)
+export class WarningResolver {
+  @Query(() => [WarningEntity])
+  warnings(
+    @Arg('id') guildID: string,
+    @Ctx() { database }: NinoContext
+  ) {
+    // todo: this
+  }
+}

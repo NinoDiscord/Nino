@@ -84,7 +84,6 @@ export default class BotlistsService {
         }
       });
 
-      const level = res.statusCode === 200 ? 'info' : 'warn';
       successful.push({
         name: 'Discord Services',
         success: res.statusCode === 200
@@ -107,7 +106,6 @@ export default class BotlistsService {
         }
       });
 
-      const level = res.statusCode === 200 ? 'info' : 'warn';
       successful.push({
         name: 'Discord Boats',
         success: res.statusCode === 200
@@ -131,7 +129,6 @@ export default class BotlistsService {
         }
       });
 
-      const level = res.statusCode === 200 ? 'info' : 'warn';
       successful.push({
         name: 'Discord Bots',
         success: res.statusCode === 200
@@ -155,7 +152,6 @@ export default class BotlistsService {
         }
       });
 
-      const level = res.statusCode === 200 ? 'info' : 'warn';
       successful.push({
         name: 'top.gg',
         success: res.statusCode === 200
@@ -180,7 +176,6 @@ export default class BotlistsService {
         }
       });
 
-      const level = res.statusCode === 200 ? 'info' : 'warn';
       successful.push({
         name: 'Delly',
         success: res.statusCode === 200
@@ -203,7 +198,6 @@ export default class BotlistsService {
         }
       });
 
-      const level = res.statusCode === 200 ? 'info' : 'warn';
       successful.push({
         name: 'Bots for Discord',
         success: res.statusCode === 200

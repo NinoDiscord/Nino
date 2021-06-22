@@ -20,18 +20,39 @@
  * SOFTWARE.
  */
 
-import { Resolver, Arg, Ctx, Mutation, UseMiddleware, InputType, Field } from 'type-graphql';
-import type { NinoContext } from '../API';
-import IsAuthorized from '../middleware/isAuthorized';
-import LoginObject from '../objects/LoginObject';
+import { Request, Response, Router } from 'express';
+import session from 'express-session';
+import API from '../API';
 
-@InputType()
-class LoginInput {
-  @Field()
-  public state!: string;
+export const SourceResource: {
+  [X in 'discord.services' | 'discord.boats' | 'discord.bots.gg' | 'top.gg' | 'delly' | 'botsfordiscord' | 'invite' | 'website']: string;
+} = {
+  'discord.services': 'nino:botlists:discord-services',
+  'discord.bots.gg': 'nino:botlists:dbots',
+  'botsfordiscord': 'nino:botlists:bfd',
+  'discord.boats': 'nino:botlists:dboats',
+  'top.gg': 'nino:botlists:dbl',
+  invite: 'nino:botlists:invite',
+  website: 'nino:botlists:website',
+  delly: 'nino:botlists:cutebflist'
+};
+
+export default function oauth2(api: API) {
+  const router = Router();
+  router
+    .use(session({
+      secret: api['config'].getProperty('api')!.secret
+    }))
+    .get('/discord', discordRedirect)
+    .get('/discord/callback', () => {
+      // todo: this
+    });
+
+  api.app.use(router);
 }
 
-@Resolver(LoginObject)
-export class LoginResolver {
-
-}
+const discordRedirect = (req: Request, res: Response) => {
+  // Will return one of the following:
+  const source = req.query.source;
+  // todo: this
+};

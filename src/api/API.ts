@@ -45,6 +45,7 @@ export interface NinoContext {
 })
 export default class API {
   private readonly api!: ComponentAPI;
+  public app!: ReturnType<typeof express>;
 
   @Inject
   private readonly logger!: Logger;
@@ -83,7 +84,7 @@ export default class API {
       })
     });
 
-    const app = express()
+    const app = this.app = express()
       .use(cors());
 
     await this.#apollo.start();

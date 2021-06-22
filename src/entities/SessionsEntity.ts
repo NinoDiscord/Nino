@@ -20,17 +20,25 @@
  * SOFTWARE.
  */
 
-import { Resolver, Query, Mutation, Arg, Ctx, UseMiddleware } from 'type-graphql';
-import type { NinoContext } from '../API';
-import CaseEntity from '../../entities/CaseEntity';
+import { Entity, Column, PrimaryColumn, BaseEntity } from 'typeorm';
 
-@Resolver(CaseEntity)
-export class CasesResolver {
-  @Query(() => CaseEntity)
-  cases(
-    @Arg('id') guildID: string,
-    @Ctx() { database }: NinoContext
-  ) {
-    // todo: this
-  }
+@Entity('sessions')
+export default class SessionsEntity extends BaseEntity {
+  @Column()
+  public discriminator!: string;
+
+  @Column()
+  public refreshToken!: string;
+
+  @Column()
+  public accessToken!: string;
+
+  @Column()
+  public username!: string;
+
+  @Column()
+  public avatar!: string;
+
+  @PrimaryColumn()
+  public id!: string;
 }

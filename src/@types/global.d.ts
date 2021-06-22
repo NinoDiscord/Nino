@@ -38,8 +38,6 @@ declare global {
   }
 
   interface APITokenResult extends Omit<crypto.EncryptedData, 'token'> {
-    refreshToken: string;
-    accessToken: string;
     expiryDate: number;
     data: APIUser;
     id: string;

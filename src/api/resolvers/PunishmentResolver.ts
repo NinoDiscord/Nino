@@ -19,3 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import { Resolver, Query, Mutation, Arg, Ctx, UseMiddleware } from 'type-graphql';
+import type { NinoContext } from '../API';
+import BlacklistEntity from '../../entities/BlacklistEntity';
+
+@Resolver(BlacklistEntity)
+export class BlacklistResolver {
+  @Query(() => BlacklistEntity)
+  blacklist(
+    @Arg('id') guildID: string,
+    @Ctx() { database }: NinoContext
+  ) {
+    // todo: this
+  }
+}
