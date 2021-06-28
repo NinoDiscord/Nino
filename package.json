@@ -52,7 +52,7 @@
     "ws": "7.5.0"
   },
   "devDependencies": {
-    "@augu/eslint-config": "2.1.1",
+    "@augu/eslint-config": "2.1.2",
     "@augu/tsconfig": "1.1.1",
     "@types/ioredis": "4.26.4",
     "@types/js-yaml": "4.0.1",
