@@ -1,5 +1,15 @@
-# Nino
-> :hammer: **Advanced and cute moderation discord bot as an entry of Discord's Hack Week!**
+<div align='center'>
+  <h2>🔨 Nino</h2>
+  <blockquote><strong>Cute, advanced discord moderation bot made in Eris. Make your server cute and automated with utilities for you and your server moderators *:･ﾟ✧*:･ﾟ✧</strong></blockquote>
+</div>
+
+<div align='center'>
+    <img alt="GitHub Workflow Status (prod)" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint/master?style=flat-square" />
+    <img alt="GitHub Workflow Status (edge)" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint/edge?style=flat-square" />
+    <img alt="GitHub" src="https://img.shields.io/github/license/NinoDiscord/Nino?style=flat-square" />
+</div>
+
+<hr />
 
 ## Features
 - Auto Moderation: **Prevents raids, spam, ads, and much more!**
@@ -14,7 +24,7 @@ Need support related to Nino or any microservices under the organization? Join i
 [![discord embed owo](https://discord.com/api/v8/guilds/824066105102303232/widget.png?style=banner3)](https://discord.gg/ATmjFH9kMH)
 
 ## Contributing
-View our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/CODE_OF_CONDUCT.md) before contributing.
+View our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/.github/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/.github/CODE_OF_CONDUCT.md) before contributing.
 
 ## Self-hosting
 Before attempting to self-host Nino, we didn't plan for users to be able to self-host their own instance of Nino. Most builds are usually buggy and untested as of late, we do have a "stable" branch but it can be buggy sometimes! If you want to use cutting edge features that are most likely not finished, view the [edge](https://github.com/NinoDiscord/Nino/tree/edge) branch for more details. The "stable" branch is master, so anything that should be stable will be added to the upstream.
@@ -50,8 +60,8 @@ This step isn't finished due to the rewrite not being stable.
 ### Migrating from v0.x -> v1.x
 If you used v0.x in the past, this is the process on how to migrate:
 
-- 1. Run `rei convert ...` to convert the documents into JSON, this process should take a while if there is a lot of cases or warnings.
-- 2. Run `node scripts/migrate.js <directory>`, where `<directory>` is the directory Rei converted your database to.
+1. Run `rei convert ...` to convert the documents into JSON, this process should take a while if there is a lot of cases or warnings.
+2. Run `node scripts/migrate.js <directory>`, where `<directory>` is the directory Rei converted your database to.
 
 ## Example `config.yml` file
 - Replace `<discord token>` with your Discord bot's token
