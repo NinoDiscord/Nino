@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-import { Field, ObjectType, registerEnumType } from 'type-graphql';
 import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 export enum LoggingEvents {
@@ -33,35 +32,23 @@ export enum LoggingEvents {
   MessageUpdated      = 'message_update'
 }
 
-registerEnumType(LoggingEvents, {
-  name: 'LogEvents',
-  description: 'The different types of events the guild has enabled.'
-});
-
 @Entity({ name: 'logging' })
-@ObjectType()
 export default class LoggingEntity {
   @Column({ default: '{}', array: true, type: 'text', name: 'ignore_channels' })
-  @Field(() => [String])
   public ignoreChannels!: string[];
 
   @Column({ default: '{}', array: true, type: 'text', name: 'ignore_users' })
-  @Field(() => [String])
   public ignoreUsers!: string[];
 
   @Column({ name: 'channel_id', nullable: true })
-  @Field()
   public channelID?: string;
 
   @Column({ default: false })
-  @Field()
   public enabled!: boolean;
 
   @Column({ type: 'enum', array: true, enum: LoggingEvents, default: '{}' })
-  @Field(() => [LoggingEvents])
   public events!: LoggingEvents[];
 
   @PrimaryColumn({ name: 'guild_id' })
-  @Field()
   public guildID!: string;
 }

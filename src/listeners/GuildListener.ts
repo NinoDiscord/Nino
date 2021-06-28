@@ -55,7 +55,7 @@ export default class VoidListener {
     this.prometheus?.guildCount?.inc();
     await this.botlists?.post();
 
-    const channel = this.discord.client.getChannel('760587940535205899') as TextChannel;
+    const channel = this.discord.client.getChannel('844410521599737878') as TextChannel;
     const owner = this.discord.client.users.get(guild.ownerID);
     const bots = guild.members.filter(r => r.bot).length;
     const humans = guild.members.filter(r => !r.bot).length;
@@ -83,7 +83,7 @@ export default class VoidListener {
     this.prometheus?.guildCount?.dec();
     await this.botlists?.post();
 
-    const channel = this.discord.client.getChannel('760587940535205899') as TextChannel;
+    const channel = this.discord.client.getChannel('844410521599737878') as TextChannel;
     const owner = this.discord.client.users.get(guild.ownerID);
     const bots = guild.members.filter(r => r.bot).length;
     const humans = guild.members.filter(r => !r.bot).length;

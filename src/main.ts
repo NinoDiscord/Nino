@@ -26,7 +26,6 @@ import 'reflect-metadata';
 import { commitHash, version } from './util/Constants';
 import Discord from './components/Discord';
 import logger from './singletons/Logger';
-import Api from './api/API';
 import app from './container';
 import ts from 'typescript';
 
@@ -39,7 +38,6 @@ import ts from 'typescript';
 
   try {
     await app.load();
-    await app.addComponent(Api);
   } catch(ex) {
     logger.fatal('Unable to load container');
     console.error(ex);

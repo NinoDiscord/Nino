@@ -39,16 +39,16 @@ export default class VoiceMuteCommand extends Command {
 
   constructor() {
     super({
-      description: 'descriptions.voice_mute',
+      description: 'descriptions.voice_deaf',
       category: Categories.Moderation,
       examples: [
-        'vcmute <@256548545856545896>',
-        'vcmute 3',
-        'vcmute 3 some reason!',
-        'vcmute 3 some reason! | 3d'
+        'vcdeaf <@256548545856545896>',
+        'vcdeaf 3',
+        'vcdeaf 3 some reason!',
+        'vcdeaf 3 some reason! | 3d'
       ],
-      aliases: ['mutevc'],
-      name: 'vcmute'
+      aliases: ['deafvc', 'vcdeaf'],
+      name: 'vcdeafen'
     });
   }
 
@@ -102,8 +102,8 @@ export default class VoiceMuteCommand extends Command {
       return msg.reply(`Member **${user.username}#${user.discriminator}** is not in this voice channel.`);
 
     const voiceState = channel.voiceMembers.get(user.id)!.voiceState;
-    if (voiceState.mute === true)
-      return msg.reply(`Member **${user.username}#${user.discriminator}** is already server muted.`);
+    if (voiceState.deaf === true)
+      return msg.reply(`Member **${user.username}#${user.discriminator}** is already server deafened.`);
 
     const areason = reason.join(' ');
     let actualReason: string | undefined = undefined;
@@ -123,7 +123,7 @@ export default class VoiceMuteCommand extends Command {
         publish: true,
         reason: actualReason,
         member: msg.guild.members.get(user.id) || { id: user.id, guild: msg.guild },
-        type: PunishmentType.VoiceMute,
+        type: PunishmentType.VoiceDeafen,
         time: time !== undefined ? ms(time!) : undefined
       });
 

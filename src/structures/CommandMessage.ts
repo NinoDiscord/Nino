@@ -25,10 +25,8 @@ import type GuildEntity from '../entities/GuildEntity';
 import { EmbedBuilder } from '.';
 import type UserEntity from '../entities/UserEntity';
 import type Locale from './Locale';
-import Discord from '../components/Discord';
-import app from '../container';
 import { Inject } from '@augu/lilith';
-import { mergeSchemas } from 'apollo-server-express';
+import Discord from '../components/Discord';
 
 export default class CommandMessage {
   public userSettings: UserEntity;

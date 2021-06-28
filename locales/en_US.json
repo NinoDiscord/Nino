@@ -112,6 +112,16 @@
     },
     "generic": {},
     "automod": {},
-    "errors": {}
+    "errors": {
+      "blacklists": {
+        "guild": [
+          "Guild **${guild}** is blacklisted from using me by **${user}**",
+          "> **${reason}**",
+          "",
+          ":question: If there was an issue or a misunderstanding in the blacklist, contact us here:"
+        ],
+        "user": []
+      }
+    }
   }
 }

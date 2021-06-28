@@ -20,7 +20,6 @@
  * SOFTWARE.
  */
 
-import { Field, ObjectType, registerEnumType } from 'type-graphql';
 import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 export enum BlacklistType {
@@ -28,28 +27,17 @@ export enum BlacklistType {
   User
 }
 
-// Register the [BlacklistType] as an enum
-registerEnumType(BlacklistType, {
-  name: 'BlacklistType',
-  description: 'The blacklist type.'
-});
-
 @Entity({ name: 'blacklists' })
-@ObjectType()
 export default class BlacklistEntity {
   @Column({ nullable: true })
-  @Field({ nullable: true })
   public reason?: string;
 
   @Column()
-  @Field()
   public issuer!: string;
 
   @Column({ type: 'enum', enum: BlacklistType })
-  @Field(() => BlacklistType)
   public type!: BlacklistType;
 
   @PrimaryColumn()
-  @Field()
   public id!: string;
 }

@@ -21,5 +21,34 @@
  */
 
 import { Inject, Subscribe } from '@augu/lilith';
+import AutomodService from '../services/AutomodService';
+import type { User } from 'eris';
+import Database from '../components/Database';
+import Discord from '../components/Discord';
 
-export default class UserListener {}
+export default class UserListener {
+  @Inject
+  private readonly database!: Database;
+
+  @Inject
+  private readonly discord!: Discord;
+
+  @Inject
+  private readonly automod!: AutomodService;
+
+  @Subscribe('userUpdate', 'discord')
+  async onUserUpdate(user: User) {
+    const mutualGuilds = this.discord.client.guilds.filter(guild =>
+      guild.members.has(user.id)
+    );
+
+    for (const guild of mutualGuilds) {
+      const automod = await this.database.automod.get(guild.id);
+      if (!automod)
+        continue;
+
+      if (automod.dehoist === true)
+        await this.automod.run('memberNick', guild.members.get(user.id)!);
+    }
+  }
+}

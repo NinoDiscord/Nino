@@ -21,20 +21,15 @@
  */
 
 import { Entity, Column, PrimaryColumn } from 'typeorm';
-import { Field, ObjectType } from 'type-graphql';
 
 @Entity({ name: 'users' })
-@ObjectType()
 export default class UserEntity {
   @Column({ default: 'en_US' })
-  @Field()
   public language!: string;
 
   @Column({ array: true, type: 'text' })
-  @Field(() => [String])
   public prefixes!: string[];
 
   @PrimaryColumn({ name: 'user_id' })
-  @Field()
   public id!: string;
 }

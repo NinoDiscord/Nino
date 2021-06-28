@@ -21,44 +21,33 @@
  */
 
 import { Entity, Column, PrimaryColumn } from 'typeorm';
-import { Field, ObjectType } from 'type-graphql';
 
 @Entity({ name: 'automod' })
-@ObjectType()
 export default class AutomodEntity {
   @Column({ array: true, type: 'text', name: 'blacklist_words', default: '{}' })
-  @Field(() => [String])
   public blacklistWords!: string[];
 
   @Column({ default: false, name: 'short_links' })
-  @Field()
   public shortLinks!: boolean;
 
   @Column({ default: false })
-  @Field()
   public blacklist!: boolean;
 
   @Column({ default: false })
-  @Field()
   public mentions!: boolean;
 
   @Column({ default: false })
-  @Field()
   public invites!: boolean;
 
   @Column({ default: false })
-  @Field()
   public dehoist!: boolean;
 
   @PrimaryColumn({ name: 'guild_id' })
-  @Field()
   public guildID!: string;
 
   @Column({ default: false })
-  @Field()
   public spam!: boolean;
 
   @Column({ default: false })
-  @Field()
   public raid!: boolean;
 }

@@ -21,7 +21,6 @@
  */
 
 import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
-import { Field, ObjectType, registerEnumType } from 'type-graphql';
 
 export enum PunishmentType {
   WarningRemoved = 'warning.removed',
@@ -29,6 +28,7 @@ export enum PunishmentType {
   WarningAdded   = 'warning.added',
   VoiceUnmute    = 'voice.unmute',
   VoiceDeafen    = 'voice.deafen',
+  VoiceKick      = 'voice.kick',
   VoiceMute      = 'voice.mute',
   Unmute         = 'unmute',
   Unban          = 'unban',
@@ -37,38 +37,26 @@ export enum PunishmentType {
   Ban            = 'ban'
 }
 
-registerEnumType(PunishmentType, {
-  name: 'PunishmentType',
-  description: 'The punishment type that was executed on that user.'
-});
-
 @Entity({ name: 'punishments' })
-@ObjectType()
 export default class PunishmentEntity {
   @Column({ default: 1 })
-  @Field()
   public warnings!: number;
 
   @PrimaryColumn({ name: 'guild_id' })
-  @Field()
   public guildID!: string;
 
   @PrimaryGeneratedColumn()
-  @Field()
   public index!: number;
 
   @Column({ default: false })
-  @Field()
   public soft!: boolean;
 
   @Column({ default: undefined, nullable: true })
-  @Field()
   public time?: number;
 
   @Column({
     type: 'enum',
     enum: PunishmentType
   })
-  @Field(() => PunishmentType)
   public type!: PunishmentType;
 }
