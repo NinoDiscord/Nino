@@ -4,9 +4,9 @@
 </div>
 
 <div align='center'>
-    <img alt="GitHub Workflow Status (prod)" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint%20Workflow/master?style=flat-square" />
-    <img alt="GitHub Workflow Status (edge)" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint%20Workflow/edge?style=flat-square" />
-    <img alt="GitHub" src="https://img.shields.io/github/license/NinoDiscord/Nino?style=flat-square" />
+  <img alt="GitHub Workflow Status (prod)" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint%20Workflow/master?style=flat-square" />
+  <img alt="GitHub Workflow Status (edge)" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint%20Workflow/edge?style=flat-square" />
+  <img alt="GitHub" src="https://img.shields.io/github/license/NinoDiscord/Nino?style=flat-square" />
 </div>
 
 <hr />
