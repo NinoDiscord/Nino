@@ -111,8 +111,8 @@ export default class PardonCommand extends Command {
       const _amount = warnings.reduce((acc, curr) => acc + curr.amount, 0);
       return msg.reply(`User **${user.username}#${user.discriminator}** now has **${_amount === 0 ? 'no' : _amount}** warnings left.`);
     } catch(ex) {
-      if (ex instanceof RangeError)
-        return msg.reply('Cannot pardon member without any warnings attached.');
+      if (ex instanceof RangeError || ex instanceof SyntaxError)
+        return msg.error(ex.message);
 
       if (ex instanceof DiscordRESTError && ex.code === 10007) {
         return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);

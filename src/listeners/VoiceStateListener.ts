@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import type { Member, TextChannel, VoiceChannel } from 'eris';
+import { Constants, Guild, Member, TextChannel, VoiceChannel } from 'eris';
 import { Inject, Subscribe } from '@augu/lilith';
 import { LoggingEvents } from '../entities/LoggingEntity';
 import Database from '../components/Database';
@@ -32,6 +32,25 @@ export default class VoiceStateListener {
 
   @Inject
   private discord!: Discord;
+
+  private async getAuditLog(
+    guild: Guild,
+    actionType: number,
+    condition?: string
+  ) {
+    if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
+      return undefined;
+
+    try {
+      const audits = await guild.getAuditLog({ limit: 3, actionType });
+      return audits.entries.sort((a, b) => b.createdAt - a.createdAt).find(entry =>
+        entry.user.id === this.discord.client.user.id && // If Nino has done this action
+        (condition !== undefined && entry.reason?.startsWith(condition))
+      );
+    } catch {
+      return undefined;
+    }
+  }
 
   @Subscribe('voiceChannelJoin')
   async onVoiceChannelJoin(member: Member, voice: VoiceChannel) {
@@ -53,6 +72,11 @@ export default class VoiceStateListener {
   async onVoiceChannelLeave(member: Member, voice: VoiceChannel) {
     const settings = await this.database.logging.get(member.guild.id);
     if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin))
+      return;
+
+    // Don't log entries if Nino has kicked them
+    const entry = await this.getAuditLog(member.guild, 27, '[Voice Kick]');
+    if (entry !== undefined)
       return;
 
     const channel = settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;

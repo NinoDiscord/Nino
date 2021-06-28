@@ -112,10 +112,10 @@ export default class CommandMessage {
   }
 
   success(content: string) {
-    return this.reply(`${this.successEmote} **${content}**`);
+    return this.reply(`${this.successEmote} ${content}`);
   }
 
   error(content: string) {
-    return this.reply(`${this.errorEmote} **${content}**`);
+    return this.reply(`${this.errorEmote} ${content}`);
   }
 }

@@ -24,7 +24,6 @@
 
 import { writeFileSync, existsSync } from 'fs';
 import { Component, Inject } from '@augu/lilith';
-import { randomBytes } from 'crypto';
 import { readFile } from 'fs/promises';
 import { Logger } from 'tslog';
 import { join } from 'path';
@@ -47,8 +46,6 @@ interface Configuration {
   ksoft?: string;
   redis: RedisConfig;
   token: string;
-  k8s?: KubernetesConfig;
-  api?: APIConfig;
 }
 
 interface BotlistConfig {
@@ -75,16 +72,6 @@ interface RedisConfig {
   master?: string;
   index?: number;
   host: string;
-  port: number;
-}
-
-interface KubernetesConfig {
-  namespace: string;
-}
-
-interface APIConfig {
-  allowState: boolean;
-  secret: string;
   port: number;
 }
 
@@ -153,22 +140,11 @@ export default class Config {
       },
       ksoft: config.ksoft,
       redis: config.redis,
-      token: config.token,
-      k8s: config.k8s,
-      api: config.api
+      token: config.token
     };
 
     if (this.config.token === '-- replace me --')
       return Promise.reject(new TypeError('Restore `token` in config with your discord bot token.'));
-
-    if (this.config.api !== undefined && this.config.api.secret === undefined) {
-      this.config.api.secret = randomBytes(32).toString('hex');
-
-      const config = yaml.dump(this.config, { indent: 2, noArrayIndent: false });
-      writeFileSync(join(__dirname, '..', '..', 'config.yml'), config);
-
-      this.logger.warn('API secret was missing so I did it myself and is saved in your configuration file.');
-    }
 
     // resolve the promise
     return Promise.resolve();

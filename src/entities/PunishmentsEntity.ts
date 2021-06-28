@@ -28,7 +28,6 @@ export enum PunishmentType {
   WarningAdded   = 'warning.added',
   VoiceUnmute    = 'voice.unmute',
   VoiceDeafen    = 'voice.deafen',
-  VoiceKick      = 'voice.kick',
   VoiceMute      = 'voice.mute',
   Unmute         = 'unmute',
   Unban          = 'unban',

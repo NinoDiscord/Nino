@@ -30,7 +30,7 @@ import { Inject } from '@augu/lilith';
 import Discord from '../../../components/Discord';
 import ms = require('ms');
 
-export default class VoiceMuteCommand extends Command {
+export default class VoiceDeafenCommand extends Command {
   @Inject
   private readonly punishments!: PunishmentService;
 
@@ -39,6 +39,7 @@ export default class VoiceMuteCommand extends Command {
 
   constructor() {
     super({
+      userPermissions: 'voiceMuteMembers',
       description: 'descriptions.voice_deaf',
       category: Categories.Moderation,
       examples: [
@@ -128,7 +129,7 @@ export default class VoiceMuteCommand extends Command {
       });
 
       this.discord.client.leaveVoiceChannel(msg.member.voiceState.channelID);
-      return msg.reply(`:thumbsup: Member **${user.username}#${user.discriminator}** has been server muted in voice channels.${reason.length ? ` *for ${reason.join(' ')}${time !== undefined ? `, for ${time}*` : '*'}` : '.'}`);
+      return msg.reply(`:thumbsup: Member **${user.username}#${user.discriminator}** has been server deafened in voice channels.${reason.length ? ` *for ${reason.join(' ')}${time !== undefined ? `, for ${time}*` : '*'}` : '.'}`);
     } catch(ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10007) {
         return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
