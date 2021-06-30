@@ -70,8 +70,9 @@ export default class BotlistsService {
     if (botlists.dservices !== undefined) {
       this.logger.info('Found Discord Services token, now posting...');
 
-      const res = await this.http.post({
+      const res = await this.http.request({
         url: 'https://api.discordservices.net/bot/:client_id/stats',
+        method: 'POST',
         query: {
           client_id: this.discord.client.user.id
         },
@@ -93,13 +94,15 @@ export default class BotlistsService {
     if (botlists.dboats !== undefined) {
       this.logger.info('Found Discord Boats token, now posting...');
 
-      const res = await this.http.post('https://discord.boats/api/bot/:client_id', {
+      const res = await this.http.request({
         query: {
           client_id: this.discord.client.user.id
         },
         data: {
           server_count: this.discord.client.guilds.size
         },
+        method: 'POST',
+        url: 'https://discord.boats/api/bot/:client_id',
         headers: {
           'Content-Type': 'application/json',
           Authorization: botlists.dboats
@@ -115,7 +118,9 @@ export default class BotlistsService {
     if (botlists.dbots !== undefined) {
       this.logger.info('Found Discord Bots token, now posting...');
 
-      const res = await this.http.post('https://discord.bots.gg/api/v1/bots/:client_id/stats', {
+      const res = await this.http.request({
+        url: 'https://discord.bots.gg/api/v1/bots/:client_id/stats',
+        method: 'POST',
         query: {
           client_id: this.discord.client.user.id
         },
@@ -138,7 +143,9 @@ export default class BotlistsService {
     if (botlists.topgg !== undefined) {
       this.logger.info('Found top.gg token, now posting...');
 
-      const res = await this.http.post('https://top.gg/api/bots/:client_id/stats', {
+      const res = await this.http.request({
+        url: 'https://top.gg/api/bots/:client_id/stats',
+        method: 'POST',
         query: {
           client_id: this.discord.client.user.id
         },
@@ -162,7 +169,9 @@ export default class BotlistsService {
     if (botlists.delly !== undefined) {
       this.logger.info('Found Discord Extreme List token, now posting...');
 
-      const res = await this.http.post('https://api.discordextremelist.xyz/v2/bot/:client_id/stats', {
+      const res = await this.http.request({
+        url: 'https://api.discordextremelist.xyz/v2/bot/:client_id/stats',
+        method: 'POST',
         query: {
           client_id: this.discord.client.user.id
         },
@@ -185,7 +194,9 @@ export default class BotlistsService {
     if (botlists.bfd !== undefined) {
       this.logger.info('Found Bots for Discord token, now posting...');
 
-      const res = await this.http.post('https://botsfordiscord.com/api/bot/:client_id', {
+      const res = await this.http.request({
+        method: 'POST',
+        url: 'https://botsfordiscord.com/api/bot/:client_id',
         query: {
           client_id: this.discord.client.user.id
         },
