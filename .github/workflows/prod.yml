@@ -31,7 +31,7 @@ jobs:
         run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login registry.floofy.dev -u august --password-stdin
 
       - name: Build the container
-        run: docker build --no-cache -t registry.floofy.dev/noelware/nino:${{github.sha}}
+        run: docker build --no-cache . -t registry.floofy.dev/noelware/nino:${{github.sha}}
 
       - name: Push to the registry
         run: docker push registry.floofy.dev/noelware/nino:${{github.sha}}
@@ -46,7 +46,7 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
       - name: Set tag
-        run: kubectl set image deployment/nino-prod nino-edge=registry.floofy.dev/noelware/nino:${{github.sha}}
+        run: kubectl set image deployment/nino-prod nino-prod=registry.floofy.dev/noelware/nino:${{github.sha}}
 
       - name: Deploy to the bot
         run: kubectl rollout status deployment/nino-prod

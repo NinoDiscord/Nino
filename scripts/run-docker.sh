@@ -1,8 +1,7 @@
 #!/bin/bash
 
-echo 'Running migrations & syncing schema...'
+echo 'Running migrations'
 typeorm migration:run
-typeorm schema:sync
 
 echo 'Migrations and schemas should be synced.'
 npm start
