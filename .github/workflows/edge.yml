@@ -1,56 +1,52 @@
 # Worklow to update Nino Edge, development bot for testing the edge branch
 
-name: Update Edge instance
+name: Updating Beta instance
 on:
   push:
     branches:
       - edge
+
     paths-ignore:
-      - '.dockerignore'
       - '.github/**'
+      - '.husky/**'
       - '.vscode/**'
+      - 'assets/**'
+      - 'locales/**'
+      - 'docker/**'
+      - '.dockerignore'
+      - '.eslintignore'
       - '.gitignore'
-      - 'LICENSE'
       - '**.md'
+      - 'LICENSE'
+      - 'renovate.json'
+
 jobs:
-  build:
+  build-container:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout the repository
+      - name: Checks out the repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js v15.x
-        uses: actions/setup-node@v2
-        with:
-          node-version: 15.x
+      - name: Login to the registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login registry.floofy.dev -u august --password-stdin
 
-      - name: Install global packages
-        run: npm i -g eslint jest typescript
+      - name: Build the container
+        run: docker build --no-cache -t registry.floofy.dev/noelware/nino:edge-${{github.sha}}
 
-      - name: Install local packages
-        run: npm ci
+      - name: Push to the registry
+        run: docker push registry.floofy.dev/noelware/nino:edge-${{github.sha}}
 
-      - name: Run the linter
-        run: npm run lint
+  deploy:
+    needs: build-container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Kubernetes
+        run: |
+          mkdir ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
-      - name: Build the project for any errors
-        run: tsc --noEmit
+      - name: Set tag
+        run: kubectl set image deployment/nino-edge nino-edge=registry.floofy.dev/noelware/nino:edge-${{github.sha}}
 
-      - name: Run tests with Jest
-        run: jest --config jest.config.js --forceExit
-
-      - name: SSH to VM
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          port: 22
-          username: ${{ secrets.USERNAME }}
-          password: ${{ secrets.PASSWORD }}
-          script: |
-            cd ~/nino-edge
-            git pull
-            rm -fr node_modules
-            rm yarn.lock
-            yarn
-            yarn build
-            pm2 restart nino-edge
+      - name: Deploy to the bot
+        run: kubectl rollout status deployment/nino-edge
