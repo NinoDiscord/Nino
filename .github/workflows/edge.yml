@@ -2,6 +2,7 @@
 
 name: Updating Beta instance
 on:
+  workflow_dispatch:
   push:
     branches:
       - edge
@@ -46,7 +47,7 @@ jobs:
           echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
       - name: Set tag
-        run: kubectl set image deployment/nino-edge nino-edge=registry.floofy.dev/noelware/nino:edge-${{github.sha}}
+        run: kubectl set image deployment/nino-edge-test-1 nino-edge-test-1=registry.floofy.dev/noelware/nino:edge-${{github.sha}}
 
       - name: Deploy to the bot
-        run: kubectl rollout status deployment/nino-edge
+        run: kubectl rollout status deployment/nino-edge-test-1

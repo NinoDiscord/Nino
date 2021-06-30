@@ -2,6 +2,7 @@
 
 name: Update Production instance
 on:
+  workflow_dispatch:
   push:
     branches:
       - master
