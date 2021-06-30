@@ -37,7 +37,7 @@
     "@augu/lilith": "5.0.0",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
-    "@sentry/node": "6.7.2",
+    "@sentry/node": "6.8.0",
     "eris": "github:abalabahaha/eris#dev",
     "ioredis": "4.27.6",
     "js-yaml": "4.1.0",
@@ -49,7 +49,7 @@
     "source-map-support": "0.5.19",
     "tslog": "3.2.0",
     "typeorm": "0.2.31",
-    "ws": "7.5.0"
+    "ws": "7.5.1"
   },
   "devDependencies": {
     "@augu/eslint-config": "2.1.2",
@@ -60,12 +60,12 @@
     "@types/ms": "0.7.31",
     "@types/node": "15.3.1",
     "@types/ws": "7.4.5",
-    "@typescript-eslint/eslint-plugin": "4.28.0",
-    "@typescript-eslint/parser": "4.28.0",
+    "@typescript-eslint/eslint-plugin": "4.28.1",
+    "@typescript-eslint/parser": "4.28.1",
     "discord-api-types": "0.18.1",
     "eslint": "7.29.0",
     "husky": "6.0.0",
-    "nodemon": "2.0.7",
+    "nodemon": "2.0.9",
     "ts-node": "10.0.0",
     "typescript": "4.3.4"
   }
