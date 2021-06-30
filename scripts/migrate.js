@@ -117,9 +117,7 @@ async function convertGuilds(connection, documents) {
     if (document.mutedRole !== undefined)
       entry.mutedRoleID = document.mutedRole;
 
-    const available = await guilds.findOne({ guildID: document.guildID });
-    if (!available)
-      await guilds.save(entry);
+    await guilds.save(entry);
 
     logger.info(`Converting ${document.punishments.length} punishments...`);
     for (const punishment of document.punishments) {
@@ -137,25 +135,21 @@ async function convertGuilds(connection, documents) {
       if (punishment.temp !== null)
         entry.time = punishment.temp;
 
-      const available = await punishments.findOne({ guildID: document.guildID, warnings: punishment.warnings });
-      if (!available)
-        await punishments.save(entry);
+      await punishments.save(entry);
     }
 
     logger.info('Converting automod actions...');
     const automodEntry = new AutomodEntity();
-    automodEntry.blacklistWords = automod.badwords?.wordlist ?? [];
-    automodEntry.blacklist = automod.badwords?.enabled ?? false;
-    automodEntry.mentions = automod.mention ?? false;
-    automodEntry.invites = automod.invites ?? false;
-    automodEntry.dehoist = automod.dehoist ?? false;
+    automodEntry.blacklistWords = document.badwords?.wordlist ?? [];
+    automodEntry.blacklist = document.badwords?.enabled ?? false;
+    automodEntry.mentions = document.mention ?? false;
+    automodEntry.invites = document.invites ?? false;
+    automodEntry.dehoist = document.dehoist ?? false;
     automodEntry.guildID = document.guildID;
-    automodEntry.spam = automod.spam ?? false;
-    automodEntry.raid = automod.raid ?? false;
+    automodEntry.spam = document.spam ?? false;
+    automodEntry.raid = document.raid ?? false;
 
-    const aeiou = await automod.findOne({ guildID: document.guildID });
-    if (!aeiou)
-      await automod.save(automodEntry);
+    await automod.save(automodEntry);
 
     logger.info('Converting logging actions...');
     const loggingEntry = new LoggingEntity();
@@ -181,9 +175,7 @@ async function convertGuilds(connection, documents) {
       if (_logging.events.messageUpdate === true)
         events.push(LoggingEvents.MessageUpdated);
 
-      const owoDaUwu = await logging.findOne({ guildID: document.guildID });
-      if (!owoDaUwu)
-        await logging.save(loggingEntry);
+      await logging.save(loggingEntry);
     }
   }
 
@@ -205,8 +197,7 @@ async function convertUsers(connection, documents) {
     entry.id = document.userID;
 
     const user = await users.find({ id: document.userID });
-    if (!user)
-      await users.save(entry);
+    await users.save(entry);
   }
 
   logger.info(`Hopefully migrated ${documents.length} user documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
@@ -229,9 +220,14 @@ async function convertWarnings(connection, documents) {
     if (typeof document.reason === 'string')
       entry.reason = document.reason;
 
-    const aeiou = await warnings.findOne({ guildID: document.guild, userID: document.user });
-    if (!aeiou)
+    try {
       await warnings.save(entry);
+    } catch(ex) {
+      logger.error('Unable to serialize input, setting to `1`:', ex);
+
+      entry.amount = 1;
+      await warnings.save(entry);
+    }
   }
 
   logger.info(`Hopefully migrated ${documents.length} warning documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
@@ -261,14 +257,11 @@ async function convertCases(connection, documents) {
     if (document.time !== undefined)
       entry.time = document.time;
 
-    const available = await cases.findOne({ guildID: document.guild, index: document.index });
-    if (!available) {
-      try {
-        await cases.save(entry);
-      } catch(ex) {
-        logger.info(`Skipping on entity #${document.id}: `, ex);
-        continue;
-      }
+    try {
+      await cases.save(entry);
+    } catch(ex) {
+      logger.info(`Skipping on entity #${document.id}: `, ex);
+      continue;
     }
   }
 
