@@ -33,7 +33,7 @@ import Config from './Config';
   name: 'discord'
 })
 export default class Discord {
-  public mentionRegex!: RegExp;
+  public mentionRegex?: RegExp;
   public client!: Client;
   api!: ComponentAPI;
 

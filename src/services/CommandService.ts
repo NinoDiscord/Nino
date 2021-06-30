@@ -97,6 +97,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
       this.config.getProperty('prefixes')!
     ).filter(Boolean);
 
+    if (!this.discord.mentionRegex)
+      return;
+
     const mention = this.discord.mentionRegex.exec(msg.content);
     if (mention !== null)
       _prefixes.push(`${mention}`);
