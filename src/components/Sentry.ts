@@ -24,7 +24,7 @@ import { version, commitHash } from '../util/Constants';
 import { Component, Inject } from '@augu/lilith';
 import { hostname } from 'os';
 import { Logger } from 'tslog';
-import sentry from '@sentry/node';
+import * as sentry from '@sentry/node';
 import Config from './Config';
 
 @Component({
