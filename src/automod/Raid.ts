@@ -137,6 +137,7 @@ export default class RaidAutomod implements Automod {
           await _raidLock.lock.release();
           await this._restore(msg.channel.guild);
           await msg.channel.createMessage(language.translate('automod.raid.unlocked'));
+          await this.redis.client.del(`nino:raid:lockdown:indicator:${msg.guildID}`);
 
           delete this._raidLocks[msg.guildID];
         }
@@ -150,6 +151,7 @@ export default class RaidAutomod implements Automod {
         lock
       };
 
+      await this.redis.client.set(`nino:raid:lockdown:indicator:${msg.guildID}`, `beep boop >:3 | ${msg.guildID}`);
       return true;
     }
 
