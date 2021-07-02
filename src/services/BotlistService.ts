@@ -64,8 +64,14 @@ export default class BotlistsService {
   }
 
   async post() {
-    const successful: { name: 'Discord Services' | 'Discord Boats' | 'Discord Bots' | 'top.gg' | 'Delly' | 'Bots for Discord', success: boolean; }[] = [];
+    const list: {
+      name: 'Discord Services' | 'Discord Boats' | 'Discord Bots' | 'top.gg' | 'Delly' | 'Bots for Discord';
+      success: boolean;
+      data: Record<string, any>;
+    }[] = [];
 
+    let successful = 0;
+    let errored = 0;
     const botlists = this.config.getProperty('botlists')!;
     if (botlists.dservices !== undefined) {
       this.logger.info('Found Discord Services token, now posting...');
@@ -85,9 +91,11 @@ export default class BotlistsService {
         }
       });
 
-      successful.push({
+      res.statusCode === 200 ? successful++ : errored++;
+      list.push({
         name: 'Discord Services',
-        success: res.statusCode === 200
+        success: res.statusCode === 200,
+        data: res.json()
       });
     }
 
@@ -109,9 +117,11 @@ export default class BotlistsService {
         }
       });
 
-      successful.push({
+      res.statusCode === 200 ? successful++ : errored++;
+      list.push({
         name: 'Discord Boats',
-        success: res.statusCode === 200
+        success: res.statusCode === 200,
+        data: res.json()
       });
     }
 
@@ -134,9 +144,11 @@ export default class BotlistsService {
         }
       });
 
-      successful.push({
+      res.statusCode === 200 ? successful++ : errored++;
+      list.push({
         name: 'Discord Bots',
-        success: res.statusCode === 200
+        success: res.statusCode === 200,
+        data: res.json()
       });
     }
 
@@ -159,9 +171,11 @@ export default class BotlistsService {
         }
       });
 
-      successful.push({
+      res.statusCode === 200 ? successful++ : errored++;
+      list.push({
         name: 'top.gg',
-        success: res.statusCode === 200
+        success: res.statusCode === 200,
+        data: res.json()
       });
     }
 
@@ -185,9 +199,11 @@ export default class BotlistsService {
         }
       });
 
-      successful.push({
+      res.statusCode === 200 ? successful++ : errored++;
+      list.push({
         name: 'Delly',
-        success: res.statusCode === 200
+        success: res.statusCode === 200,
+        data: res.json()
       });
     }
 
@@ -209,13 +225,22 @@ export default class BotlistsService {
         }
       });
 
-      successful.push({
+      res.statusCode === 200 ? successful++ : errored++;
+      list.push({
         name: 'Bots for Discord',
-        success: res.statusCode === 200
+        success: res.statusCode === 200,
+        data: res.json()
       });
     }
 
-    const successRate = successful.reduce((_, curr) => curr.success ? 1 : 0, 0);
-    this.logger.info(`Successfully posted to ${successful.length} botlists! (${((successful.length / 5) / 100).toFixed(2)}% of botlists; ${((successRate / successful.length) / 100).toFixed(2)}% success)`, successful.map(botlist => `${botlist.success === true ? '✔' : '❌'} ${botlist.name}`));
+    const successRate = ((successful / list.length) * 100).toFixed(2);
+    this.logger.info([
+      `ℹ️ Successfully posted to ${list.length} botlists with a success rate of ${successRate}%`,
+      'Serialized output will be displayed:'
+    ].join('\n'));
+
+    for (const botlist of list) {
+      this.logger.info(`${botlist.success ? '✔' : '❌'} ${botlist.name}`, botlist.data);
+    }
   }
 }

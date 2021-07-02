@@ -104,7 +104,7 @@ const startTime = process.hrtime();
   const data = res.body().split(/\n\r?/);
   data.shift();
 
-  const shortlinks = [...new Set([].concat(data.map(s => s.slice(0, s.length - 1)), otherUrls))];
+  const shortlinks = [...new Set([].concat(data.map(s => s.slice(0, s.length - 1)), otherUrls))].filter(s => s !== '');
   if (!existsSync(join(__dirname, '..', 'assets')))
     await fs.mkdir(join(__dirname, '..', 'assets'));
 

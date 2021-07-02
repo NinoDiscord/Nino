@@ -1,7 +1,7 @@
 {
   "name": "@august/nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "homepage": "https://nino.floofy.dev",
   "license": "MIT",
@@ -64,9 +64,9 @@
     "@typescript-eslint/parser": "4.28.1",
     "discord-api-types": "0.18.1",
     "eslint": "7.29.0",
-    "husky": "6.0.0",
+    "husky": "7.0.0",
     "nodemon": "2.0.9",
     "ts-node": "10.0.0",
-    "typescript": "4.3.4"
+    "typescript": "4.3.5"
   }
 }

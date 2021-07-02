@@ -60,12 +60,15 @@ export default class VoidListener {
     const statusType = this.config.getProperty('status.type');
     const status = this.config.getProperty('status.status')!;
 
-    this.discord.client.editStatus(this.config.getProperty('status.presence') ?? 'online', {
-      name: status
-        .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
-        .replace('$guilds$', this.discord.client.guilds.size.toLocaleString()),
+    for (const shard of this.discord.client.shards.values()) {
+      this.discord.client.editStatus(this.config.getProperty('status.presence') ?? 'online', {
+        name: status
+          .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
+          .replace('$guilds$', this.discord.client.guilds.size.toLocaleString())
+          .replace('$shard$', `#${shard.id}`),
 
-      type: statusType ?? 0
-    });
+        type: statusType ?? 0
+      });
+    }
   }
 }
