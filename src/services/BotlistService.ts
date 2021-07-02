@@ -70,18 +70,15 @@ export default class BotlistsService {
       data: Record<string, any>;
     }[] = [];
 
-    let successful = 0;
+    let success = 0;
     let errored = 0;
     const botlists = this.config.getProperty('botlists')!;
     if (botlists.dservices !== undefined) {
       this.logger.info('Found Discord Services token, now posting...');
 
       const res = await this.http.request({
-        url: 'https://api.discordservices.net/bot/:client_id/stats',
+        url: `https://api.discordservices.net/bot/${this.discord.client.user.id}/stats`,
         method: 'POST',
-        query: {
-          client_id: this.discord.client.user.id
-        },
         data: {
           server_count: this.discord.client.guilds.size
         },
@@ -91,7 +88,7 @@ export default class BotlistsService {
         }
       });
 
-      res.statusCode === 200 ? successful++ : errored++;
+      res.statusCode === 200 ? success++ : errored++;
       list.push({
         name: 'Discord Services',
         success: res.statusCode === 200,
@@ -103,21 +100,18 @@ export default class BotlistsService {
       this.logger.info('Found Discord Boats token, now posting...');
 
       const res = await this.http.request({
-        query: {
-          client_id: this.discord.client.user.id
-        },
         data: {
           server_count: this.discord.client.guilds.size
         },
         method: 'POST',
-        url: 'https://discord.boats/api/bot/:client_id',
+        url: `https://discord.boats/api/bot/${this.discord.client.user.id}`,
         headers: {
           'Content-Type': 'application/json',
           Authorization: botlists.dboats
         }
       });
 
-      res.statusCode === 200 ? successful++ : errored++;
+      res.statusCode === 200 ? success++ : errored++;
       list.push({
         name: 'Discord Boats',
         success: res.statusCode === 200,
@@ -129,11 +123,8 @@ export default class BotlistsService {
       this.logger.info('Found Discord Bots token, now posting...');
 
       const res = await this.http.request({
-        url: 'https://discord.bots.gg/api/v1/bots/:client_id/stats',
+        url: `https://discord.bots.gg/api/v1/bots/${this.discord.client.user.id}/stats`,
         method: 'POST',
-        query: {
-          client_id: this.discord.client.user.id
-        },
         data: {
           shardCount: this.discord.client.shards.size,
           guildCount: this.discord.client.guilds.size
@@ -144,7 +135,7 @@ export default class BotlistsService {
         }
       });
 
-      res.statusCode === 200 ? successful++ : errored++;
+      res.statusCode === 200 ? success++ : errored++;
       list.push({
         name: 'Discord Bots',
         success: res.statusCode === 200,
@@ -156,11 +147,8 @@ export default class BotlistsService {
       this.logger.info('Found top.gg token, now posting...');
 
       const res = await this.http.request({
-        url: 'https://top.gg/api/bots/:client_id/stats',
+        url: `https://top.gg/api/bots/${this.discord.client.user.id}/stats`,
         method: 'POST',
-        query: {
-          client_id: this.discord.client.user.id
-        },
         data: {
           server_count: this.discord.client.guilds.size,
           shard_count: this.discord.client.shards.size
@@ -171,7 +159,7 @@ export default class BotlistsService {
         }
       });
 
-      res.statusCode === 200 ? successful++ : errored++;
+      res.statusCode === 200 ? success++ : errored++;
       list.push({
         name: 'top.gg',
         success: res.statusCode === 200,
@@ -184,11 +172,8 @@ export default class BotlistsService {
       this.logger.info('Found Discord Extreme List token, now posting...');
 
       const res = await this.http.request({
-        url: 'https://api.discordextremelist.xyz/v2/bot/:client_id/stats',
+        url: `https://api.discordextremelist.xyz/v2/bot/${this.discord.client.user.id}/stats`,
         method: 'POST',
-        query: {
-          client_id: this.discord.client.user.id
-        },
         data: {
           guildCount: this.discord.client.guilds.size,
           shardCount: this.discord.client.shards.size
@@ -199,7 +184,7 @@ export default class BotlistsService {
         }
       });
 
-      res.statusCode === 200 ? successful++ : errored++;
+      res.statusCode === 200 ? success++ : errored++;
       list.push({
         name: 'Delly',
         success: res.statusCode === 200,
@@ -212,10 +197,7 @@ export default class BotlistsService {
 
       const res = await this.http.request({
         method: 'POST',
-        url: 'https://botsfordiscord.com/api/bot/:client_id',
-        query: {
-          client_id: this.discord.client.user.id
-        },
+        url: `https://botsfordiscord.com/api/bot/${this.discord.client.user.id}`,
         data: {
           server_count: this.discord.client.guilds.size
         },
@@ -225,7 +207,7 @@ export default class BotlistsService {
         }
       });
 
-      res.statusCode === 200 ? successful++ : errored++;
+      res.statusCode === 200 ? success++ : errored++;
       list.push({
         name: 'Bots for Discord',
         success: res.statusCode === 200,
@@ -233,9 +215,9 @@ export default class BotlistsService {
       });
     }
 
-    const successRate = ((successful / list.length) * 100).toFixed(2);
+    const successRate = ((success / list.length) * 100).toFixed(2);
     this.logger.info([
-      `ℹ️ Successfully posted to ${list.length} botlists with a success rate of ${successRate}%`,
+      `ℹ️ listly posted to ${list.length} botlists with a success rate of ${successRate}%`,
       'Serialized output will be displayed:'
     ].join('\n'));
 

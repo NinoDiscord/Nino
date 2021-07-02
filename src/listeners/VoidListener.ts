@@ -22,6 +22,7 @@
 
 import { Inject, Subscribe } from '@augu/lilith';
 import type { RawPacket } from 'eris';
+import BotlistsService from '../services/BotlistService';
 import { Logger } from 'tslog';
 import Discord from '../components/Discord';
 import Config from '../components/Config';
@@ -33,6 +34,9 @@ export default class VoidListener {
 
   @Inject
   private readonly discord!: Discord;
+
+  @Inject
+  private readonly botlists?: BotlistsService;
 
   @Inject
   private readonly logger!: Logger;
@@ -49,11 +53,12 @@ export default class VoidListener {
   }
 
   @Subscribe('ready', 'discord')
-  onReady() {
+  async onReady() {
     this.logger.info(`Connected as ${this.discord.client.user.username}#${this.discord.client.user.discriminator} (ID: ${this.discord.client.user.id})`);
     this.logger.info(`Guilds: ${this.discord.client.guilds.size.toLocaleString()} | Users: ${this.discord.client.users.size.toLocaleString()}`);
 
     this.prometheus?.guildCount?.set(this.discord.client.guilds.size);
+    await this.botlists?.post();
     this.discord.mentionRegex = new RegExp(`^<@!?${this.discord.client.user.id}> `);
 
     const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
