@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+import { MembershipScreeningFieldType } from 'discord-api-types';
 import { Constants, GuildChannel, Role, Member, Permission } from 'eris';
 
 /**
@@ -31,6 +32,11 @@ export default class Permissions {
    * @param member The member to check
    */
   static getTopRole(member: Member) {
+    // For some reason, `roles` will become undefined? So we have to check for that.
+    // It could be a bug in Discord or `member` is undefined.
+    if (member.roles === undefined)
+      return;
+
     if (member.roles.length === 0)
       return;
 
