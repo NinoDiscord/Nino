@@ -25,6 +25,7 @@ import 'reflect-metadata';
 
 import { commitHash, version } from './util/Constants';
 import Discord from './components/Discord';
+import Sentry from './components/Sentry';
 import logger from './singletons/Logger';
 import app from './container';
 import ts from 'typescript';
@@ -58,8 +59,18 @@ const ReconnectCodes = [
   1006  // Connection reset by peer
 ];
 
-process.on('unhandledRejection', error => logger.fatal('Unhandled promise rejection has occured\n', (error as any).stack ?? '(none provided)'));
+process.on('unhandledRejection', error => {
+  const sentry = app.$ref<Sentry>(Sentry);
+  if (error !== null || error !== undefined) {
+    logger.fatal('Received unhandled Promise rejection:', error);
+    if (error instanceof Error)
+      sentry?.report(error);
+  }
+});
+
 process.on('uncaughtException', async error => {
+  const sentry = app.$ref<Sentry>(Sentry);
+
   if ((error as any).code !== undefined && ReconnectCodes.includes((error as any).code)) {
     logger.fatal('Disconnected due to peer to peer connection ended, restarting client...');
 
@@ -67,6 +78,7 @@ process.on('uncaughtException', async error => {
     discord.client.disconnect({ reconnect: false });
     await discord.client.connect();
   } else {
+    sentry?.report(error);
     logger.fatal('Uncaught exception has occured\n', error);
   }
 });

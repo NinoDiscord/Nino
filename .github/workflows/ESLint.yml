@@ -42,7 +42,7 @@ on:
       - 'LICENSE'
       - 'renovate.json'
 jobs:
-  build:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - name: 'Checkout repository'

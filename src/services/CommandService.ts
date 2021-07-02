@@ -34,6 +34,7 @@ import Database from '../components/Database';
 import { join } from 'path';
 import Discord from '../components/Discord';
 import Config from '../components/Config';
+import Sentry from '../components/Sentry';
 
 const FLAG_REGEX = /(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi;
 
@@ -48,25 +49,28 @@ export default class CommandService extends Collection<string, NinoCommand> {
   public cooldowns: Collection<string, Collection<string, number>> = new Collection();
 
   @Inject
-  private config!: Config;
+  private readonly config!: Config;
 
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private prometheus!: Prometheus;
+  private readonly prometheus!: Prometheus;
 
   @Inject
-  private automod!: AutomodService;
+  private readonly automod!: AutomodService;
 
   @Inject
-  private localization!: LocalizationService;
+  private readonly localization!: LocalizationService;
+
+  @Inject
+  private readonly sentry?: Sentry;
 
   onChildLoad(command: NinoCommand) {
     if (!command.name) {
@@ -257,6 +261,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
 
       await msg.channel.createMessage({ embed });
       this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute`, ex.stack);
+      this.sentry?.report(ex);
     }
   }
 
