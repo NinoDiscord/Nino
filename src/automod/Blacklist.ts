@@ -21,6 +21,7 @@
  */
 
 import type { Message, TextChannel } from 'eris';
+import LocalizationService from '../services/LocalizationService';
 import PunishmentService from '../services/PunishmentService';
 import PermissionUtil from '../util/Permissions';
 import { Automod } from '../structures';
@@ -32,13 +33,16 @@ export default class BlacklistAutomod implements Automod {
   public name: string = 'blacklists';
 
   @Inject
-  private punishments!: PunishmentService;
+  private readonly locales!: LocalizationService;
 
   @Inject
-  private database!: Database;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private discord!: Discord;
+  private readonly database!: Database;
+
+  @Inject
+  private readonly discord!: Discord;
 
   async onMessage(msg: Message<TextChannel>) {
     const settings = await this.database.automod.get(msg.guildID);
@@ -61,7 +65,9 @@ export default class BlacklistAutomod implements Automod {
     const content = msg.content.toLowerCase().split(' ');
     for (const word of settings.blacklistWords) {
       if (content.filter(c => c === word.toLowerCase()).length > 0) {
-        await msg.channel.createMessage('hey, that\'s a word this server doesn\'t want you to say (☍﹏⁰)｡');
+        const language = this.locales.get(msg.guildID, msg.author.id);
+
+        await msg.channel.createMessage(language.translate('automod.blacklist'));
         await msg.delete();
         await this.punishments.createWarning(msg.member, '[Automod] User said a word that is blacklisted here (☍﹏⁰)｡');
 

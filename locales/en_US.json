@@ -111,7 +111,17 @@
       }
     },
     "generic": {},
-    "automod": {},
+    "automod": {
+      "blacklist": "Hey, I don't think you should say that here! (☍﹏⁰)｡",
+      "invites": "Hey! You're not allowed to post server links here... o(╥﹏╥)o",
+      "mentions": "Uhm, I don't think that'll get their attention... （；¬＿¬)",
+      "shortlinks": "You shouldn't send that kind of link here... (⁎˃ᆺ˂)",
+      "spam": "I don't think spamming will get you anywhere... o(╥﹏╥)o",
+      "raid": {
+        "locked": "Hey all! I decided to close off all channels you had access in for ~10 seconds due to someone being rude and raiding! ૮( ᵒ̌▱๋ᵒ̌ )ა",
+        "unlocked": "Heyo! I restored all channels, I hope there is no more raiders.. :3."
+      }
+    },
     "errors": {
       "blacklists": {
         "guild": [

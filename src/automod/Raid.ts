@@ -21,6 +21,7 @@
  */
 
 import { Constants, Guild, Message, TextChannel, Overwrite } from 'eris';
+import LocalizationService from '../services/LocalizationService';
 import { PunishmentType } from '../entities/PunishmentsEntity';
 import PunishmentService from '../services/PunishmentService';
 import PermissionUtil from '../util/Permissions';
@@ -31,6 +32,7 @@ import { Inject } from '@augu/lilith';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 import Redis from '../components/Redis';
+import RedisLock from '../util/RedisLock';
 
 interface RaidChannelLock {
   affectedIn: string;
@@ -69,11 +71,14 @@ const bigintDeserializer = (_: string, value: unknown) => {
 };
 
 export default class RaidAutomod implements Automod {
-  protected _raidLocks: Record<string, NodeJS.Timeout> = {};
+  public _raidLocks: Record<string, { lock: RedisLock; timeout: NodeJS.Timeout; }> = {};
   public name = 'raid';
 
   @Inject
   private readonly punishments!: PunishmentService;
+
+  @Inject
+  private readonly locales!: LocalizationService;
 
   @Inject
   private readonly database!: Database;
@@ -107,13 +112,12 @@ export default class RaidAutomod implements Automod {
     const joinedAt = luxon.DateTime.fromJSDate(new Date(msg.member.joinedAt));
     const now = luxon.DateTime.now();
     const difference = Math.floor(now.diff(joinedAt, ['days']).days);
+    const language = this.locales.get(msg.guildID, msg.author.id);
+
     if (msg.mentions.length > 20 && difference < 3) {
       // Lockdown all channels @everyone has access in
       await this._lockChannels(msg.channel.id, msg.channel.guild);
-      await msg.channel.createMessage([
-        ':lock: A raid is occuring, so I lock down all channels everyone has **\`Send Messages\`** in.',
-        'Channels be restored in 10 seconds, so prepare for yourself!'
-      ].join('\n'));
+      await msg.channel.createMessage(language.translate('automod.raid.locked'));
 
       await this.punishments.apply({
         moderator: this.discord.client.user,
@@ -127,8 +131,24 @@ export default class RaidAutomod implements Automod {
         type: PunishmentType.Ban
       });
 
-      await this._restore(msg.channel.guild);
-      await msg.channel.createMessage(':thumbsup: Permissions have been restored, sorry if you got pinged!');
+      const timeout = setTimeout(async() => {
+        const _raidLock = this._raidLocks[msg.guildID];
+        if (_raidLock !== undefined) {
+          await _raidLock.lock.release();
+          await this._restore(msg.channel.guild);
+          await msg.channel.createMessage(language.translate('automod.raid.unlocked'));
+
+          delete this._raidLocks[msg.guildID];
+        }
+      }, 10_000);
+
+      const lock = RedisLock.create();
+      await lock.acquire(`raid:lockdown:${msg.guildID}`);
+
+      this._raidLocks[msg.guildID] = {
+        timeout,
+        lock
+      };
 
       return true;
     }

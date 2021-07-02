@@ -21,6 +21,7 @@
  */
 
 import type { Message, TextChannel } from 'eris';
+import LocalizationService from '../services/LocalizationService';
 import PunishmentService from '../services/PunishmentService';
 import { Collection } from '@augu/collections';
 import PermissionUtil from '../util/Permissions';
@@ -34,13 +35,16 @@ export default class Mentions implements Automod {
   public name: string = 'mentions';
 
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly locales!: LocalizationService;
+
+  @Inject
+  private readonly discord!: Discord;
 
   async onMessage(msg: Message<TextChannel>) {
     const settings = await this.database.automod.get(msg.guildID);
@@ -69,8 +73,10 @@ export default class Mentions implements Automod {
         return false;
 
       if (msg.timestamp - old <= 3000) {
+        const language = this.locales.get(msg.guildID, msg.author.id);
         this.clear(msg.guildID, msg.author.id);
-        await msg.channel.createMessage('o(╥﹏╥)o pls don\'t spam...');
+
+        await msg.channel.createMessage(language.translate('automod.spam'));
         await this.punishments.createWarning(msg.member, `[Automod] Spamming in ${msg.channel.mention} o(╥﹏╥)o`);
         return true;
       }
