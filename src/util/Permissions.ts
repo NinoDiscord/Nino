@@ -20,8 +20,7 @@
  * SOFTWARE.
  */
 
-import { MembershipScreeningFieldType } from 'discord-api-types';
-import { Constants, GuildChannel, Role, Member, Permission } from 'eris';
+import { Constants, Role, Member, Permission } from 'eris';
 
 /**
  * Contains utility functions to help with permission checking and hierarchy.
