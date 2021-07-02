@@ -73,6 +73,10 @@ export default class BotlistsService {
     let success = 0;
     let errored = 0;
     const botlists = this.config.getProperty('botlists')!;
+
+    if (botlists === undefined)
+      return;
+
     if (botlists.dservices !== undefined) {
       this.logger.info('Found Discord Services token, now posting...');
 
