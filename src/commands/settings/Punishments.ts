@@ -33,6 +33,8 @@ const TYPES = Object.values(PunishmentType).filter(w => !w.startsWith('warning.'
 
 interface Flags {
   soft?: string | true;
+  days?: string | true;
+  d?: string | true;
   s?: string | true;
 }
 
@@ -96,6 +98,7 @@ export default class PunishmentsCommand extends Command {
 
     const flags = msg.flags<Flags>();
     const soft = flags.soft === true || flags.s === true;
+    const days = flags.days !== undefined ? flags.days : flags.d !== undefined ? flags.d : undefined;
     let timeStamp: number | undefined = undefined;
 
     try {
@@ -113,6 +116,7 @@ export default class PunishmentsCommand extends Command {
       guildID: msg.guild.id,
       time: timeStamp,
       soft,
+      days: days ? Number(days) : undefined,
       type: type as PunishmentType
     });
 
@@ -120,18 +124,18 @@ export default class PunishmentsCommand extends Command {
   }
 
   @Subcommand('<index>')
-  async remove(msg: CommandMessage, [warnings]: [string]) {
-    if (!warnings)
+  async remove(msg: CommandMessage, [index]: [string]) {
+    if (!index)
       return msg.reply(`Missing an amount of warnings to be removed. Run \`${msg.settings.prefixes[0]}punishments\` to see which one you want removed.`);
 
-    if (isNaN(Number(warnings)))
-      return msg.reply(`\`${warnings}\` was not a number`);
+    if (isNaN(Number(index)))
+      return msg.reply(`\`${index}\` was not a number`);
 
-    const punishment = await this.database.punishments.get(msg.guild.id, Number(warnings));
+    const punishment = await this.database.punishments.get(msg.guild.id, Number(index));
     if (punishment === undefined)
-      return msg.reply(`Punishment #**${warnings}** warnings was not found. Run \`${msg.settings.prefixes[0]}punishments\` to see which one you want removed.`);
+      return msg.reply(`Punishment #**${index}** warnings was not found. Run \`${msg.settings.prefixes[0]}punishments\` to see which one you want removed.`);
 
-    await this.database.punishments['repository'].delete({ guildID: msg.guild.id, index: Number(warnings) });
+    await this.database.punishments['repository'].delete({ guildID: msg.guild.id, index: Number(index) });
     return msg.reply(`:thumbsup: Punishment #**${punishment.index}** has been removed.`);
   }
 }

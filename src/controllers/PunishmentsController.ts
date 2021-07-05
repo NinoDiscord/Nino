@@ -29,6 +29,7 @@ interface CreatePunishmentOptions {
   guildID: string;
   soft?: boolean;
   time?: number;
+  days?: number;
   type: PunishmentType;
 }
 
@@ -39,16 +40,19 @@ export default class PunishmentsController {
     return this.database.connection.getRepository(PunishmentEntity);
   }
 
-  create({
+  async create({
     warnings,
     guildID,
     soft,
     time,
+    days,
     type
   }: CreatePunishmentOptions) {
+    const all = await this.getAll(guildID);
     const entry = new PunishmentEntity();
     entry.warnings = warnings;
     entry.guildID = guildID;
+    entry.index = all.length + 1; // increment by 1
     entry.type = type;
 
     if (soft !== undefined && soft === true)
@@ -57,6 +61,9 @@ export default class PunishmentsController {
     if (time !== undefined)
       entry.time = time;
 
+    if (days !== undefined)
+      entry.days = days;
+
     return this.repository.save(entry);
   }
 
@@ -64,8 +71,8 @@ export default class PunishmentsController {
     return this.repository.find({ guildID });
   }
 
-  get(guildID: string, warnings: number) {
-    return this.repository.findOne({ guildID, warnings });
+  get(guildID: string, index: number) {
+    return this.repository.findOne({ guildID, index });
   }
 
   update(guildID: string, values: QueryDeepPartialEntity<PunishmentEntity>) {

@@ -20,45 +20,18 @@
  * SOFTWARE.
  */
 
-import { Entity, Column, PrimaryGeneratedColumn, PrimaryColumn } from 'typeorm';
+const { createConnection } = require('typeorm');
 
-export enum PunishmentType {
-  WarningRemoved = 'warning.removed',
-  VoiceUndeafen  = 'voice.undeafen',
-  WarningAdded   = 'warning.added',
-  VoiceUnmute    = 'voice.unmute',
-  VoiceDeafen    = 'voice.deafen',
-  VoiceMute      = 'voice.mute',
-  Unmute         = 'unmute',
-  Unban          = 'unban',
-  Kick           = 'kick',
-  Mute           = 'mute',
-  Ban            = 'ban'
-}
+async function main() {
+  console.log(`[scripts:update-punishments | ${new Date().toLocaleTimeString()}] Updating punishments...`);
+  const connection = await createConnection();
 
-@Entity({ name: 'punishments' })
-export default class PunishmentEntity {
-  @Column({ default: 1 })
-  public warnings!: number;
+  // Retrieve all punishments
+  const repository = connection.getRepository(require('../build/entities/PunishmentsEntity').default);
+  const punishments = await repository.find();
 
-  @PrimaryColumn({ name: 'guild_id' })
-  public guildID!: string;
+  // Update punishments
+  console.log(`[scripts:update-punishments | ${new Date().toLocaleTimeString()}] Found ${punishments.length} punishments to update`);
 
-  @PrimaryColumn()
-  public index!: number;
-
-  @Column({ default: false })
-  public soft!: boolean;
-
-  @Column({ default: undefined, nullable: true })
-  public time?: number;
-
-  @Column({ default: undefined, nullable: true })
-  public days?: number;
-
-  @Column({
-    type: 'enum',
-    enum: PunishmentType
-  })
-  public type!: PunishmentType;
+  // TODO: this
 }
