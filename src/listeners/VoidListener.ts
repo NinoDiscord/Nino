@@ -70,18 +70,18 @@ export default class VoidListener {
     const statusType = this.config.getProperty('status.type');
     const status = this.config.getProperty('status.status')!;
 
-    const raids = await this.redis.client.keys('nino:raid:lockdown:indicator:*');
-    const automod = app.$ref<AutomodService>(AutomodService);
+    // const raids = await this.redis.client.keys('nino:raid:lockdown:indicator:*');
+    // const automod = app.$ref<AutomodService>(AutomodService);
 
-    for (let guildID of raids) {
-      if (guildID.includes(' | '))
-        guildID = guildID.split(' | ').pop()!;
+    // for (let guildID of raids) {
+    //   if (guildID.includes(' | '))
+    //     guildID = guildID.split(' | ').pop()!;
 
-      await this.redis.client.del(`nino:raid:lockdown:indicator:${guildID}`);
-      if (this.discord.client.guilds.has(guildID)) {
-        await automod['_restore'](this.discord.client.guilds.get(guildID)!);
-      }
-    }
+    //   await this.redis.client.del(`nino:raid:lockdown:indicator:${guildID}`);
+    //   if (this.discord.client.guilds.has(guildID)) {
+    //     await automod['_restore'](this.discord.client.guilds.get(guildID)!);
+    //   }
+    // }
 
     for (const shard of this.discord.client.shards.values()) {
       this.discord.client.editStatus(this.config.getProperty('status.presence') ?? 'online', {
