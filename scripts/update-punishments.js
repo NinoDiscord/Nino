@@ -21,17 +21,54 @@
  */
 
 const { createConnection } = require('typeorm');
+const { default: PunishmentsEntity } = require('../build/entities/PunishmentsEntity');
 
 async function main() {
   console.log(`[scripts:update-punishments | ${new Date().toLocaleTimeString()}] Updating punishments...`);
   const connection = await createConnection();
 
   // Retrieve all punishments
-  const repository = connection.getRepository(require('../build/entities/PunishmentsEntity').default);
-  const punishments = await repository.find();
+  const repository = connection.getRepository(PunishmentsEntity);
+  const punishments = await repository.find({});
+  const traversedGuilds = [];
+  let i = 0;
+
+  await repository.delete({});
 
   // Update punishments
   console.log(`[scripts:update-punishments | ${new Date().toLocaleTimeString()}] Found ${punishments.length} punishments to update`);
+  for (const punishment of punishments) {
+    console.log(`idx: ${i} | guild entry: ${traversedGuilds.find(c => c.guild === punishment.guildID) !== undefined}`);
 
-  // TODO: this
+    if (traversedGuilds.find(c => c.guild === punishment.guildID) !== undefined) {
+      const f = traversedGuilds.find(c => c.guild === punishment.guildID);
+      const id = traversedGuilds.findIndex(c => c.guild === punishment.guildID);
+      const entity = new PunishmentsEntity();
+
+      entity.warnings = punishment.warnings;
+      entity.guildID  = punishment.guildID;
+      entity.index    = f.index += 1;
+      entity.soft     = punishment.soft;
+      entity.time     = punishment.time;
+      entity.type     = punishment.type;
+      entity.days     = punishment.days;
+
+      traversedGuilds[id] = { guild: punishment.guildID, index: f.index += 1 };
+      await repository.save(entity);
+    } else {
+      const entity = new PunishmentsEntity();
+      entity.warnings = punishment.warnings;
+      entity.guildID  = punishment.guildID;
+      entity.index    = 1;
+      entity.soft     = punishment.soft;
+      entity.time     = punishment.time;
+      entity.type     = punishment.type;
+      entity.days     = punishment.days;
+
+      traversedGuilds.push({ guild: punishment.guildID, index: 1 });
+      await repository.save(entity);
+    }
+  }
 }
+
+main();

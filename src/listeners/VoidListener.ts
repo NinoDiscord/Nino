@@ -73,8 +73,9 @@ export default class VoidListener {
     const raids = await this.redis.client.keys('nino:raid:lockdown:indicator:*');
     const automod = app.$ref<AutomodService>(AutomodService);
 
-    for (const c of raids) {
-      const [, guildID] = c.split(' | ');
+    for (let guildID of raids) {
+      if (guildID.includes(' | '))
+        guildID = guildID.split(' | ').pop()!;
 
       await this.redis.client.del(`nino:raid:lockdown:indicator:${guildID}`);
       if (this.discord.client.guilds.has(guildID)) {

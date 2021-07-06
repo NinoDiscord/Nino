@@ -115,6 +115,8 @@ export default class Database {
         const ran = await this.connection.runMigrations({ transaction: 'all' });
         this.logger.info(`Ran ${ran.length} migrations! You're all to go.`);
       } catch(ex) {
+        this.logger.fatal(ex);
+
         if (ex.message.indexOf('already exists') !== -1) {
           this.logger.warn('Seems like relations or indexes existed!');
           return Promise.resolve();

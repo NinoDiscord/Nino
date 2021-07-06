@@ -29,10 +29,10 @@ import { isObject } from '@augu/utils';
 import { Automod } from '../structures';
 import * as luxon from 'luxon';
 import { Inject } from '@augu/lilith';
+import RedisLock from '../util/RedisLock';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 import Redis from '../components/Redis';
-import RedisLock from '../util/RedisLock';
 
 interface RaidChannelLock {
   affectedIn: string;
@@ -119,40 +119,74 @@ export default class RaidAutomod implements Automod {
       await this._lockChannels(msg.channel.id, msg.channel.guild);
       await msg.channel.createMessage(language.translate('automod.raid.locked'));
 
-      await this.punishments.apply({
-        moderator: this.discord.client.user,
-        publish: true,
-        reason: `[Automod] Raid in <#${msg.channel.id}> (Pinged ${msg.mentions.length} users)`,
-        member: {
-          guild: msg.channel.guild,
-          id: msg.author.id
-        },
-        soft: false,
-        type: PunishmentType.Ban
-      });
+      try {
+        await this.punishments.apply({
+          moderator: this.discord.client.user,
+          publish: true,
+          reason: `[Automod] Raid in <#${msg.channel.id}> (Pinged ${msg.mentions.length} users)`,
+          member: {
+            guild: msg.channel.guild,
+            id: msg.author.id
+          },
+          soft: false,
+          type: PunishmentType.Ban
+        });
+      } catch {
+        // skip if we can't ban the user
+      }
 
-      const timeout = setTimeout(async() => {
-        const _raidLock = this._raidLocks[msg.guildID];
-        if (_raidLock !== undefined) {
-          await _raidLock.lock.release();
-          await this._restore(msg.channel.guild);
-          await msg.channel.createMessage(language.translate('automod.raid.unlocked'));
-          await this.redis.client.del(`nino:raid:lockdown:indicator:${msg.guildID}`);
+      if (this._raidLocks.hasOwnProperty(msg.channel.guild.id)) {
+        await this._raidLocks[msg.channel.guild.id].lock.extend(`raid:lockdown:${msg.guildID}`);
+        clearTimeout(this._raidLocks[msg.channel.guild.id].timeout);
 
-          delete this._raidLocks[msg.guildID];
-        }
-      }, 10_000);
+        // Create a new timeout
+        this._raidLocks[msg.channel.guild.id].timeout = setTimeout(async() => {
+          const _raidLock = this._raidLocks[msg.guildID];
+          if (_raidLock !== undefined) {
+            try {
+              await _raidLock.lock.release();
+            } catch {
+              // ignore if we can't release the lock
+            }
 
-      const lock = RedisLock.create();
-      await lock.acquire(`raid:lockdown:${msg.guildID}`);
+            await this._restore(msg.channel.guild);
+            await msg.channel.createMessage(language.translate('automod.raid.unlocked'));
+            await this.redis.client.del(`nino:raid:lockdown:indicator:${msg.guildID}`);
 
-      this._raidLocks[msg.guildID] = {
-        timeout,
-        lock
-      };
+            delete this._raidLocks[msg.guildID];
+          }
+        }, 3000);
 
-      await this.redis.client.set(`nino:raid:lockdown:indicator:${msg.guildID}`, `beep boop >:3 | ${msg.guildID}`);
-      return true;
+        return true;
+      } else {
+        const timeout = setTimeout(async() => {
+          const _raidLock = this._raidLocks[msg.guildID];
+          if (_raidLock !== undefined) {
+            try {
+              await _raidLock.lock.release();
+            } catch {
+              // ignore if we can't release the lock
+            }
+
+            await this._restore(msg.channel.guild);
+            await msg.channel.createMessage(language.translate('automod.raid.unlocked'));
+            await this.redis.client.del(`nino:raid:lockdown:indicator:${msg.guildID}`);
+
+            delete this._raidLocks[msg.guildID];
+          }
+        }, 3000);
+
+        const lock = RedisLock.create();
+        await lock.acquire(`raid:lockdown:${msg.guildID}`);
+
+        this._raidLocks[msg.guildID] = {
+          timeout,
+          lock
+        };
+
+        await this.redis.client.set(`nino:raid:lockdown:indicator:${msg.guildID}`, msg.guildID);
+        return true;
+      }
     }
 
     return false;
@@ -163,7 +197,7 @@ export default class RaidAutomod implements Automod {
     const state = guild.channels.map(channel => ({
       channelID: channel.id,
       position: channel.permissionOverwrites
-        .filter(overwrite => overwrite.type === 'role' && overwrite.id !== guild.id)
+        .filter(overwrite => overwrite.type === 'role')
         .map(overwrite => ({
           allow: overwrite.allow,
           deny: overwrite.deny,
@@ -174,8 +208,13 @@ export default class RaidAutomod implements Automod {
 
     await this.redis.client.hset('nino:raid:lockdowns:channels', guild.id, JSON.stringify({ affectedIn: affectedID, state }, bigintSerializer));
 
+    const automod = await this.database.automod.get(guild.id);
+    const filter = (channel: TextChannel) =>
+      channel.type === 0 &&
+      !automod!.whitelistChannelsDuringRaid.includes(channel.id);
+
     // Change @everyone's permissions in all text channels
-    for (const channel of guild.channels.filter<TextChannel>(channel => channel.type === 0)) {
+    for (const channel of guild.channels.filter<TextChannel>(filter)) {
       const allow = channel.permissionOverwrites.has(guild.id) ? channel.permissionOverwrites.get(guild.id)!.allow : 0n;
       const deny = channel.permissionOverwrites.has(guild.id) ? channel.permissionOverwrites.get(guild.id)!.deny : 0n;
 
@@ -197,16 +236,17 @@ export default class RaidAutomod implements Automod {
   protected async _restore(guild: Guild) {
     const locks = await this.redis.client.hget('nino:raid:lockdowns:channels', guild.id)
       .then(data => data !== null ? JSON.parse<RaidChannelLock>(data, bigintDeserializer) : null)
-      .catch(() => null);
+      .catch(() => null) as RaidChannelLock | null;
 
     if (locks !== null) {
+      // Release the locks of the channels
       const channel = guild.channels.get<TextChannel>(locks.affectedIn);
       if (channel !== undefined && channel.type === 0) {
         const overwrite = channel.permissionOverwrites.get(guild.id);
         await channel.editPermission(
           guild.id,
-          overwrite?.allow ?? 0n | Constants.Permissions.sendMessages,
-          overwrite?.deny ?? 0n & ~Constants.Permissions.sendMessages,
+          overwrite?.allow ?? 0n,
+          overwrite?.deny ?? 0n,
           'role',
           '[Lockdown] Raid lock has been released.'
         );
@@ -217,31 +257,12 @@ export default class RaidAutomod implements Automod {
         if (channel !== undefined && channel.type !== 0)
           continue;
 
-        const overwrite = channel!.permissionOverwrites.get(guild.id);
-        if (overwrite !== undefined) {
-          await channel!.editPermission(
-            guild.id,
-            overwrite.allow | Constants.Permissions.sendMessages,
-            overwrite.deny & ~Constants.Permissions.sendMessages,
-            'role',
-            '[Lockdown] Raid lock has been released.'
-          );
-        } else {
-          await channel!.editPermission(
-            guild.id,
-            0n | Constants.Permissions.sendMessages,
-            0n & ~Constants.Permissions.sendMessages,
-            'role',
-            '[Lockdown] Raid lock has been released.'
-          );
-        }
-
         for (const pos of position) {
           try {
             await channel!.editPermission(
               pos.id,
-              pos.allow | Constants.Permissions.sendMessages,
-              pos.deny & ~Constants.Permissions.sendMessages,
+              pos.allow,
+              pos.deny,
               pos.type,
               '[Lockdown] Raid lock has been released.'
             );

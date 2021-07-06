@@ -24,10 +24,15 @@ import { Command, CommandMessage, Subcommand, EmbedBuilder } from '../../structu
 import { Categories, Color } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
+import Discord from '../../components/Discord';
+import { TextChannel } from 'eris';
 
 export default class AutomodCommand extends Command {
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
+
+  @Inject
+  private readonly discord!: Discord
 
   constructor() {
     super({
@@ -44,20 +49,17 @@ export default class AutomodCommand extends Command {
   }
 
   async run(msg: CommandMessage) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
-
     const settings = await this.database.automod.get(msg.guild.id);
     const embed = new EmbedBuilder()
       .setColor(Color)
       .setDescription([
-        `• ${settings!.shortLinks ? checkmark : xmark} **Short Links** (\`${msg.settings.prefixes[0]}automod shortlinks\`)`,
-        `• ${settings!.blacklist ? checkmark : xmark} **Blacklist Words** (\`${msg.settings.prefixes[0]}automod blacklist\`)`,
-        `• ${settings!.mentions ? checkmark : xmark} **Mentions** (\`${msg.settings.prefixes[0]}automod mentions\`)`,
-        `• ${settings!.dehoist ? checkmark : xmark} **Dehoisting** (\`${msg.settings.prefixes[0]}automod dehoist\`)`,
-        `• ${settings!.invites ? checkmark : xmark} **Invites** (\`${msg.settings.prefixes[0]}automod invites\`)`,
-        `• ${settings!.raid ? checkmark : xmark} **Raids** (\`${msg.settings.prefixes[0]}automod raid\`)`,
-        `• ${settings!.spam ? checkmark : xmark} **Spam** (\`${msg.settings.prefixes[0]}automod spam\`)`
+        `• ${settings!.shortLinks ? msg.successEmote : msg.errorEmote} **Short Links** (\`${msg.settings.prefixes[0]}automod shortlinks\`)`,
+        `• ${settings!.blacklist ? msg.successEmote : msg.errorEmote} **Blacklist Words** (\`${msg.settings.prefixes[0]}automod blacklist\`)`,
+        `• ${settings!.mentions ? msg.successEmote : msg.errorEmote} **Mentions** (\`${msg.settings.prefixes[0]}automod mentions\`)`,
+        `• ${settings!.dehoist ? msg.successEmote : msg.errorEmote} **Dehoisting** (\`${msg.settings.prefixes[0]}automod dehoist\`)`,
+        `• ${settings!.invites ? msg.successEmote : msg.errorEmote} **Invites** (\`${msg.settings.prefixes[0]}automod invites\`)`,
+        `• ${settings!.raid ? msg.successEmote : msg.errorEmote} **Raids** (\`${msg.settings.prefixes[0]}automod raid\`)`,
+        `• ${settings!.spam ? msg.successEmote : msg.errorEmote} **Spam** (\`${msg.settings.prefixes[0]}automod spam\`)`
       ]);
 
     return msg.reply(embed);
@@ -65,27 +67,23 @@ export default class AutomodCommand extends Command {
 
   @Subcommand()
   async shortlinks(msg: CommandMessage) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.automod.get(msg.guild.id);
     const result = await this.database.automod.update(msg.guild.id, {
       shortLinks: !settings!.shortLinks
     });
 
-    return msg.reply(result.affected === 1 ? checkmark : xmark);
+    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
   }
 
   @Subcommand('[...words]')
   async blacklist(msg: CommandMessage, [...words]: [...string[]]) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.automod.get(msg.guild.id);
 
     if (!words.length) {
       const type = !settings!.blacklist;
 
       await this.database.automod.update(msg.guild.id, { blacklist: type });
-      return msg.reply(`${type ? checkmark : xmark} Successfully **${type ? 'enabled' : 'disabled'}** the Blacklist automod feature.`);
+      return msg.reply(`${type ? msg.successEmote : msg.errorEmote} Successfully **${type ? 'enabled' : 'disabled'}** the Blacklist automod feature.`);
     }
 
     const curr = settings!.blacklistWords.concat(words);
@@ -93,66 +91,67 @@ export default class AutomodCommand extends Command {
       blacklistWords: curr
     });
 
-    return msg.reply(result.affected === 1 ? checkmark : xmark);
+    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
   }
 
   @Subcommand()
   async mentions(msg: CommandMessage) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.automod.get(msg.guild.id);
     const result = await this.database.automod.update(msg.guild.id, {
       mentions: !settings!.mentions
     });
 
-    return msg.reply(result.affected === 1 ? checkmark : xmark);
+    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
   }
 
   @Subcommand()
   async invites(msg: CommandMessage) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.automod.get(msg.guild.id);
     const result = await this.database.automod.update(msg.guild.id, {
       invites: !settings!.invites
     });
 
-    return msg.reply(result.affected === 1 ? checkmark : xmark);
+    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
   }
 
   @Subcommand()
   async dehoist(msg: CommandMessage) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.automod.get(msg.guild.id);
     const result = await this.database.automod.update(msg.guild.id, {
       dehoist: !settings!.dehoist
     });
 
-    return msg.reply(result.affected === 1 ? checkmark : xmark);
+    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
   }
 
   @Subcommand()
   async spam(msg: CommandMessage) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.automod.get(msg.guild.id);
     const result = await this.database.automod.update(msg.guild.id, {
       spam: !settings!.spam
     });
 
-    return msg.reply(result.affected === 1 ? checkmark : xmark);
+    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
   }
 
-  @Subcommand()
-  async raid(msg: CommandMessage) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
-    const settings = await this.database.automod.get(msg.guild.id);
+  @Subcommand('[...channels]')
+  async raid(msg: CommandMessage, [...channels]: string[]) {
+    if (!channels.length) {
+      const settings = await this.database.automod.get(msg.guild.id);
+      const result = await this.database.automod.update(msg.guild.id, {
+        raid: !settings!.raid
+      });
+
+      return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
+    }
+
+    const automod = await this.database.automod.get(msg.guild.id);
+    const found = await Promise.all(channels.map(chanID => this.discord.getChannel<TextChannel>(chanID)));
+    const chans = found.filter(c => c !== null && c.type !== 0).map(s => s!.id);
     const result = await this.database.automod.update(msg.guild.id, {
-      raid: !settings!.raid
+      whitelistChannelsDuringRaid: automod!.whitelistChannelsDuringRaid.concat(chans)
     });
 
-    return msg.reply(result.affected === 1 ? checkmark : xmark);
+    return msg.reply(`${result.affected === 1 ? msg.successEmote : msg.errorEmote} Added **${chans.length}** channels to the whitelist.`);
   }
 }

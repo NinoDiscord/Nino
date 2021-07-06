@@ -59,7 +59,7 @@ export default class RedisLock {
    */
   async acquire(key: string) {
     this.logger.info(`Creating lock for key "${key}"...`);
-    this.lock = createLock(this.redis.client);
+    this.lock = createLock(this.redis.client, { timeout: 5000 }); // Set it to 20 seconds
 
     await this.lock.acquire(`nino:${key}`);
   }
@@ -79,6 +79,6 @@ export default class RedisLock {
    */
   async extend(key: string) {
     this.logger.warn(`Extending time for key "${key}"...`);
-    await this.lock?.extend(10000); // Extend it for another 10 seconds
+    await this.lock?.extend(5000); // Extend it for another 10 seconds
   }
 }

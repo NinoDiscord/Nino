@@ -24,6 +24,9 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 @Entity({ name: 'automod' })
 export default class AutomodEntity {
+  @Column({ array: true, type: 'text', name: 'whitelist_channels_during_raid', default: '{}' })
+  public whitelistChannelsDuringRaid!: string[];
+
   @Column({ array: true, type: 'text', name: 'blacklist_words', default: '{}' })
   public blacklistWords!: string[];
 
