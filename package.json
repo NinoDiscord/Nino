@@ -37,7 +37,7 @@
     "@augu/lilith": "5.0.1",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
-    "@sentry/node": "6.8.0",
+    "@sentry/node": "6.9.0",
     "eris": "github:abalabahaha/eris#dev",
     "ioredis": "4.27.6",
     "ioredis-lock": "4.0.0",
