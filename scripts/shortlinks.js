@@ -88,7 +88,8 @@ const otherUrls = [
   'ur3.us',
   'kek.gg',
   'waa.ai',
-  'steamcommunity.ru'
+  'steamcommunity.ru',
+  'steanconmunity.ru'
 ];
 
 const startTime = process.hrtime();
