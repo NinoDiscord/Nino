@@ -24,7 +24,6 @@ const { LoggerWithoutCallSite } = require('tslog');
 const { calculateHRTime, readdir } = require('@augu/utils');
 const determineCaseType = require('./util/getCaseType');
 const getRepositories = require('./util/getRepositories');
-const { resolve, sep } = require('path');
 const { existsSync } = require('fs');
 const { readFile } = require('fs/promises');
 const { createConnection } = require('typeorm');
@@ -140,14 +139,15 @@ async function convertGuilds(connection, documents) {
 
     logger.info('Converting automod actions...');
     const automodEntry = new AutomodEntity();
-    automodEntry.blacklistWords = document.badwords?.wordlist ?? [];
-    automodEntry.blacklist = document.badwords?.enabled ?? false;
-    automodEntry.mentions = document.mention ?? false;
-    automodEntry.invites = document.invites ?? false;
-    automodEntry.dehoist = document.dehoist ?? false;
+    automodEntry.blacklistWords = document.automod.badwords?.wordlist ?? [];
+    automodEntry.blacklist = document.automod.badwords?.enabled ?? false;
+    automodEntry.shortLinks = false; // wasn't introduced in v0
+    automodEntry.mentions = document.automod.mention ?? false;
+    automodEntry.invites = document.automod.invites ?? false;
+    automodEntry.dehoist = document.automod.dehoist ?? false;
     automodEntry.guildID = document.guildID;
-    automodEntry.spam = document.spam ?? false;
-    automodEntry.raid = document.raid ?? false;
+    automodEntry.spam = document.automod.spam ?? false;
+    automodEntry.raid = document.automod.raid ?? false;
 
     await automod.save(automodEntry);
 
@@ -158,16 +158,14 @@ async function convertGuilds(connection, documents) {
     const _logging = document.logging ?? { enabled: false };
     if (!_logging.enabled) {
       loggingEntry.enabled = false;
-      const owoDaUwu = await logging.findOne({ guildID: document.guildID });
-      if (!owoDaUwu)
-        await logging.save(loggingEntry);
+      await logging.save(loggingEntry);
     } else {
       const events = [];
 
       loggingEntry.enabled = true;
       loggingEntry.channelID = _logging.channelID ?? null;
-      loggingEntry.ignoreUsers = _logging.ignoreChannels ?? [];
-      loggingEntry.ignoreChannels = _logging.ignore ?? [];
+      loggingEntry.ignoreUsers = _logging.ignore ?? [];
+      loggingEntry.ignoreChannels = _logging.ignoreChannels ?? [];
 
       if (_logging.events.messageDelete === true)
         events.push(LoggingEvents.MessageDeleted);

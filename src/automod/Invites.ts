@@ -21,6 +21,7 @@
  */
 
 import { DiscordRESTError, Invite, Message, TextChannel } from 'eris';
+import LocalizationService from '../services/LocalizationService';
 import PunishmentService from '../services/PunishmentService';
 import * as Constants from '../util/Constants';
 import PermissionUtil from '../util/Permissions';
@@ -33,13 +34,16 @@ export default class Invites implements Automod {
   public name: string = 'invites';
 
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly locales!: LocalizationService;
+
+  @Inject
+  private readonly discord!: Discord;
 
   async onMessage(msg: Message<TextChannel>) {
     const settings = await this.database.automod.get(msg.guildID);
@@ -102,7 +106,9 @@ export default class Invites implements Automod {
       if (invites.find(inv => inv === code))
         return false;
 
-      await msg.channel.createMessage('hey can u not advertise in this server o(╥﹏╥)o');
+      const language = this.locales.get(msg.guildID, msg.author.id);
+
+      await msg.channel.createMessage(language.translate('automod.invites'));
       await msg.delete();
       await this.punishments.createWarning(msg.member, `[Automod] Advertising in ${msg.channel.mention}`);
 

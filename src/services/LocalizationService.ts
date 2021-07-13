@@ -37,10 +37,10 @@ export default class LocalizationService {
   public locales: Collection<string, Locale> = new Collection();
 
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
 
   @Inject
-  private config!: Config;
+  private readonly config!: Config;
 
   async load() {
     this.logger.info('Loading in localization files...');
@@ -87,17 +87,12 @@ export default class LocalizationService {
 
     // committing yanderedev over here
     if (user === this.defaultLocale.code && guild === this.defaultLocale.code)
-      return this.locales.get(this.defaultLocale.code)!;
+      return this.defaultLocale;
     else if (user !== this.defaultLocale.code && guild === this.defaultLocale.code)
       return this.locales.get(user)!;
     else if (guild !== this.defaultLocale.code && user === this.defaultLocale.code)
       return this.locales.get(guild)!;
     else
       return this.defaultLocale;
-  }
-
-  // returns the completed localization on all locales
-  getCompletion(): { [x: string]: number } {
-    return {};
   }
 }

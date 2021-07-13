@@ -34,16 +34,16 @@ const HTTP_REGEX = /^https?:\/\/(.*)/;
 
 export default class MessageListener {
   @Inject
-  private commands!: CommandService;
+  private readonly commands!: CommandService;
 
   @Inject
-  private automod!: AutomodService;
+  private readonly automod!: AutomodService;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   @Subscribe('messageCreate', 'discord')
   onMessageCreate(msg: Message<TextChannel>) {
@@ -76,12 +76,15 @@ export default class MessageListener {
     if (msg.author.id === this.discord.client.user.id)
       return;
 
+    if (msg.author.system)
+      return;
+
     // It's in a closure so we don't have to use `return;` on the outer scope
     const auditLog = await (async() => {
       if (!msg.channel.guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
         return undefined;
 
-      const audits = await msg.channel.guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MESSAGE_DELETE);
+      const audits = await msg.channel.guild.getAuditLog({ limit: 3, actionType: Constants.AuditLogActions.MESSAGE_DELETE });
       return audits.entries.find(entry => entry.targetID === msg.author.id && entry.user.id !== msg.author.id && entry.user.id !== this.discord.client.user.id);
     })();
 
@@ -195,10 +198,14 @@ export default class MessageListener {
     if (!settings.enabled || !settings.events.includes(LoggingEvents.MessageUpdated))
       return;
 
-    if (settings.channelID !== undefined && (
-      !msg.channel.guild.channels.has(settings.channelID) ||
-      !msg.channel.guild.channels.get<TextChannel>(settings.channelID)?.permissionsOf(this.discord.client.user.id).has('sendMessages')
-    )) return;
+    if (!settings.channelID)
+      return;
+
+    if (!msg.channel.guild)
+      return;
+
+    if (!msg.channel.guild.channels.has(settings.channelID) || !msg.channel.guild.channels.get<TextChannel>(settings.channelID)?.permissionsOf(this.discord.client.user.id).has('sendMessages'))
+      return;
 
     const buffers: Buffer[] = [];
     for (let i = 0; i < allMsgs.length; i++) {

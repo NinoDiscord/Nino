@@ -21,6 +21,7 @@
  */
 
 import { Constants, Guild, Message, TextChannel, Overwrite } from 'eris';
+import LocalizationService from '../services/LocalizationService';
 import { PunishmentType } from '../entities/PunishmentsEntity';
 import PunishmentService from '../services/PunishmentService';
 import PermissionUtil from '../util/Permissions';
@@ -28,6 +29,7 @@ import { isObject } from '@augu/utils';
 import { Automod } from '../structures';
 import * as luxon from 'luxon';
 import { Inject } from '@augu/lilith';
+import RedisLock from '../util/RedisLock';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 import Redis from '../components/Redis';
@@ -69,11 +71,14 @@ const bigintDeserializer = (_: string, value: unknown) => {
 };
 
 export default class RaidAutomod implements Automod {
-  protected _raidLocks: Record<string, NodeJS.Timeout> = {};
+  public _raidLocks: Record<string, { lock: RedisLock; timeout: NodeJS.Timeout; }> = {};
   public name = 'raid';
 
   @Inject
   private readonly punishments!: PunishmentService;
+
+  @Inject
+  private readonly locales!: LocalizationService;
 
   @Inject
   private readonly database!: Database;
@@ -107,129 +112,169 @@ export default class RaidAutomod implements Automod {
     const joinedAt = luxon.DateTime.fromJSDate(new Date(msg.member.joinedAt));
     const now = luxon.DateTime.now();
     const difference = Math.floor(now.diff(joinedAt, ['days']).days);
+    //const language = this.locales.get(msg.guildID, msg.author.id);
+
     if (msg.mentions.length > 20 && difference < 3) {
       // Lockdown all channels @everyone has access in
-      await this._lockChannels(msg.channel.id, msg.channel.guild);
-      await msg.channel.createMessage([
-        ':lock: A raid is occuring, so I lock down all channels everyone has **\`Send Messages\`** in.',
-        'Channels be restored in 10 seconds, so prepare for yourself!'
-      ].join('\n'));
+      // await this._lockChannels(msg.channel.id, msg.channel.guild);
+      // await msg.channel.createMessage(language.translate('automod.raid.locked'));
 
-      await this.punishments.apply({
-        moderator: this.discord.client.user,
-        publish: true,
-        reason: `[Automod] Raid in <#${msg.channel.id}> (Pinged ${msg.mentions.length} users)`,
-        member: {
-          guild: msg.channel.guild,
-          id: msg.author.id
-        },
-        soft: false,
-        type: PunishmentType.Ban
-      });
-
-      await this._restore(msg.channel.guild);
-      await msg.channel.createMessage(':thumbsup: Permissions have been restored, sorry if you got pinged!');
+      try {
+        await this.punishments.apply({
+          moderator: this.discord.client.user,
+          publish: true,
+          reason: `[Automod] Raid in <#${msg.channel.id}> (Pinged ${msg.mentions.length} users)`,
+          member: {
+            guild: msg.channel.guild,
+            id: msg.author.id
+          },
+          soft: false,
+          type: PunishmentType.Ban
+        });
+      } catch {
+        // skip if we can't ban the user
+      }
 
       return true;
+
+      // if (this._raidLocks.hasOwnProperty(msg.channel.guild.id)) {
+      //   await this._raidLocks[msg.channel.guild.id].lock.extend(`raid:lockdown:${msg.guildID}`);
+      //   clearTimeout(this._raidLocks[msg.channel.guild.id].timeout);
+
+      //   // Create a new timeout
+      //   this._raidLocks[msg.channel.guild.id].timeout = setTimeout(async() => {
+      //     const _raidLock = this._raidLocks[msg.guildID];
+      //     if (_raidLock !== undefined) {
+      //       try {
+      //         await _raidLock.lock.release();
+      //       } catch {
+      //         // ignore if we can't release the lock
+      //       }
+
+      //       await this._restore(msg.channel.guild);
+      //       await msg.channel.createMessage(language.translate('automod.raid.unlocked'));
+      //       await this.redis.client.del(`nino:raid:lockdown:indicator:${msg.guildID}`);
+
+      //       delete this._raidLocks[msg.guildID];
+      //     }
+      //   }, 3000);
+
+      //   return true;
+      // } else {
+      //   const timeout = setTimeout(async() => {
+      //     const _raidLock = this._raidLocks[msg.guildID];
+      //     if (_raidLock !== undefined) {
+      //       try {
+      //         await _raidLock.lock.release();
+      //       } catch {
+      //         // ignore if we can't release the lock
+      //       }
+
+      //       await this._restore(msg.channel.guild);
+      //       await msg.channel.createMessage(language.translate('automod.raid.unlocked'));
+      //       await this.redis.client.del(`nino:raid:lockdown:indicator:${msg.guildID}`);
+
+      //       delete this._raidLocks[msg.guildID];
+      //     }
+      //   }, 3000);
+
+      //   const lock = RedisLock.create();
+      //   await lock.acquire(`raid:lockdown:${msg.guildID}`);
+
+      //   this._raidLocks[msg.guildID] = {
+      //     timeout,
+      //     lock
+      //   };
+
+      //   await this.redis.client.set(`nino:raid:lockdown:indicator:${msg.guildID}`, msg.guildID);
+      //   return true;
+      // }
     }
 
     return false;
   }
 
-  protected async _lockChannels(affectedID: string, guild: Guild) {
-    // Retrieve old permissions
-    const state = guild.channels.map(channel => ({
-      channelID: channel.id,
-      position: channel.permissionOverwrites
-        .filter(overwrite => overwrite.type === 'role' && overwrite.id !== guild.id)
-        .map(overwrite => ({
-          allow: overwrite.allow,
-          deny: overwrite.deny,
-          type: overwrite.type,
-          id: overwrite.id
-        }))
-    }));
+  // protected async _lockChannels(affectedID: string, guild: Guild) {
+  //   // Retrieve old permissions
+  //   const state = guild.channels.map(channel => ({
+  //     channelID: channel.id,
+  //     position: channel.permissionOverwrites
+  //       .filter(overwrite => overwrite.type === 'role')
+  //       .map(overwrite => ({
+  //         allow: overwrite.allow,
+  //         deny: overwrite.deny,
+  //         type: overwrite.type,
+  //         id: overwrite.id
+  //       }))
+  //   }));
 
-    await this.redis.client.hset('nino:raid:lockdowns:channels', guild.id, JSON.stringify({ affectedIn: affectedID, state }, bigintSerializer));
+  //   await this.redis.client.hset('nino:raid:lockdowns:channels', guild.id, JSON.stringify({ affectedIn: affectedID, state }, bigintSerializer));
 
-    // Change @everyone's permissions in all text channels
-    for (const channel of guild.channels.filter<TextChannel>(channel => channel.type === 0)) {
-      const allow = channel.permissionOverwrites.has(guild.id) ? channel.permissionOverwrites.get(guild.id)!.allow : 0n;
-      const deny = channel.permissionOverwrites.has(guild.id) ? channel.permissionOverwrites.get(guild.id)!.deny : 0n;
+  //   const automod = await this.database.automod.get(guild.id);
+  //   const filter = (channel: TextChannel) =>
+  //     channel.type === 0 &&
+  //     !automod!.whitelistChannelsDuringRaid.includes(channel.id);
 
-      // this shouldn't happen but whatever
-      // Checks if `deny` can be shifted with `sendMessages`
-      if (!!(deny & Constants.Permissions.sendMessages) === true)
-        continue;
+  //   // Change @everyone's permissions in all text channels
+  //   for (const channel of guild.channels.filter<TextChannel>(filter)) {
+  //     const allow = channel.permissionOverwrites.has(guild.id) ? channel.permissionOverwrites.get(guild.id)!.allow : 0n;
+  //     const deny = channel.permissionOverwrites.has(guild.id) ? channel.permissionOverwrites.get(guild.id)!.deny : 0n;
 
-      await channel.editPermission(
-        /* role id */ guild.id,
-        /* allowed */ allow & ~Constants.Permissions.sendMessages,
-        /* denied */ deny | Constants.Permissions.sendMessages,
-        /* type */ 'role',
-        /* reason */ '[Lockdown] Raid occured.'
-      );
-    }
-  }
+  //     // this shouldn't happen but whatever
+  //     // Checks if `deny` can be shifted with `sendMessages`
+  //     if (!!(deny & Constants.Permissions.sendMessages) === true)
+  //       continue;
 
-  protected async _restore(guild: Guild) {
-    const locks = await this.redis.client.hget('nino:raid:lockdowns:channels', guild.id)
-      .then(data => data !== null ? JSON.parse<RaidChannelLock>(data, bigintDeserializer) : null)
-      .catch(() => null);
+  //     await channel.editPermission(
+  //       /* role id */ guild.id,
+  //       /* allowed */ allow & ~Constants.Permissions.sendMessages,
+  //       /* denied */ deny | Constants.Permissions.sendMessages,
+  //       /* type */ 'role',
+  //       /* reason */ '[Lockdown] Raid occured.'
+  //     );
+  //   }
+  // }
 
-    if (locks !== null) {
-      const channel = guild.channels.get<TextChannel>(locks.affectedIn);
-      if (channel !== undefined && channel.type === 0) {
-        const overwrite = channel.permissionOverwrites.get(guild.id);
-        await channel.editPermission(
-          guild.id,
-          overwrite?.allow ?? 0n | Constants.Permissions.sendMessages,
-          overwrite?.deny ?? 0n & ~Constants.Permissions.sendMessages,
-          'role',
-          '[Lockdown] Raid lock has been released.'
-        );
-      }
+  // protected async _restore(guild: Guild) {
+  //   const locks = await this.redis.client.hget('nino:raid:lockdowns:channels', guild.id)
+  //     .then(data => data !== null ? JSON.parse<RaidChannelLock>(data, bigintDeserializer) : null)
+  //     .catch(() => null) as RaidChannelLock | null;
 
-      for (const { channelID, position } of locks.state.filter(c => c.channelID !== locks.affectedIn)) {
-        const channel = guild.channels.get(channelID);
-        if (channel !== undefined && channel.type !== 0)
-          continue;
+  //   if (locks !== null) {
+  //     // Release the locks of the channels
+  //     const channel = guild.channels.get<TextChannel>(locks.affectedIn);
+  //     if (channel !== undefined && channel.type === 0) {
+  //       const overwrite = channel.permissionOverwrites.get(guild.id);
+  //       await channel.editPermission(
+  //         guild.id,
+  //         overwrite?.allow ?? 0n,
+  //         overwrite?.deny ?? 0n,
+  //         'role',
+  //         '[Lockdown] Raid lock has been released.'
+  //       );
+  //     }
 
-        const overwrite = channel!.permissionOverwrites.get(guild.id);
-        if (overwrite !== undefined) {
-          await channel!.editPermission(
-            guild.id,
-            overwrite.allow | Constants.Permissions.sendMessages,
-            overwrite.deny & ~Constants.Permissions.sendMessages,
-            'role',
-            '[Lockdown] Raid lock has been released.'
-          );
-        } else {
-          await channel!.editPermission(
-            guild.id,
-            0n | Constants.Permissions.sendMessages,
-            0n & ~Constants.Permissions.sendMessages,
-            'role',
-            '[Lockdown] Raid lock has been released.'
-          );
-        }
+  //     for (const { channelID, position } of locks.state.filter(c => c.channelID !== locks.affectedIn)) {
+  //       const channel = guild.channels.get(channelID);
+  //       if (channel !== undefined && channel.type !== 0)
+  //         continue;
 
-        for (const pos of position) {
-          try {
-            await channel!.editPermission(
-              pos.id,
-              pos.allow | Constants.Permissions.sendMessages,
-              pos.deny & ~Constants.Permissions.sendMessages,
-              pos.type,
-              '[Lockdown] Raid lock has been released.'
-            );
-          } catch(ex) {
-            console.error(ex);
-          }
-        }
-      }
-    }
+  //       for (const pos of position) {
+  //         try {
+  //           await channel!.editPermission(
+  //             pos.id,
+  //             pos.allow,
+  //             pos.deny,
+  //             pos.type,
+  //             '[Lockdown] Raid lock has been released.'
+  //           );
+  //         } catch(ex) {
+  //           console.error(ex);
+  //         }
+  //       }
+  //     }
+  //   }
 
-    await this.redis.client.hdel('nino:raid:lockdowns:channels', guild.id);
-  }
+  //   await this.redis.client.hdel('nino:raid:lockdowns:channels', guild.id);
+  // }
 }

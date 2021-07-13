@@ -32,13 +32,13 @@ import ms from 'ms';
 
 export default class ReasonCommand extends Command {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   constructor() {
     super({

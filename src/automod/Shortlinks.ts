@@ -21,6 +21,7 @@
  */
 
 import type { Message, TextChannel } from 'eris';
+import LocalizationService from '../services/LocalizationService';
 import PunishmentService from '../services/PunishmentService';
 import * as Constants from '../util/Constants';
 import PermissionUtil from '../util/Permissions';
@@ -36,13 +37,16 @@ export default class Shortlinks implements Automod {
   public name: string = 'shortlinks';
 
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private database!: Database;
+  private readonly locales!: LocalizationService;
 
   @Inject
-  private discord!: Discord;
+  private readonly database!: Database;
+
+  @Inject
+  private readonly discord!: Discord;
 
   async onMessage(msg: Message<TextChannel>) {
     if (!msg || msg === null)
@@ -76,8 +80,10 @@ export default class Shortlinks implements Automod {
     // it'll only match "owo.com" and not "bit.ly"
     for (let i = 0; i < matches.length; i++) {
       if (Constants.SHORT_LINKS.includes(matches[i])) {
+        const language = this.locales.get(msg.guildID, msg.author.id);
+
         await msg.delete();
-        await msg.channel.createMessage('yo bro wtf dont send links like that >:(');
+        await msg.channel.createMessage(language.translate('automod.shortlinks'));
         await this.punishments.createWarning(msg.member, `[Automod] Sending a blacklisted URL in ${msg.channel.mention}`);
 
         return true;

@@ -21,6 +21,7 @@
  */
 
 import type { Message, TextChannel } from 'eris';
+import LocalizationService from '../services/LocalizationService';
 import PunishmentService from '../services/PunishmentService';
 import PermissionUtil from '../util/Permissions';
 import { Automod } from '../structures';
@@ -32,13 +33,16 @@ export default class Mentions implements Automod {
   public name: string = 'mentions';
 
   @Inject
-  private punishments!: PunishmentService;
+  private readonly locales!: LocalizationService;
 
   @Inject
-  private database!: Database;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private discord!: Discord;
+  private readonly database!: Database;
+
+  @Inject
+  private readonly discord!: Discord;
 
   async onMessage(msg: Message<TextChannel>) {
     const settings = await this.database.automod.get(msg.guildID);
@@ -59,9 +63,11 @@ export default class Mentions implements Automod {
     ) return false;
 
     if (msg.mentions.length >= 4) {
-      await msg.channel.createMessage('o(╥﹏╥)o i dont think that\'s gonna get their attention...');
+      const language = this.locales.get(msg.guildID, msg.author.id);
+
+      await msg.channel.createMessage(language.translate('automod.mentions'));
       await msg.delete();
-      await this.punishments.createWarning(msg.member, `[Automod] Spamming(?) 4 or more mentions in ${msg.channel.mention}`);
+      await this.punishments.createWarning(msg.member, `[Automod] Mentioned 4 or more people in ${msg.channel.mention}`);
 
       return true;
     }

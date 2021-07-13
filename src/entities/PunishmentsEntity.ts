@@ -44,7 +44,7 @@ export default class PunishmentEntity {
   @PrimaryColumn({ name: 'guild_id' })
   public guildID!: string;
 
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   public index!: number;
 
   @Column({ default: false })
@@ -52,6 +52,9 @@ export default class PunishmentEntity {
 
   @Column({ default: undefined, nullable: true })
   public time?: number;
+
+  @Column({ default: undefined, nullable: true })
+  public days?: number;
 
   @Column({
     type: 'enum',

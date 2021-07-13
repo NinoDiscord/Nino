@@ -140,9 +140,13 @@ declare global {
       };
     }
 
-    // eslint-disable-next-line
     export interface Automod {
-
+      blacklist: string;
+      invites: string;
+      mentions: string;
+      shortlinks: string;
+      spam: string;
+      raid: Record<'locked' | 'unlocked', string>;
     }
 
     // eslint-disable-next-line

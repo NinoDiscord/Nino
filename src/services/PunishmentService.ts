@@ -618,7 +618,7 @@ export default class PunishmentService {
         victim: this.discord.client.users.get(model.victimID)!,
         reason: model.reason,
         guild: this.discord.client.guilds.get(model.guildID)!,
-        time: Number(model.time),
+        time: model.time !== undefined ? Number(model.time) : undefined,
         type: stringifyDBType(model.type)!,
 
         ...obj
