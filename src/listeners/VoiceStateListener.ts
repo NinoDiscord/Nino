@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Constants, Guild, Member, TextChannel, VoiceChannel } from 'eris';
+import { Guild, Member, TextChannel, VoiceChannel } from 'eris';
 import { Inject, Subscribe } from '@augu/lilith';
 import { LoggingEvents } from '../entities/LoggingEntity';
 import Database from '../components/Database';
@@ -52,7 +52,7 @@ export default class VoiceStateListener {
     }
   }
 
-  @Subscribe('voiceChannelJoin')
+  @Subscribe('voiceChannelJoin', { emitter: 'discord' })
   async onVoiceChannelJoin(member: Member, voice: VoiceChannel) {
     const settings = await this.database.logging.get(member.guild.id);
     if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin))
@@ -68,7 +68,7 @@ export default class VoiceStateListener {
     return channel.createMessage(`:loudspeaker: **${member.user.username}#${member.user.discriminator}** (${member.user.id}) has joined channel **${voice.name}** with ${voice.voiceMembers.size} members.`);
   }
 
-  @Subscribe('voiceChannelLeave')
+  @Subscribe('voiceChannelLeave', { emitter: 'discord' })
   async onVoiceChannelLeave(member: Member, voice: VoiceChannel) {
     const settings = await this.database.logging.get(member.guild.id);
     if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin))
@@ -89,7 +89,7 @@ export default class VoiceStateListener {
     return channel.createMessage(`:bust_in_silhouette: **${member.username}#${member.discriminator}** (${member.id}) has left channel **${voice.name}**`);
   }
 
-  @Subscribe('voiceChannelSwitch')
+  @Subscribe('voiceChannelSwitch', { emitter: 'discord' })
   async onVoiceChannelSwitch(member: Member, voice: VoiceChannel, old: VoiceChannel) {
     const settings = await this.database.logging.get(member.guild.id);
     if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin))

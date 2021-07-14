@@ -73,8 +73,6 @@ export default class Discord {
     });
 
     this.api.container.addEmitter('discord', this.client);
-    this.api.forwardSubscriptions(this.client, this);
-
     return this.client.connect();
   }
 
@@ -182,17 +180,17 @@ export default class Discord {
     });
   }
 
-  @Subscribe('shardReady', 'discord')
+  @Subscribe('shardReady', { emitter: 'discord' })
   private onShardReady(id: number) {
     this.logger.info(`Shard #${id} is now ready.`);
   }
 
-  @Subscribe('shardDisconnect', 'discord')
+  @Subscribe('shardDisconnect', { emitter: 'discord' })
   private onShardDisconnect(error: any, id: number) {
     this.logger.fatal(`Shard #${id} has disconnected from the universe\n`, error || 'Connection has been reset by peer.');
   }
 
-  @Subscribe('shardResume', 'discord')
+  @Subscribe('shardResume', { emitter: 'discord' })
   private onShardResume(id: number) {
     this.logger.info(`Shard #${id} has resumed it's connection!`);
   }

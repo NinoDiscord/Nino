@@ -1,7 +1,7 @@
 {
   "name": "@august/nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "homepage": "https://nino.floofy.dev",
   "license": "MIT",
@@ -34,7 +34,7 @@
   "dependencies": {
     "@augu/collections": "1.0.12",
     "@augu/dotenv": "1.3.0",
-    "@augu/lilith": "5.0.1",
+    "@augu/lilith": "5.0.2",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
     "@sentry/node": "6.9.0",

@@ -49,7 +49,7 @@ export default class VoidListener {
   @Inject
   private readonly config!: Config;
 
-  @Subscribe('rawWS', 'discord')
+  @Subscribe('rawWS', { emitter: 'discord' })
   onRawWS(packet: RawPacket) {
     if (!packet.t)
       return;
@@ -57,7 +57,7 @@ export default class VoidListener {
     this.prometheus?.rawWSEvents?.labels(packet.t).inc();
   }
 
-  @Subscribe('ready', 'discord')
+  @Subscribe('ready', { emitter: 'discord' })
   async onReady() {
     this.logger.info(`Connected as ${this.discord.client.user.username}#${this.discord.client.user.discriminator} (ID: ${this.discord.client.user.id})`);
     this.logger.info(`Guilds: ${this.discord.client.guilds.size.toLocaleString()} | Users: ${this.discord.client.users.size.toLocaleString()}`);

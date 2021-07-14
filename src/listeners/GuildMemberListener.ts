@@ -22,10 +22,9 @@
 
 import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, Member } from 'eris';
+import { Inject, Subscribe } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
-import { Inject } from '@augu/lilith';
 import AutomodService from '../services/AutomodService';
-import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
@@ -38,16 +37,16 @@ interface OldMember {
 
 export default class GuildMemberListener {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   @Inject
-  private automod!: AutomodService;
+  private readonly automod!: AutomodService;
 
   private async findAuditLog(guild: Guild, member: Member) {
     if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
@@ -65,7 +64,7 @@ export default class GuildMemberListener {
     }
   }
 
-  @Subscribe('guildMemberUpdate')
+  @Subscribe('guildMemberUpdate', { emitter: 'discord' })
   async onGuildMemberUpdate(guild: Guild, member: Member, old: OldMember) {
     const settings = await this.database.automod.get(guild.id);
     const gSettings = await this.database.guilds.get(guild.id);

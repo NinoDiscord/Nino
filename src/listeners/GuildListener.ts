@@ -31,21 +31,21 @@ import Prom from '../components/Prometheus';
 
 export default class VoidListener {
   @Inject
-  private prometheus?: Prom;
+  private readonly prometheus?: Prom;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   @Inject
   private readonly botlists?: BotlistsService;
 
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
 
-  @Subscribe('guildCreate', 'discord')
+  @Subscribe('guildCreate', { emitter: 'discord' })
   async onGuildCreate(guild: Guild) {
     if (guild.name === undefined)
       return;
@@ -73,7 +73,7 @@ export default class VoidListener {
     }
   }
 
-  @Subscribe('guildDelete', 'discord')
+  @Subscribe('guildDelete', { emitter: 'discord' })
   async onGuildDelete(guild: Guild) {
     if (guild.name === undefined)
       return;

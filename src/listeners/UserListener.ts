@@ -36,7 +36,7 @@ export default class UserListener {
   @Inject
   private readonly automod!: AutomodService;
 
-  @Subscribe('userUpdate', 'discord')
+  @Subscribe('userUpdate', { emitter: 'discord' })
   async onUserUpdate(user: User) {
     const mutualGuilds = this.discord.client.guilds.filter(guild =>
       guild.members.has(user.id)
