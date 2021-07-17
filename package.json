@@ -64,7 +64,7 @@
     "@typescript-eslint/eslint-plugin": "4.28.3",
     "@typescript-eslint/parser": "4.28.3",
     "discord-api-types": "0.18.1",
-    "eslint": "7.30.0",
+    "eslint": "7.31.0",
     "husky": "7.0.1",
     "nodemon": "2.0.12",
     "ts-node": "10.1.0",
