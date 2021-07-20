@@ -63,7 +63,7 @@
     "@types/ws": "7.4.7",
     "@typescript-eslint/eslint-plugin": "4.28.4",
     "@typescript-eslint/parser": "4.28.4",
-    "discord-api-types": "0.20.0",
+    "discord-api-types": "0.20.1",
     "eslint": "7.31.0",
     "husky": "7.0.1",
     "nodemon": "2.0.12",
