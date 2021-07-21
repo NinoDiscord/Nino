@@ -20,44 +20,37 @@
  * SOFTWARE.
  */
 
-import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
-import LoggingEntity from '../entities/LoggingEntity';
-import type Database from '../components/Database';
+import { Command, CommandMessage } from '../../structures';
+import { Categories } from '../../util/Constants';
+import { Stopwatch } from '@augu/utils';
+import { Inject } from '@augu/lilith';
+import S3 from '../../components/S3';
 
-export default class LoggingController {
-  constructor(private database: Database) {}
+export default class AddCommandsToS3 extends Command {
+  @Inject
+  private readonly s3!: S3;
 
-  private get repository() {
-    return this.database.connection.getRepository(LoggingEntity);
+  constructor() {
+    super({
+      description: 'Bulk adds commands to Noel\'s S3 bucket',
+      ownerOnly: true,
+      category: Categories.Owner,
+      aliases: ['bulk:s3'],
+      name: 'commands:s3'
+    });
   }
 
-  async get(guildID: string) {
-    const entry = await this.repository.findOne({ guildID });
-    if (entry === undefined)
-      return this.create(guildID);
+  async run(msg: CommandMessage) {
+    if (!this.s3.client)
+      return msg.reply('S3 client isn\'t attached.');
 
-    return entry;
-  }
+    const message = await msg.reply('Now uploading commands to S3...');
+    const stopwatch = new Stopwatch();
+    stopwatch.start();
 
-  create(guildID: string) {
-    const entry = new LoggingEntity();
-    entry.ignoreChannels = [];
-    entry.ignoreUsers = [];
-    entry.enabled = false;
-    entry.events = [];
-    entry.guildID = guildID;
+    await this.s3.publishCommands();
+    const endTime = stopwatch.end();
 
-    return this.repository.save(entry);
-  }
-
-  update(guildID: string, values: QueryDeepPartialEntity<LoggingEntity>) {
-    return this
-      .database
-      .connection
-      .createQueryBuilder()
-      .update(LoggingEntity)
-      .set(values)
-      .where('guild_id = :id', { id: guildID })
-      .execute();
+    return message.edit(`:timer: Took ~**${endTime}** to upload commands to S3.`);
   }
 }

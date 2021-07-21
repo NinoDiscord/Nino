@@ -260,7 +260,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
         .build();
 
       await msg.channel.createMessage({ embed });
-      this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute`, ex.stack);
+      this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute:`);
+      this.logger.error(ex);
+
       this.sentry?.report(ex);
     }
   }

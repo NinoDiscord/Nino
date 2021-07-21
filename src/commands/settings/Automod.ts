@@ -68,11 +68,13 @@ export default class AutomodCommand extends Command {
   @Subcommand()
   async shortlinks(msg: CommandMessage) {
     const settings = await this.database.automod.get(msg.guild.id);
-    const result = await this.database.automod.update(msg.guild.id, {
-      shortLinks: !settings!.shortLinks
+    const enabled = !settings!.shortLinks;
+
+    await this.database.automod.update(msg.guild.id, {
+      shortLinks: enabled
     });
 
-    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
+    return msg.reply(`${enabled ? msg.successEmote : msg.errorEmote} the Shortlinks automod feature`);
   }
 
   @Subcommand('[...words]')
@@ -81,68 +83,96 @@ export default class AutomodCommand extends Command {
 
     if (!words.length) {
       const type = !settings!.blacklist;
+      const res = await this.database.automod.update(msg.guild.id, { blacklist: type });
 
-      await this.database.automod.update(msg.guild.id, { blacklist: type });
-      return msg.reply(`${type ? msg.successEmote : msg.errorEmote} Successfully **${type ? 'enabled' : 'disabled'}** the Blacklist automod feature.`);
+      const suffix = res ? 'd' : '';
+      return msg.reply(`${res ? `${msg.successEmote} Successfully` : `${msg.errorEmote} Unable to`} **${type ? `enable${suffix}` : `disable${suffix}`}** the Blacklist automod feature.`);
+    }
+
+    if (words[0] === 'remove') {
+      // Remove argument "remove" from the words list
+      words.shift();
+
+      const all: string[] = settings!.blacklistWords;
+      for (const word of words) {
+        const index = all.indexOf(word);
+        if (index !== -1)
+          all.splice(index, 1);
+      }
+
+      await this.database.automod.update(msg.guild.id, {
+        blacklistWords: all
+      });
+
+      return msg.success('Successfully removed the blacklisted words. :D');
     }
 
     const curr = settings!.blacklistWords.concat(words);
-    const result = await this.database.automod.update(msg.guild.id, {
+    await this.database.automod.update(msg.guild.id, {
       blacklistWords: curr
     });
 
-    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
+    return msg.success('Successfully added the words to the blacklist. :3');
   }
 
   @Subcommand()
   async mentions(msg: CommandMessage) {
     const settings = await this.database.automod.get(msg.guild.id);
-    const result = await this.database.automod.update(msg.guild.id, {
-      mentions: !settings!.mentions
+    const type = !settings!.mentions;
+
+    await this.database.automod.update(msg.guild.id, {
+      mentions: type
     });
 
-    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
+    return msg.reply(`${type ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Mentions automod feature.`);
   }
 
   @Subcommand()
   async invites(msg: CommandMessage) {
     const settings = await this.database.automod.get(msg.guild.id);
-    const result = await this.database.automod.update(msg.guild.id, {
+    const t = !settings!.invites;
+
+    await this.database.automod.update(msg.guild.id, {
       invites: !settings!.invites
     });
 
-    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
+    return msg.reply(`${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Invites automod feature.`);
   }
 
   @Subcommand()
   async dehoist(msg: CommandMessage) {
     const settings = await this.database.automod.get(msg.guild.id);
-    const result = await this.database.automod.update(msg.guild.id, {
+    const t = !settings!.dehoist;
+
+    await this.database.automod.update(msg.guild.id, {
       dehoist: !settings!.dehoist
     });
 
-    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
+    return msg.reply(`${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Dehoisting automod feature.`);
   }
 
   @Subcommand()
   async spam(msg: CommandMessage) {
     const settings = await this.database.automod.get(msg.guild.id);
-    const result = await this.database.automod.update(msg.guild.id, {
-      spam: !settings!.spam
+    const t = !settings!.spam;
+
+    await this.database.automod.update(msg.guild.id, {
+      spam: t
     });
 
-    return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
+    return msg.reply(`${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Spam automod feature.`);
   }
 
   @Subcommand('[...channels]')
   async raid(msg: CommandMessage, [...channels]: string[]) {
     if (!channels.length) {
       const settings = await this.database.automod.get(msg.guild.id);
+      const t = !settings!.raid;
       const result = await this.database.automod.update(msg.guild.id, {
         raid: !settings!.raid
       });
 
-      return msg.reply(result.affected === 1 ? msg.successEmote : msg.errorEmote);
+      return msg.reply(`${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Raid automod feature.`);
     }
 
     const automod = await this.database.automod.get(msg.guild.id);
@@ -152,6 +182,10 @@ export default class AutomodCommand extends Command {
       whitelistChannelsDuringRaid: automod!.whitelistChannelsDuringRaid.concat(chans)
     });
 
-    return msg.reply(`${result.affected === 1 ? msg.successEmote : msg.errorEmote} Added **${chans.length}** channels to the whitelist.`);
+    const message = result.affected === 1
+      ? `${msg.successEmote} Added **${chans.length}** channels to the whitelist.`
+      : `${msg.errorEmote} Unable to add **${chans.length}** channels to the whitelist.`;
+
+    return msg.reply(message);
   }
 }

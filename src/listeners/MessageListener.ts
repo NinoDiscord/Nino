@@ -137,7 +137,10 @@ export default class MessageListener {
     if (msg.content !== old.content)
       await this.commands.handleCommand(msg);
 
-    // await this.automod.onMessageUpdate(msg, old);
+    const result = await this.automod.run('message', msg);
+    if (result)
+      return;
+
     const settings = await this.database.logging.get(msg.channel.guild.id);
     if (!settings.enabled || !settings.events.includes(LoggingEvents.MessageUpdated))
       return;

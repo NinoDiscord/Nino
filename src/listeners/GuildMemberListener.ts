@@ -73,7 +73,8 @@ export default class GuildMemberListener {
       if (settings !== undefined && settings.dehoist === false)
         return;
 
-      if ((await this.automod.run('memberNick', member)) === true)
+      const result = await this.automod.run('memberNick', member);
+      if (result)
         return;
     }
 
@@ -97,6 +98,7 @@ export default class GuildMemberListener {
       });
     }
 
+    // added it
     if (member.roles.includes(gSettings.mutedRoleID) && !old.roles.includes(gSettings.mutedRoleID)) {
       const entry = await this.findAuditLog(guild, member);
       if (!entry)
@@ -105,15 +107,16 @@ export default class GuildMemberListener {
       await this.punishments.apply({
         moderator: entry.user,
         member,
-        reason: '[Automod] Moderator has removed the Muted role',
+        reason: '[Automod] Moderator has added the Muted role',
         type: PunishmentType.Mute
       });
     }
   }
 
-  @Subscribe('guildMemberAdd')
+  @Subscribe('guildMemberAdd', { emitter: 'discord' })
   async onGuildMemberJoin(guild: Guild, member: Member) {
-    if ((await this.automod.run('memberJoin', member)) === true)
+    const result = await this.automod.run('memberJoin', member);
+    if (result)
       return;
 
     const cases = await this.database.cases.getAll(guild.id);
@@ -129,9 +132,13 @@ export default class GuildMemberListener {
     }
   }
 
-  @Subscribe('guildMemberRemove')
+  @Subscribe('guildMemberRemove', { emitter: 'discord' })
   async onGuildMemberRemove(guild: Guild, member: Member) {
-    const logs = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_KICK).catch(() => undefined);
+    const logs = await guild.getAuditLog({
+      limit: 3,
+      actionType: Constants.AuditLogActions.MEMBER_KICK
+    }).catch(() => undefined);
+
     if (logs === undefined)
       return;
 

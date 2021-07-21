@@ -39,10 +39,10 @@ const humanizedEvents = {
 
 export default class ModLogCommand extends Command {
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   constructor() {
     super({
@@ -67,16 +67,14 @@ export default class ModLogCommand extends Command {
 
   async run(msg: CommandMessage, [channel]: [string]) {
     if (!channel) {
-      const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-      const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
       const settings = await this.database.logging.get(msg.guild.id);
       const type = !settings.enabled;
 
-      const result = await this.database.logging.update(msg.guild.id, {
+      await this.database.logging.update(msg.guild.id, {
         enabled: type
       });
 
-      return msg.reply(result.affected === 1 ? checkmark : xmark);
+      return msg.reply(`${type ? msg.successEmote : msg.errorEmote} Successfully **${type ? 'enabled' : 'disabled'}** the Logging feature.`);
     }
 
     const chan = await this.discord.getChannel<TextChannel>(channel, msg.guild);
@@ -108,8 +106,6 @@ export default class ModLogCommand extends Command {
 
   @Subcommand()
   async list(msg: CommandMessage) {
-    const checkmark = msg.guild.emojis.find(emoji => emoji.id === '464708611260678145') !== undefined ? '<:success:464708611260678145>' : ':white_check_mark:';
-    const xmark = msg.guild.emojis.find(emoji => emoji.id === '464708589123141634') !== undefined ? '<:xmark:464708589123141634>' : ':x:';
     const settings = await this.database.logging.get(msg.guild.id);
 
     const embed = EmbedBuilder.create()
@@ -117,7 +113,7 @@ export default class ModLogCommand extends Command {
         `• **Channels Ignored**: ${settings.ignoreChannels.length}`,
         `• **Users Ignored**: ${settings.ignoreUsers.length}`,
         `• **Channel**: ${settings.channelID !== null ? `<#${settings!.channelID}>` : 'None'}`,
-        `• **Enabled**: ${settings.enabled ? checkmark : xmark}`,
+        `• **Enabled**: ${settings.enabled ? msg.successEmote : msg.errorEmote}`,
         `• **Events**: ${settings.events.map(ev => humanizedEvents[ev]).join(', ') || 'None'}`
       ]);
 
