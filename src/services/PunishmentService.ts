@@ -652,7 +652,7 @@ export default class PunishmentService {
               /* overwriteID */ role.id,
               /* allowed */ 0,
               /* denied */ Constants.Permissions.sendMessages,
-              /* type */ 'role',
+              /* type */ 0,
               /* reason */ `[${this.discord.client.user.username}#${this.discord.client.user.discriminator}] Overrided permissions for new Muted role`
             );
         }
