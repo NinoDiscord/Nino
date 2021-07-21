@@ -27,6 +27,7 @@ import BotlistsService from '../services/BotlistService';
 import { Logger } from 'tslog';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
+import Config from '../components/Config';
 import Prom from '../components/Prometheus';
 
 export default class VoidListener {
@@ -45,6 +46,9 @@ export default class VoidListener {
   @Inject
   private readonly logger!: Logger;
 
+  @Inject
+  private readonly config!: Config;
+
   @Subscribe('guildCreate', { emitter: 'discord' })
   async onGuildCreate(guild: Guild) {
     if (guild.name === undefined)
@@ -59,6 +63,21 @@ export default class VoidListener {
     const owner = this.discord.client.users.get(guild.ownerID);
     const bots = guild.members.filter(r => r.bot).length;
     const humans = guild.members.filter(r => !r.bot).length;
+
+    const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
+    const statusType = this.config.getProperty('status.type');
+    const status = this.config.getProperty('status.status')!;
+
+    for (const shard of this.discord.client.shards.values()) {
+      this.discord.client.editStatus(this.config.getProperty('status.presence') ?? 'online', {
+        name: status
+          .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
+          .replace('$guilds$', this.discord.client.guilds.size.toLocaleString())
+          .replace('$shard$', `#${shard.id}`),
+
+        type: statusType ?? 0
+      });
+    }
 
     if (channel !== undefined && channel.type === 0) {
       const embed = EmbedBuilder.create()
@@ -87,6 +106,21 @@ export default class VoidListener {
     const owner = this.discord.client.users.get(guild.ownerID);
     const bots = guild.members.filter(r => r.bot).length;
     const humans = guild.members.filter(r => !r.bot).length;
+
+    const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
+    const statusType = this.config.getProperty('status.type');
+    const status = this.config.getProperty('status.status')!;
+
+    for (const shard of this.discord.client.shards.values()) {
+      this.discord.client.editStatus(this.config.getProperty('status.presence') ?? 'online', {
+        name: status
+          .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
+          .replace('$guilds$', this.discord.client.guilds.size.toLocaleString())
+          .replace('$shard$', `#${shard.id}`),
+
+        type: statusType ?? 0
+      });
+    }
 
     if (channel !== undefined && channel.type === 0) {
       const embed = EmbedBuilder.create()
