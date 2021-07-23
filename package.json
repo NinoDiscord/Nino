@@ -38,7 +38,7 @@
     "@augu/lilith": "5.0.4",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
-    "@aws-sdk/client-s3": "3.22.0",
+    "@aws-sdk/client-s3": "3.23.0",
     "@sentry/node": "6.10.0",
     "eris": "github:abalabahaha/eris#dev",
     "ioredis": "4.27.6",
