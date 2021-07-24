@@ -81,17 +81,13 @@ export default class GuildMemberListener {
     const settings = await this.database.automod.get(guild.id);
     const gSettings = await this.database.guilds.get(guild.id);
 
-    if (old.hasOwnProperty('nick') && member.nick !== old.nick) {
-      if (settings !== undefined && settings.dehoist === false) return;
+    const hasOldNick =
+      old !== null
+        ? old.hasOwnProperty('nick') &&
+          (old.nick !== undefined || old.nick !== null)
+        : false;
 
-      const result = await this.automod.run('memberNick', member);
-      if (result) return;
-    }
-
-    if (
-      (old.nick !== undefined || old.nick !== null) &&
-      member.nick !== old.nick
-    ) {
+    if (hasOldNick && member.nick !== old.nick) {
       if (settings !== undefined && settings.dehoist === false) return;
 
       const result = await this.automod.run('memberNick', member);
