@@ -39,12 +39,12 @@ export default class Locale {
   public full: string;
   public code: string;
 
-  #strings: LocalizationStrings;
+  private strings: LocalizationStrings;
 
   constructor({ meta, strings }: Localization) {
     this.contributors = meta.contributors;
     this.translator = meta.translator;
-    this.#strings = strings;
+    this.strings = strings;
     this.aliases = meta.aliases;
     this.flag = meta.flag;
     this.full = meta.full;
@@ -59,20 +59,19 @@ export default class Locale {
     args?: { [x: string]: any } | any[]
   ): R extends string[] ? string : string {
     const nodes = key.split('.');
-    let value: any = this.#strings;
+    let value: any = this.strings;
 
     for (const node of nodes) {
       try {
         value = value[node];
       } catch (ex) {
-        console.error(ex);
+        if (ex.message.includes('of undefined')) value = NOT_FOUND_SYMBOL;
 
-        value = NOT_FOUND_SYMBOL;
         break;
       }
     }
 
-    if (value === NOT_FOUND_SYMBOL)
+    if (value === undefined || value === NOT_FOUND_SYMBOL)
       throw new TypeError(`Node '${key}' doesn't exist...`);
 
     if (isObject(value)) throw new TypeError(`Node '${key}' is a object!`);
