@@ -58,6 +58,8 @@ export default class Locale {
     key: K,
     args?: { [x: string]: any } | any[]
   ): R extends string[] ? string : string {
+    console.log(`key: ${key}; args: ${JSON.stringify(args)}`);
+
     const nodes = key.split('.');
     let value: any = this.strings;
 
