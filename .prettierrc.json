@@ -1,0 +1,4 @@
+{
+  "extends": "@augu/prettier-config",
+  "singleQuote": true
+}

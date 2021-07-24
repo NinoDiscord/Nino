@@ -56,6 +56,7 @@
   },
   "devDependencies": {
     "@augu/eslint-config": "2.1.2",
+    "@augu/prettier-config": "1.0.0",
     "@augu/tsconfig": "1.1.1",
     "@types/ioredis": "4.26.6",
     "@types/js-yaml": "4.0.2",
@@ -67,8 +68,10 @@
     "@typescript-eslint/parser": "4.28.4",
     "discord-api-types": "0.20.2",
     "eslint": "7.31.0",
+    "eslint-config-prettier": "8.3.0",
     "husky": "7.0.1",
     "nodemon": "2.0.12",
+    "prettier": "2.3.2",
     "ts-node": "10.1.0",
     "typescript": "4.3.5"
   }

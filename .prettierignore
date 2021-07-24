@@ -1,0 +1,16 @@
+.github
+.husky
+.idea
+assets
+build
+
+.dockerignore
+.env
+.eslintignore
+.gitignore
+LICENSE
+package-*.json
+package.json
+README.md
+renovate.json
+tsconfig.json
