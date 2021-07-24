@@ -43,15 +43,18 @@ export default class Locale {
 
   constructor({ meta, strings }: Localization) {
     this.contributors = meta.contributors;
-    this.translator   = meta.translator;
-    this.#strings     = strings;
-    this.aliases      = meta.aliases;
-    this.flag         = meta.flag;
-    this.full         = meta.full;
-    this.code         = meta.code;
+    this.translator = meta.translator;
+    this.#strings = strings;
+    this.aliases = meta.aliases;
+    this.flag = meta.flag;
+    this.full = meta.full;
+    this.code = meta.code;
   }
 
-  translate<K extends ObjectKeysWithSeperator<LocalizationStrings>, R = KeyToPropType<LocalizationStrings, K>>(
+  translate<
+    K extends ObjectKeysWithSeperator<LocalizationStrings>,
+    R = KeyToPropType<LocalizationStrings, K>
+  >(
     key: K,
     args?: { [x: string]: any } | any[]
   ): R extends string[] ? string : string {
@@ -61,7 +64,9 @@ export default class Locale {
     for (const node of nodes) {
       try {
         value = value[node];
-      } catch(ex) {
+      } catch (ex) {
+        console.error(ex);
+
         value = NOT_FOUND_SYMBOL;
         break;
       }
@@ -70,30 +75,31 @@ export default class Locale {
     if (value === NOT_FOUND_SYMBOL)
       throw new TypeError(`Node '${key}' doesn't exist...`);
 
-    if (isObject(value))
-      throw new TypeError(`Node '${key}' is a object!`);
+    if (isObject(value)) throw new TypeError(`Node '${key}' is a object!`);
 
     if (Array.isArray(value)) {
-      return value.map(val => this.stringify(val, args)).join('\n') as unknown as any;
+      return value
+        .map((val) => this.stringify(val, args))
+        .join('\n') as unknown as any;
     } else {
       return this.stringify(value, args);
     }
   }
 
-  private stringify(value: any, rawArgs?: { [x: string]: any } | (string | number)[]) {
+  private stringify(
+    value: any,
+    rawArgs?: { [x: string]: any } | (string | number)[]
+  ) {
     // If no arguments are provided, best to assume to return the string
-    if (!rawArgs)
-      return value;
+    if (!rawArgs) return value;
 
     // Convert it to a string
-    if (typeof value !== 'string')
-      value = String(value);
+    if (typeof value !== 'string') value = String(value);
 
     let _i = 0;
     if (Array.isArray(rawArgs)) {
       const matches = /%s|%d/g.exec(value);
-      if (matches === null)
-        return value;
+      if (matches === null) return value;
 
       for (let i = 0; i < matches.length; i++) {
         const match = matches[i];
@@ -102,7 +108,9 @@ export default class Locale {
           return value.replace(/%s/g, () => String(rawArgs.shift()));
         } else if (match === '%d') {
           if (isNaN(Number(rawArgs[_i])))
-            throw new TypeError(`Value "${rawArgs[_i]}" was not a number (index: ${_i})`);
+            throw new TypeError(
+              `Value "${rawArgs[_i]}" was not a number (index: ${_i})`
+            );
 
           _i++;
           return value.replace(/%d/g, () => String(rawArgs.shift()));
