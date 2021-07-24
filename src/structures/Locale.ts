@@ -58,14 +58,11 @@ export default class Locale {
     key: K,
     args?: { [x: string]: any } | any[]
   ): R extends string[] ? string : string {
-    console.log(`key: ${key}; args: ${JSON.stringify(args)}`);
-
     const nodes = key.split('.');
     let value: any = this.strings;
 
     for (const node of nodes) {
       try {
-        console.log(value);
         value = value[node];
       } catch (ex) {
         if (ex.message.includes('of undefined')) value = NOT_FOUND_SYMBOL;
