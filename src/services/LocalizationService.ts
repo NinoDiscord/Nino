@@ -59,7 +59,6 @@ export default class LocalizationService {
     for (let i = 0; i < files.length; i++) {
       const contents = readFileSync(files[i], 'utf-8');
       const lang = JSON.parse<Record<string, any>>(contents);
-      console.log(lang);
 
       this.logger.info(
         `✔ Found language ${lang.meta.full} (${lang.meta.code}) by ${lang.meta.translator}`
