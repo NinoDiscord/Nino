@@ -29,7 +29,7 @@
     "prepare": "npm run clean:node_modules",
     "build": "npm run lint && rm -rf build && tsc",
     "start": "cd build && node main.js",
-    "lint": "eslint src --ext .ts --fix",
+    "lint": "eslint src --ext .ts --fix && prettier --write src/**/*.ts",
     "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
   },
   "dependencies": {
