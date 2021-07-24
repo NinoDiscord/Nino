@@ -65,6 +65,7 @@ export default class Locale {
 
     for (const node of nodes) {
       try {
+        console.log(value);
         value = value[node];
       } catch (ex) {
         if (ex.message.includes('of undefined')) value = NOT_FOUND_SYMBOL;
