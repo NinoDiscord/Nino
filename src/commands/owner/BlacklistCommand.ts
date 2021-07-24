@@ -46,68 +46,86 @@ export default class BlacklistCommand extends Command {
       ownerOnly: true,
       aliases: ['bl'],
       usage: '["guild" | "user"] [id] [...reason]',
-      name: 'blacklist'
+      name: 'blacklist',
     });
   }
 
-  async run(msg: CommandMessage, [type, id, ...reason]: ['guild' | 'user', string, ...string[]]) {
+  async run(
+    msg: CommandMessage,
+    [type, id, ...reason]: ['guild' | 'user', string, ...string[]]
+  ) {
     if (!type) {
-      const guilds = await this.database.blacklists.getByType(BlacklistType.Guild);
-      const users = await this.database.blacklists.getByType(BlacklistType.User);
+      const guilds = await this.database.blacklists.getByType(
+        BlacklistType.Guild
+      );
+      const users = await this.database.blacklists.getByType(
+        BlacklistType.User
+      );
 
       return msg.reply(
         new EmbedBuilder()
           .setColor(Color)
           .setDescription([
             `❯ **Guilds Blacklisted**: ${guilds.length.toLocaleString()}`,
-            `❯ **Users Blacklisted**: ${users.length.toLocaleString()}`
+            `❯ **Users Blacklisted**: ${users.length.toLocaleString()}`,
           ])
       );
     }
 
     if (!['guild', 'user'].includes(type))
-      return msg.reply('Missing the type to blacklist. Available options: `user` and `guild`.');
+      return msg.reply(
+        'Missing the type to blacklist. Available options: `user` and `guild`.'
+      );
 
     if (type === 'guild') {
       const guild = this.discord.client.guilds.get(id);
-      if (!guild)
-        return msg.reply(`Guild **${id}** doesn't exist`);
+      if (!guild) return msg.reply(`Guild **${id}** doesn't exist`);
 
       const entry = await this.database.blacklists.get(id);
       if (entry !== undefined)
-        return msg.reply(`Guild **${guild.name}** is already on the blacklist.`);
+        return msg.reply(
+          `Guild **${guild.name}** is already on the blacklist.`
+        );
 
       await this.database.blacklists.create({
         issuer: msg.author.id,
         reason: reason ? reason.join(' ') : undefined,
         type: BlacklistType.Guild,
-        id
+        id,
       });
 
-      return msg.reply(`:thumbsup: Blacklisted guild **${guild.name}** for *${reason ?? 'no reason provided'}*`);
+      return msg.reply(
+        `:thumbsup: Blacklisted guild **${guild.name}** for *${
+          reason ?? 'no reason provided'
+        }*`
+      );
     }
 
     if (type === 'user') {
       const owners = this.config.getProperty('owners') ?? [];
       const user = await this.discord.getUser(id);
-      if (user === null)
-        return msg.reply(`User ${id} doesn't exist.`);
+      if (user === null) return msg.reply(`User ${id} doesn't exist.`);
 
-      if (owners.includes(id))
-        return msg.reply('Cannot blacklist a owner');
+      if (owners.includes(id)) return msg.reply('Cannot blacklist a owner');
 
       const entry = await this.database.blacklists.get(user.id);
       if (entry !== undefined)
-        return msg.reply(`User **${user.username}#${user.discriminator}** is already on the blacklist.`);
+        return msg.reply(
+          `User **${user.username}#${user.discriminator}** is already on the blacklist.`
+        );
 
       await this.database.blacklists.create({
         issuer: msg.author.id,
         reason: reason ? reason.join(' ') : undefined,
         type: BlacklistType.User,
-        id: user.id
+        id: user.id,
       });
 
-      return msg.reply(`:thumbsup: Blacklisted user ${user.username}#${user.discriminator} for *${reason?.join(' ') ?? 'no reason, just felt like it.'}*`);
+      return msg.reply(
+        `:thumbsup: Blacklisted user ${user.username}#${
+          user.discriminator
+        } for *${reason?.join(' ') ?? 'no reason, just felt like it.'}*`
+      );
     }
   }
 }

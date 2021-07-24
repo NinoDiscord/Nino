@@ -28,7 +28,7 @@ import prom from 'prom-client';
 
 @Component({
   priority: 3,
-  name: 'prometheus'
+  name: 'prometheus',
 })
 export default class Prometheus {
   public commandsExecuted!: prom.Counter<string>;
@@ -46,7 +46,9 @@ export default class Prometheus {
   load() {
     const port = this.config.getProperty('prometheusPort');
     if (port === undefined) {
-      this.logger.warn('Prometheus will not be available! This is not recommended for private instances unless you want analytics.');
+      this.logger.warn(
+        'Prometheus will not be available! This is not recommended for private instances unless you want analytics.'
+      );
       return Promise.resolve();
     }
 
@@ -54,28 +56,30 @@ export default class Prometheus {
     this.commandsExecuted = new prom.Counter({
       labelNames: ['command'],
       name: 'nino_commands_executed',
-      help: 'How many commands Nino has executed successfully'
+      help: 'How many commands Nino has executed successfully',
     });
 
     this.messagesSeen = new prom.Counter({
       name: 'nino_messages_seen',
-      help: 'How many messages Nino has seen throughout the process lifespan'
+      help: 'How many messages Nino has seen throughout the process lifespan',
     });
 
     this.rawWSEvents = new prom.Counter({
       labelNames: ['event'],
       name: 'nino_discord_websocket_events',
-      help: 'Received WebSocket events from Discord and what they were'
+      help: 'Received WebSocket events from Discord and what they were',
     });
 
     this.guildCount = new prom.Gauge({
       name: 'nino_guild_count',
-      help: 'Number of guilds Nino is in'
+      help: 'Number of guilds Nino is in',
     });
 
     this.#server = createServer(this.onRequest.bind(this));
-    this.#server.once('listening', () => this.logger.info(`Prometheus: Listening at http://localhost:${port}`));
-    this.#server.on('error', error => this.logger.fatal(error));
+    this.#server.once('listening', () =>
+      this.logger.info(`Prometheus: Listening at http://localhost:${port}`)
+    );
+    this.#server.on('error', (error) => this.logger.fatal(error));
     this.#server.listen(port);
   }
 

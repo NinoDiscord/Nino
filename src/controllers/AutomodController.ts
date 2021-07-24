@@ -49,9 +49,7 @@ export default class AutomodController {
   }
 
   update(guildID: string, values: QueryDeepPartialEntity<AutomodEntity>) {
-    return this
-      .database
-      .connection
+    return this.database.connection
       .createQueryBuilder()
       .update(AutomodEntity)
       .set(values)

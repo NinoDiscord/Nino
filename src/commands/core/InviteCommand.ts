@@ -33,17 +33,19 @@ export default class InviteCommand extends Command {
       description: 'descriptions.invite',
       aliases: ['inviteme', 'inv'],
       cooldown: 2,
-      name: 'invite'
+      name: 'invite',
     });
   }
 
   run(msg: CommandMessage) {
-    return msg.reply([
-      ':wave: Wanting to invite me? Use the link below to do so:',
-      `**<https://discord.com/oauth2/authorize?client_id=${this.discord.client.user.id}&scope=bot>**`,
-      '',
-      ':question: Have questions about me? Join the support server under the <#824071651486335036> channel:',
-      'https://discord.gg/ATmjFH9kMH'
-    ].join('\n'));
+    return msg.reply(
+      [
+        ':wave: Wanting to invite me? Use the link below to do so:',
+        `**<https://discord.com/oauth2/authorize?client_id=${this.discord.client.user.id}&scope=bot>**`,
+        '',
+        ':question: Have questions about me? Join the support server under the <#824071651486335036> channel:',
+        'https://discord.gg/ATmjFH9kMH',
+      ].join('\n')
+    );
   }
 }

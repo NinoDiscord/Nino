@@ -27,10 +27,11 @@ import { Logger } from 'tslog';
 import { join } from 'path';
 import Locale from '../structures/Locale';
 import Config from '../components/Config';
+import { readFileSync } from 'fs';
 
 @Service({
   priority: 1,
-  name: 'localization'
+  name: 'localization',
 })
 export default class LocalizationService {
   public defaultLocale!: Locale;
@@ -49,26 +50,43 @@ export default class LocalizationService {
     const files = await readdir(directory);
 
     if (!files.length) {
-      this.logger.fatal('Missing localization files, did you clone the wrong commit?');
+      this.logger.fatal(
+        'Missing localization files, did you clone the wrong commit?'
+      );
       process.exit(1);
     }
 
     for (let i = 0; i < files.length; i++) {
-      const lang = require(files[i]);
+      const contents = readFileSync(files[i], 'utf-8');
+      const lang = JSON.parse<Record<string, any>>(contents);
+      console.log(lang);
 
-      this.logger.info(`✔ Found language ${lang.meta.full} (${lang.meta.code}) by ${lang.meta.translator}`);
-      this.locales.set(lang.meta.code, new Locale(lang));
+      this.logger.info(
+        `✔ Found language ${lang.meta.full} (${lang.meta.code}) by ${lang.meta.translator}`
+      );
+      this.locales.set(
+        lang.meta.code,
+        new Locale(
+          lang as { meta: LocalizationMeta; strings: LocalizationStrings }
+        )
+      );
     }
 
     const defaultLocale = this.config.getProperty('defaultLocale') ?? 'en_US';
-    this.logger.info(`Default localization language was set to ${defaultLocale}, applying...`);
+    this.logger.info(
+      `Default localization language was set to ${defaultLocale}, applying...`
+    );
 
-    const locale = this.locales.find(locale => locale.code === defaultLocale);
+    const locale = this.locales.find((locale) => locale.code === defaultLocale);
     if (locale === null) {
-      this.logger.fatal(`Localization "${defaultLocale}" was not found, defaulting to en_US...`);
+      this.logger.fatal(
+        `Localization "${defaultLocale}" was not found, defaulting to en_US...`
+      );
       this.defaultLocale = this.locales.get('en_US')!;
 
-      this.logger.warn(`Due to locale "${defaultLocale}" not being found and want to translate, read up on our translating guide:`);
+      this.logger.warn(
+        `Due to locale "${defaultLocale}" not being found and want to translate, read up on our translating guide:`
+      );
     } else {
       this.logger.info(`Localization "${defaultLocale}" was found!`);
       this.defaultLocale = locale;
@@ -88,11 +106,16 @@ export default class LocalizationService {
     // committing yanderedev over here
     if (user === this.defaultLocale.code && guild === this.defaultLocale.code)
       return this.defaultLocale;
-    else if (user !== this.defaultLocale.code && guild === this.defaultLocale.code)
+    else if (
+      user !== this.defaultLocale.code &&
+      guild === this.defaultLocale.code
+    )
       return this.locales.get(user)!;
-    else if (guild !== this.defaultLocale.code && user === this.defaultLocale.code)
+    else if (
+      guild !== this.defaultLocale.code &&
+      user === this.defaultLocale.code
+    )
       return this.locales.get(guild)!;
-    else
-      return this.defaultLocale;
+    else return this.defaultLocale;
   }
 }

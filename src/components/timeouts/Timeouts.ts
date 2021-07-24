@@ -40,12 +40,12 @@ interface ApplyTimeoutOptions {
 
 @Component({
   priority: 6,
-  name: 'timeouts'
+  name: 'timeouts',
 })
 export default class TimeoutsManager {
   protected _reconnectTimeout?: NodeJS.Timeout;
   protected _connectTimeout?: NodeJS.Timeout;
-  protected _readyPromise?: { resolve(): void, reject(error: Error): void; };
+  protected _readyPromise?: { resolve(): void; reject(error: Error): void };
 
   private socket!: WebSocket;
   public state: types.SocketState = types.SocketState.Unknown;
@@ -69,7 +69,11 @@ export default class TimeoutsManager {
     return new Promise<void>((resolve, reject) => {
       this._readyPromise = { resolve, reject };
       this.state = types.SocketState.Connecting;
-      this.logger.info(this._reconnectTimeout !== undefined ? 'Reconnecting to the timeouts service...' : 'Connecting to the timeouts service!');
+      this.logger.info(
+        this._reconnectTimeout !== undefined
+          ? 'Reconnecting to the timeouts service...'
+          : 'Connecting to the timeouts service!'
+      );
 
       const host = this.config.getProperty('timeouts.host');
       const port = this.config.getProperty('timeouts.port');
@@ -77,12 +81,14 @@ export default class TimeoutsManager {
 
       // @ts-ignore yes
       if (this.config.getProperty('timeouts') === undefined)
-        return reject('Missing `timeouts` configuration, refer to the Process section: https://github.com/NinoDiscord/Nino#config-timeouts');
+        return reject(
+          'Missing `timeouts` configuration, refer to the Process section: https://github.com/NinoDiscord/Nino#config-timeouts'
+        );
 
       this.socket = new WebSocket(`ws://${host ?? 'localhost'}:${port}`, {
         headers: {
-          Authorization: auth
-        }
+          Authorization: auth,
+        },
       });
 
       if (this._reconnectTimeout !== undefined)
@@ -99,7 +105,9 @@ export default class TimeoutsManager {
 
         delete this._connectTimeout;
         delete this._readyPromise;
-        return reject(new Error('Connection to timeouts service took too long.'));
+        return reject(
+          new Error('Connection to timeouts service took too long.')
+        );
       }, 15000);
     });
   }
@@ -109,12 +117,17 @@ export default class TimeoutsManager {
   }
 
   send(op: types.OPCodes.Request, data: types.RequestPacket['d']): void;
-  send(op: types.OPCodes.Acknowledged, data: types.AcknowledgedPacket['d']): void;
+  send(
+    op: types.OPCodes.Acknowledged,
+    data: types.AcknowledgedPacket['d']
+  ): void;
   send(op: types.OPCodes, d?: any) {
-    this.socket.send(JSON.stringify({
-      op,
-      d
-    }));
+    this.socket.send(
+      JSON.stringify({
+        op,
+        d,
+      })
+    );
   }
 
   async apply({
@@ -123,7 +136,7 @@ export default class TimeoutsManager {
     victim,
     guild,
     time,
-    type
+    type,
   }: ApplyTimeoutOptions) {
     const list = await this.redis.getTimeouts(guild);
     list.push({
@@ -133,10 +146,13 @@ export default class TimeoutsManager {
       issued: Date.now(),
       guild,
       user: victim,
-      type
+      type,
     });
 
-    await this.redis.client.hmset('nino:timeouts', [guild, JSON.stringify(list)]);
+    await this.redis.client.hmset('nino:timeouts', [
+      guild,
+      JSON.stringify(list),
+    ]);
     this.send(types.OPCodes.Request, {
       moderator,
       reason: reason === undefined ? null : reason,
@@ -144,7 +160,7 @@ export default class TimeoutsManager {
       issued: Date.now(),
       guild,
       user: victim,
-      type
+      type,
     });
 
     return Promise.resolve();
@@ -165,7 +181,9 @@ export default class TimeoutsManager {
   }
 
   private _onClose(code: number, reason: string) {
-    this.logger.warn(`Timeouts service has closed our connection with "${code}: ${reason}"`);
+    this.logger.warn(
+      `Timeouts service has closed our connection with "${code}: ${reason}"`
+    );
 
     this._reconnectTimeout = setTimeout(() => {
       this.logger.info('Attempting to reconnect...');
@@ -176,40 +194,63 @@ export default class TimeoutsManager {
   private async _onMessage(message: string) {
     const data: types.DataPacket<any> = JSON.parse(message);
     switch (data.op) {
-      case types.OPCodes.Ready: {
-        this.logger.info('Authenicated successfully, now sending timeouts...');
-        const timeouts = await this.redis.client.hvals('nino:timeouts').then((value) => value[0] !== '' ? value.map(val => JSON.parse<types.Timeout>(val)).flat() : [] as types.Timeout[]);
-        this.logger.info(`Received ${timeouts.length} timeouts to relay`);
+      case types.OPCodes.Ready:
+        {
+          this.logger.info(
+            'Authenicated successfully, now sending timeouts...'
+          );
+          const timeouts = await this.redis.client
+            .hvals('nino:timeouts')
+            .then((value) =>
+              value[0] !== ''
+                ? value.map((val) => JSON.parse<types.Timeout>(val)).flat()
+                : ([] as types.Timeout[])
+            );
+          this.logger.info(`Received ${timeouts.length} timeouts to relay`);
 
-        this.send(types.OPCodes.Acknowledged, timeouts);
-      } break;
-
-      case types.OPCodes.Apply: {
-        const packet = data as types.ApplyPacket;
-        this.logger.debug(`Told to apply a packet on user ${packet.d.user} in guild ${packet.d.guild}.`);
-
-        const guild = this.discord.client.guilds.get(packet.d.guild);
-        if (guild === undefined) {
-          this.logger.warn(`Guild ${packet.d.guild} has pending timeouts but Nino isn't in the guild? Skipping...`);
-          break;
+          this.send(types.OPCodes.Acknowledged, timeouts);
         }
+        break;
 
-        const timeouts = await this.redis.getTimeouts(packet.d.guild);
-        const available = timeouts.filter(pkt =>
-          packet.d.user !== pkt.user &&
-          packet.d.type.toLowerCase() !== pkt.type.toLowerCase() &&
-          pkt.guild === packet.d.guild
-        );
+      case types.OPCodes.Apply:
+        {
+          const packet = data as types.ApplyPacket;
+          this.logger.debug(
+            `Told to apply a packet on user ${packet.d.user} in guild ${packet.d.guild}.`
+          );
 
-        await this.redis.client.hmset('nino:timeouts', [guild.id, JSON.stringify(available)]);
-        await this.punishments.apply({
-          moderator: this.discord.client.user,
-          publish: true,
-          reason: packet.d.reason === null ? '[Automod] Time is up.' : packet.d.reason,
-          member: { id: packet.d.user, guild },
-          type: packet.d.type
-        });
-      } break;
+          const guild = this.discord.client.guilds.get(packet.d.guild);
+          if (guild === undefined) {
+            this.logger.warn(
+              `Guild ${packet.d.guild} has pending timeouts but Nino isn't in the guild? Skipping...`
+            );
+            break;
+          }
+
+          const timeouts = await this.redis.getTimeouts(packet.d.guild);
+          const available = timeouts.filter(
+            (pkt) =>
+              packet.d.user !== pkt.user &&
+              packet.d.type.toLowerCase() !== pkt.type.toLowerCase() &&
+              pkt.guild === packet.d.guild
+          );
+
+          await this.redis.client.hmset('nino:timeouts', [
+            guild.id,
+            JSON.stringify(available),
+          ]);
+          await this.punishments.apply({
+            moderator: this.discord.client.user,
+            publish: true,
+            reason:
+              packet.d.reason === null
+                ? '[Automod] Time is up.'
+                : packet.d.reason,
+            member: { id: packet.d.user, guild },
+            type: packet.d.type,
+          });
+        }
+        break;
     }
   }
 }

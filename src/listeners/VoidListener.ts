@@ -51,20 +51,25 @@ export default class VoidListener {
 
   @Subscribe('rawWS', { emitter: 'discord' })
   onRawWS(packet: RawPacket) {
-    if (!packet.t)
-      return;
+    if (!packet.t) return;
 
     this.prometheus?.rawWSEvents?.labels(packet.t).inc();
   }
 
   @Subscribe('ready', { emitter: 'discord' })
   async onReady() {
-    this.logger.info(`Connected as ${this.discord.client.user.username}#${this.discord.client.user.discriminator} (ID: ${this.discord.client.user.id})`);
-    this.logger.info(`Guilds: ${this.discord.client.guilds.size.toLocaleString()} | Users: ${this.discord.client.users.size.toLocaleString()}`);
+    this.logger.info(
+      `Connected as ${this.discord.client.user.username}#${this.discord.client.user.discriminator} (ID: ${this.discord.client.user.id})`
+    );
+    this.logger.info(
+      `Guilds: ${this.discord.client.guilds.size.toLocaleString()} | Users: ${this.discord.client.users.size.toLocaleString()}`
+    );
 
     this.prometheus?.guildCount?.set(this.discord.client.guilds.size);
     await this.botlists?.post();
-    this.discord.mentionRegex = new RegExp(`^<@!?${this.discord.client.user.id}> `);
+    this.discord.mentionRegex = new RegExp(
+      `^<@!?${this.discord.client.user.id}> `
+    );
 
     const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
     const statusType = this.config.getProperty('status.type');
@@ -84,14 +89,23 @@ export default class VoidListener {
     // }
 
     for (const shard of this.discord.client.shards.values()) {
-      this.discord.client.editStatus(this.config.getProperty('status.presence') ?? 'online', {
-        name: status
-          .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
-          .replace('$guilds$', this.discord.client.guilds.size.toLocaleString())
-          .replace('$shard$', `#${shard.id}`),
+      this.discord.client.editStatus(
+        this.config.getProperty('status.presence') ?? 'online',
+        {
+          name: status
+            .replace(
+              '$prefix$',
+              prefixes[Math.floor(Math.random() * prefixes.length)]
+            )
+            .replace(
+              '$guilds$',
+              this.discord.client.guilds.size.toLocaleString()
+            )
+            .replace('$shard$', `#${shard.id}`),
 
-        type: statusType ?? 0
-      });
+          type: statusType ?? 0,
+        }
+      );
     }
   }
 }

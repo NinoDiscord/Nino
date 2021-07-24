@@ -55,7 +55,7 @@ export default class StatisticsCommand extends Command {
       description: 'descriptions.statistics',
       aliases: ['stats', 'botinfo', 'info', 'me'],
       cooldown: 8,
-      name: 'statistics'
+      name: 'statistics',
     });
   }
 
@@ -63,28 +63,42 @@ export default class StatisticsCommand extends Command {
     const database = await this.database.getStatistics();
     const redis = await this.redis.getStatistics();
     const guilds = this.discord.client.guilds.size.toLocaleString();
-    const users = this.discord.client.guilds.reduce((a, b) => a + b.memberCount, 0).toLocaleString();
-    const channels = Object.keys(this.discord.client.channelGuildMap).length.toLocaleString();
+    const users = this.discord.client.guilds
+      .reduce((a, b) => a + b.memberCount, 0)
+      .toLocaleString();
+    const channels = Object.keys(
+      this.discord.client.channelGuildMap
+    ).length.toLocaleString();
     const memoryUsage = process.memoryUsage();
-    const avgPing = this.discord.client.shards.reduce((a, b) => a + b.latency, 0);
+    const avgPing = this.discord.client.shards.reduce(
+      (a, b) => a + b.latency,
+      0
+    );
     const node = process.env.REGION ?? 'unknown';
     const ownerIDs = this.config.getProperty('owners') ?? [];
-    const owners = await Promise.all(ownerIDs.map(id => {
-      const user = this.discord.client.users.get(id);
-      if (user === undefined)
-        return this.discord.client.getRESTUser(id);
-      else
-        return Promise.resolve(user);
-    }));
+    const owners = await Promise.all(
+      ownerIDs.map((id) => {
+        const user = this.discord.client.users.get(id);
+        if (user === undefined) return this.discord.client.getRESTUser(id);
+        else return Promise.resolve(user);
+      })
+    );
 
-    const dashboardUrl = this.discord.client.user.id === '531613242473054229'
-      ? 'https://stats.floofy.dev/d/e3KPDLknk/nino-prod?orgId=1'
-      : this.discord.client.user.id === '613907896622907425'
+    const dashboardUrl =
+      this.discord.client.user.id === '531613242473054229'
+        ? 'https://stats.floofy.dev/d/e3KPDLknk/nino-prod?orgId=1'
+        : this.discord.client.user.id === '613907896622907425'
         ? 'https://stats.floofy.dev/d/C5bZHVZ7z/nino-edge?orgId=1'
         : '';
 
     const embed = new EmbedBuilder()
-      .setAuthor(`[ ${this.discord.client.user.username}#${this.discord.client.user.discriminator} ~ v${version} (${commitHash ?? '<unknown>'}) ]`, 'https://nino.floofy.dev', this.discord.client.user.dynamicAvatarURL('png', 1024))
+      .setAuthor(
+        `[ ${this.discord.client.user.username}#${
+          this.discord.client.user.discriminator
+        } ~ v${version} (${commitHash ?? '<unknown>'}) ]`,
+        'https://nino.floofy.dev',
+        this.discord.client.user.dynamicAvatarURL('png', 1024)
+      )
       .setColor(Color)
       .addFields([
         {
@@ -95,41 +109,59 @@ export default class StatisticsCommand extends Command {
             `• **Shards [C / T]**\n${msg.guild.shard.id} / ${this.discord.client.shards.size} (${avgPing}ms avg.)`,
             `• **Channels**\n${channels}`,
             `• **Guilds**\n${guilds}`,
-            `• **Users**\n${users}`
+            `• **Users**\n${users}`,
           ].join('\n'),
-          inline: true
+          inline: true,
         },
         {
           name: `❯ Process [${process.pid}]`,
           value: [
-            `• **System Memory [Free / Total]**\n${formatSize(os.freemem())} / ${formatSize(os.totalmem())}`,
-            `• **Memory Usage [RSS / Heap]**\n${formatSize(memoryUsage.rss)} / ${formatSize(memoryUsage.heapUsed)}`,
+            `• **System Memory [Free / Total]**\n${formatSize(
+              os.freemem()
+            )} / ${formatSize(os.totalmem())}`,
+            `• **Memory Usage [RSS / Heap]**\n${formatSize(
+              memoryUsage.rss
+            )} / ${formatSize(memoryUsage.heapUsed)}`,
             `• **Current Node**\n${node ?? 'Unknown'}`,
-            `• **Uptime**\n${humanize(Math.floor(process.uptime() * 1000), true)}`
+            `• **Uptime**\n${humanize(
+              Math.floor(process.uptime() * 1000),
+              true
+            )}`,
           ].join('\n'),
-          inline: true
+          inline: true,
         },
         {
-          name: `❯ Redis v${redis.server.redis_version} [${firstUpper(redis.server.redis_mode)}]`,
+          name: `❯ Redis v${redis.server.redis_version} [${firstUpper(
+            redis.server.redis_mode
+          )}]`,
           value: [
-            `• **Network I/O**\n${formatSize(redis.stats.total_net_input_bytes)} / ${formatSize(redis.stats.total_net_output_bytes)}`,
-            `• **Uptime**\n${humanize(Number(redis.server.uptime_in_seconds) * 1000, true)}`,
+            `• **Network I/O**\n${formatSize(
+              redis.stats.total_net_input_bytes
+            )} / ${formatSize(redis.stats.total_net_output_bytes)}`,
+            `• **Uptime**\n${humanize(
+              Number(redis.server.uptime_in_seconds) * 1000,
+              true
+            )}`,
             `• **Ops/s**\n${redis.stats.instantaneous_ops_per_sec.toLocaleString()}`,
-            `• **Ping**\n${redis.ping}`
+            `• **Ping**\n${redis.ping}`,
           ].join('\n'),
-          inline: true
+          inline: true,
         },
         {
           name: `❯ PostgreSQL v${database.version}`,
           value: [
             `• **Insert / Delete / Update / Fetched**:\n${database.inserted.toLocaleString()} / ${database.deleted.toLocaleString()} / ${database.updated.toLocaleString()} / ${database.fetched.toLocaleString()}`,
             `• **Uptime**\n${database.uptime}`,
-            `• **Ping**\n${database.ping}`
+            `• **Ping**\n${database.ping}`,
           ].join('\n'),
-          inline: true
-        }
+          inline: true,
+        },
       ])
-      .setFooter(`Owners: ${owners.map((user) => `${user.username}#${user.discriminator}`).join(', ')}`);
+      .setFooter(
+        `Owners: ${owners
+          .map((user) => `${user.username}#${user.discriminator}`)
+          .join(', ')}`
+      );
 
     if (dashboardUrl !== '')
       embed.setDescription(`[[**Metrics Dashboard**]](${dashboardUrl})`);

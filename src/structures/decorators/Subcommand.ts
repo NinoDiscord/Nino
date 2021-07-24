@@ -20,20 +20,23 @@
  * SOFTWARE.
  */
 
-
 import type { SubcommandInfo } from '../Subcommand';
 import { MetadataKeys } from '../../util/Constants';
 
-export const getSubcommandsIn = (target: any) => Reflect.getMetadata<SubcommandInfo[]>(MetadataKeys.Subcommand, target) ?? [];
+export const getSubcommandsIn = (target: any) =>
+  Reflect.getMetadata<SubcommandInfo[]>(MetadataKeys.Subcommand, target) ?? [];
 
-export default function Subcommand(usage?: string, aliases?: string[]): MethodDecorator {
+export default function Subcommand(
+  usage?: string,
+  aliases?: string[]
+): MethodDecorator {
   return (target, methodName, descriptor: TypedPropertyDescriptor<any>) => {
     const subcommands = getSubcommandsIn(target);
     subcommands.push({
       aliases,
       methodName: String(methodName),
       usage: usage ?? '',
-      run: descriptor.value!
+      run: descriptor.value!,
     });
 
     Reflect.defineMetadata(MetadataKeys.Subcommand, subcommands, target);

@@ -20,7 +20,12 @@
  * SOFTWARE.
  */
 
-import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
+import {
+  Command,
+  CommandMessage,
+  EmbedBuilder,
+  Subcommand,
+} from '../../structures';
 import LocalizationService from '../../services/LocalizationService';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
@@ -50,10 +55,10 @@ export default class LocaleCommand extends Command {
         'locale set fr_FR --user',
         'locale set fr_FR',
         'locale reset --user',
-        'locale reset'
+        'locale reset',
       ],
       aliases: ['language', 'lang'],
-      name: 'locale'
+      name: 'locale',
     });
   }
 
@@ -68,8 +73,8 @@ export default class LocaleCommand extends Command {
         '```',
         '',
         `• Use \`${msg.settings.prefixes[0]}locale set fr_FR\` to set the guild's language (Requires \`Manage Guild\`)`,
-        '• Use the \`--user\` or \`-u\` flag to set or reset your language.',
-        `• Use \`${msg.settings.prefixes[0]}locale list\` to view a list of the languages available`
+        '• Use the `--user` or `-u` flag to set or reset your language.',
+        `• Use \`${msg.settings.prefixes[0]}locale list\` to view a list of the languages available`,
       ]);
 
     return msg.reply(embed);
@@ -77,25 +82,33 @@ export default class LocaleCommand extends Command {
 
   @Subcommand()
   list(msg: CommandMessage) {
-    const languages = this.languages.locales.map(locale => {
+    const languages = this.languages.locales.map((locale) => {
       const user = this.discord.client.users.get(locale.translator);
-      return `❯ ${locale.flag} **${locale.full} (${locale.code})** by **${user?.username ?? 'Unknown User'}**#**${user?.discriminator ?? '0000'}** (${locale.contributors.length} contributers, \`${msg.settings.prefixes[0]}locale set ${locale.code} -u\`)`;
+      return `❯ ${locale.flag} **${locale.full} (${locale.code})** by **${
+        user?.username ?? 'Unknown User'
+      }**#**${user?.discriminator ?? '0000'}** (${
+        locale.contributors.length
+      } contributers, \`${msg.settings.prefixes[0]}locale set ${
+        locale.code
+      } -u\`)`;
     });
 
     return msg.reply(
-      EmbedBuilder.create()
-        .setTitle('[ Languages ]')
-        .setDescription(languages)
+      EmbedBuilder.create().setTitle('[ Languages ]').setDescription(languages)
     );
   }
 
   @Subcommand('<locale>')
   async set(msg: CommandMessage, [locale]: [string]) {
     if (!locale)
-      return msg.reply(`No locale has been specified, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`);
+      return msg.reply(
+        `No locale has been specified, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`
+      );
 
     if (!this.languages.locales.has(locale))
-      return msg.reply(`Locale \`${locale}\` doesn't exist, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`);
+      return msg.reply(
+        `Locale \`${locale}\` doesn't exist, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`
+      );
 
     const flags = msg.flags<Flags>();
     const isUser = flags.user === true || flags.u === true;
@@ -103,7 +116,9 @@ export default class LocaleCommand extends Command {
     const id = isUser ? msg.author.id : msg.guild.id;
 
     await controller.update(id, { language: locale });
-    return msg.reply(`Language for ${isUser ? 'user' : 'server'} has been set to **${locale}**`);
+    return msg.reply(
+      `Language for ${isUser ? 'user' : 'server'} has been set to **${locale}**`
+    );
   }
 
   @Subcommand()
@@ -113,7 +128,13 @@ export default class LocaleCommand extends Command {
     const controller = isUser ? this.database.users : this.database.guilds;
     const id = isUser ? msg.author.id : msg.guild.id;
 
-    await controller.update(id, { language: this.languages.defaultLocale.code });
-    return msg.reply(`Language for ${isUser ? 'user' : 'server'} has been resetted to **${this.languages.defaultLocale.code}**`);
+    await controller.update(id, {
+      language: this.languages.defaultLocale.code,
+    });
+    return msg.reply(
+      `Language for ${isUser ? 'user' : 'server'} has been resetted to **${
+        this.languages.defaultLocale.code
+      }**`
+    );
   }
 }

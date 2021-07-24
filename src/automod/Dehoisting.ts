@@ -37,18 +37,23 @@ export default class Dehoisting implements Automod {
 
   async onMemberNickUpdate(member: Member) {
     const settings = await this.database.automod.get(member.guild.id);
-    if (settings !== undefined && settings.dehoist === false)
-      return false;
+    if (settings !== undefined && settings.dehoist === false) return false;
 
-    if (member.nick === null)
-      return false;
+    if (member.nick === null) return false;
 
-    if (!member.guild.members.get(this.discord.client.user.id)?.permissions.has('manageNicknames'))
+    if (
+      !member.guild.members
+        .get(this.discord.client.user.id)
+        ?.permissions.has('manageNicknames')
+    )
       return false;
 
     if (member.nick[0] < '0') {
       const origin = member.nick;
-      await member.edit({ nick: 'hoister' }, `[Automod] Member ${member.username}#${member.discriminator} has updated their nick to "${origin}" and dehoisting is enabled.`);
+      await member.edit(
+        { nick: 'hoister' },
+        `[Automod] Member ${member.username}#${member.discriminator} has updated their nick to "${origin}" and dehoisting is enabled.`
+      );
 
       return true;
     }

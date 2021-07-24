@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
+import PunishmentService, {
+  PunishmentEntryType,
+} from '../services/PunishmentService';
 import { Constants, Guild, User } from 'eris';
 import { Inject, Subscribe } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
@@ -39,19 +41,26 @@ export default class GuildBansListener {
 
   @Subscribe('guildBanAdd', { emitter: 'discord' })
   async onGuildBanAdd(guild: Guild, user: User) {
-    if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs')) {
+    if (
+      !guild.members
+        .get(this.discord.client.user.id)
+        ?.permissions.has('viewAuditLogs')
+    ) {
       return;
     }
 
     const audits = await guild.getAuditLog({
       actionType: Constants.AuditLogActions.MEMBER_BAN_ADD,
-      limit: 3
+      limit: 3,
     });
 
-    const entry = audits.entries.find(entry => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
+    const entry = audits.entries.find(
+      (entry) =>
+        entry.targetID === user.id &&
+        entry.user.id !== this.discord.client.user.id
+    );
 
-    if (entry === undefined)
-      return;
+    if (entry === undefined) return;
 
     const caseModel = await this.database.cases.create({
       attachments: [],
@@ -59,32 +68,42 @@ export default class GuildBansListener {
       victimID: entry.targetID,
       guildID: entry.guild.id,
       reason: entry.reason ?? 'No reason was provided',
-      type: PunishmentType.Ban
+      type: PunishmentType.Ban,
     });
 
-    await this.punishments['publishToModLog']({
-      moderator: this.discord.client.users.get(entry.user.id)!,
-      victim: this.discord.client.users.get(entry.targetID)!,
-      reason: entry.reason ?? 'No reason was provided',
-      guild: entry.guild,
-      type: PunishmentEntryType.Banned
-    }, caseModel);
+    await this.punishments['publishToModLog'](
+      {
+        moderator: this.discord.client.users.get(entry.user.id)!,
+        victim: this.discord.client.users.get(entry.targetID)!,
+        reason: entry.reason ?? 'No reason was provided',
+        guild: entry.guild,
+        type: PunishmentEntryType.Banned,
+      },
+      caseModel
+    );
   }
 
   @Subscribe('guildBanRemove', { emitter: 'discord' })
   async onGuildBanRemove(guild: Guild, user: User) {
-    if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
+    if (
+      !guild.members
+        .get(this.discord.client.user.id)
+        ?.permissions.has('viewAuditLogs')
+    )
       return;
 
     const audits = await guild.getAuditLog({
       actionType: Constants.AuditLogActions.MEMBER_BAN_REMOVE,
-      limit: 3
+      limit: 3,
     });
 
-    const entry = audits.entries.find(entry => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
+    const entry = audits.entries.find(
+      (entry) =>
+        entry.targetID === user.id &&
+        entry.user.id !== this.discord.client.user.id
+    );
 
-    if (entry === undefined)
-      return;
+    if (entry === undefined) return;
 
     const caseModel = await this.database.cases.create({
       attachments: [],
@@ -92,15 +111,18 @@ export default class GuildBansListener {
       victimID: entry.targetID,
       guildID: entry.guild.id,
       reason: entry.reason ?? 'No reason was provided',
-      type: PunishmentType.Unban
+      type: PunishmentType.Unban,
     });
 
-    await this.punishments['publishToModLog']({
-      moderator: this.discord.client.users.get(entry.user.id)!,
-      victim: this.discord.client.users.get(entry.targetID)!,
-      reason: 'Moderator has unbanned on their own accord.',
-      guild: entry.guild,
-      type: PunishmentEntryType.Unban
-    }, caseModel);
+    await this.punishments['publishToModLog'](
+      {
+        moderator: this.discord.client.users.get(entry.user.id)!,
+        victim: this.discord.client.users.get(entry.targetID)!,
+        reason: 'Moderator has unbanned on their own accord.',
+        guild: entry.guild,
+        type: PunishmentEntryType.Unban,
+      },
+      caseModel
+    );
   }
 }

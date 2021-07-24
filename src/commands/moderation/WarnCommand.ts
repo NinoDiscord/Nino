@@ -45,77 +45,102 @@ export default class WarnCommand extends Command {
       userPermissions: 'kickMembers',
       description: 'descriptions.warn',
       category: Categories.Moderation,
-      examples: [
-        'warn 280158289667555328 no'
-      ],
+      examples: ['warn 280158289667555328 no'],
       aliases: ['addwarn'],
-      name: 'warn'
+      name: 'warn',
     });
   }
 
   async run(msg: CommandMessage, [userID, ...reason]: string[]) {
-    if (!userID)
-      return msg.reply('No bot or user was specified.');
+    if (!userID) return msg.reply('No bot or user was specified.');
 
     let user!: User | null;
     try {
       user = await this.discord.getUser(userID);
-    } catch(ex) {
+    } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10013)
-        return msg.reply(`User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`);
+        return msg.reply(
+          `User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`
+        );
 
-      return msg.reply([
-        'Uh-oh! An internal error has occured while running this.',
-        'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
-        '',
-        '```js',
-        ex.stack ?? '<... no stacktrace? ...>',
-        '```'
-      ].join('\n'));
+      return msg.reply(
+        [
+          'Uh-oh! An internal error has occured while running this.',
+          'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
+          '',
+          '```js',
+          ex.stack ?? '<... no stacktrace? ...>',
+          '```',
+        ].join('\n')
+      );
     }
 
-    if (user === null)
-      return msg.reply('Bot or user was not found.');
+    if (user === null) return msg.reply('Bot or user was not found.');
 
     if (!msg.guild.members.has(user.id))
       return msg.reply('Cannot warn members outside the server.');
 
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
-      return msg.reply('I don\'t think I can perform this action due to you kicking the owner, you idiot.');
+      return msg.reply(
+        "I don't think I can perform this action due to you kicking the owner, you idiot."
+      );
 
     if (member.id === this.discord.client.user.id)
       return msg.reply(';w; why would you warn me? **(／。＼)**');
 
-    if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
-      return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
+    if (
+      member.permissions.has('administrator') ||
+      member.permissions.has('banMembers')
+    )
+      return msg.reply(
+        `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
+      );
 
     if (!Permissions.isMemberAbove(msg.member, member))
-      return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above as you.`);
+      return msg.reply(
+        `User **${user.username}#${user.discriminator}** is the same or above as you.`
+      );
 
     if (!Permissions.isMemberAbove(msg.self!, member))
-      return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
+      return msg.reply(
+        `User **${user.username}#${user.discriminator}** is the same or above me.`
+      );
 
     try {
-      await this.punishments.createWarning(msg.guild.members.get(user.id)!, reason.join(' ') || 'No reason was provided.', 1);
+      await this.punishments.createWarning(
+        msg.guild.members.get(user.id)!,
+        reason.join(' ') || 'No reason was provided.',
+        1
+      );
 
-      const warnings = await this.database.warnings.getAll(msg.guild.id, user.id).then(warnings => warnings.filter(warns => warns.amount > 0));
+      const warnings = await this.database.warnings
+        .getAll(msg.guild.id, user.id)
+        .then((warnings) => warnings.filter((warns) => warns.amount > 0));
       const count = warnings.reduce((acc, curr) => acc + curr.amount, 0);
 
-      return msg.reply(`:thumbsup: Warned **${user.username}#${user.discriminator}**${reason.length > 0 ? ` for **${reason.join(' ')}**` : ' '}, they now have **${pluralize('warning', count)}**.`);
-    } catch(ex) {
+      return msg.reply(
+        `:thumbsup: Warned **${user.username}#${user.discriminator}**${
+          reason.length > 0 ? ` for **${reason.join(' ')}**` : ' '
+        }, they now have **${pluralize('warning', count)}**.`
+      );
+    } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10007) {
-        return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
+        return msg.reply(
+          `Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`
+        );
       }
 
-      return msg.reply([
-        'Uh-oh! An internal error has occured while running this.',
-        'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
-        '',
-        '```js',
-        ex.stack ?? '<... no stacktrace? ...>',
-        '```'
-      ].join('\n'));
+      return msg.reply(
+        [
+          'Uh-oh! An internal error has occured while running this.',
+          'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
+          '',
+          '```js',
+          ex.stack ?? '<... no stacktrace? ...>',
+          '```',
+        ].join('\n')
+      );
     }
   }
 }

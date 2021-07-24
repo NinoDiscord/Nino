@@ -24,12 +24,12 @@ import { Entity, Column, PrimaryColumn } from 'typeorm';
 
 export enum LoggingEvents {
   VoiceMemberDeafened = 'voice_member_deafened',
-  VoiceChannelSwitch  = 'voice_channel_switch',
-  VoiceMemberMuted    = 'voice_member_muted',
-  VoiceChannelLeft    = 'voice_channel_left',
-  VoiceChannelJoin    = 'voice_channel_join',
-  MessageDeleted      = 'message_delete',
-  MessageUpdated      = 'message_update'
+  VoiceChannelSwitch = 'voice_channel_switch',
+  VoiceMemberMuted = 'voice_member_muted',
+  VoiceChannelLeft = 'voice_channel_left',
+  VoiceChannelJoin = 'voice_channel_join',
+  MessageDeleted = 'message_delete',
+  MessageUpdated = 'message_update',
 }
 
 @Entity({ name: 'logging' })

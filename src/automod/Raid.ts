@@ -56,22 +56,22 @@ interface IBigIntSerialized {
 
 // Serializer for JSON.stringify for bigints
 const bigintSerializer = (_: string, value: unknown) => {
-  if (typeof value === 'bigint')
-    return { value: Number(value), bigint: true };
-  else
-    return value;
+  if (typeof value === 'bigint') return { value: Number(value), bigint: true };
+  else return value;
 };
 
 // Deserializer for JSON.parse for bigints
 const bigintDeserializer = (_: string, value: unknown) => {
   if (isObject<IBigIntSerialized>(value) && value.bigint === true)
     return BigInt(value.value);
-  else
-    return value;
+  else return value;
 };
 
 export default class RaidAutomod implements Automod {
-  public _raidLocks: Record<string, { lock: RedisLock; timeout: NodeJS.Timeout; }> = {};
+  public _raidLocks: Record<
+    string,
+    { lock: RedisLock; timeout: NodeJS.Timeout }
+  > = {};
   public name = 'raid';
 
   @Inject
@@ -92,21 +92,22 @@ export default class RaidAutomod implements Automod {
   async onMessage(msg: Message<TextChannel>) {
     const settings = await this.database.automod.get(msg.guildID);
 
-    if (settings === undefined || settings.raid === false)
-      return false;
+    if (settings === undefined || settings.raid === false) return false;
 
-    if (!msg || msg === null)
-      return false;
+    if (!msg || msg === null) return false;
 
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      msg.member !== null &&
-      !PermissionUtil.isMemberAbove(nino, msg.member) ||
-      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
+      (msg.member !== null &&
+        !PermissionUtil.isMemberAbove(nino, msg.member)) ||
+      !msg.channel
+        .permissionsOf(this.discord.client.user.id)
+        .has('manageMessages') ||
       msg.author.bot ||
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
-    ) return false;
+    )
+      return false;
 
     // A raid can happen with 25-100+ pings
     const joinedAt = luxon.DateTime.fromJSDate(new Date(msg.member.joinedAt));
@@ -126,10 +127,10 @@ export default class RaidAutomod implements Automod {
           reason: `[Automod] Raid in <#${msg.channel.id}> (Pinged ${msg.mentions.length} users)`,
           member: {
             guild: msg.channel.guild,
-            id: msg.author.id
+            id: msg.author.id,
           },
           soft: false,
-          type: PunishmentType.Ban
+          type: PunishmentType.Ban,
         });
       } catch {
         // skip if we can't ban the user

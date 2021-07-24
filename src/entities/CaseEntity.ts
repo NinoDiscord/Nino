@@ -48,7 +48,7 @@ export default class CaseEntity {
 
   @Column({
     type: 'enum',
-    enum: PunishmentType
+    enum: PunishmentType,
   })
   public type!: PunishmentType;
 

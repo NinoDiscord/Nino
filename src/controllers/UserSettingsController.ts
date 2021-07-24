@@ -47,9 +47,7 @@ export default class UserSettingsController {
   }
 
   update(userID: string, values: QueryDeepPartialEntity<UserEntity>) {
-    return this
-      .database
-      .connection
+    return this.database.connection
       .createQueryBuilder()
       .update(UserEntity)
       .set(values)

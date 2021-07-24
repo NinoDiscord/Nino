@@ -34,7 +34,10 @@ declare module 'ioredis-lock' {
    * Creates and returns a new Lock instance, configured for use with the supplied redis client, as well as options, if provided.
    * The options object may contain following three keys, as outlined at the start of the documentation: timeout, retries and delay.
    */
-  export function createLock(client: ioredis.Redis | ioredis.Cluster, options?: RedisLockOptions): Lock;
+  export function createLock(
+    client: ioredis.Redis | ioredis.Cluster,
+    options?: RedisLockOptions
+  ): Lock;
 
   /**
    * Returns an array of currently active/acquired locks.

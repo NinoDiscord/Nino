@@ -29,7 +29,7 @@ import Config from './Config';
 
 @Component({
   priority: 4,
-  name: 'redis'
+  name: 'redis',
 })
 export default class Redis {
   public client!: IORedis.Redis;
@@ -50,30 +50,31 @@ export default class Redis {
     const host = this.config.getProperty('redis.host');
     const port = this.config.getProperty('redis.port');
 
-    const config = (sentinels ?? []).length > 0 ? {
-      enableReadyCheck: true,
-      connectionName: 'Nino',
-      lazyConnect: true,
-      sentinels,
-      password: password,
-      name: masterName,
-      db: index
-    } : {
-      enableReadyCheck: true,
-      connectionName: 'Nino',
-      lazyConnect: true,
-      password: password,
-      host: host,
-      port: port,
-      db: index
-    };
+    const config =
+      (sentinels ?? []).length > 0
+        ? {
+            enableReadyCheck: true,
+            connectionName: 'Nino',
+            lazyConnect: true,
+            sentinels,
+            password: password,
+            name: masterName,
+            db: index,
+          }
+        : {
+            enableReadyCheck: true,
+            connectionName: 'Nino',
+            lazyConnect: true,
+            password: password,
+            host: host,
+            port: port,
+            db: index,
+          };
 
     this.client = new IORedis(config);
 
     await this.client.client('SETNAME', 'Nino');
-    this.client.on('ready', () =>
-      this.logger.info('Connected to Redis!')
-    );
+    this.client.on('ready', () => this.logger.info('Connected to Redis!'));
 
     this.client.on('error', this.logger.error);
     return this.client.connect().catch(() => {}); // eslint-disable-line
@@ -84,8 +85,9 @@ export default class Redis {
   }
 
   getTimeouts(guild: string) {
-    return this.client.hget('nino:timeouts', guild)
-      .then(value => value !== null ? JSON.parse<Timeout[]>(value) : [])
+    return this.client
+      .hget('nino:timeouts', guild)
+      .then((value) => (value !== null ? JSON.parse<Timeout[]>(value) : []))
       .catch(() => [] as Timeout[]);
   }
 
@@ -99,27 +101,33 @@ export default class Redis {
     // stole this from donny
     // Credit: https://github.com/FurryBotCo/FurryBot/blob/master/src/commands/information/stats-cmd.ts#L22
     const [stats, server] = await Promise.all([
-      this.client.info('stats').then(info =>
-        info
-          .split(/\n\r?/)
-          .slice(1, -1)
-          .map(item => ({ [item.split(':')[0]]: item.split(':')[1].trim() }))
-          .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisInfo
+      this.client.info('stats').then(
+        (info) =>
+          info
+            .split(/\n\r?/)
+            .slice(1, -1)
+            .map((item) => ({
+              [item.split(':')[0]]: item.split(':')[1].trim(),
+            }))
+            .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisInfo
       ),
 
-      this.client.info('server').then(info =>
-        info
-          .split(/\n\r?/)
-          .slice(1, -1)
-          .map(item => ({ [item.split(':')[0]]: item.split(':')[1].trim() }))
-          .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisServerInfo
-      )
+      this.client.info('server').then(
+        (info) =>
+          info
+            .split(/\n\r?/)
+            .slice(1, -1)
+            .map((item) => ({
+              [item.split(':')[0]]: item.split(':')[1].trim(),
+            }))
+            .reduce((a, b) => ({ ...a, ...b })) as unknown as RedisServerInfo
+      ),
     ]);
 
     return {
       server,
       stats,
-      ping
+      ping,
     };
   }
 }

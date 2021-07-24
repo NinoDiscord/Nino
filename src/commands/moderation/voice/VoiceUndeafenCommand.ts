@@ -41,67 +41,88 @@ export default class VoiceUndeafenCommand extends Command {
     super({
       description: 'descriptions.voice_undeaf',
       category: Categories.Moderation,
-      examples: [
-        'vcundeaf <@256548545856545896>',
-        'vcundeaf 3 some reason!'
-      ],
+      examples: ['vcundeaf <@256548545856545896>', 'vcundeaf 3 some reason!'],
       aliases: ['undeafvc'],
-      name: 'vcundeaf'
+      name: 'vcundeaf',
     });
   }
 
   async run(msg: CommandMessage, [userID, ...reason]: string[]) {
-    if (!userID)
-      return msg.reply('No bot or user was specified.');
+    if (!userID) return msg.reply('No bot or user was specified.');
 
     let user!: User | null;
     try {
       user = await this.discord.getUser(userID);
-    } catch(ex) {
+    } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10013)
-        return msg.reply(`User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`);
+        return msg.reply(
+          `User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`
+        );
 
-      return msg.reply([
-        'Uh-oh! An internal error has occured while running this.',
-        'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
-        '',
-        '```js',
-        ex.stack ?? '<... no stacktrace? ...>',
-        '```'
-      ].join('\n'));
+      return msg.reply(
+        [
+          'Uh-oh! An internal error has occured while running this.',
+          'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
+          '',
+          '```js',
+          ex.stack ?? '<... no stacktrace? ...>',
+          '```',
+        ].join('\n')
+      );
     }
 
-    if (user === null)
-      return msg.reply('Bot or user was not found.');
+    if (user === null) return msg.reply('Bot or user was not found.');
 
-    const member = msg.guild.members.get(user.id) ?? { id: user.id, guild: msg.guild };
+    const member = msg.guild.members.get(user.id) ?? {
+      id: user.id,
+      guild: msg.guild,
+    };
     if (member.id === msg.guild.ownerID)
-      return msg.reply('I don\'t think I can perform this action due to you banning the owner, you idiot.');
+      return msg.reply(
+        "I don't think I can perform this action due to you banning the owner, you idiot."
+      );
 
     if (member instanceof Member) {
-      if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
-        return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
+      if (
+        member.permissions.has('administrator') ||
+        member.permissions.has('banMembers')
+      )
+        return msg.reply(
+          `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
+        );
 
       if (!Permissions.isMemberAbove(msg.member, member))
-        return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above as you.`);
+        return msg.reply(
+          `User **${user.username}#${user.discriminator}** is the same or above as you.`
+        );
 
       if (!Permissions.isMemberAbove(msg.self!, member))
-        return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
+        return msg.reply(
+          `User **${user.username}#${user.discriminator}** is the same or above me.`
+        );
     }
 
     if (msg.member.voiceState.channelID === null)
-      return msg.reply('You must be in a voice channel to perform this action.');
+      return msg.reply(
+        'You must be in a voice channel to perform this action.'
+      );
 
-    const channel = this.discord.client.getChannel(msg.member.voiceState.channelID) as VoiceChannel;
+    const channel = this.discord.client.getChannel(
+      msg.member.voiceState.channelID
+    ) as VoiceChannel;
     if (channel.voiceMembers.size === 1)
       return msg.reply('You must be in an active voice channel.');
 
     if (!channel.voiceMembers.has(user.id))
-      return msg.reply(`Member **${user.username}#${user.discriminator}** is not in this voice channel.`);
+      return msg.reply(
+        `Member **${user.username}#${user.discriminator}** is not in this voice channel.`
+      );
 
     const voiceState = channel.voiceMembers.get(user.id)!.voiceState;
     if (!voiceState.deaf)
-      return msg.reply(`Member **${user.username}#${user.discriminator}** is already not deafened.`);
+      return msg.reply(
+        `Member **${user.username}#${user.discriminator}** is already not deafened.`
+      );
 
     const areason = reason.join(' ');
     let actualReason: string | undefined = undefined;
@@ -120,26 +141,43 @@ export default class VoiceUndeafenCommand extends Command {
         moderator: msg.author,
         publish: true,
         reason: actualReason,
-        member: msg.guild.members.get(user.id) || { id: user.id, guild: msg.guild },
+        member: msg.guild.members.get(user.id) || {
+          id: user.id,
+          guild: msg.guild,
+        },
         type: PunishmentType.VoiceUndeafen,
-        time: time !== undefined ? ms(time!) : undefined
+        time: time !== undefined ? ms(time!) : undefined,
       });
 
       this.discord.client.leaveVoiceChannel(msg.member.voiceState.channelID);
-      return msg.reply(`:thumbsup: Member **${user.username}#${user.discriminator}** has been server undeafen in voice channels.${reason.length ? ` *for ${reason.join(' ')}${time !== undefined ? `, for ${time}*` : '*'}` : '.'}`);
-    } catch(ex) {
+      return msg.reply(
+        `:thumbsup: Member **${user.username}#${
+          user.discriminator
+        }** has been server undeafen in voice channels.${
+          reason.length
+            ? ` *for ${reason.join(' ')}${
+                time !== undefined ? `, for ${time}*` : '*'
+              }`
+            : '.'
+        }`
+      );
+    } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10007) {
-        return msg.reply(`Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`);
+        return msg.reply(
+          `Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`
+        );
       }
 
-      return msg.reply([
-        'Uh-oh! An internal error has occured while running this.',
-        'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
-        '',
-        '```js',
-        ex.stack ?? '<... no stacktrace? ...>',
-        '```'
-      ].join('\n'));
+      return msg.reply(
+        [
+          'Uh-oh! An internal error has occured while running this.',
+          'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
+          '',
+          '```js',
+          ex.stack ?? '<... no stacktrace? ...>',
+          '```',
+        ].join('\n')
+      );
     }
   }
 }

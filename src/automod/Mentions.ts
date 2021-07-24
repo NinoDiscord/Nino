@@ -46,28 +46,32 @@ export default class Mentions implements Automod {
 
   async onMessage(msg: Message<TextChannel>) {
     const settings = await this.database.automod.get(msg.guildID);
-    if (settings === undefined || settings.invites === false)
-      return false;
+    if (settings === undefined || settings.invites === false) return false;
 
-    if (!msg || msg === null)
-      return false;
+    if (!msg || msg === null) return false;
 
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      msg.member !== null &&
-      !PermissionUtil.isMemberAbove(nino, msg.member) ||
-      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
+      (msg.member !== null &&
+        !PermissionUtil.isMemberAbove(nino, msg.member)) ||
+      !msg.channel
+        .permissionsOf(this.discord.client.user.id)
+        .has('manageMessages') ||
       msg.author.bot ||
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
-    ) return false;
+    )
+      return false;
 
     if (msg.mentions.length >= 4) {
       const language = this.locales.get(msg.guildID, msg.author.id);
 
       await msg.channel.createMessage(language.translate('automod.mentions'));
       await msg.delete();
-      await this.punishments.createWarning(msg.member, `[Automod] Mentioned 4 or more people in ${msg.channel.mention}`);
+      await this.punishments.createWarning(
+        msg.member,
+        `[Automod] Mentioned 4 or more people in ${msg.channel.mention}`
+      );
 
       return true;
     }

@@ -24,5 +24,5 @@ import { HttpClient } from '@augu/orchid';
 import { version } from '../util/Constants';
 
 export default new HttpClient({
-  userAgent: `Nino (v${version}, https://github.com/NinoDiscord/Nino)`
+  userAgent: `Nino (v${version}, https://github.com/NinoDiscord/Nino)`,
 });

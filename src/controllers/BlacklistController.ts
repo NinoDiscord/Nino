@@ -52,8 +52,7 @@ export default class BlacklistController {
     entry.type = type;
     entry.id = id;
 
-    if (reason !== undefined)
-      entry.reason = reason;
+    if (reason !== undefined) entry.reason = reason;
 
     return this.repository.save(entry);
   }
@@ -63,9 +62,7 @@ export default class BlacklistController {
   }
 
   update(id: string, values: QueryDeepPartialEntity<BlacklistEntity>) {
-    return this
-      .database
-      .connection
+    return this.database.connection
       .createQueryBuilder()
       .update(BlacklistEntity)
       .set(values)

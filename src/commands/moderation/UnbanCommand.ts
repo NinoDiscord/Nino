@@ -40,19 +40,15 @@ export default class UnbanCommand extends Command {
       botPermissions: 'banMembers',
       description: 'descriptions.ban',
       category: Categories.Moderation,
-      examples: [
-        'unban @Nino',
-        'unban @Nino some reason!'
-      ],
+      examples: ['unban @Nino', 'unban @Nino some reason!'],
       aliases: ['unbent', 'unbean'],
       usage: '<user> [reason]',
-      name: 'unban'
+      name: 'unban',
     });
   }
 
   async run(msg: CommandMessage, [userID, ...reason]: [string, ...string[]]) {
-    if (!userID)
-      return msg.reply('No bot or user was specified.');
+    if (!userID) return msg.reply('No bot or user was specified.');
 
     try {
       await this.punishments.apply({
@@ -60,25 +56,30 @@ export default class UnbanCommand extends Command {
         publish: true,
         reason: reason.join(' ') || 'No description was provided.',
         member: { id: userID, guild: msg.guild },
-        type: PunishmentType.Unban
+        type: PunishmentType.Unban,
       });
 
       const timeouts = await this.redis.getTimeouts(msg.guild.id);
-      const available = timeouts.filter(pkt =>
-        pkt.type !== 'unban' && pkt.user !== userID && pkt.guild === msg.guild.id
+      const available = timeouts.filter(
+        (pkt) =>
+          pkt.type !== 'unban' &&
+          pkt.user !== userID &&
+          pkt.guild === msg.guild.id
       );
 
       await this.redis.client.hmset('nino:timeouts', [msg.guild.id, available]);
       return msg.reply('User or bot has been unbanned successfully.');
-    } catch(ex) {
-      return msg.reply([
-        'Uh-oh! An internal error has occured while running this.',
-        'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
-        '',
-        '```js',
-        ex.stack ?? '<... no stacktrace? ...>',
-        '```'
-      ].join('\n'));
+    } catch (ex) {
+      return msg.reply(
+        [
+          'Uh-oh! An internal error has occured while running this.',
+          'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
+          '',
+          '```js',
+          ex.stack ?? '<... no stacktrace? ...>',
+          '```',
+        ].join('\n')
+      );
     }
   }
 }

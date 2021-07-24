@@ -31,9 +31,9 @@ import 'reflect-metadata';
     NODE_ENV: {
       oneOf: ['production', 'development'],
       default: 'development',
-      type: 'string'
-    }
-  }
+      type: 'string',
+    },
+  },
 });
 
 import { commitHash, version } from './util/Constants';
@@ -43,7 +43,7 @@ import logger from './singletons/Logger';
 import app from './container';
 import ts from 'typescript';
 
-(async() => {
+(async () => {
   logger.info(`Loading Nino v${version} (${commitHash ?? '<unknown>'})`);
   logger.info(`-> TypeScript: ${ts.version}`);
   logger.info(`->    Node.js: ${process.version}`);
@@ -52,7 +52,7 @@ import ts from 'typescript';
 
   try {
     await app.load();
-  } catch(ex) {
+  } catch (ex) {
     logger.fatal('Unable to load container');
     console.error(ex);
     process.exit(1);
@@ -69,23 +69,27 @@ import ts from 'typescript';
 
 const ReconnectCodes = [
   1001, // Going Away (re-connect now)
-  1006  // Connection reset by peer
+  1006, // Connection reset by peer
 ];
 
-process.on('unhandledRejection', error => {
+process.on('unhandledRejection', (error) => {
   const sentry = app.$ref<Sentry>(Sentry);
   if (error !== null || error !== undefined) {
     logger.fatal('Received unhandled Promise rejection:', error);
-    if (error instanceof Error)
-      sentry?.report(error);
+    if (error instanceof Error) sentry?.report(error);
   }
 });
 
-process.on('uncaughtException', async error => {
+process.on('uncaughtException', async (error) => {
   const sentry = app.$ref<Sentry>(Sentry);
 
-  if ((error as any).code !== undefined && ReconnectCodes.includes((error as any).code)) {
-    logger.fatal('Disconnected due to peer to peer connection ended, restarting client...');
+  if (
+    (error as any).code !== undefined &&
+    ReconnectCodes.includes((error as any).code)
+  ) {
+    logger.fatal(
+      'Disconnected due to peer to peer connection ended, restarting client...'
+    );
 
     const discord = app.$ref<Discord>(Discord);
     discord.client.disconnect({ reconnect: false });

@@ -30,9 +30,12 @@ import { join } from 'path';
 @Service({
   priority: 1,
   children: join(process.cwd(), 'automod'),
-  name: 'automod'
+  name: 'automod',
 })
-export default class AutomodService extends Collection<string, Automod> implements ComponentOrServiceHooks<Automod> {
+export default class AutomodService
+  extends Collection<string, Automod>
+  implements ComponentOrServiceHooks<Automod>
+{
   @Inject
   private logger!: Logger;
 
@@ -48,44 +51,42 @@ export default class AutomodService extends Collection<string, Automod> implemen
   async run(type: string, ...args: any[]) {
     switch (type) {
       case 'userUpdate': {
-        const automod = this.filter(am => am.onUserUpdate !== undefined);
+        const automod = this.filter((am) => am.onUserUpdate !== undefined);
         for (const am of automod) {
           const res = await am.onUserUpdate!(args[0]);
-          if (res === true)
-            return true;
+          if (res === true) return true;
         }
 
         return false;
       }
 
       case 'memberNick': {
-        const automod = this.filter(am => am.onMemberNickUpdate !== undefined);
+        const automod = this.filter(
+          (am) => am.onMemberNickUpdate !== undefined
+        );
         for (const am of automod) {
           const res = await am.onMemberNickUpdate!(args[0]);
-          if (res === true)
-            return true;
+          if (res === true) return true;
         }
 
         return false;
       }
 
       case 'memberJoin': {
-        const automod = this.filter(am => am.onMemberJoin !== undefined);
+        const automod = this.filter((am) => am.onMemberJoin !== undefined);
         for (const am of automod) {
           const res = await am.onMemberJoin!(args[0]);
-          if (res === true)
-            return true;
+          if (res === true) return true;
         }
 
         return false;
       }
 
       case 'message': {
-        const automod = this.filter(am => am.onMessage !== undefined);
+        const automod = this.filter((am) => am.onMessage !== undefined);
         for (const am of automod) {
           const res = await am.onMessage!(args[0]);
-          if (res === true)
-            return true;
+          if (res === true) return true;
         }
 
         return false;

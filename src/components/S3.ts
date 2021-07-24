@@ -20,7 +20,12 @@
  * SOFTWARE.
  */
 
-import { S3Client, ListBucketsCommand, CreateBucketCommand, PutObjectCommand } from '@aws-sdk/client-s3';
+import {
+  S3Client,
+  ListBucketsCommand,
+  CreateBucketCommand,
+  PutObjectCommand,
+} from '@aws-sdk/client-s3';
 import { Component, ComponentAPI, Inject } from '@augu/lilith';
 import type { Provider, Credentials } from '@aws-sdk/types';
 import CommandService from '../services/CommandService';
@@ -29,7 +34,7 @@ import Config from './Config';
 
 @Component({
   priority: 0,
-  name: 'util:s3'
+  name: 'util:s3',
 })
 export default class S3 {
   public client?: S3Client;
@@ -42,16 +47,21 @@ export default class S3 {
   private readonly config!: Config;
 
   private get credentialsProvider(): Provider<Credentials> {
-    return () => new Promise(resolve => resolve({
-      accessKeyId: this.config.getProperty('s3')?.accessKey!,
-      secretAccessKey: this.config.getProperty('s3')?.secretKey!
-    }));
+    return () =>
+      new Promise((resolve) =>
+        resolve({
+          accessKeyId: this.config.getProperty('s3')?.accessKey!,
+          secretAccessKey: this.config.getProperty('s3')?.secretKey!,
+        })
+      );
   }
 
   async load() {
     const s3 = this.config.getProperty('s3');
     if (s3 === undefined) {
-      this.logger.warn('S3 client credentials are not provided but this is fine, it isn\'t needed.');
+      this.logger.warn(
+        "S3 client credentials are not provided but this is fine, it isn't needed."
+      );
       return Promise.resolve();
     }
 
@@ -59,29 +69,45 @@ export default class S3 {
     this.client = new S3Client({
       credentialDefaultProvider: () => this.credentialsProvider.bind(this),
       endpoint: 'https://s3.wasabisys.com',
-      region: s3.region ?? 'us-east-1'
+      region: s3.region ?? 'us-east-1',
     });
 
-    this.logger.info(`Created S3 client on region ${s3.region ?? 'us-east-1'}.`);
+    this.logger.info(
+      `Created S3 client on region ${s3.region ?? 'us-east-1'}.`
+    );
     const buckets = await this.client.send(new ListBucketsCommand({}));
 
     if (!buckets.Buckets) {
-      this.logger.warn('Unable to retrieve buckets from S3, do you have the list buckets permission?');
+      this.logger.warn(
+        'Unable to retrieve buckets from S3, do you have the list buckets permission?'
+      );
       this.client = undefined; // set it as undefined
 
       return Promise.resolve();
     }
 
-    this.logger.info(`S3 authentication was successful, retrieved ${buckets.Buckets!.length} buckets.`);
-    if (!buckets.Buckets!.find(s => s.Name !== undefined && s.Name === s3.bucket)) {
-      this.logger.info(`Bucket with name ${s3.bucket} was not found, creating...`);
+    this.logger.info(
+      `S3 authentication was successful, retrieved ${
+        buckets.Buckets!.length
+      } buckets.`
+    );
+    if (
+      !buckets.Buckets!.find(
+        (s) => s.Name !== undefined && s.Name === s3.bucket
+      )
+    ) {
+      this.logger.info(
+        `Bucket with name ${s3.bucket} was not found, creating...`
+      );
       try {
-        await this.client.send(new CreateBucketCommand({
-          Bucket: s3.bucket
-        }));
+        await this.client.send(
+          new CreateBucketCommand({
+            Bucket: s3.bucket,
+          })
+        );
 
         this.logger.info('created bucket');
-      } catch(ex) {
+      } catch (ex) {
         this.logger.warn('error occured but thats fine :p, i think?');
         this.logger.error(ex);
       }
@@ -89,14 +115,13 @@ export default class S3 {
   }
 
   async publishCommands() {
-    if (!this.client)
-      return Promise.resolve();
+    if (!this.client) return Promise.resolve();
 
     const commands = this.api.getReference<CommandService>(CommandService);
     this.logger.info(`Serializing and uploading ${commands.size} commands...`);
 
     const obj: Record<string, any> = {};
-    for (const command of commands.filter(s => !s.ownerOnly).values()) {
+    for (const command of commands.filter((s) => !s.ownerOnly).values()) {
       obj[command.name] = {
         userPermissions: command.userPermissions,
         botPermissions: command.botPermissions,
@@ -105,18 +130,20 @@ export default class S3 {
         category: command.category,
         cooldown: command.cooldown,
         aliases: command.aliases,
-        usage: command.usage
+        usage: command.usage,
       };
     }
 
     const packet = JSON.stringify(obj);
-    await this.client!.send(new PutObjectCommand({
-      ContentLength: packet.length,
-      ContentType: 'application/json',
-      Bucket: this.config.getProperty('s3')!.bucket,
-      Body: packet,
-      Key: 'commands.json',
-      ACL: 'public-read'
-    }));
+    await this.client!.send(
+      new PutObjectCommand({
+        ContentLength: packet.length,
+        ContentType: 'application/json',
+        Bucket: this.config.getProperty('s3')!.bucket,
+        Body: packet,
+        Key: 'commands.json',
+        ACL: 'public-read',
+      })
+    );
   }
 }

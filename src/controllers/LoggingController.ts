@@ -33,8 +33,7 @@ export default class LoggingController {
 
   async get(guildID: string) {
     const entry = await this.repository.findOne({ guildID });
-    if (entry === undefined)
-      return this.create(guildID);
+    if (entry === undefined) return this.create(guildID);
 
     return entry;
   }
@@ -51,9 +50,7 @@ export default class LoggingController {
   }
 
   update(guildID: string, values: QueryDeepPartialEntity<LoggingEntity>) {
-    return this
-      .database
-      .connection
+    return this.database.connection
       .createQueryBuilder()
       .update(LoggingEntity)
       .set(values)

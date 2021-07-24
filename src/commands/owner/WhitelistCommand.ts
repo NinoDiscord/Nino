@@ -41,13 +41,15 @@ export default class WhitelistCommand extends Command {
       hidden: true,
       aliases: ['wl'],
       usage: '["guild" | "user"] [id] [...reason]',
-      name: 'whitelist'
+      name: 'whitelist',
     });
   }
 
   async run(msg: CommandMessage, [type, id]: ['guild' | 'user', string]) {
     if (!['guild', 'user'].includes(type))
-      return msg.reply('Missing the type to blacklist. Available options: `user` and `guild`.');
+      return msg.reply(
+        'Missing the type to blacklist. Available options: `user` and `guild`.'
+      );
 
     if (type === 'guild') {
       const entry = await this.database.blacklists.get(id);
@@ -60,8 +62,7 @@ export default class WhitelistCommand extends Command {
 
     if (type === 'user') {
       const owners = this.config.getProperty('owners') ?? [];
-      if (owners.includes(id))
-        return msg.reply('Cannot whitelist a owner');
+      if (owners.includes(id)) return msg.reply('Cannot whitelist a owner');
 
       const entry = await this.database.blacklists.get(id);
       if (entry === undefined)

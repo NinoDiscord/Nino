@@ -33,16 +33,13 @@ export default class Permissions {
   static getTopRole(member: Member) {
     // For some reason, `roles` will become undefined? So we have to check for that.
     // It could be a bug in Discord or `member` is undefined.
-    if (member.roles === undefined)
-      return;
+    if (member.roles === undefined) return;
 
-    if (member.roles.length === 0)
-      return;
+    if (member.roles.length === 0) return;
 
-    return member
-      .roles
-      .map(roleID => member.guild.roles.get(roleID))
-      .filter(role => role !== undefined)
+    return member.roles
+      .map((roleID) => member.guild.roles.get(roleID))
+      .filter((role) => role !== undefined)
       .sort((a, b) => b!.position - a!.position)[0];
   }
 
@@ -79,8 +76,7 @@ export default class Permissions {
     const names: string[] = [];
 
     for (const key of Object.keys(Constants.Permissions)) {
-      if (permissions.hasOwnProperty(key))
-        names.push(key);
+      if (permissions.hasOwnProperty(key)) names.push(key);
     }
 
     return names.join(', ');
@@ -92,6 +88,6 @@ export default class Permissions {
    * @param required The required permission bitfield
    */
   static hasOverlap(user: number, required: number) {
-    return ((user & 8) !== 0 || (user & required) === required);
+    return (user & 8) !== 0 || (user & required) === required;
   }
 }

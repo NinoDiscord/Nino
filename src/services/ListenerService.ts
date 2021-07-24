@@ -26,7 +26,7 @@ import { join } from 'path';
 @Service({
   priority: 0,
   children: join(process.cwd(), 'listeners'),
-  name: 'listeners'
+  name: 'listeners',
 })
 // a noop service to register all listeners
 export default class ListenerService {}

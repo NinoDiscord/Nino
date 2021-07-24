@@ -108,7 +108,7 @@ declare global {
             moderation: string;
             core: string;
             settings: string;
-          }
+          };
         };
 
         command: {
@@ -126,13 +126,13 @@ declare global {
               bot_perms: string;
               examples: string;
             };
-          }
+          };
         };
 
         module: {
           embed: {
             title: string;
-          }
+          };
         };
 
         usage_title: string;
@@ -150,13 +150,9 @@ declare global {
     }
 
     // eslint-disable-next-line
-    export interface Generic {
-
-    }
+    export interface Generic {}
 
     // eslint-disable-next-line
-    export interface Errors {
-
-    }
+    export interface Errors {}
   }
 }

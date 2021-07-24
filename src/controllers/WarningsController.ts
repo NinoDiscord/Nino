@@ -48,8 +48,7 @@ export default class WarningsController {
   }
 
   create({ guildID, userID, reason, amount }: CreateWarningOptions) {
-    if (amount < 0)
-      throw new RangeError('amount index out of bounds');
+    if (amount < 0) throw new RangeError('amount index out of bounds');
 
     const entry = new WarningEntity();
     entry.guildID = guildID;
@@ -60,10 +59,12 @@ export default class WarningsController {
     return this.repository.save(entry);
   }
 
-  update(guildID: string, userID: string, values: QueryDeepPartialEntity<WarningEntity>) {
-    return this
-      .database
-      .connection
+  update(
+    guildID: string,
+    userID: string,
+    values: QueryDeepPartialEntity<WarningEntity>
+  ) {
+    return this.database.connection
       .createQueryBuilder()
       .update(WarningEntity)
       .set(values)

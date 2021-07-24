@@ -38,7 +38,12 @@ export default class CommandMessage {
   @Inject
   private discord!: Discord;
 
-  constructor(message: Message<TextChannel>, locale: Locale, settings: GuildEntity, userSettings: UserEntity) {
+  constructor(
+    message: Message<TextChannel>,
+    locale: Locale,
+    settings: GuildEntity,
+    userSettings: UserEntity
+  ) {
     this.userSettings = userSettings;
     this.settings = settings;
     this.#message = message;
@@ -70,11 +75,17 @@ export default class CommandMessage {
   }
 
   get successEmote() {
-    return this.discord.emojis.find(e => e === '<:success:464708611260678145>') ?? ':black_check_mark:';
+    return (
+      this.discord.emojis.find((e) => e === '<:success:464708611260678145>') ??
+      ':black_check_mark:'
+    );
   }
 
   get errorEmote() {
-    return this.discord.emojis.find(e => e === '<:xmark:464708589123141634>') ?? ':x:';
+    return (
+      this.discord.emojis.find((e) => e === '<:xmark:464708589123141634>') ??
+      ':x:'
+    );
   }
 
   flags<T extends object>(): T {
@@ -87,8 +98,8 @@ export default class CommandMessage {
         repliedUser: false,
         everyone: false,
         roles: false,
-        users: false
-      }
+        users: false,
+      },
     };
 
     if (reference) {
@@ -101,12 +112,21 @@ export default class CommandMessage {
     } else {
       if (this.guild) {
         if (this.self?.permissions.has('embedLinks'))
-          return this.channel.createMessage({ embed: content.build(), ...payload });
+          return this.channel.createMessage({
+            embed: content.build(),
+            ...payload,
+          });
+        // TODO: unembedify util
         else
-          // TODO: unembedify util
-          return this.channel.createMessage({ content: content.description!, ...payload });
+          return this.channel.createMessage({
+            content: content.description!,
+            ...payload,
+          });
       } else {
-        return this.channel.createMessage({ embed: content.build(), ...payload });
+        return this.channel.createMessage({
+          embed: content.build(),
+          ...payload,
+        });
       }
     }
   }

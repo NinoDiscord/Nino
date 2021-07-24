@@ -29,7 +29,7 @@ export default class UptimeCommand extends Command {
       description: 'descriptions.uptime',
       cooldown: 3,
       aliases: ['up', 'upfor', 'online'],
-      name: 'uptime'
+      name: 'uptime',
     });
   }
 

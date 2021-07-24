@@ -59,7 +59,7 @@ export default class CasesController {
     reason,
     soft,
     time,
-    type
+    type,
   }: CreateCaseOptions) {
     const cases = await this.getAll(guildID);
     const index = (cases[cases.length - 1]?.index ?? 0) + 1;
@@ -73,19 +73,19 @@ export default class CasesController {
     entry.soft = soft === true; // if it's undefined, then it'll be false so no ternaries :crab:
     entry.type = type;
 
-    if (reason !== undefined)
-      entry.reason = reason;
+    if (reason !== undefined) entry.reason = reason;
 
-    if (time !== undefined)
-      entry.time = String(time);
+    if (time !== undefined) entry.time = String(time);
 
     return this.repository.save(entry);
   }
 
-  update(guildID: string, index: number, values: QueryDeepPartialEntity<CaseEntity>) {
-    return this
-      .database
-      .connection
+  update(
+    guildID: string,
+    index: number,
+    values: QueryDeepPartialEntity<CaseEntity>
+  ) {
+    return this.database.connection
       .createQueryBuilder()
       .update(CaseEntity)
       .set(values)

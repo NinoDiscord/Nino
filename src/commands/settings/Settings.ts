@@ -31,7 +31,7 @@ const humanizedEvents = {
   [LoggingEvents.VoiceChannelLeft]: 'Voice Channel Leave',
   [LoggingEvents.VoiceChannelJoin]: 'Voice Channel Join',
   [LoggingEvents.MessageUpdated]: 'Message Updated',
-  [LoggingEvents.MessageDeleted]: 'Message Deleted'
+  [LoggingEvents.MessageDeleted]: 'Message Deleted',
 };
 
 export default class SettingsCommand extends Command {
@@ -44,7 +44,7 @@ export default class SettingsCommand extends Command {
       description: 'descriptions.settings',
       category: Categories.Settings,
       aliases: ['config', 'conf'],
-      name: 'settings'
+      name: 'settings',
     });
   }
 
@@ -53,44 +53,73 @@ export default class SettingsCommand extends Command {
     const [settings, automod, logging] = await Promise.all([
       this.database.guilds.get(msg.guild.id),
       this.database.automod.get(msg.guild.id),
-      this.database.logging.get(msg.guild.id)
+      this.database.logging.get(msg.guild.id),
     ]);
 
     const embed = EmbedBuilder.create()
-      .setTitle(`[ :pencil2: Settings for ${msg.guild.name} (${msg.guild.id}) ]`)
+      .setTitle(
+        `[ :pencil2: Settings for ${msg.guild.name} (${msg.guild.id}) ]`
+      )
       .addFields([
         {
           name: '❯ Settings',
           value: [
-            `• **Muted Role**: ${settings.mutedRoleID !== null ? `<@&${settings.mutedRoleID}> (**${settings.mutedRoleID}**)` : 'None'}`,
-            `• **Mod Log**: ${settings.modlogChannelID !== null ? `<#${settings.modlogChannelID}> (**${settings.modlogChannelID}**)` : 'None'}`
+            `• **Muted Role**: ${
+              settings.mutedRoleID !== null
+                ? `<@&${settings.mutedRoleID}> (**${settings.mutedRoleID}**)`
+                : 'None'
+            }`,
+            `• **Mod Log**: ${
+              settings.modlogChannelID !== null
+                ? `<#${settings.modlogChannelID}> (**${settings.modlogChannelID}**)`
+                : 'None'
+            }`,
           ].join('\n'),
-          inline: true
+          inline: true,
         },
         {
           name: '❯ Automod',
           value: [
-            `• ${automod!.shortLinks ? msg.successEmote : msg.errorEmote} **Short Links**`,
-            `• ${automod!.blacklist ? msg.successEmote : msg.errorEmote} **Blacklist Words**`,
-            `• ${automod!.mentions ? msg.successEmote : msg.errorEmote} **Mentions**`,
-            `• ${automod!.dehoist ? msg.successEmote : msg.errorEmote} **Dehoisting**`,
-            `• ${automod!.invites ? msg.successEmote : msg.errorEmote} **Invites**`,
+            `• ${
+              automod!.shortLinks ? msg.successEmote : msg.errorEmote
+            } **Short Links**`,
+            `• ${
+              automod!.blacklist ? msg.successEmote : msg.errorEmote
+            } **Blacklist Words**`,
+            `• ${
+              automod!.mentions ? msg.successEmote : msg.errorEmote
+            } **Mentions**`,
+            `• ${
+              automod!.dehoist ? msg.successEmote : msg.errorEmote
+            } **Dehoisting**`,
+            `• ${
+              automod!.invites ? msg.successEmote : msg.errorEmote
+            } **Invites**`,
             `• ${automod!.raid ? msg.successEmote : msg.errorEmote} **Raid**`,
-            `• ${automod!.spam ? msg.successEmote : msg.errorEmote} **Spam**`
+            `• ${automod!.spam ? msg.successEmote : msg.errorEmote} **Spam**`,
           ].join('\n'),
-          inline: true
+          inline: true,
         },
         {
           name: '❯ Logging',
           value: [
             `• **Channels Ignored**: ${logging.ignoreChannels.length}`,
             `• **Users Ignored**: ${logging.ignoreUsers.length}`,
-            `• **Channel**: ${logging.channelID !== null ? `<#${logging.channelID}> (**${logging.channelID}**)` : 'None'}`,
-            `• **Enabled**: ${logging.enabled ? msg.successEmote : msg.errorEmote}`,
-            `• **Events**: ${logging.events.map(ev => humanizedEvents[ev]).join(', ') || 'None'}`
+            `• **Channel**: ${
+              logging.channelID !== null
+                ? `<#${logging.channelID}> (**${logging.channelID}**)`
+                : 'None'
+            }`,
+            `• **Enabled**: ${
+              logging.enabled ? msg.successEmote : msg.errorEmote
+            }`,
+            `• **Events**: ${
+              logging.events.map((ev) => humanizedEvents[ev]).join(', ') ||
+              'None'
+            }`,
           ].join('\n'),
-          inline: true
-        }
+          inline: true,
+        },
       ]);
 
     return msg.reply(embed);

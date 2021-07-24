@@ -24,7 +24,7 @@ import { Entity, PrimaryColumn, Column } from 'typeorm';
 
 export enum BlacklistType {
   Guild,
-  User
+  User,
 }
 
 @Entity({ name: 'blacklists' })

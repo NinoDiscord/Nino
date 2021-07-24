@@ -20,15 +20,24 @@
  * SOFTWARE.
  */
 
-import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
+import {
+  Command,
+  CommandMessage,
+  EmbedBuilder,
+  Subcommand,
+} from '../../structures';
 import { Inject } from '@augu/lilith';
-import { Categories, DISCORD_INVITE_REGEX, ID_REGEX } from '../../util/Constants';
+import {
+  Categories,
+  DISCORD_INVITE_REGEX,
+  ID_REGEX,
+} from '../../util/Constants';
 import Discord from '../../components/Discord';
 import { Message, User } from 'eris';
 import { pluralize } from '@augu/utils';
 
 // It's a function so it can properly hydrate instead of being in the command scope as a getter.
-const getTwoWeeksFromNow = () => Date.now() - (1000 * 60 * 60 * 24 * 14);
+const getTwoWeeksFromNow = () => Date.now() - 1000 * 60 * 60 * 24 * 14;
 
 export default class PurgeCommand extends Command {
   @Inject
@@ -45,36 +54,51 @@ export default class PurgeCommand extends Command {
         'prune August#5820 5 | Removes messages that **August** has said. (do not actually do this)',
         'prune self 6 | Removes 6 messages that I have said',
         'prune system | Prunes all system-related messages',
-        'prune attachments | Prunes all messages with attachments'
+        'prune attachments | Prunes all messages with attachments',
       ],
-      aliases: [
-        'prune',
-        'delmsgs',
-        'delmsg'
-      ],
+      aliases: ['prune', 'delmsgs', 'delmsg'],
       category: Categories.Moderation,
       usage: '<userID> [amount] | <before[-after]> | [amount]',
-      name: 'purge'
+      name: 'purge',
     });
   }
 
   private _generateEmbed(msg: CommandMessage, messages: Message[]) {
     // removes duplicated ids (so it doesn't look garbage (i.e: https://github.com/NinoDiscord/Nino/blob/56290f3cce32ec8376d704ab510a10bdeea7fa7a/src/commands/moderation/Prune.ts#L64))
-    const users = [...new Set(messages.map(s => s.author.id))];
+    const users = [...new Set(messages.map((s) => s.author.id))];
     return EmbedBuilder.create()
-      .setAuthor(`[ ${msg.author.username}#${msg.author.discriminator} ~ Purge Result ]`, '', msg.author.dynamicAvatarURL('png', 1024))
+      .setAuthor(
+        `[ ${msg.author.username}#${msg.author.discriminator} ~ Purge Result ]`,
+        '',
+        msg.author.dynamicAvatarURL('png', 1024)
+      )
       .setDescription([
-        `${msg.successEmote} I have deleted **${pluralize('message', messages.length)}** from this channel.`,
+        `${msg.successEmote} I have deleted **${pluralize(
+          'message',
+          messages.length
+        )}** from this channel.`,
         '> 👤 **Users Affected**',
         '```apache',
-        users.map(user => {
-          const u = this.discord.client.users.get(user) ?? { username: 'Unknown User', discriminator: '0000', id: user, bot: false };
-          const messagesByUser = messages.filter(c => c.author.id === user);
-          const percentage = ((messagesByUser.length / messages.length) * 100).toFixed();
+        users
+          .map((user) => {
+            const u = this.discord.client.users.get(user) ?? {
+              username: 'Unknown User',
+              discriminator: '0000',
+              id: user,
+              bot: false,
+            };
+            const messagesByUser = messages.filter((c) => c.author.id === user);
+            const percentage = (
+              (messagesByUser.length / messages.length) *
+              100
+            ).toFixed();
 
-          return `• ${u.username}#${u.discriminator}${u.bot ? ' (Bot)' : ''} (${u.id}) - ${percentage}% deleted`;
-        }).join('\n'),
-        '```'
+            return `• ${u.username}#${u.discriminator}${
+              u.bot ? ' (Bot)' : ''
+            } (${u.id}) - ${percentage}% deleted`;
+          })
+          .join('\n'),
+        '```',
       ]);
   }
 
@@ -82,14 +106,16 @@ export default class PurgeCommand extends Command {
     if (!userIdOrAmount) {
       await msg.reply('Now purging 100 messages from this channel...');
 
-      const messages = await msg.channel.getMessages({ limit: 100 }).then(f => f.filter(c => c.timestamp >= getTwoWeeksFromNow()));
+      const messages = await msg.channel
+        .getMessages({ limit: 100 })
+        .then((f) => f.filter((c) => c.timestamp >= getTwoWeeksFromNow()));
       if (!messages.length)
         return msg.error('No messages were found that is under 2 weeks?');
 
       await this.discord.client.deleteMessages(
         /* channelID */ msg.channel.id,
-        /* messages */  messages.map(i => i.id),
-        /* reason */    `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command.`
+        /* messages */ messages.map((i) => i.id),
+        /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command.`
       );
 
       return msg.reply(this._generateEmbed(msg, messages), false);
@@ -97,22 +123,42 @@ export default class PurgeCommand extends Command {
 
     const user = await this.discord.getUser(userIdOrAmount).catch(() => null);
     if (user !== null)
-      return this._deleteByUser(msg, user.id, amount !== undefined && !isNaN(Number(amount)) ? Number(amount) : 50);
+      return this._deleteByUser(
+        msg,
+        user.id,
+        amount !== undefined && !isNaN(Number(amount)) ? Number(amount) : 50
+      );
     else
-      return this._deleteAmount(msg, !isNaN(Number(userIdOrAmount))
-        ? Number(userIdOrAmount)
-        : amount !== undefined && !isNaN(Number(amount))
+      return this._deleteAmount(
+        msg,
+        !isNaN(Number(userIdOrAmount))
+          ? Number(userIdOrAmount)
+          : amount !== undefined && !isNaN(Number(amount))
           ? Number(amount)
           : 50
       );
   }
 
-  private async _deleteByUser(msg: CommandMessage, userID: string, amount?: number) {
+  private async _deleteByUser(
+    msg: CommandMessage,
+    userID: string,
+    amount?: number
+  ) {
     const amountToDelete = amount ?? 50;
     if (amountToDelete > 100)
-      return msg.reply(`Cannot delete more or equal to 100 messages. (went over **${amountToDelete - 100}**.)`);
+      return msg.reply(
+        `Cannot delete more or equal to 100 messages. (went over **${
+          amountToDelete - 100
+        }**.)`
+      );
 
-    const messages = await msg.channel.getMessages({ limit: amountToDelete }).then(messages => messages.filter(m => m.author.id === userID && m.timestamp >= getTwoWeeksFromNow()));
+    const messages = await msg.channel
+      .getMessages({ limit: amountToDelete })
+      .then((messages) =>
+        messages.filter(
+          (m) => m.author.id === userID && m.timestamp >= getTwoWeeksFromNow()
+        )
+      );
     if (!messages.length)
       return msg.error('No messages were found that is under 2 weeks?');
 
@@ -123,11 +169,11 @@ export default class PurgeCommand extends Command {
       return msg.success('Deleted one message.');
     }
 
-    const user = await this.discord.getUser(userID) as User;
+    const user = (await this.discord.getUser(userID)) as User;
     await this.discord.client.deleteMessages(
       /* channelID */ msg.channel.id,
-      /* messages */  messages.map(i => i.id),
-      /* reason */    `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${amountToDelete} messages from ${user.username}#${user.discriminator})`
+      /* messages */ messages.map((i) => i.id),
+      /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${amountToDelete} messages from ${user.username}#${user.discriminator})`
     );
 
     return msg.reply(this._generateEmbed(msg, messages), false);
@@ -135,9 +181,15 @@ export default class PurgeCommand extends Command {
 
   private async _deleteAmount(msg: CommandMessage, amount: number) {
     if (amount > 100)
-      return msg.reply(`Cannot delete more or equal to 100 messages. (went over **${amount - 100}**.)`);
+      return msg.reply(
+        `Cannot delete more or equal to 100 messages. (went over **${
+          amount - 100
+        }**.)`
+      );
 
-    const messages = await msg.channel.getMessages({ limit: amount }).then(m => m.filter(c => c.timestamp > getTwoWeeksFromNow()));
+    const messages = await msg.channel
+      .getMessages({ limit: amount })
+      .then((m) => m.filter((c) => c.timestamp > getTwoWeeksFromNow()));
     if (!messages.length)
       return msg.error('No messages were found that is under 2 weeks?');
 
@@ -150,8 +202,8 @@ export default class PurgeCommand extends Command {
 
     await this.discord.client.deleteMessages(
       /* channelID */ msg.channel.id,
-      /* messages */  messages.map(i => i.id),
-      /* reason */    `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${amount} messages from all users)`
+      /* messages */ messages.map((i) => i.id),
+      /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${amount} messages from all users)`
     );
 
     return msg.reply(this._generateEmbed(msg, messages), false);
@@ -159,11 +211,22 @@ export default class PurgeCommand extends Command {
 
   @Subcommand('[amount]', ['images', 'imgs'])
   async attachments(msg: CommandMessage, [amount]: [string?]) {
-    const toDelete = amount !== undefined && !isNaN(Number(amount)) ? Number(amount) : 50;
+    const toDelete =
+      amount !== undefined && !isNaN(Number(amount)) ? Number(amount) : 50;
     if (toDelete > 100)
-      return msg.reply(`Cannot delete more or equal to 100 messages. (went over **${toDelete - 100}**.)`);
+      return msg.reply(
+        `Cannot delete more or equal to 100 messages. (went over **${
+          toDelete - 100
+        }**.)`
+      );
 
-    const messages = await msg.channel.getMessages({ limit: toDelete }).then(m => m.filter(c => c.attachments.length > 0).filter(c => c.timestamp > getTwoWeeksFromNow()));
+    const messages = await msg.channel
+      .getMessages({ limit: toDelete })
+      .then((m) =>
+        m
+          .filter((c) => c.attachments.length > 0)
+          .filter((c) => c.timestamp > getTwoWeeksFromNow())
+      );
     if (toDelete === 1) {
       const message = messages[0];
       await message.delete();
@@ -173,8 +236,8 @@ export default class PurgeCommand extends Command {
 
     await this.discord.client.deleteMessages(
       /* channelID */ msg.channel.id,
-      /* messages */  messages.map(i => i.id),
-      /* reason */    `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${toDelete} messages with attachments)`
+      /* messages */ messages.map((i) => i.id),
+      /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${toDelete} messages with attachments)`
     );
 
     return msg.reply(this._generateEmbed(msg, messages));
@@ -182,11 +245,17 @@ export default class PurgeCommand extends Command {
 
   @Subcommand()
   async system(msg: CommandMessage) {
-    const messages = await msg.channel.getMessages({ limit: 10 }).then(m => m.filter(c => c.author.system).filter(c => c.timestamp > getTwoWeeksFromNow()));
+    const messages = await msg.channel
+      .getMessages({ limit: 10 })
+      .then((m) =>
+        m
+          .filter((c) => c.author.system)
+          .filter((c) => c.timestamp > getTwoWeeksFromNow())
+      );
     await this.discord.client.deleteMessages(
       /* channelID */ msg.channel.id,
-      /* messages */  messages.map(i => i.id),
-      /* reason */    `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete 10 messages that are system-related)`
+      /* messages */ messages.map((i) => i.id),
+      /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete 10 messages that are system-related)`
     );
 
     return msg.reply(this._generateEmbed(msg, messages));
@@ -194,11 +263,17 @@ export default class PurgeCommand extends Command {
 
   @Subcommand()
   async invites(msg: CommandMessage) {
-    const messages = await msg.channel.getMessages({ limit: 10 }).then(m => m.filter(c => DISCORD_INVITE_REGEX.test(c.content)).filter(c => c.timestamp > getTwoWeeksFromNow()));
+    const messages = await msg.channel
+      .getMessages({ limit: 10 })
+      .then((m) =>
+        m
+          .filter((c) => DISCORD_INVITE_REGEX.test(c.content))
+          .filter((c) => c.timestamp > getTwoWeeksFromNow())
+      );
     await this.discord.client.deleteMessages(
       /* channelID */ msg.channel.id,
-      /* messages */  messages.map(i => i.id),
-      /* reason */    `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete 10 messages that are system-related)`
+      /* messages */ messages.map((i) => i.id),
+      /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete 10 messages that are system-related)`
     );
 
     return msg.reply(this._generateEmbed(msg, messages));
@@ -206,11 +281,22 @@ export default class PurgeCommand extends Command {
 
   @Subcommand('[amount]')
   async self(msg: CommandMessage, [amount]: [string?]) {
-    const toDelete = amount !== undefined && !isNaN(Number(amount)) ? Number(amount) : 50;
+    const toDelete =
+      amount !== undefined && !isNaN(Number(amount)) ? Number(amount) : 50;
     if (toDelete > 100)
-      return msg.reply(`Cannot delete more or equal to 100 messages. (went over **${toDelete - 100}**.)`);
+      return msg.reply(
+        `Cannot delete more or equal to 100 messages. (went over **${
+          toDelete - 100
+        }**.)`
+      );
 
-    const messages = await msg.channel.getMessages({ limit: toDelete }).then(m => m.filter(c => c.author.id === this.discord.client.user.id).filter(c => c.timestamp > getTwoWeeksFromNow()));
+    const messages = await msg.channel
+      .getMessages({ limit: toDelete })
+      .then((m) =>
+        m
+          .filter((c) => c.author.id === this.discord.client.user.id)
+          .filter((c) => c.timestamp > getTwoWeeksFromNow())
+      );
     if (toDelete === 1) {
       const message = messages[0];
       await message.delete();
@@ -220,8 +306,8 @@ export default class PurgeCommand extends Command {
 
     await this.discord.client.deleteMessages(
       /* channelID */ msg.channel.id,
-      /* messages */  messages.map(i => i.id),
-      /* reason */    `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${toDelete} messages that I said)`
+      /* messages */ messages.map((i) => i.id),
+      /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${toDelete} messages that I said)`
     );
 
     return msg.reply(this._generateEmbed(msg, messages));

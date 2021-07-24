@@ -20,7 +20,9 @@
  * SOFTWARE.
  */
 
-import PunishmentEntity, { PunishmentType } from '../entities/PunishmentsEntity';
+import PunishmentEntity, {
+  PunishmentType,
+} from '../entities/PunishmentsEntity';
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import Database from '../components/Database';
 
@@ -46,7 +48,7 @@ export default class PunishmentsController {
     soft,
     time,
     days,
-    type
+    type,
   }: CreatePunishmentOptions) {
     const all = await this.getAll(guildID);
     const entry = new PunishmentEntity();
@@ -55,14 +57,11 @@ export default class PunishmentsController {
     entry.index = all.length + 1; // increment by 1
     entry.type = type;
 
-    if (soft !== undefined && soft === true)
-      entry.soft = true;
+    if (soft !== undefined && soft === true) entry.soft = true;
 
-    if (time !== undefined)
-      entry.time = time;
+    if (time !== undefined) entry.time = time;
 
-    if (days !== undefined)
-      entry.days = days;
+    if (days !== undefined) entry.days = days;
 
     return this.repository.save(entry);
   }
@@ -76,9 +75,7 @@ export default class PunishmentsController {
   }
 
   update(guildID: string, values: QueryDeepPartialEntity<PunishmentEntity>) {
-    return this
-      .database
-      .connection
+    return this.database.connection
       .createQueryBuilder()
       .update(PunishmentEntity)
       .set(values)

@@ -38,43 +38,42 @@ export default class WarningsCommand extends Command {
     super({
       description: 'descriptions.warnings',
       category: Categories.Moderation,
-      examples: [
-        'warnings 280158289667555328'
-      ],
+      examples: ['warnings 280158289667555328'],
       aliases: ['warns', 'view-warns'],
-      name: 'warnings'
+      name: 'warnings',
     });
   }
 
   async run(msg: CommandMessage, [userID]: string[]) {
-    if (!userID)
-      return msg.reply('No user was specified.');
+    if (!userID) return msg.reply('No user was specified.');
 
     let user!: User | null;
     try {
       user = await this.discord.getUser(userID);
-    } catch(ex) {
+    } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10013)
-        return msg.reply(`User with ID "${userID}" was not found. (assuming it's a deleted user)`);
+        return msg.reply(
+          `User with ID "${userID}" was not found. (assuming it's a deleted user)`
+        );
 
-      return msg.reply([
-        'Uh-oh! An internal error has occured while running this.',
-        'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
-        '',
-        '```js',
-        ex.stack ?? '<... no stacktrace? ...>',
-        '```'
-      ].join('\n'));
+      return msg.reply(
+        [
+          'Uh-oh! An internal error has occured while running this.',
+          'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
+          '',
+          '```js',
+          ex.stack ?? '<... no stacktrace? ...>',
+          '```',
+        ].join('\n')
+      );
     }
 
-    if (user === null)
-      return msg.reply('Bot or user was not found.');
+    if (user === null) return msg.reply('Bot or user was not found.');
 
     if (!msg.guild.members.has(user.id))
       return msg.reply('Cannot view warnings outside of this guild.');
 
-    if (user.bot)
-      return msg.reply('Bots cannot be warned.');
+    if (user.bot) return msg.reply('Bots cannot be warned.');
 
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
@@ -83,24 +82,39 @@ export default class WarningsCommand extends Command {
     if (member.id === this.discord.client.user.id)
       return msg.reply('W-why would I have any warnings?!');
 
-    if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
-      return msg.reply('Moderators or administrators don\'t have warnings attached to them.');
+    if (
+      member.permissions.has('administrator') ||
+      member.permissions.has('banMembers')
+    )
+      return msg.reply(
+        "Moderators or administrators don't have warnings attached to them."
+      );
 
-    const warnings = await this.database.warnings.getAll(msg.guild.id, user.id).then(warnings => warnings.filter(warn => warn.amount > 0));
+    const warnings = await this.database.warnings
+      .getAll(msg.guild.id, user.id)
+      .then((warnings) => warnings.filter((warn) => warn.amount > 0));
     if (warnings.length === 0)
-      return msg.reply(`User **${user.username}#${user.discriminator}** doesn't have any warnings attached to them.`);
+      return msg.reply(
+        `User **${user.username}#${user.discriminator}** doesn't have any warnings attached to them.`
+      );
 
     const embed = EmbedBuilder.create()
-      .setTitle(`[ ${user.username}#${user.discriminator} (${user.id}) <~> Warnings ]`)
-      .setDescription(`They have a total of **${warnings.length}** warnings attached`)
-      .addFields(warnings.map((warn, idx) => ({
-        name: `❯ Warning #${idx + 1}`,
-        value: [
-          `• **Amount**: ${warn.amount}`,
-          `• **Reason**: ${warn.reason ?? '(no reason was provided)'}`
-        ].join('\n'),
-        inline: true
-      })));
+      .setTitle(
+        `[ ${user.username}#${user.discriminator} (${user.id}) <~> Warnings ]`
+      )
+      .setDescription(
+        `They have a total of **${warnings.length}** warnings attached`
+      )
+      .addFields(
+        warnings.map((warn, idx) => ({
+          name: `❯ Warning #${idx + 1}`,
+          value: [
+            `• **Amount**: ${warn.amount}`,
+            `• **Reason**: ${warn.reason ?? '(no reason was provided)'}`,
+          ].join('\n'),
+          inline: true,
+        }))
+      );
 
     return msg.reply(embed);
   }

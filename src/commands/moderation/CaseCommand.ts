@@ -42,20 +42,16 @@ export default class CaseCommand extends Command {
     super({
       userPermissions: 'banMembers',
       description: 'descriptions.case',
-      examples: [
-        'case',
-        'case 3'
-      ],
+      examples: ['case', 'case 3'],
       category: Categories.Moderation,
       aliases: ['lookup'],
       usage: '[caseID]',
-      name: 'case'
+      name: 'case',
     });
   }
 
   async run(msg: CommandMessage, args: string[]) {
-    if (args.length < 1)
-      return msg.reply('No bot or user was found.');
+    if (args.length < 1) return msg.reply('No bot or user was found.');
 
     const caseID = args[0];
     if (isNaN(Number(caseID)))
@@ -63,7 +59,7 @@ export default class CaseCommand extends Command {
 
     const caseModel = await this.database.cases.repository.findOne({
       guildID: msg.guild.id,
-      index: Number(caseID)
+      index: Number(caseID),
     });
 
     if (caseModel === undefined)
@@ -71,26 +67,46 @@ export default class CaseCommand extends Command {
 
     const moderator = this.discord.client.users.get(caseModel.moderatorID) ?? {
       username: 'Unknown User',
-      discriminator: '0000'
+      discriminator: '0000',
     };
 
     const victim = this.discord.client.users.get(caseModel.victimID) ?? {
       discriminator: '0000',
-      username: 'Unknown User'
+      username: 'Unknown User',
     };
 
     const embed = EmbedBuilder.create()
-      .setAuthor(`[ Case #${caseModel.index} | ${victim.username}#${victim.discriminator} (${caseModel.victimID})]`, undefined, (victim as any).dynamicAvatarURL?.('png', 1024)) // dynamicAvatarURL might not exist since partials
+      .setAuthor(
+        `[ Case #${caseModel.index} | ${victim.username}#${victim.discriminator} (${caseModel.victimID})]`,
+        undefined,
+        (victim as any).dynamicAvatarURL?.('png', 1024)
+      ) // dynamicAvatarURL might not exist since partials
       .setDescription([
-        `${caseModel.reason ? `**${caseModel.reason}**` : `*Unknown, use \`${msg.settings.prefixes[0]}reason ${caseModel.index} <reason>\` to set a reason*`}`,
+        `${
+          caseModel.reason
+            ? `**${caseModel.reason}**`
+            : `*Unknown, use \`${msg.settings.prefixes[0]}reason ${caseModel.index} <reason>\` to set a reason*`
+        }`,
         '',
-        caseModel.messageID !== null || msg.settings.modlogChannelID !== null ? `[**\`[Jump Here]\`**](https://discord.com/channels/${msg.guild.id}/${msg.settings.modlogChannelID}/${caseModel.messageID})` : ''
+        caseModel.messageID !== null || msg.settings.modlogChannelID !== null
+          ? `[**\`[Jump Here]\`**](https://discord.com/channels/${msg.guild.id}/${msg.settings.modlogChannelID}/${caseModel.messageID})`
+          : '',
       ])
-      .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${(moderator as any).id ?? '(unknown)'})`, true)
+      .addField(
+        '• Moderator',
+        `${moderator.username}#${moderator.discriminator} (${
+          (moderator as any).id ?? '(unknown)'
+        })`,
+        true
+      )
       .addField('• Type', caseModel.type, true);
 
     if (caseModel.time !== null)
-      embed.addField('• Time', ms(Number(caseModel.time!), { long: true }), true);
+      embed.addField(
+        '• Time',
+        ms(Number(caseModel.time!), { long: true }),
+        true
+      );
 
     return msg.reply(embed);
   }

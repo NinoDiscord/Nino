@@ -38,26 +38,29 @@ export default class EvalCommand extends Command {
       hidden: true,
       category: Categories.Owner,
       aliases: ['evl', 'ev', 'js'],
-      name: 'eval'
+      name: 'eval',
     });
   }
 
   async run(msg: CommandMessage, args: string[]) {
-    if (!args.length)
-      return msg.reply('What do you want me to evaluate?');
+    if (!args.length) return msg.reply('What do you want me to evaluate?');
 
     let script = args.join(' ');
     let result: any;
     let depth = 1;
 
-    const flags = msg.flags<{ depth?: string | true; slient?: string | true; s?: string | true; }>();
+    const flags =
+      msg.flags<{
+        depth?: string | true;
+        slient?: string | true;
+        s?: string | true;
+      }>();
     if (flags.depth === true)
       return msg.reply('`--depth` flag requires a input. Example: `--depth 1`');
 
     if (flags.depth !== undefined) {
       depth = Number(flags.depth);
-      if (isNaN(depth))
-        return msg.reply('Depth value was not a number');
+      if (isNaN(depth)) return msg.reply('Depth value was not a number');
 
       script = script.replace(`--depth=${depth}`, '');
     }
@@ -90,33 +93,38 @@ export default class EvalCommand extends Command {
           showHidden: false,
         });
 
-      if (slient)
-        return;
+      if (slient) return;
 
       const res = this.redact(result);
-      return msg.reply([
-        `:timer: **${asyncTimer !== undefined ? `${time}<${asyncTimer}>` : time}**`,
-        '',
-        '```js',
-        res,
-        '```'
-      ].join('\n'));
-    } catch(ex) {
+      return msg.reply(
+        [
+          `:timer: **${
+            asyncTimer !== undefined ? `${time}<${asyncTimer}>` : time
+          }**`,
+          '',
+          '```js',
+          res,
+          '```',
+        ].join('\n')
+      );
+    } catch (ex) {
       const time = stopwatch.end();
-      return msg.reply([
-        `:timer: **${time}**`,
-        '',
-        '```js',
-        ex.stack ?? '<... no stacktrace ...>',
-        '```'
-      ].join('\n'));
+      return msg.reply(
+        [
+          `:timer: **${time}**`,
+          '',
+          '```js',
+          ex.stack ?? '<... no stacktrace ...>',
+          '```',
+        ].join('\n')
+      );
     }
   }
 
   private redact(script: string) {
     const rawConfig = this.config['config']; // yes we need the raw config cuz i dont feel like using .getProperty :woeme:
     let tokens = [
-      ...(rawConfig.redis.sentinels?.map(r => r.host) ?? []),
+      ...(rawConfig.redis.sentinels?.map((r) => r.host) ?? []),
       rawConfig.database.username,
       rawConfig.database.password,
       rawConfig.redis.password,
@@ -125,7 +133,7 @@ export default class EvalCommand extends Command {
       rawConfig.redis.host,
       rawConfig.sentryDsn,
       rawConfig.ksoft,
-      rawConfig.token
+      rawConfig.token,
     ];
 
     if (rawConfig.botlists !== undefined)

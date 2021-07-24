@@ -40,8 +40,7 @@ export default class GuildSettingsController {
   get(id: string, create?: false): Promise<GuildEntity | undefined>;
   async get(id: string, create: boolean = true) {
     const settings = await this.repository.findOne({ guildID: id });
-    if (settings === undefined && create)
-      return this.create(id);
+    if (settings === undefined && create) return this.create(id);
 
     return settings;
   }
@@ -64,9 +63,7 @@ export default class GuildSettingsController {
   }
 
   update(guildID: string, values: QueryDeepPartialEntity<GuildEntity>) {
-    return this
-      .database
-      .connection
+    return this.database.connection
       .createQueryBuilder()
       .update(GuildEntity)
       .set(values)

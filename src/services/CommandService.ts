@@ -41,12 +41,13 @@ const FLAG_REGEX = /(?:--?|—)([\w]+)(=?(\w+|['"].*['"]))?/gi;
 @Service({
   priority: 1,
   children: join(process.cwd(), 'commands'),
-  name: 'commands'
+  name: 'commands',
 })
 export default class CommandService extends Collection<string, NinoCommand> {
   public commandsExecuted: number = 0;
   public messagesSeen: number = 0;
-  public cooldowns: Collection<string, Collection<string, number>> = new Collection();
+  public cooldowns: Collection<string, Collection<string, number>> =
+    new Collection();
 
   @Inject
   private readonly config!: Config;
@@ -86,8 +87,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
     this.prometheus.messagesSeen?.inc();
     this.messagesSeen++;
 
-    if ((await this.automod.run('message', msg)) === true)
-      return;
+    if ((await this.automod.run('message', msg)) === true) return;
 
     if (msg.author.bot) return;
     if (![0, 5].includes(msg.channel.type)) return;
@@ -95,16 +95,19 @@ export default class CommandService extends Collection<string, NinoCommand> {
     const settings = await this.database.guilds.get(msg.channel.guild.id);
     const userSettings = await this.database.users.get(msg.author.id);
 
-    const _prefixes = ([] as string[]).concat(
-      settings.prefixes,
-      userSettings.prefixes,
-      this.config.getProperty('prefixes')!
-    ).filter(Boolean);
+    const _prefixes = ([] as string[])
+      .concat(
+        settings.prefixes,
+        userSettings.prefixes,
+        this.config.getProperty('prefixes')!
+      )
+      .filter(Boolean);
 
-    const mentionRegex = this.discord.mentionRegex ?? new RegExp(`<@!?${this.discord.client.user.id}> `);
+    const mentionRegex =
+      this.discord.mentionRegex ??
+      new RegExp(`<@!?${this.discord.client.user.id}> `);
     const mention = mentionRegex.exec(msg.content);
-    if (mention !== null)
-      _prefixes.push(`${mention}`);
+    if (mention !== null) _prefixes.push(`${mention}`);
 
     // remove duplicates
     if (this.discord.client.user.id === '531613242473054229')
@@ -112,30 +115,32 @@ export default class CommandService extends Collection<string, NinoCommand> {
 
     // Removes any duplicates
     const prefixes = [...new Set(_prefixes)];
-    const prefix = prefixes.find(prefix => msg.content.startsWith(prefix));
-    if (prefix === undefined)
-      return;
+    const prefix = prefixes.find((prefix) => msg.content.startsWith(prefix));
+    if (prefix === undefined) return;
 
     let rawArgs = msg.content.slice(prefix.length).trim().split(/ +/g);
     const name = rawArgs.shift()!;
-    const command = this.find(command =>
-      command.name === name || command.aliases.includes(name)
+    const command = this.find(
+      (command) => command.name === name || command.aliases.includes(name)
     );
 
-    if (command === null)
-      return;
+    if (command === null) return;
 
     // Check for if the guild is blacklisted
     const guildBlacklist = await this.database.blacklists.get(msg.guildID);
     if (guildBlacklist !== undefined) {
       const issuer = this.discord.client.users.get(guildBlacklist.issuer);
-      await msg.channel.createMessage([
-        `:pencil2: **This guild is blacklisted by ${issuer?.username ?? 'Unknown User'}#${issuer?.discriminator ?? '0000'}**`,
-        `> ${guildBlacklist.reason ?? '*(no reason provided)*'}`,
-        '',
-        'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.',
-        'I will attempt to leave this guild, goodbye. :wave:'
-      ].join('\n'));
+      await msg.channel.createMessage(
+        [
+          `:pencil2: **This guild is blacklisted by ${
+            issuer?.username ?? 'Unknown User'
+          }#${issuer?.discriminator ?? '0000'}**`,
+          `> ${guildBlacklist.reason ?? '*(no reason provided)*'}`,
+          '',
+          'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.',
+          'I will attempt to leave this guild, goodbye. :wave:',
+        ].join('\n')
+      );
 
       await msg.channel.guild.leave();
       return;
@@ -145,38 +150,57 @@ export default class CommandService extends Collection<string, NinoCommand> {
     const userBlacklist = await this.database.blacklists.get(msg.author.id);
     if (userBlacklist !== undefined) {
       const issuer = this.discord.client.users.get(userBlacklist.issuer);
-      return msg.channel.createMessage([
-        `:pencil2: **You were blacklisted by ${issuer?.username ?? 'Unknown User'}#${issuer?.discriminator ?? '0000'}**`,
-        `> ${userBlacklist.reason ?? '*(no reason provided)*'}`,
-        '',
-        'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.'
-      ].join('\n'));
+      return msg.channel.createMessage(
+        [
+          `:pencil2: **You were blacklisted by ${
+            issuer?.username ?? 'Unknown User'
+          }#${issuer?.discriminator ?? '0000'}**`,
+          `> ${userBlacklist.reason ?? '*(no reason provided)*'}`,
+          '',
+          'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.',
+        ].join('\n')
+      );
     }
 
-    const locale = this.localization.get(settings.language, userSettings.language);
+    const locale = this.localization.get(
+      settings.language,
+      userSettings.language
+    );
     const message = new CommandMessage(msg, locale, settings, userSettings);
     app.addInjections(message);
 
     const owners = this.config.getProperty('owners') ?? [];
     if (command.ownerOnly && !owners.includes(msg.author.id))
-      return message.reply(`Command **${command.name}** is a developer-only command, nice try...`);
+      return message.reply(
+        `Command **${command.name}** is a developer-only command, nice try...`
+      );
 
     // Check for permissions of Nino
     if (command.botPermissions.length) {
-      const permissions = msg.channel.permissionsOf(this.discord.client.user.id);
-      const missing = command.botPermissions.filter(perm => !permissions.has(perm));
+      const permissions = msg.channel.permissionsOf(
+        this.discord.client.user.id
+      );
+      const missing = command.botPermissions.filter(
+        (perm) => !permissions.has(perm)
+      );
 
       if (missing.length > 0)
-        return message.reply(`I am missing the following permissions: **${missing.join(', ')}**`);
+        return message.reply(
+          `I am missing the following permissions: **${missing.join(', ')}**`
+        );
     }
 
     // Check for the user's permissions
     if (command.userPermissions.length) {
       const permissions = msg.channel.permissionsOf(msg.author.id);
-      const missing = command.userPermissions.filter(perm => !permissions.has(perm));
+      const missing = command.userPermissions.filter(
+        (perm) => !permissions.has(perm)
+      );
 
       if (missing.length > 0 && !owners.includes(msg.author.id))
-        return message.reply(`You are missing the following permission: **${missing.join(', ')}**`);
+        return message.reply(
+          `You are missing the following permission: **${missing.join(', ')}**`
+        );
     }
 
     // Cooldowns
@@ -191,7 +215,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
       const time = timestamps.get(msg.author.id)! + amount;
       if (now < time) {
         const left = (time - now) / 1000;
-        return message.reply(`Please wait **${left.toFixed()}** seconds before executing this command.`);
+        return message.reply(
+          `Please wait **${left.toFixed()}** seconds before executing this command.`
+        );
       }
     }
 
@@ -203,64 +229,88 @@ export default class CommandService extends Collection<string, NinoCommand> {
     let subcommand: Subcommand | undefined = undefined;
     for (const arg of rawArgs) {
       if (command.subcommands.length > 0) {
-        if (command.subcommands.find(r => r.aliases.includes(arg)) !== undefined) {
-          subcommand = command.subcommands.find(r => r.aliases.includes(arg))!;
+        if (
+          command.subcommands.find((r) => r.aliases.includes(arg)) !== undefined
+        ) {
+          subcommand = command.subcommands.find((r) =>
+            r.aliases.includes(arg)
+          )!;
           methodName = subcommand.name;
           break;
         }
 
-        if (command.subcommands.find(r => r.name === arg) !== undefined) {
-          subcommand = command.subcommands.find(r => r.name === arg)!;
+        if (command.subcommands.find((r) => r.name === arg) !== undefined) {
+          subcommand = command.subcommands.find((r) => r.name === arg)!;
           methodName = subcommand.name;
           break;
         }
       }
     }
 
-    if (subcommand !== undefined)
-      rawArgs.shift();
+    if (subcommand !== undefined) rawArgs.shift();
 
     message['_flags'] = this.parseFlags(rawArgs.join(' '));
     if (command.name !== 'eval') {
-      rawArgs = rawArgs.filter(arg => !FLAG_REGEX.test(arg));
+      rawArgs = rawArgs.filter((arg) => !FLAG_REGEX.test(arg));
     }
 
     try {
       const executor = Reflect.get(command, methodName);
       if (typeof executor !== 'function')
-        throw new SyntaxError(`${subcommand ? 'Subc' : 'C'}ommand "${subcommand ? methodName : command.name}" was not a function.`);
+        throw new SyntaxError(
+          `${subcommand ? 'Subc' : 'C'}ommand "${
+            subcommand ? methodName : command.name
+          }" was not a function.`
+        );
 
       this.prometheus.commandsExecuted?.labels(command.name).inc();
       this.commandsExecuted++;
       await executor.call(command, message, rawArgs);
-      this.logger.info(`Command "${command.name}" has been ran by ${msg.author.username}#${msg.author.discriminator} in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`);
-    } catch(ex) {
-      const _owners = await Promise.all(owners.map(id => {
-        const user = this.discord.client.users.get(id);
-        if (user === undefined)
-          return this.discord.client.getRESTUser(id);
-        else
-          return Promise.resolve(user);
-      }));
+      this.logger.info(
+        `Command "${command.name}" has been ran by ${msg.author.username}#${msg.author.discriminator} in guild ${msg.channel.guild.name} (${msg.channel.guild.id})`
+      );
+    } catch (ex) {
+      const _owners = await Promise.all(
+        owners.map((id) => {
+          const user = this.discord.client.users.get(id);
+          if (user === undefined) return this.discord.client.getRESTUser(id);
+          else return Promise.resolve(user);
+        })
+      );
 
       const contact = _owners
-        .map((r, index) => `${index + 1 === owners.length ? 'or ' : ''}**${r.username}#${r.discriminator}**`)
+        .map(
+          (r, index) =>
+            `${index + 1 === owners.length ? 'or ' : ''}**${r.username}#${
+              r.discriminator
+            }**`
+        )
         .join(', ');
 
       const embed = new EmbedBuilder()
-        .setColor(0xDAA2C6)
+        .setColor(0xdaa2c6)
         .setDescription([
-          `${subcommand !== undefined ? `Subcommand **${methodName}** (parent **${command.name}**)` : `Command **${command.name}**`} has failed to execute.`,
+          `${
+            subcommand !== undefined
+              ? `Subcommand **${methodName}** (parent **${command.name}**)`
+              : `Command **${command.name}**`
+          } has failed to execute.`,
           `If this is a re-occuring issue, contact ${contact} at <https://discord.gg/ATmjFH9kMH>, under the <#747522228714733610> channel.`,
           '',
           '```js',
           ex.stack ?? '<... no stacktrace? ...>',
-          '```'
+          '```',
         ])
         .build();
 
       await msg.channel.createMessage({ embed });
-      this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute:`);
+      this.logger.error(
+        `${
+          subcommand !== undefined
+            ? `Subcommand ${methodName}`
+            : `Command ${command.name}`
+        } has failed to execute:`
+      );
       this.logger.error(ex);
 
       this.sentry?.report(ex);
@@ -271,7 +321,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
   private parseFlags(content: string): Record<string, string | true> {
     const record: Record<string, string | true> = {};
     content.replaceAll(FLAG_REGEX, (_, key: string, value: string) => {
-      record[key.trim()] = value ? value.replaceAll(/(^[='"]+|['"]+$)/g, '').trim() : true;
+      record[key.trim()] = value
+        ? value.replaceAll(/(^[='"]+|['"]+$)/g, '').trim()
+        : true;
       return value;
     });
 

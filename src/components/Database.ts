@@ -48,7 +48,7 @@ import UserEntity from '../entities/UserEntity';
 
 @Component({
   priority: 1,
-  name: 'database'
+  name: 'database',
 })
 export default class Database {
   public punishments!: PunishmentsController;
@@ -72,7 +72,8 @@ export default class Database {
     this.logger.info('Now connecting to the database...');
 
     const url = this.config.getProperty('database.url');
-    const entities = [ // readability mmmmm
+    const entities = [
+      // readability mmmmm
       PunishmentEntity,
       BlacklistEntity,
       LoggingEntity,
@@ -80,26 +81,29 @@ export default class Database {
       AutomodEntity,
       GuildEntity,
       CaseEntity,
-      UserEntity
+      UserEntity,
     ];
 
-    const config: ConnectionOptions = url !== undefined ? {
-      migrations: ['./migrations/*.ts'],
-      entities,
-      type: 'postgres',
-      name: 'Nino',
-      url
-    } : {
-      migrations: ['./migrations/*.ts'],
-      username: this.config.getProperty('database.username'),
-      password: this.config.getProperty('database.password'),
-      database: this.config.getProperty('database.database'),
-      entities,
-      host: this.config.getProperty('database.host'),
-      port: this.config.getProperty('database.port'),
-      type: 'postgres',
-      name: 'Nino'
-    };
+    const config: ConnectionOptions =
+      url !== undefined
+        ? {
+            migrations: ['./migrations/*.ts'],
+            entities,
+            type: 'postgres',
+            name: 'Nino',
+            url,
+          }
+        : {
+            migrations: ['./migrations/*.ts'],
+            username: this.config.getProperty('database.username'),
+            password: this.config.getProperty('database.password'),
+            database: this.config.getProperty('database.database'),
+            entities,
+            host: this.config.getProperty('database.host'),
+            port: this.config.getProperty('database.port'),
+            type: 'postgres',
+            name: 'Nino',
+          };
 
     this.connection = await createConnection(config);
     this.initRepos();
@@ -107,14 +111,18 @@ export default class Database {
     const migrations = await this.connection.showMigrations();
     const shouldRun = this.config.getProperty('runPendingMigrations');
     if (migrations && (shouldRun === undefined || shouldRun === false)) {
-      this.logger.info('There are pending migrations to be ran, but you have `runPendingMigrations` disabled! Run `npm run migrations` to migrate the database or set `runPendingMigrations` = true to run them at runtime.');
+      this.logger.info(
+        'There are pending migrations to be ran, but you have `runPendingMigrations` disabled! Run `npm run migrations` to migrate the database or set `runPendingMigrations` = true to run them at runtime.'
+      );
     } else if (migrations && shouldRun === true) {
-      this.logger.info('Found pending migrations and `runPendingMigrations` is enabled, now running...');
+      this.logger.info(
+        'Found pending migrations and `runPendingMigrations` is enabled, now running...'
+      );
 
       try {
         const ran = await this.connection.runMigrations({ transaction: 'all' });
         this.logger.info(`Ran ${ran.length} migrations! You're all to go.`);
-      } catch(ex) {
+      } catch (ex) {
         this.logger.fatal(ex);
 
         if (ex.message.indexOf('already exists') !== -1) {
@@ -125,11 +133,15 @@ export default class Database {
         return Promise.reject(ex);
       }
     } else {
-      this.logger.info('No migrations needs to be ran and the connection to the database is healthy.');
+      this.logger.info(
+        'No migrations needs to be ran and the connection to the database is healthy.'
+      );
       return Promise.resolve();
     }
 
-    this.logger.info('All migrations has been migrated and the connection has been established correctly!');
+    this.logger.info(
+      'All migrations has been migrated and the connection has been established correctly!'
+    );
     return Promise.resolve();
   }
 
@@ -154,9 +166,13 @@ export default class Database {
 
     // collect shit
     const data = await Promise.all([
-      this.connection.query(`SELECT tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted FROM pg_stat_database WHERE datname = '${dbName}';`),
+      this.connection.query(
+        `SELECT tup_returned, tup_fetched, tup_inserted, tup_updated, tup_deleted FROM pg_stat_database WHERE datname = '${dbName}';`
+      ),
       this.connection.query('SELECT version();'),
-      this.connection.query('SELECT extract(epoch FROM current_timestamp - pg_postmaster_start_time()) AS uptime;')
+      this.connection.query(
+        'SELECT extract(epoch FROM current_timestamp - pg_postmaster_start_time()) AS uptime;'
+      ),
     ]);
 
     return {
@@ -164,9 +180,13 @@ export default class Database {
       updated: Number(data[0]?.[0]?.tup_updated ?? 0),
       deleted: Number(data[0]?.[0]?.tup_deleted ?? 0),
       fetched: Number(data[0]?.[0]?.tup_fetched ?? 0),
-      version: data[1][0].version.split(', ').shift().replace('PostgreSQL ', '').trim(),
+      version: data[1][0].version
+        .split(', ')
+        .shift()
+        .replace('PostgreSQL ', '')
+        .trim(),
       uptime: humanize(Math.floor(data[2][0].uptime * 1000), true),
-      ping
+      ping,
     };
   }
 
@@ -180,7 +200,16 @@ export default class Database {
     this.cases = new CasesController(this);
     this.users = new UserSettingsController(this);
 
-    for (const controller of [this.punishments, this.blacklists, this.warnings, this.logging, this.automod, this.guilds, this.cases, this.users]) {
+    for (const controller of [
+      this.punishments,
+      this.blacklists,
+      this.warnings,
+      this.logging,
+      this.automod,
+      this.guilds,
+      this.cases,
+      this.users,
+    ]) {
       this.api.container.addInjections(controller);
     }
   }

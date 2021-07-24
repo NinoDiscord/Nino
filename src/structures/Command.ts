@@ -43,48 +43,56 @@ interface CommandInfo {
 
 export default abstract class NinoCommand {
   public userPermissions: PermissionField[];
-  public botPermissions:  PermissionField[];
-  public description:     ObjectKeysWithSeperator<LocalizationStrings>;
-  public ownerOnly:       boolean;
-  public examples:        string[];
-  public category:        Categories;
-  public cooldown:        number;
-  public aliases:         string[];
-  public hidden:          boolean;
-  public usage:           string;
-  public name:            string;
+  public botPermissions: PermissionField[];
+  public description: ObjectKeysWithSeperator<LocalizationStrings>;
+  public ownerOnly: boolean;
+  public examples: string[];
+  public category: Categories;
+  public cooldown: number;
+  public aliases: string[];
+  public hidden: boolean;
+  public usage: string;
+  public name: string;
 
   constructor(info: CommandInfo) {
-    this.userPermissions = typeof info.userPermissions === 'string'
-      ? [info.userPermissions]
-      : Array.isArray(info.userPermissions)
+    this.userPermissions =
+      typeof info.userPermissions === 'string'
+        ? [info.userPermissions]
+        : Array.isArray(info.userPermissions)
         ? info.userPermissions
         : [];
 
-    this.botPermissions = typeof info.botPermissions === 'string'
-      ? [info.botPermissions]
-      : Array.isArray(info.botPermissions)
+    this.botPermissions =
+      typeof info.botPermissions === 'string'
+        ? [info.botPermissions]
+        : Array.isArray(info.botPermissions)
         ? info.botPermissions
         : [];
 
-    this.description  = info.description as unknown as ObjectKeysWithSeperator<LocalizationStrings> ?? 'descriptions.unknown';
-    this.ownerOnly    = info.ownerOnly ?? false;
-    this.examples     = info.examples ?? [];
-    this.category     = info.category ?? Categories.Core;
-    this.cooldown     = info.cooldown ?? 5;
-    this.aliases      = info.aliases ?? [];
-    this.hidden       = info.hidden ?? false;
-    this.usage        = info.usage ?? '';
-    this.name         = info.name;
+    this.description =
+      (info.description as unknown as ObjectKeysWithSeperator<LocalizationStrings>) ??
+      'descriptions.unknown';
+    this.ownerOnly = info.ownerOnly ?? false;
+    this.examples = info.examples ?? [];
+    this.category = info.category ?? Categories.Core;
+    this.cooldown = info.cooldown ?? 5;
+    this.aliases = info.aliases ?? [];
+    this.hidden = info.hidden ?? false;
+    this.usage = info.usage ?? '';
+    this.name = info.name;
   }
 
   get subcommands() {
-    return getSubcommandsIn(this).map(sub => new Subcommand(sub));
+    return getSubcommandsIn(this).map((sub) => new Subcommand(sub));
   }
 
   get format() {
-    const subcommands = this.subcommands.map(sub => `[${sub.name} ${sub.usage.trim()}]`.trim()).join(' | ');
-    return `${this.name}${this.usage !== '' ? ` ${this.usage.trim()}` : ''} ${subcommands}`;
+    const subcommands = this.subcommands
+      .map((sub) => `[${sub.name} ${sub.usage.trim()}]`.trim())
+      .join(' | ');
+    return `${this.name}${
+      this.usage !== '' ? ` ${this.usage.trim()}` : ''
+    } ${subcommands}`;
   }
 
   abstract run(msg: CommandMessage, ...args: any[]): any;

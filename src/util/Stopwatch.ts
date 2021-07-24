@@ -48,8 +48,7 @@ export default class Stopwatch {
   }
 
   end() {
-    if (!this.startTime)
-      throw new TypeError('Stopwatch has not started');
+    if (!this.startTime) throw new TypeError('Stopwatch has not started');
 
     this.endTime = performance.now();
     return this.symbolOf(this.endTime - this.startTime);

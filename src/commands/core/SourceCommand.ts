@@ -27,7 +27,7 @@ export default class SourceCommand extends Command {
     super({
       description: 'descriptions.source',
       aliases: ['git', 'github', 'sauce', 'oss'],
-      name: 'source'
+      name: 'source',
     });
   }
 

@@ -30,7 +30,7 @@ import Config from '../components/Config';
 
 @Service({
   priority: 1,
-  name: 'botlists'
+  name: 'botlists',
 })
 export default class BotlistsService {
   @Inject
@@ -50,7 +50,9 @@ export default class BotlistsService {
   async load() {
     const botlists = this.config.getProperty('botlists');
     if (botlists === undefined) {
-      this.logger.warn('`botlists` is missing, don\'t need to add it if running privately.');
+      this.logger.warn(
+        "`botlists` is missing, don't need to add it if running privately."
+      );
       return Promise.resolve();
     }
 
@@ -59,13 +61,18 @@ export default class BotlistsService {
   }
 
   dispose() {
-    if (this.#interval)
-      clearInterval(this.#interval);
+    if (this.#interval) clearInterval(this.#interval);
   }
 
   async post() {
     const list: {
-      name: 'Discord Services' | 'Discord Boats' | 'Discord Bots' | 'top.gg' | 'Delly' | 'Bots for Discord';
+      name:
+        | 'Discord Services'
+        | 'Discord Boats'
+        | 'Discord Bots'
+        | 'top.gg'
+        | 'Delly'
+        | 'Bots for Discord';
       success: boolean;
       data: Record<string, any>;
     }[] = [];
@@ -74,161 +81,189 @@ export default class BotlistsService {
     let errored = 0;
     const botlists = this.config.getProperty('botlists')!;
 
-    if (botlists === undefined)
-      return;
+    if (botlists === undefined) return;
 
     if (botlists.dservices !== undefined) {
       this.logger.info('Found Discord Services token, now posting...');
 
-      await this.http.request({
-        url: `https://api.discordservices.net/bot/${this.discord.client.user.id}/stats`,
-        method: 'POST',
-        data: {
-          server_count: this.discord.client.guilds.size
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: botlists.dservices
-        }
-      }).then(res => {
-        res.statusCode === 200 ? success++ : errored++;
-        list.push({
-          name: 'Discord Services',
-          success: res.statusCode === 200,
-          data: res.json()
-        });
-      }).catch(ex => this.logger.warn('Unable to parse JSON [discordservices.net]:', ex));
+      await this.http
+        .request({
+          url: `https://api.discordservices.net/bot/${this.discord.client.user.id}/stats`,
+          method: 'POST',
+          data: {
+            server_count: this.discord.client.guilds.size,
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: botlists.dservices,
+          },
+        })
+        .then((res) => {
+          res.statusCode === 200 ? success++ : errored++;
+          list.push({
+            name: 'Discord Services',
+            success: res.statusCode === 200,
+            data: res.json(),
+          });
+        })
+        .catch((ex) =>
+          this.logger.warn('Unable to parse JSON [discordservices.net]:', ex)
+        );
     }
 
     if (botlists.dboats !== undefined) {
       this.logger.info('Found Discord Boats token, now posting...');
 
-      await this.http.request({
-        data: {
-          server_count: this.discord.client.guilds.size
-        },
-        method: 'POST',
-        url: `https://discord.boats/api/bot/${this.discord.client.user.id}`,
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: botlists.dboats
-        }
-      })
-        .then(res => {
+      await this.http
+        .request({
+          data: {
+            server_count: this.discord.client.guilds.size,
+          },
+          method: 'POST',
+          url: `https://discord.boats/api/bot/${this.discord.client.user.id}`,
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: botlists.dboats,
+          },
+        })
+        .then((res) => {
           res.statusCode === 200 ? success++ : errored++;
           list.push({
             name: 'Discord Boats',
             success: res.statusCode === 200,
-            data: res.json()
+            data: res.json(),
           });
         })
-        .catch(ex => this.logger.warn('Unable to parse JSON [discord.boats]:', ex));
+        .catch((ex) =>
+          this.logger.warn('Unable to parse JSON [discord.boats]:', ex)
+        );
     }
 
     if (botlists.dbots !== undefined) {
       this.logger.info('Found Discord Bots token, now posting...');
 
-      await this.http.request({
-        url: `https://discord.bots.gg/api/v1/bots/${this.discord.client.user.id}/stats`,
-        method: 'POST',
-        data: {
-          shardCount: this.discord.client.shards.size,
-          guildCount: this.discord.client.guilds.size
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: botlists.dbots
-        }
-      }).then(res => {
-        res.statusCode === 200 ? success++ : errored++;
-        list.push({
-          name: 'Discord Bots',
-          success: res.statusCode === 200,
-          data: res.json()
-        });
-      }).catch(ex => this.logger.warn('Unable to parse JSON [discord.bots.gg]:', ex));
+      await this.http
+        .request({
+          url: `https://discord.bots.gg/api/v1/bots/${this.discord.client.user.id}/stats`,
+          method: 'POST',
+          data: {
+            shardCount: this.discord.client.shards.size,
+            guildCount: this.discord.client.guilds.size,
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: botlists.dbots,
+          },
+        })
+        .then((res) => {
+          res.statusCode === 200 ? success++ : errored++;
+          list.push({
+            name: 'Discord Bots',
+            success: res.statusCode === 200,
+            data: res.json(),
+          });
+        })
+        .catch((ex) =>
+          this.logger.warn('Unable to parse JSON [discord.bots.gg]:', ex)
+        );
     }
 
     if (botlists.topgg !== undefined) {
       this.logger.info('Found top.gg token, now posting...');
 
-      await this.http.request({
-        url: `https://top.gg/api/bots/${this.discord.client.user.id}/stats`,
-        method: 'POST',
-        data: {
-          server_count: this.discord.client.guilds.size,
-          shard_count: this.discord.client.shards.size
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: botlists.topgg
-        }
-      }).then(res => {
-        res.statusCode === 200 ? success++ : errored++;
-        list.push({
-          name: 'top.gg',
-          success: res.statusCode === 200,
-          data: res.json()
-        });
-      }).catch(ex => this.logger.warn('Unable to parse JSON [top.gg]:', ex));
+      await this.http
+        .request({
+          url: `https://top.gg/api/bots/${this.discord.client.user.id}/stats`,
+          method: 'POST',
+          data: {
+            server_count: this.discord.client.guilds.size,
+            shard_count: this.discord.client.shards.size,
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: botlists.topgg,
+          },
+        })
+        .then((res) => {
+          res.statusCode === 200 ? success++ : errored++;
+          list.push({
+            name: 'top.gg',
+            success: res.statusCode === 200,
+            data: res.json(),
+          });
+        })
+        .catch((ex) => this.logger.warn('Unable to parse JSON [top.gg]:', ex));
     }
 
     // Ice is a cute boyfriend btw <3
     if (botlists.delly !== undefined) {
       this.logger.info('Found Discord Extreme List token, now posting...');
 
-      await this.http.request({
-        url: `https://api.discordextremelist.xyz/v2/bot/${this.discord.client.user.id}/stats`,
-        method: 'POST',
-        data: {
-          guildCount: this.discord.client.guilds.size,
-          shardCount: this.discord.client.shards.size
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: botlists.delly
-        }
-      }).then(res => {
-        res.statusCode === 200 ? success++ : errored++;
-        list.push({
-          name: 'Delly',
-          success: res.statusCode === 200,
-          data: res.json()
-        });
-      }).catch(ex => this.logger.warn('Unable to parse JSON [Delly]:', ex));
+      await this.http
+        .request({
+          url: `https://api.discordextremelist.xyz/v2/bot/${this.discord.client.user.id}/stats`,
+          method: 'POST',
+          data: {
+            guildCount: this.discord.client.guilds.size,
+            shardCount: this.discord.client.shards.size,
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: botlists.delly,
+          },
+        })
+        .then((res) => {
+          res.statusCode === 200 ? success++ : errored++;
+          list.push({
+            name: 'Delly',
+            success: res.statusCode === 200,
+            data: res.json(),
+          });
+        })
+        .catch((ex) => this.logger.warn('Unable to parse JSON [Delly]:', ex));
     }
 
     if (botlists.bfd !== undefined) {
       this.logger.info('Found Bots for Discord token, now posting...');
 
-      const res = await this.http.request({
-        method: 'POST',
-        url: `https://botsfordiscord.com/api/bot/${this.discord.client.user.id}`,
-        data: {
-          server_count: this.discord.client.guilds.size
-        },
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: botlists.bfd
-        }
-      }).then(res => {
-        res.statusCode === 200 ? success++ : errored++;
-        list.push({
-          name: 'Bots for Discord',
-          success: res.statusCode === 200,
-          data: res.json()
-        });
-      }).catch(ex => this.logger.warn('Unable to parse JSON [Bots for Discord]:', ex));
+      const res = await this.http
+        .request({
+          method: 'POST',
+          url: `https://botsfordiscord.com/api/bot/${this.discord.client.user.id}`,
+          data: {
+            server_count: this.discord.client.guilds.size,
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: botlists.bfd,
+          },
+        })
+        .then((res) => {
+          res.statusCode === 200 ? success++ : errored++;
+          list.push({
+            name: 'Bots for Discord',
+            success: res.statusCode === 200,
+            data: res.json(),
+          });
+        })
+        .catch((ex) =>
+          this.logger.warn('Unable to parse JSON [Bots for Discord]:', ex)
+        );
     }
 
     const successRate = ((success / list.length) * 100).toFixed(2);
-    this.logger.info([
-      `ℹ️ listly posted to ${list.length} botlists with a success rate of ${successRate}%`,
-      'Serialized output will be displayed:'
-    ].join('\n'));
+    this.logger.info(
+      [
+        `ℹ️ listly posted to ${list.length} botlists with a success rate of ${successRate}%`,
+        'Serialized output will be displayed:',
+      ].join('\n')
+    );
 
     for (const botlist of list) {
-      this.logger.info(`${botlist.success ? '✔' : '❌'} ${botlist.name}`, botlist.data);
+      this.logger.info(
+        `${botlist.success ? '✔' : '❌'} ${botlist.name}`,
+        botlist.data
+      );
     }
   }
 }

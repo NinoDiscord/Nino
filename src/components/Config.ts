@@ -100,7 +100,7 @@ interface S3Config {
 
 @Component({
   priority: 0,
-  name: 'config'
+  name: 'config',
 })
 export default class Config {
   private config!: Configuration;
@@ -110,24 +110,34 @@ export default class Config {
 
   async load() {
     if (!existsSync(join(__dirname, '..', '..', 'config.yml'))) {
-      const config = yaml.dump({
-        runPendingMigrations: true,
-        defaultLocale: 'en_US',
-        environment: 'production',
-        prefixes: ['!'],
-        owners: [],
-        token: '-- replace me --'
-      }, {
-        indent: 2,
-        noArrayIndent: false
-      });
+      const config = yaml.dump(
+        {
+          runPendingMigrations: true,
+          defaultLocale: 'en_US',
+          environment: 'production',
+          prefixes: ['!'],
+          owners: [],
+          token: '-- replace me --',
+        },
+        {
+          indent: 2,
+          noArrayIndent: false,
+        }
+      );
 
       writeFileSync(join(__dirname, '..', '..', 'config.yml'), config);
-      return Promise.reject(new SyntaxError('Weird, you didn\'t have a configuration file... So, I may have provided you a default one, if you don\'t mind... >W<'));
+      return Promise.reject(
+        new SyntaxError(
+          "Weird, you didn't have a configuration file... So, I may have provided you a default one, if you don't mind... >W<"
+        )
+      );
     }
 
     this.logger.info('Loading configuration...');
-    const contents = await readFile(join(__dirname, '..', '..', 'config.yml'), 'utf8');
+    const contents = await readFile(
+      join(__dirname, '..', '..', 'config.yml'),
+      'utf8'
+    );
     const config = yaml.load(contents) as unknown as Configuration;
 
     this.config = {
@@ -144,22 +154,26 @@ export default class Config {
       status: config.status ?? {
         type: 0,
         status: '$prefix$help | $guilds$ Guilds',
-        presence: 'online'
+        presence: 'online',
       },
       ksoft: config.ksoft,
       redis: config.redis,
       token: config.token,
-      s3: config.s3
+      s3: config.s3,
     };
 
     if (this.config.token === '-- replace me --')
-      return Promise.reject(new TypeError('Restore `token` in config with your discord bot token.'));
+      return Promise.reject(
+        new TypeError('Restore `token` in config with your discord bot token.')
+      );
 
     // resolve the promise
     return Promise.resolve();
   }
 
-  getProperty<K extends ObjectKeysWithSeperator<Configuration>>(key: K): KeyToPropType<Configuration, K> | undefined {
+  getProperty<K extends ObjectKeysWithSeperator<Configuration>>(
+    key: K
+  ): KeyToPropType<Configuration, K> | undefined {
     const nodes = key.split('.');
     let value: any = this.config;
 

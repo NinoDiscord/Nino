@@ -27,9 +27,9 @@ import type { PunishmentType } from '../../entities/PunishmentsEntity';
  */
 export const enum SocketState {
   Connecting = 'connecting',
-  Connected  = 'connected',
-  Unknown    = 'unknown',
-  Closed     = 'closed'
+  Connected = 'connected',
+  Unknown = 'unknown',
+  Closed = 'closed',
 }
 
 /**
@@ -42,7 +42,7 @@ export const enum OPCodes {
 
   // send
   Request,
-  Acknowledged
+  Acknowledged,
 }
 
 /**
@@ -82,4 +82,13 @@ export type RequestPacket = DataPacket<Timeout, OPCodes.Request>;
 export type AcknowledgedPacket = DataPacket<Timeout[]>;
 
 export type ApplyPacket = DataPacket<Timeout>;
-export type PunishmentTimeoutType = Exclude<PunishmentType, PunishmentType.Kick | PunishmentType.WarningAdded | PunishmentType.WarningRemoved | PunishmentType.Mute | PunishmentType.Ban | PunishmentType.VoiceMute | PunishmentType.VoiceDeafen>;
+export type PunishmentTimeoutType = Exclude<
+  PunishmentType,
+  | PunishmentType.Kick
+  | PunishmentType.WarningAdded
+  | PunishmentType.WarningRemoved
+  | PunishmentType.Mute
+  | PunishmentType.Ban
+  | PunishmentType.VoiceMute
+  | PunishmentType.VoiceDeafen
+>;

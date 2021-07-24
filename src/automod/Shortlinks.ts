@@ -49,26 +49,26 @@ export default class Shortlinks implements Automod {
   private readonly discord!: Discord;
 
   async onMessage(msg: Message<TextChannel>) {
-    if (!msg || msg === null)
-      return false;
+    if (!msg || msg === null) return false;
 
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      msg.member !== null &&
-      !PermissionUtil.isMemberAbove(nino, msg.member) ||
-      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
+      (msg.member !== null &&
+        !PermissionUtil.isMemberAbove(nino, msg.member)) ||
+      !msg.channel
+        .permissionsOf(this.discord.client.user.id)
+        .has('manageMessages') ||
       msg.author.bot ||
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
-    ) return false;
+    )
+      return false;
 
     const settings = await this.database.automod.get(msg.author.id);
-    if (settings !== undefined && settings.shortLinks === false)
-      return false;
+    if (settings !== undefined && settings.shortLinks === false) return false;
 
     const matches = msg.content.match(LINK_REGEX);
-    if (matches === null)
-      return false;
+    if (matches === null) return false;
 
     // Why not use .find/.filter?
     // Because, it should traverse *all* matches, just not one match.
@@ -83,8 +83,13 @@ export default class Shortlinks implements Automod {
         const language = this.locales.get(msg.guildID, msg.author.id);
 
         await msg.delete();
-        await msg.channel.createMessage(language.translate('automod.shortlinks'));
-        await this.punishments.createWarning(msg.member, `[Automod] Sending a blacklisted URL in ${msg.channel.mention}`);
+        await msg.channel.createMessage(
+          language.translate('automod.shortlinks')
+        );
+        await this.punishments.createWarning(
+          msg.member,
+          `[Automod] Sending a blacklisted URL in ${msg.channel.mention}`
+        );
 
         return true;
       }

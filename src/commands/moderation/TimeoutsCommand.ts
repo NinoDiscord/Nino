@@ -41,52 +41,77 @@ export default class TimeoutsCommand extends Command {
       botPermissions: 'manageMessages',
       description: 'descriptions.timeouts',
       category: Categories.Moderation,
-      examples: [
-        'timeouts',
-        'timeouts unban'
-      ],
-      name: 'timeouts'
+      examples: ['timeouts', 'timeouts unban'],
+      name: 'timeouts',
     });
   }
 
   async run(msg: CommandMessage, [type]: [string]) {
-    return type !== undefined ? this._sendTimeoutsAsSpecific(msg, type) : this._sendTimeouts(msg);
+    return type !== undefined
+      ? this._sendTimeoutsAsSpecific(msg, type)
+      : this._sendTimeouts(msg);
   }
 
   private async _sendTimeoutsAsSpecific(msg: CommandMessage, type: string) {
-    const timeouts = await this.redis.client.hget('nino:timeouts', msg.guild.id)
-      .then((value) => value !== null ? JSON.parse<Timeout[]>(value) : [])
+    const timeouts = await this.redis.client
+      .hget('nino:timeouts', msg.guild.id)
+      .then((value) => (value !== null ? JSON.parse<Timeout[]>(value) : []))
       .catch(() => [] as Timeout[]);
 
     if (!timeouts.length)
-      return msg.reply(`Guild **${msg.guild.name}** doesn't have any concurrent timeouts.`);
+      return msg.reply(
+        `Guild **${msg.guild.name}** doesn't have any concurrent timeouts.`
+      );
 
-    const all = timeouts.filter(p => p.type.toLowerCase() === type.toLowerCase());
+    const all = timeouts.filter(
+      (p) => p.type.toLowerCase() === type.toLowerCase()
+    );
     if (!all.length)
       return msg.reply(`Punishment type **${type}** didn't have any timeouts.`);
 
-    const h = await Promise.all(all.slice(0, 10).map(async (pkt, idx) => {
-      const user = await this.discord.getUser(pkt.user).then(user => user === null ?
-        ({ username: 'Unknown User', discriminator: '0000', id: pkt.user })
-        : user!
-      ).catch(() => ({ username: 'Unknown User', discriminator: '0000', id: pkt.user }));
+    const h = await Promise.all(
+      all.slice(0, 10).map(async (pkt, idx) => {
+        const user = await this.discord
+          .getUser(pkt.user)
+          .then((user) =>
+            user === null
+              ? {
+                  username: 'Unknown User',
+                  discriminator: '0000',
+                  id: pkt.user,
+                }
+              : user!
+          )
+          .catch(() => ({
+            username: 'Unknown User',
+            discriminator: '0000',
+            id: pkt.user,
+          }));
 
-      const moderator = this.discord.client.users.get(pkt.moderator) ?? { username: 'Unknown User', discriminator: '0000' };
-      const issuedAt = new Date(pkt.issued);
-      return {
-        name: `❯ #${idx + 1}: User ${user!.username}#${user!.discriminator}`,
-        value: [
-          `• **Issued At**: ${issuedAt.toUTCString()}`,
-          `• **Expires At**: ${new Date(pkt.expired).toUTCString()}`,
-          `• **Moderator**: ${moderator.username}#${moderator.discriminator}`,
-          `• **Reason**: ${pkt.reason ?? '*No reason was defined.*'}`
-        ].join('\n'),
-        inline: true
-      };
-    }));
+        const moderator = this.discord.client.users.get(pkt.moderator) ?? {
+          username: 'Unknown User',
+          discriminator: '0000',
+        };
+        const issuedAt = new Date(pkt.issued);
+        return {
+          name: `❯ #${idx + 1}: User ${user!.username}#${user!.discriminator}`,
+          value: [
+            `• **Issued At**: ${issuedAt.toUTCString()}`,
+            `• **Expires At**: ${new Date(pkt.expired).toUTCString()}`,
+            `• **Moderator**: ${moderator.username}#${moderator.discriminator}`,
+            `• **Reason**: ${pkt.reason ?? '*No reason was defined.*'}`,
+          ].join('\n'),
+          inline: true,
+        };
+      })
+    );
 
     const embed = EmbedBuilder.create()
-      .setAuthor(`[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`, undefined, msg.guild.dynamicIconURL('png', 1024))
+      .setAuthor(
+        `[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`,
+        undefined,
+        msg.guild.dynamicIconURL('png', 1024)
+      )
       .addFields(h)
       .setFooter('Only showing 10 entries.');
 
@@ -94,36 +119,60 @@ export default class TimeoutsCommand extends Command {
   }
 
   private async _sendTimeouts(msg: CommandMessage) {
-    const timeouts = await this.redis.client.hget('nino:timeouts', msg.guild.id)
-      .then((value) => value !== null ? JSON.parse<Timeout[]>(value) : [])
+    const timeouts = await this.redis.client
+      .hget('nino:timeouts', msg.guild.id)
+      .then((value) => (value !== null ? JSON.parse<Timeout[]>(value) : []))
       .catch(() => [] as Timeout[]);
 
     if (!timeouts.length)
-      return msg.reply(`Guild **${msg.guild.name}** doesn't have any concurrent timeouts.`);
+      return msg.reply(
+        `Guild **${msg.guild.name}** doesn't have any concurrent timeouts.`
+      );
 
-    const h = await Promise.all(timeouts.slice(0, 10).map(async (pkt, idx) => {
-      const user = await this.discord.getUser(pkt.user).then(user => user === null ?
-        ({ username: 'Unknown User', discriminator: '0000', id: pkt.user })
-        : user!
-      ).catch(() => ({ username: 'Unknown User', discriminator: '0000', id: pkt.user }));
+    const h = await Promise.all(
+      timeouts.slice(0, 10).map(async (pkt, idx) => {
+        const user = await this.discord
+          .getUser(pkt.user)
+          .then((user) =>
+            user === null
+              ? {
+                  username: 'Unknown User',
+                  discriminator: '0000',
+                  id: pkt.user,
+                }
+              : user!
+          )
+          .catch(() => ({
+            username: 'Unknown User',
+            discriminator: '0000',
+            id: pkt.user,
+          }));
 
-      const moderator = this.discord.client.users.get(pkt.moderator) ?? { username: 'Unknown User', discriminator: '0000' };
-      const issuedAt = new Date(pkt.issued);
-      return {
-        name: `❯ #${idx + 1}: User ${user!.username}#${user!.discriminator}`,
-        value: [
-          `• **Issued At**: ${issuedAt.toUTCString()}`,
-          `• **Expires At**: ${new Date(pkt.expired).toDateString()}`,
-          `• **Moderator**: ${moderator.username}#${moderator.discriminator}`,
-          `• **Reason**: ${pkt.reason ?? '*No reason was defined.*'}`,
-          `• **Punishment**: ${firstUpper(pkt.type)}`
-        ].join('\n'),
-        inline: true
-      };
-    }));
+        const moderator = this.discord.client.users.get(pkt.moderator) ?? {
+          username: 'Unknown User',
+          discriminator: '0000',
+        };
+        const issuedAt = new Date(pkt.issued);
+        return {
+          name: `❯ #${idx + 1}: User ${user!.username}#${user!.discriminator}`,
+          value: [
+            `• **Issued At**: ${issuedAt.toUTCString()}`,
+            `• **Expires At**: ${new Date(pkt.expired).toDateString()}`,
+            `• **Moderator**: ${moderator.username}#${moderator.discriminator}`,
+            `• **Reason**: ${pkt.reason ?? '*No reason was defined.*'}`,
+            `• **Punishment**: ${firstUpper(pkt.type)}`,
+          ].join('\n'),
+          inline: true,
+        };
+      })
+    );
 
     const embed = EmbedBuilder.create()
-      .setAuthor(`[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`, undefined, msg.guild.dynamicIconURL('png', 1024))
+      .setAuthor(
+        `[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`,
+        undefined,
+        msg.guild.dynamicIconURL('png', 1024)
+      )
       .addFields(h)
       .setFooter('Only showing 10 entries.');
 

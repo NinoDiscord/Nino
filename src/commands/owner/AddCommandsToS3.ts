@@ -32,17 +32,16 @@ export default class AddCommandsToS3 extends Command {
 
   constructor() {
     super({
-      description: 'Bulk adds commands to Noel\'s S3 bucket',
+      description: "Bulk adds commands to Noel's S3 bucket",
       ownerOnly: true,
       category: Categories.Owner,
       aliases: ['bulk:s3'],
-      name: 'commands:s3'
+      name: 'commands:s3',
     });
   }
 
   async run(msg: CommandMessage) {
-    if (!this.s3.client)
-      return msg.reply('S3 client isn\'t attached.');
+    if (!this.s3.client) return msg.reply("S3 client isn't attached.");
 
     const message = await msg.reply('Now uploading commands to S3...');
     const stopwatch = new Stopwatch();
@@ -51,6 +50,8 @@ export default class AddCommandsToS3 extends Command {
     await this.s3.publishCommands();
     const endTime = stopwatch.end();
 
-    return message.edit(`:timer: Took ~**${endTime}** to upload commands to S3.`);
+    return message.edit(
+      `:timer: Took ~**${endTime}** to upload commands to S3.`
+    );
   }
 }

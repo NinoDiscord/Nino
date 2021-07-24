@@ -39,36 +39,47 @@ export default class ModLogCommand extends Command {
       userPermissions: ['manageGuild'],
       description: 'descriptions.modlog',
       category: Categories.Settings,
-      examples: [
-        'modlog',
-        'modlog reset',
-        'modlog <#236987412589632587>'
-      ],
+      examples: ['modlog', 'modlog reset', 'modlog <#236987412589632587>'],
       aliases: ['set-modlog'],
       usage: '[channel]',
-      name: 'modlog'
+      name: 'modlog',
     });
   }
 
   async run(msg: CommandMessage, [channel]: [string]) {
     if (!channel) {
-      const chan = msg.settings.modlogChannelID !== null ? await this.discord.getChannel<TextChannel>(msg.settings.modlogChannelID!, msg.guild) : null;
-      return msg.reply(chan === null ? 'No mod-log has been set.' : `Mod Logs are set in **#${chan.name}**`);
+      const chan =
+        msg.settings.modlogChannelID !== null
+          ? await this.discord.getChannel<TextChannel>(
+              msg.settings.modlogChannelID!,
+              msg.guild
+            )
+          : null;
+      return msg.reply(
+        chan === null
+          ? 'No mod-log has been set.'
+          : `Mod Logs are set in **#${chan.name}**`
+      );
     }
 
     const chan = await this.discord.getChannel<TextChannel>(channel, msg.guild);
-    if (chan === null)
-      return msg.reply(`Channel "${channel}" doesn't exist.`);
+    if (chan === null) return msg.reply(`Channel "${channel}" doesn't exist.`);
 
     if (chan.type !== 0)
       return msg.reply(`Channel #${chan.name} was not a text channel`);
 
     const perms = chan.permissionsOf(this.discord.client.user.id);
-    if (!perms.has('sendMessages') || !perms.has('readMessages') || !perms.has('embedLinks'))
-      return msg.reply(`I am missing the following permissions: **Send Messages**, **Read Messages**, and **Embed Links** in #${chan.name}.`);
+    if (
+      !perms.has('sendMessages') ||
+      !perms.has('readMessages') ||
+      !perms.has('embedLinks')
+    )
+      return msg.reply(
+        `I am missing the following permissions: **Send Messages**, **Read Messages**, and **Embed Links** in #${chan.name}.`
+      );
 
     await this.database.guilds.update(msg.guild.id, {
-      modlogChannelID: chan.id
+      modlogChannelID: chan.id,
     });
 
     return msg.reply(`Mod Logs are now set in #${chan.name}!`);
@@ -80,7 +91,7 @@ export default class ModLogCommand extends Command {
       return msg.reply('No mod logs channel has been set.');
 
     await this.database.guilds.update(msg.guild.id, {
-      modlogChannelID: undefined
+      modlogChannelID: undefined,
     });
 
     return msg.reply('Resetted the mod log successfully.');

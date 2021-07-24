@@ -22,7 +22,13 @@
 
 /* eslint-disable camelcase */
 
-import type { APIEmbedAuthor, APIEmbedField, APIEmbedFooter, APIEmbedImage, APIEmbedThumbnail } from 'discord-api-types';
+import type {
+  APIEmbedAuthor,
+  APIEmbedField,
+  APIEmbedFooter,
+  APIEmbedImage,
+  APIEmbedThumbnail,
+} from 'discord-api-types';
 import { omitUndefinedOrNull } from '@augu/utils';
 import type { EmbedOptions } from 'eris';
 import { Color } from '../util/Constants';
@@ -44,46 +50,37 @@ export default class EmbedBuilder {
   }
 
   patch(data: EmbedOptions) {
-    if (data.description !== undefined)
-      this.description = data.description;
+    if (data.description !== undefined) this.description = data.description;
 
-    if (data.thumbnail !== undefined)
-      this.thumbnail = data.thumbnail;
+    if (data.thumbnail !== undefined) this.thumbnail = data.thumbnail;
 
-    if (data.timestamp !== undefined)
-      this.timestamp = data.timestamp;
+    if (data.timestamp !== undefined) this.timestamp = data.timestamp;
 
-    if (data.author !== undefined)
-      this.author = data.author;
+    if (data.author !== undefined) this.author = data.author;
 
-    if (data.fields !== undefined)
-      this.fields = data.fields;
+    if (data.fields !== undefined) this.fields = data.fields;
 
-    if (data.image !== undefined)
-      this.image = data.image;
+    if (data.image !== undefined) this.image = data.image;
 
-    if (data.color !== undefined)
-      this.color = data.color;
+    if (data.color !== undefined) this.color = data.color;
 
-    if (data.title !== undefined)
-      this.title = data.title;
+    if (data.title !== undefined) this.title = data.title;
 
-    if (data.url !== undefined)
-      this.url = data.url;
+    if (data.url !== undefined) this.url = data.url;
   }
 
   setDescription(description: string | string[]) {
-    this.description = Array.isArray(description) ? description.join('\n') : description;
+    this.description = Array.isArray(description)
+      ? description.join('\n')
+      : description;
     return this;
   }
 
   setTimestamp(stamp: Date | number = new Date()) {
     let timestamp!: number;
 
-    if (stamp instanceof Date)
-      timestamp = stamp.getTime();
-    else if (typeof stamp === 'number')
-      timestamp = stamp;
+    if (stamp instanceof Date) timestamp = stamp.getTime();
+    else if (typeof stamp === 'number') timestamp = stamp;
 
     this.timestamp = String(timestamp);
     return this;
@@ -101,7 +98,8 @@ export default class EmbedBuilder {
 
   addField(name: string, value: string, inline: boolean = false) {
     if (this.fields === undefined) this.fields = [];
-    if (this.fields.length > 25) throw new RangeError('Maximum amount of fields reached.');
+    if (this.fields.length > 25)
+      throw new RangeError('Maximum amount of fields reached.');
 
     this.fields.push({ name, value, inline });
     return this;
@@ -112,12 +110,20 @@ export default class EmbedBuilder {
   }
 
   addFields(fields: APIEmbedField[]) {
-    for (let i = 0; i < fields.length; i++) this.addField(fields[i].name, fields[i].value, fields[i].inline);
+    for (let i = 0; i < fields.length; i++)
+      this.addField(fields[i].name, fields[i].value, fields[i].inline);
 
     return this;
   }
 
-  setColor(color: string | number | [r: number, g: number, b: number] | 'random' | 'default') {
+  setColor(
+    color:
+      | string
+      | number
+      | [r: number, g: number, b: number]
+      | 'random'
+      | 'default'
+  ) {
     if (typeof color === 'number') {
       this.color = color;
       return this;
@@ -130,7 +136,7 @@ export default class EmbedBuilder {
       }
 
       if (color === 'random') {
-        this.color = Math.floor(Math.random() * (0xFFFFFF + 1));
+        this.color = Math.floor(Math.random() * (0xffffff + 1));
         return this;
       }
 
@@ -141,7 +147,8 @@ export default class EmbedBuilder {
     }
 
     if (Array.isArray(color)) {
-      if (color.length > 2) throw new RangeError('RGB value cannot exceed to 3 or more elements');
+      if (color.length > 2)
+        throw new RangeError('RGB value cannot exceed to 3 or more elements');
 
       const [r, g, b] = color;
       this.color = (r << 16) + (g << 8) + b;
@@ -149,7 +156,9 @@ export default class EmbedBuilder {
       return this;
     }
 
-    throw new TypeError(`'color' argument was not a hexadecimal, number, RGB value, 'random', or 'default' (${typeof color})`);
+    throw new TypeError(
+      `'color' argument was not a hexadecimal, number, RGB value, 'random', or 'default' (${typeof color})`
+    );
   }
 
   setTitle(title: string) {
@@ -173,8 +182,7 @@ export default class EmbedBuilder {
   }
 
   static create() {
-    return new EmbedBuilder()
-      .setColor(Color);
+    return new EmbedBuilder().setColor(Color);
   }
 
   build() {
@@ -183,16 +191,18 @@ export default class EmbedBuilder {
       thumbnail: this.thumbnail,
       timestamp: this.timestamp,
       footer: this.footer,
-      author: this.author ? {
-        name: this.author.name!,
-        url: this.author.url,
-        icon_url: this.author.icon_url
-      } : undefined,
+      author: this.author
+        ? {
+            name: this.author.name!,
+            url: this.author.url,
+            icon_url: this.author.icon_url,
+          }
+        : undefined,
       fields: this.fields,
       image: this.image,
       color: this.color,
       title: this.title,
-      url: this.url
+      url: this.url,
     });
   }
 }

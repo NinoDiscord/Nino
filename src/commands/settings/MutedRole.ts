@@ -41,20 +41,23 @@ export default class MutedRoleCommand extends Command {
       examples: [
         'muterole | View the current Muted role in this server',
         'muterole reset | Resets the Muted role in this server',
-        'muterole 3621587485965325 | Sets the current mute role'
+        'muterole 3621587485965325 | Sets the current mute role',
       ],
       aliases: ['mutedrole', 'mute-role'],
-      name: 'muterole'
+      name: 'muterole',
     });
   }
 
   async run(msg: CommandMessage, [roleID]: [string]) {
     if (!roleID)
-      return msg.settings.mutedRoleID !== null ? msg.reply(`The muted role in this guild is <@&${msg.settings.mutedRoleID}>`) : msg.reply('No muted role is set in this guild.');
+      return msg.settings.mutedRoleID !== null
+        ? msg.reply(
+            `The muted role in this guild is <@&${msg.settings.mutedRoleID}>`
+          )
+        : msg.reply('No muted role is set in this guild.');
 
     const role = await this.discord.getRole(roleID, msg.guild);
-    if (role === null)
-      return msg.reply(`\`${roleID}\` was not a role.`);
+    if (role === null) return msg.reply(`\`${roleID}\` was not a role.`);
 
     await this.database.guilds.update(msg.guild.id, { mutedRoleID: role.id });
     return msg.reply(`The Muted role is now set to **${role.name}**`);

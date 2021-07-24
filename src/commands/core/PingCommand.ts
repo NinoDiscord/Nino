@@ -36,7 +36,7 @@ export default class PingCommand extends Command {
       description: 'descriptions.ping',
       aliases: ['pong', 'latency', 'lat'],
       cooldown: 1,
-      name: 'ping'
+      name: 'ping',
     });
   }
 
@@ -53,14 +53,16 @@ export default class PingCommand extends Command {
     const redis = await app.get<Redis>('redis').getStatistics();
     const postgres = await app.get<Database>('database').getStatistics();
 
-    return msg.reply([
-      `:satellite_orbital: Running under node **${node}**`,
-      '',
-      `> **Message Delete**: ${calculateHRTime(deleteMsg).toFixed()}ms`,
-      `> **Message Send**: ${ping.toFixed()}ms`,
-      `> **PostgreSQL**: ${postgres.ping}`,
-      `> **Shard #${shard.id}**: ${shard.latency}ms`,
-      `> **Redis**: ${redis.ping}`
-    ].join('\n'));
+    return msg.reply(
+      [
+        `:satellite_orbital: Running under node **${node}**`,
+        '',
+        `> **Message Delete**: ${calculateHRTime(deleteMsg).toFixed()}ms`,
+        `> **Message Send**: ${ping.toFixed()}ms`,
+        `> **PostgreSQL**: ${postgres.ping}`,
+        `> **Shard #${shard.id}**: ${shard.latency}ms`,
+        `> **Redis**: ${redis.ping}`,
+      ].join('\n')
+    );
   }
 }

@@ -29,7 +29,7 @@ import Config from './Config';
 
 @Component({
   priority: 5,
-  name: 'sentry'
+  name: 'sentry',
 })
 export default class Sentry {
   @Inject
@@ -43,28 +43,28 @@ export default class Sentry {
 
     const dsn = this.config.getProperty('sentryDsn');
     if (dsn === undefined) {
-      this.logger.warn('Missing sentryDsn variable in config.yml! Don\'t worry, this is optional.');
+      this.logger.warn(
+        "Missing sentryDsn variable in config.yml! Don't worry, this is optional."
+      );
       return;
     }
 
     sentry.init({
       tracesSampleRate: 1.0,
-      integrations: [
-        new sentry.Integrations.Http({ tracing: true })
-      ],
+      integrations: [new sentry.Integrations.Http({ tracing: true })],
       environment: this.config.getProperty('environment')!,
       serverName: hostname(),
       release: version,
-      dsn
+      dsn,
     });
 
-    sentry.configureScope(scope =>
+    sentry.configureScope((scope) =>
       scope.setTags({
         'nino.environment': this.config.getProperty('environment')!,
         'nino.commitHash': commitHash,
         'nino.version': version,
         'system.user': require('os').userInfo().username,
-        'system.os': process.platform
+        'system.os': process.platform,
       })
     );
 
