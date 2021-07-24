@@ -46,6 +46,7 @@ interface Configuration {
   ksoft?: string;
   redis: RedisConfig;
   token: string;
+  s3?: S3Config;
 }
 
 interface BotlistConfig {
@@ -89,6 +90,13 @@ interface StatusConfig {
 
 // eslint-disable-next-line
 interface RedisSentinelConfig extends Pick<RedisConfig, 'host' | 'port'> {}
+
+interface S3Config {
+  accessKey: string;
+  secretKey: string;
+  region?: string;
+  bucket: string;
+}
 
 @Component({
   priority: 0,
@@ -140,7 +148,8 @@ export default class Config {
       },
       ksoft: config.ksoft,
       redis: config.redis,
-      token: config.token
+      token: config.token,
+      s3: config.s3
     };
 
     if (this.config.token === '-- replace me --')

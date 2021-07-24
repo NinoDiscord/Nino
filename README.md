@@ -51,10 +51,36 @@ There are 2 ways to setup Nino: using Docker or just doing shit yourself. Doing 
 of how much Nino uses from v0 to v1 since Nino utilizes microservices! **☆♬○♩●♪✧♩((ヽ( ᐛ )ﾉ))♩✧♪●♩○♬☆**
 
 ### Docker
-This step isn't finished due to the rewrite not being stable.
+```sh
+# 1. Clone the repository
+$ git clone https://github.com/NinoDiscord/Nino.git && cd Nino
+
+# 2. Create a image
+$ docker build -t nino:latest --no-cache .
+
+# 3. Run the image
+$ docker run -d \
+  --volume './config.yml:/opt/Nino/config.yml:ro' \ # read-only
+  nino:latest
+
+# OPTIONAL: Use docker-compose.yml to run the services
+$ docker-compose up -d
+```
 
 ### Normal
-This step isn't finished due to the rewrite not being stable.
+```sh
+# 1. Clone the repository
+$ git clone https://github.com/NinoDiscord/Nino.git && cd Nino
+
+# 2. Install the dependencies
+$ npm install
+
+# 3. Build the project
+$ npm run build
+
+# 4. Run the project
+$ npm start
+```
 
 ### Migrating from v0.x -> v1.x
 If you used v0.x in the past, this is the process on how to migrate:

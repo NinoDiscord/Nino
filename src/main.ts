@@ -23,6 +23,19 @@
 import 'source-map-support/register';
 import 'reflect-metadata';
 
+(require('@augu/dotenv') as typeof import('@augu/dotenv')).parse({
+  populate: true,
+  delimiter: ',',
+  file: require('path').join(process.cwd(), '..', '.env'),
+  schema: {
+    NODE_ENV: {
+      oneOf: ['production', 'development'],
+      default: 'development',
+      type: 'string'
+    }
+  }
+});
+
 import { commitHash, version } from './util/Constants';
 import Discord from './components/Discord';
 import Sentry from './components/Sentry';

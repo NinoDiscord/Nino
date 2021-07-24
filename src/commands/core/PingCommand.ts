@@ -23,7 +23,9 @@
 import { Command, CommandMessage } from '../../structures';
 import { calculateHRTime } from '@augu/utils';
 import { Inject } from '@augu/lilith';
+import Database from '../../components/Database';
 import Discord from '../../components/Discord';
+import Redis from '../../components/Redis';
 
 export default class PingCommand extends Command {
   @Inject
@@ -48,12 +50,17 @@ export default class PingCommand extends Command {
     await message.delete();
 
     const shard = this.discord.client.shards.get(msg.guild.shard.id)!;
+    const redis = await app.get<Redis>('redis').getStatistics();
+    const postgres = await app.get<Database>('database').getStatistics();
+
     return msg.reply([
-      `:satellite_orbital: Running under node **${node ?? 'unknown'}**`,
+      `:satellite_orbital: Running under node **${node}**`,
       '',
       `> **Message Delete**: ${calculateHRTime(deleteMsg).toFixed()}ms`,
       `> **Message Send**: ${ping.toFixed()}ms`,
-      `> **Shard #${shard.id}**: ${shard.latency}ms`
+      `> **PostgreSQL**: ${postgres.ping}`,
+      `> **Shard #${shard.id}**: ${shard.latency}ms`,
+      `> **Redis**: ${redis.ping}`
     ].join('\n'));
   }
 }

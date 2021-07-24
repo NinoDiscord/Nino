@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-import { Service, ServiceAPI } from '@augu/lilith';
+import { Service } from '@augu/lilith';
 import { join } from 'path';
 
 @Service({
@@ -28,10 +28,5 @@ import { join } from 'path';
   children: join(process.cwd(), 'listeners'),
   name: 'listeners'
 })
-export default class ListenerService {
-  api!: ServiceAPI;
-
-  onChildLoad(listener: any) {
-    this.api.forwardSubscriptions(this.api.container.emitters.get('discord')!, listener);
-  }
-}
+// a noop service to register all listeners
+export default class ListenerService {}

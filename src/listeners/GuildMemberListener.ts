@@ -22,10 +22,9 @@
 
 import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, Member } from 'eris';
+import { Inject, Subscribe } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
-import { Inject } from '@augu/lilith';
 import AutomodService from '../services/AutomodService';
-import Subscribe from '../structures/decorators/Subscribe';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 
@@ -38,16 +37,16 @@ interface OldMember {
 
 export default class GuildMemberListener {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   @Inject
-  private automod!: AutomodService;
+  private readonly automod!: AutomodService;
 
   private async findAuditLog(guild: Guild, member: Member) {
     if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
@@ -65,7 +64,7 @@ export default class GuildMemberListener {
     }
   }
 
-  @Subscribe('guildMemberUpdate')
+  @Subscribe('guildMemberUpdate', { emitter: 'discord' })
   async onGuildMemberUpdate(guild: Guild, member: Member, old: OldMember) {
     const settings = await this.database.automod.get(guild.id);
     const gSettings = await this.database.guilds.get(guild.id);
@@ -74,7 +73,8 @@ export default class GuildMemberListener {
       if (settings !== undefined && settings.dehoist === false)
         return;
 
-      if ((await this.automod.run('memberNick', member)) === true)
+      const result = await this.automod.run('memberNick', member);
+      if (result)
         return;
     }
 
@@ -98,6 +98,7 @@ export default class GuildMemberListener {
       });
     }
 
+    // added it
     if (member.roles.includes(gSettings.mutedRoleID) && !old.roles.includes(gSettings.mutedRoleID)) {
       const entry = await this.findAuditLog(guild, member);
       if (!entry)
@@ -106,15 +107,16 @@ export default class GuildMemberListener {
       await this.punishments.apply({
         moderator: entry.user,
         member,
-        reason: '[Automod] Moderator has removed the Muted role',
+        reason: '[Automod] Moderator has added the Muted role',
         type: PunishmentType.Mute
       });
     }
   }
 
-  @Subscribe('guildMemberAdd')
+  @Subscribe('guildMemberAdd', { emitter: 'discord' })
   async onGuildMemberJoin(guild: Guild, member: Member) {
-    if ((await this.automod.run('memberJoin', member)) === true)
+    const result = await this.automod.run('memberJoin', member);
+    if (result)
       return;
 
     const cases = await this.database.cases.getAll(guild.id);
@@ -130,9 +132,13 @@ export default class GuildMemberListener {
     }
   }
 
-  @Subscribe('guildMemberRemove')
+  @Subscribe('guildMemberRemove', { emitter: 'discord' })
   async onGuildMemberRemove(guild: Guild, member: Member) {
-    const logs = await guild.getAuditLogs(3, undefined, Constants.AuditLogActions.MEMBER_KICK).catch(() => undefined);
+    const logs = await guild.getAuditLog({
+      limit: 3,
+      actionType: Constants.AuditLogActions.MEMBER_KICK
+    }).catch(() => undefined);
+
     if (logs === undefined)
       return;
 

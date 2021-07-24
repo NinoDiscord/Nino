@@ -39,16 +39,16 @@ export default class StatisticsCommand extends Command {
   private parent!: CommandService;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   @Inject
-  private config!: Config;
+  private readonly config!: Config;
 
   @Inject
-  private redis!: Redis;
+  private readonly redis!: Redis;
 
   constructor() {
     super({
@@ -76,6 +76,12 @@ export default class StatisticsCommand extends Command {
       else
         return Promise.resolve(user);
     }));
+
+    const dashboardUrl = this.discord.client.user.id === '531613242473054229'
+      ? 'https://stats.floofy.dev/d/e3KPDLknk/nino-prod?orgId=1'
+      : this.discord.client.user.id === '613907896622907425'
+        ? 'https://stats.floofy.dev/d/C5bZHVZ7z/nino-edge?orgId=1'
+        : '';
 
     const embed = new EmbedBuilder()
       .setAuthor(`[ ${this.discord.client.user.username}#${this.discord.client.user.discriminator} ~ v${version} (${commitHash ?? '<unknown>'}) ]`, 'https://nino.floofy.dev', this.discord.client.user.dynamicAvatarURL('png', 1024))
@@ -124,6 +130,9 @@ export default class StatisticsCommand extends Command {
         }
       ])
       .setFooter(`Owners: ${owners.map((user) => `${user.username}#${user.discriminator}`).join(', ')}`);
+
+    if (dashboardUrl !== '')
+      embed.setDescription(`[[**Metrics Dashboard**]](${dashboardUrl})`);
 
     return msg.reply(embed);
   }

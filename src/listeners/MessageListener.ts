@@ -45,12 +45,12 @@ export default class MessageListener {
   @Inject
   private readonly discord!: Discord;
 
-  @Subscribe('messageCreate', 'discord')
+  @Subscribe('messageCreate', { emitter: 'discord' })
   onMessageCreate(msg: Message<TextChannel>) {
     return this.commands.handleCommand(msg);
   }
 
-  @Subscribe('messageDelete', 'discord')
+  @Subscribe('messageDelete', { emitter: 'discord' })
   async onMessageDelete(msg: Message<TextChannel>) {
     if (!msg.author || ![0, 5].includes(msg.channel.type))
       return;
@@ -120,7 +120,7 @@ export default class MessageListener {
     });
   }
 
-  @Subscribe('messageUpdate', 'discord')
+  @Subscribe('messageUpdate', { emitter: 'discord' })
   async onMessageUpdate(msg: Message<TextChannel>, old: OldMessage | null) {
     await this.automod.run('message', msg);
 
@@ -137,7 +137,10 @@ export default class MessageListener {
     if (msg.content !== old.content)
       await this.commands.handleCommand(msg);
 
-    // await this.automod.onMessageUpdate(msg, old);
+    const result = await this.automod.run('message', msg);
+    if (result)
+      return;
+
     const settings = await this.database.logging.get(msg.channel.guild.id);
     if (!settings.enabled || !settings.events.includes(LoggingEvents.MessageUpdated))
       return;
@@ -187,7 +190,7 @@ export default class MessageListener {
     });
   }
 
-  @Subscribe('messageDeleteBulk', 'discord')
+  @Subscribe('messageDeleteBulk', { emitter: 'discord' })
   async onMessageDeleteBulk(messages: Message<TextChannel>[]) {
     const allMsgs = messages
       .filter(msg => msg.guildID !== undefined)

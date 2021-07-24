@@ -29,15 +29,15 @@ import Discord from '../components/Discord';
 
 export default class GuildBansListener {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private database!: Database;
+  private readonly database!: Database;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
-  @Subscribe('guildBanAdd', 'discord')
+  @Subscribe('guildBanAdd', { emitter: 'discord' })
   async onGuildBanAdd(guild: Guild, user: User) {
     if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs')) {
       return;
@@ -71,7 +71,7 @@ export default class GuildBansListener {
     }, caseModel);
   }
 
-  @Subscribe('guildBanRemove', 'discord')
+  @Subscribe('guildBanRemove', { emitter: 'discord' })
   async onGuildBanRemove(guild: Guild, user: User) {
     if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
       return;
