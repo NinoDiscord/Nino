@@ -23,12 +23,12 @@
 import { Inject, Subscribe } from '@augu/lilith';
 import type { RawPacket } from 'eris';
 import BotlistsService from '../services/BotlistService';
-import AutomodService from '../services/AutomodService';
 import { Logger } from 'tslog';
 import Discord from '../components/Discord';
 import Config from '../components/Config';
 import Redis from '../components/Redis';
 import Prom from '../components/Prometheus';
+import { GatewayInteractionCreateDispatchData } from 'discord-api-types';
 
 export default class VoidListener {
   @Inject
@@ -53,6 +53,10 @@ export default class VoidListener {
   onRawWS(packet: RawPacket) {
     if (!packet.t) return;
 
+    if (packet.t === 'INTERACTION_CREATE') {
+      const data = packet.d as GatewayInteractionCreateDispatchData;
+    }
+
     this.prometheus?.rawWSEvents?.labels(packet.t).inc();
   }
 
@@ -74,19 +78,6 @@ export default class VoidListener {
     const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
     const statusType = this.config.getProperty('status.type');
     const status = this.config.getProperty('status.status')!;
-
-    // const raids = await this.redis.client.keys('nino:raid:lockdown:indicator:*');
-    // const automod = app.$ref<AutomodService>(AutomodService);
-
-    // for (let guildID of raids) {
-    //   if (guildID.includes(' | '))
-    //     guildID = guildID.split(' | ').pop()!;
-
-    //   await this.redis.client.del(`nino:raid:lockdown:indicator:${guildID}`);
-    //   if (this.discord.client.guilds.has(guildID)) {
-    //     await automod['_restore'](this.discord.client.guilds.get(guildID)!);
-    //   }
-    // }
 
     for (const shard of this.discord.client.shards.values()) {
       this.discord.client.editStatus(

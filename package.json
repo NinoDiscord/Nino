@@ -42,7 +42,6 @@
     "@sentry/node": "6.10.0",
     "eris": "github:abalabahaha/eris#dev",
     "ioredis": "4.27.6",
-    "ioredis-lock": "4.0.0",
     "js-yaml": "4.1.0",
     "luxon": "2.0.1",
     "ms": "2.1.3",
