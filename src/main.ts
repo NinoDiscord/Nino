@@ -72,6 +72,10 @@ const ReconnectCodes = [
   1006, // Connection reset by peer
 ];
 
+const OtherPossibleReconnectCodes = [
+  'WebSocket was closed before the connection was established',
+];
+
 process.on('unhandledRejection', (error) => {
   const sentry = app.$ref<Sentry>(Sentry);
   if (error !== null || error !== undefined) {
@@ -83,17 +87,19 @@ process.on('unhandledRejection', (error) => {
 process.on('uncaughtException', async (error) => {
   const sentry = app.$ref<Sentry>(Sentry);
 
-  if (
-    (error as any).code !== undefined &&
-    ReconnectCodes.includes((error as any).code)
-  ) {
-    logger.fatal(
-      'Disconnected due to peer to peer connection ended, restarting client...'
-    );
+  if ((error as any).code !== undefined) {
+    if (
+      ReconnectCodes.includes((error as any).code) ||
+      OtherPossibleReconnectCodes.includes(error.message)
+    ) {
+      logger.fatal(
+        'Disconnected due to peer to peer connection ended, restarting client...'
+      );
 
-    const discord = app.$ref<Discord>(Discord);
-    discord.client.disconnect({ reconnect: false });
-    await discord.client.connect();
+      const discord = app.$ref<Discord>(Discord);
+      discord.client.disconnect({ reconnect: false });
+      await discord.client.connect();
+    }
   } else {
     sentry?.report(error);
     logger.fatal('Uncaught exception has occured\n', error);
