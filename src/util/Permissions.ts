@@ -31,6 +31,10 @@ export default class Permissions {
    * @param member The member to check
    */
   static getTopRole(member: Member) {
+    // eris why
+    if (member === undefined || member === null)
+      return;
+
     // For some reason, `roles` will become undefined? So we have to check for that.
     // It could be a bug in Discord or `member` is undefined.
     if (member.roles === undefined) return;
