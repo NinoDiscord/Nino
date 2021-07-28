@@ -20,15 +20,84 @@
  * SOFTWARE.
  */
 
+import type { GatewayInteractionCreateDispatchData } from 'discord-api-types';
 import { Inject, Subscribe } from '@augu/lilith';
 import type { RawPacket } from 'eris';
 import BotlistsService from '../services/BotlistService';
 import { Logger } from 'tslog';
 import Discord from '../components/Discord';
 import Config from '../components/Config';
-import Redis from '../components/Redis';
 import Prom from '../components/Prometheus';
-import { GatewayInteractionCreateDispatchData } from 'discord-api-types';
+
+/*
+  _format() {
+    if (!this.command) return {
+      roleMentions: [],
+      userMentions: [],
+      content: ''
+    };
+
+    if (!this.command.options) return {
+      roleMentions: [],
+      userMentions: [],
+      content: `/${this.command.name}`
+    };
+
+    const roleMentions: string[] = [];
+    const userMentions: string[] = [];
+    let content = `/${this.command!.name}`;
+
+    const formatArgument = (arg: interactions.ApplicationCommandOption) => {
+      // @ts-ignore
+      if (arg.options !== undefined && !arg.value) {
+        const args = arg.options.map(arg => formatArgument(arg));
+        return `${arg.name} ${args.join(' ')}`;
+      }
+
+      if (['member', 'user'].some(e => arg.name.startsWith(e))) {
+        // @ts-ignore
+        userMentions.push(arg.value);
+
+        // @ts-ignore
+        return `<@!${arg.value}>`;
+      } else if (arg.name === 'channel') {
+        // @ts-ignore
+        return `<@#${arg.value}>`;
+      } else if (arg.name === 'role') {
+        // @ts-ignore
+        roleMentions.push(arg.value);
+
+        // @ts-ignore
+        return `<@&${arg.value}>`;
+      } else {
+        // @ts-ignore
+        return arg.value;
+      }
+    };
+
+    this.command!.options?.forEach(option => {
+      const choices = (option.choices?.length ?? false)
+        ? option.choices!.map(choice =>
+          choice !== undefined
+            ? undefined
+            : `${choice!.name}: ${choice!.value}`
+        ).filter(c => c !== undefined) : null;
+
+      if (choices !== null) {
+        content += ` ${choices.join(' ')}`;
+        return;
+      }
+
+      content += ` ${formatArgument(option)}`;
+    });
+
+    return {
+      roleMentions,
+      userMentions,
+      content
+    };
+  }
+*/
 
 export default class VoidListener {
   @Inject
@@ -42,9 +111,6 @@ export default class VoidListener {
 
   @Inject
   private readonly logger!: Logger;
-
-  @Inject
-  private readonly redis!: Redis;
 
   @Inject
   private readonly config!: Config;
