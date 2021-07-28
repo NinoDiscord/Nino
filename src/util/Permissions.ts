@@ -32,8 +32,7 @@ export default class Permissions {
    */
   static getTopRole(member: Member) {
     // eris why
-    if (member === undefined || member === null)
-      return;
+    if (member === undefined || member === null) return;
 
     // For some reason, `roles` will become undefined? So we have to check for that.
     // It could be a bug in Discord or `member` is undefined.
