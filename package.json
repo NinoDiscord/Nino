@@ -29,7 +29,7 @@
     "prepare": "npm run clean:node_modules",
     "build": "npm run lint && rm -rf build && tsc",
     "start": "cd build && node main.js",
-    "lint": "eslint src --ext .ts --fix && prettier --write src/**/*.ts",
+    "lint": "eslint src --ext .ts --fix && prettier --semi --tab-width=2 --single-quote --end-of-line=lf --write src/**/*.ts",
     "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
   },
   "dependencies": {
@@ -69,6 +69,7 @@
     "discord-api-types": "0.20.2",
     "eslint": "7.31.0",
     "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-prettier": "3.4.0",
     "husky": "7.0.1",
     "nodemon": "2.0.12",
     "prettier": "2.3.2",
