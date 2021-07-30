@@ -4,8 +4,9 @@
 </div>
 
 <div align='center'>
-  <img alt="GitHub Workflow Status (prod)" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint%20Workflow/master?style=flat-square" />
-  <img alt="GitHub" src="https://img.shields.io/github/license/NinoDiscord/Nino?style=flat-square" />
+  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint%20Workflow/master?style=flat-square" />
+  <img alt="GitHub License" src="https://img.shields.io/github/license/NinoDiscord/Nino?style=flat-square" />
+  <img alt="Noelware Server" src="https://discord.com/api/v9/guilds/824066105102303232/widget.png?style=shield" />
 </div>
 
 <hr />
@@ -20,7 +21,7 @@
 ## Support
 Need support related to Nino or any microservices under the organization? Join in the **Noelware** Discord server in #support under the **Nino** category:
 
-[![discord embed owo](https://discord.com/api/v8/guilds/824066105102303232/widget.png?style=banner3)](https://discord.gg/ATmjFH9kMH)
+[![discord embed owo](https://discord.com/api/v9/guilds/824066105102303232/widget.png?style=banner3)](https://discord.gg/ATmjFH9kMH)
 
 ## Contributing
 View our [contributing guidelines](https://github.com/NinoDiscord/Nino/blob/master/.github/CONTRIBUTING.md) and [code of conduct](https://github.com/NinoDiscord/Nino/blob/master/.github/CODE_OF_CONDUCT.md) before contributing.
