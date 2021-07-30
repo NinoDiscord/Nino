@@ -68,10 +68,13 @@ const bigintDeserializer = (_: string, value: unknown) => {
 };
 
 export default class RaidAutomod implements Automod {
+  /* eslint-disable @typescript-eslint/indent */
   public _raidLocks: Record<
     string,
     { lock: RedisLock; timeout: NodeJS.Timeout }
   > = {};
+  /* eslint-enable @typescript-eslint/indent */
+
   public name = 'raid';
 
   @Inject

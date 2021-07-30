@@ -49,12 +49,12 @@ export default class EvalCommand extends Command {
     let result: any;
     let depth = 1;
 
-    const flags =
-      msg.flags<{
-        depth?: string | true;
-        slient?: string | true;
-        s?: string | true;
-      }>();
+    const flags = msg.flags<{
+      depth?: string | true;
+      slient?: string | true;
+      s?: string | true;
+    }>();
+
     if (flags.depth === true)
       return msg.reply('`--depth` flag requires a input. Example: `--depth 1`');
 
