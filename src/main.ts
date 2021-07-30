@@ -76,7 +76,6 @@ const ReconnectCodes = [
 
 const OtherPossibleReconnectCodes = [
   'WebSocket was closed before the connection was established',
-  // eslint-disable-next-line prettier/prettier
   'Server didn\'t acknowledge previous heartbeat, possible lost connection'
 ];
 
