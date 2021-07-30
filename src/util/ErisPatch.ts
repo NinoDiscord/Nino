@@ -20,38 +20,9 @@
  * SOFTWARE.
  */
 
-import { Command, CommandMessage } from '../../structures';
-import { Categories } from '../../util/Constants';
-import { Stopwatch } from '@augu/utils';
-import { Inject } from '@augu/lilith';
-import S3 from '../../components/S3';
+import { Logger } from 'tslog';
 
-export default class AddCommandsToS3 extends Command {
-  @Inject
-  private readonly s3!: S3;
+const logger = app.$ref<Logger>(Logger);
+logger.info('monkeypatching eris...');
 
-  constructor() {
-    super({
-      description: 'Bulk adds commands to Noel\'s S3 bucket',
-      ownerOnly: true,
-      category: Categories.Owner,
-      aliases: ['bulk:s3'],
-      name: 'commands:s3',
-    });
-  }
-
-  async run(msg: CommandMessage) {
-    if (!this.s3.client) return msg.reply('S3 client isn\'t attached.');
-
-    const message = await msg.reply('Now uploading commands to S3...');
-    const stopwatch = new Stopwatch();
-    stopwatch.start();
-
-    await this.s3.publishCommands();
-    const endTime = stopwatch.end();
-
-    return message.edit(
-      `:timer: Took ~**${endTime}** to upload commands to S3.`
-    );
-  }
-}
+// this file is for later if i need to patch more things into eris that Nino needs :<

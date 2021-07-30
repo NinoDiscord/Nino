@@ -83,12 +83,12 @@ export type AcknowledgedPacket = DataPacket<Timeout[]>;
 
 export type ApplyPacket = DataPacket<Timeout>;
 export type PunishmentTimeoutType = Exclude<
-  PunishmentType,
-  | PunishmentType.Kick
-  | PunishmentType.WarningAdded
-  | PunishmentType.WarningRemoved
-  | PunishmentType.Mute
-  | PunishmentType.Ban
-  | PunishmentType.VoiceMute
-  | PunishmentType.VoiceDeafen
+PunishmentType,
+| PunishmentType.Kick
+| PunishmentType.WarningAdded
+| PunishmentType.WarningRemoved
+| PunishmentType.Mute
+| PunishmentType.Ban
+| PunishmentType.VoiceMute
+| PunishmentType.VoiceDeafen
 >;

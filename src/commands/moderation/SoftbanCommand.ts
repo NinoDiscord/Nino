@@ -93,7 +93,7 @@ export default class SoftbanCommand extends Command {
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
       return msg.reply(
-        "I don't think I can perform this action due to you banning the owner, you idiot."
+        'I don\'t think I can perform this action due to you banning the owner, you idiot.'
       );
 
     if (member.id === this.discord.client.user.id)

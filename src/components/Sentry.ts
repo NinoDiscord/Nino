@@ -44,7 +44,7 @@ export default class Sentry {
     const dsn = this.config.getProperty('sentryDsn');
     if (dsn === undefined) {
       this.logger.warn(
-        "Missing sentryDsn variable in config.yml! Don't worry, this is optional."
+        'Missing sentryDsn variable in config.yml! Don\'t worry, this is optional.'
       );
       return;
     }

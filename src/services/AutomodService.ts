@@ -34,8 +34,7 @@ import { join } from 'path';
 })
 export default class AutomodService
   extends Collection<string, Automod>
-  implements ComponentOrServiceHooks<Automod>
-{
+  implements ComponentOrServiceHooks<Automod> {
   @Inject
   private logger!: Logger;
 

@@ -53,23 +53,23 @@ export default class Redis {
     const config =
       (sentinels ?? []).length > 0
         ? {
-            enableReadyCheck: true,
-            connectionName: 'Nino',
-            lazyConnect: true,
-            sentinels,
-            password: password,
-            name: masterName,
-            db: index,
-          }
+          enableReadyCheck: true,
+          connectionName: 'Nino',
+          lazyConnect: true,
+          sentinels,
+          password: password,
+          name: masterName,
+          db: index,
+        }
         : {
-            enableReadyCheck: true,
-            connectionName: 'Nino',
-            lazyConnect: true,
-            password: password,
-            host: host,
-            port: port,
-            db: index,
-          };
+          enableReadyCheck: true,
+          connectionName: 'Nino',
+          lazyConnect: true,
+          password: password,
+          host: host,
+          port: port,
+          db: index,
+        };
 
     this.client = new IORedis(config);
 

@@ -76,10 +76,10 @@ export default class TimeoutsCommand extends Command {
           .then((user) =>
             user === null
               ? {
-                  username: 'Unknown User',
-                  discriminator: '0000',
-                  id: pkt.user,
-                }
+                username: 'Unknown User',
+                discriminator: '0000',
+                id: pkt.user,
+              }
               : user!
           )
           .catch(() => ({
@@ -136,10 +136,10 @@ export default class TimeoutsCommand extends Command {
           .then((user) =>
             user === null
               ? {
-                  username: 'Unknown User',
-                  discriminator: '0000',
-                  id: pkt.user,
-                }
+                username: 'Unknown User',
+                discriminator: '0000',
+                id: pkt.user,
+              }
               : user!
           )
           .catch(() => ({

@@ -58,7 +58,7 @@ export default class Discord {
     const token = this.config.getProperty('token');
     if (token === undefined) {
       this.logger.fatal(
-        "Property `token` doesn't exist in the config file, please populate it."
+        'Property `token` doesn\'t exist in the config file, please populate it.'
       );
       return;
     }

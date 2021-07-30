@@ -59,15 +59,15 @@ export default abstract class NinoCommand {
       typeof info.userPermissions === 'string'
         ? [info.userPermissions]
         : Array.isArray(info.userPermissions)
-        ? info.userPermissions
-        : [];
+          ? info.userPermissions
+          : [];
 
     this.botPermissions =
       typeof info.botPermissions === 'string'
         ? [info.botPermissions]
         : Array.isArray(info.botPermissions)
-        ? info.botPermissions
-        : [];
+          ? info.botPermissions
+          : [];
 
     this.description =
       (info.description as unknown as ObjectKeysWithSeperator<LocalizationStrings>) ??

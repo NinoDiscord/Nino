@@ -85,11 +85,11 @@ export default class PardonCommand extends Command {
 
     const member = msg.guild.members.get(user.id)!;
     if (!(member instanceof Member))
-      return msg.reply("Cannot remove warnings from a member that isn't here.");
+      return msg.reply('Cannot remove warnings from a member that isn\'t here.');
 
     if (member.id === msg.guild.ownerID)
       return msg.reply(
-        "I don't think I can perform this action due to you kicking the owner, you idiot."
+        'I don\'t think I can perform this action due to you kicking the owner, you idiot.'
       );
 
     if (member.id === this.discord.client.user.id)

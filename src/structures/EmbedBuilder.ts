@@ -118,11 +118,11 @@ export default class EmbedBuilder {
 
   setColor(
     color:
-      | string
-      | number
-      | [r: number, g: number, b: number]
-      | 'random'
-      | 'default'
+    | string
+    | number
+    | [r: number, g: number, b: number]
+    | 'random'
+    | 'default'
   ) {
     if (typeof color === 'number') {
       this.color = color;
@@ -193,10 +193,10 @@ export default class EmbedBuilder {
       footer: this.footer,
       author: this.author
         ? {
-            name: this.author.name!,
-            url: this.author.url,
-            icon_url: this.author.icon_url,
-          }
+          name: this.author.name!,
+          url: this.author.url,
+          icon_url: this.author.icon_url,
+        }
         : undefined,
       fields: this.fields,
       image: this.image,

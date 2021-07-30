@@ -87,7 +87,7 @@ export default class WarningsCommand extends Command {
       member.permissions.has('banMembers')
     )
       return msg.reply(
-        "Moderators or administrators don't have warnings attached to them."
+        'Moderators or administrators don\'t have warnings attached to them.'
       );
 
     const warnings = await this.database.warnings

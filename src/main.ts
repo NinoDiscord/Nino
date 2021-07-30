@@ -51,6 +51,8 @@ import ts from 'typescript';
     logger.info(`->     Region: ${process.env.REGION}`);
 
   try {
+    // call patch before container load
+    await import('./util/ErisPatch');
     await app.load();
   } catch (ex) {
     logger.fatal('Unable to load container');

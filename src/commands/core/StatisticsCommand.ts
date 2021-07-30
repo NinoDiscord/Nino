@@ -88,8 +88,8 @@ export default class StatisticsCommand extends Command {
       this.discord.client.user.id === '531613242473054229'
         ? 'https://stats.floofy.dev/d/e3KPDLknk/nino-prod?orgId=1'
         : this.discord.client.user.id === '613907896622907425'
-        ? 'https://stats.floofy.dev/d/C5bZHVZ7z/nino-edge?orgId=1'
-        : '';
+          ? 'https://stats.floofy.dev/d/C5bZHVZ7z/nino-edge?orgId=1'
+          : '';
 
     const embed = new EmbedBuilder()
       .setAuthor(

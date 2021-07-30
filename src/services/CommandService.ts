@@ -47,7 +47,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
   public commandsExecuted: number = 0;
   public messagesSeen: number = 0;
   public cooldowns: Collection<string, Collection<string, number>> =
-    new Collection();
+  new Collection();
 
   @Inject
   private readonly config!: Config;
