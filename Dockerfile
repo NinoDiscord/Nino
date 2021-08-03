@@ -7,9 +7,9 @@ WORKDIR /opt/Nino
 COPY . .
 RUN apk add --no-cache git
 RUN npm i -g typescript eslint typeorm
-RUN npm ci
-RUN npm run build:no-lint
-RUN npm cache clean --force
+RUN yarn
+RUN yarn build:no-lint
+RUN yarn cache clean
 
 # Give it executable permissions
 RUN chmod +x ./scripts/run-docker.sh
