@@ -20,31 +20,25 @@
  * SOFTWARE.
  */
 
-import type CommandMessage from './CommandMessage';
-import type { Constants } from 'eris';
-import type Command from './Command';
+import { Logger } from 'tslog';
+import { User } from 'eris';
 
-export interface SubcommandInfo {
-  run(this: Command, msg: CommandMessage): Promise<any>;
+const logger = app.$ref<Logger>(Logger);
+logger.info('monkeypatching eris...');
 
-  permissions?: keyof Constants['Permissions'];
-  methodName: string;
-  aliases?: string[];
-  usage: string;
-}
+Object.defineProperty(User.prototype, 'tag', {
+  get(this: User) {
+    return `${this.username}#${this.discriminator}`;
+  },
 
-export default class Subcommand {
-  public permissions?: keyof Constants['Permissions'];
-  public aliases: string[];
-  public usage: string;
-  public name: string;
-  public run: (this: Command, msg: CommandMessage) => Promise<any>;
-
-  constructor(info: SubcommandInfo) {
-    this.permissions = info.permissions;
-    this.aliases = info.aliases ?? [];
-    this.usage = info.usage;
-    this.name = info.methodName;
-    this.run = info.run;
+  set: () => {
+    throw new TypeError('cannot set user tags :(');
   }
-}
+});
+
+logger.info(
+  'Monkey patched the following items:',
+  [
+    'User#tag'
+  ].join('\n')
+);

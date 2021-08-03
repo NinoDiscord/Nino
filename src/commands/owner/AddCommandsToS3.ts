@@ -32,7 +32,7 @@ export default class AddCommandsToS3 extends Command {
 
   constructor() {
     super({
-      description: "Bulk adds commands to Noel's S3 bucket",
+      description: 'Bulk adds commands to Noel\'s S3 bucket',
       ownerOnly: true,
       category: Categories.Owner,
       aliases: ['bulk:s3'],
@@ -41,7 +41,7 @@ export default class AddCommandsToS3 extends Command {
   }
 
   async run(msg: CommandMessage) {
-    if (!this.s3.client) return msg.reply("S3 client isn't attached.");
+    if (!this.s3.client) return msg.reply('S3 client isn\'t attached.');
 
     const message = await msg.reply('Now uploading commands to S3...');
     const stopwatch = new Stopwatch();

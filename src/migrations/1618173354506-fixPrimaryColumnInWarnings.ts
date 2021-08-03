@@ -23,8 +23,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class fixPrimaryColumnInWarnings1618173354506
-  implements MigrationInterface
-{
+implements MigrationInterface {
   name = 'fixPrimaryColumnInWarnings1618173354506';
 
   public async up(queryRunner: QueryRunner): Promise<void> {

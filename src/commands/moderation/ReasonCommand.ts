@@ -106,7 +106,7 @@ export default class ReasonCommand extends Command {
     }
 
     return msg.reply(
-      "Unable to edit case due to no mod-log channel or that case didn't create a message in the mod-log."
+      'Unable to edit case due to no mod-log channel or that case didn\'t create a message in the mod-log.'
     );
   }
 
@@ -161,7 +161,7 @@ export default class ReasonCommand extends Command {
     }
 
     return msg.reply(
-      "Unable to edit case due to no mod-log channel or that case didn't create a message in the mod-log."
+      'Unable to edit case due to no mod-log channel or that case didn\'t create a message in the mod-log.'
     );
   }
 }

@@ -37,4 +37,8 @@ declare module 'eris' {
   interface Guild {
     channels: Collection<Eris.AnyGuildChannel>;
   }
+
+  interface User {
+    tag: string;
+  }
 }

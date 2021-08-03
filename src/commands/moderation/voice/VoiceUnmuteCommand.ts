@@ -79,7 +79,7 @@ export default class VoiceUnmuteCommand extends Command {
     };
     if (member.id === msg.guild.ownerID)
       return msg.reply(
-        "I don't think I can perform this action due to you banning the owner, you idiot."
+        'I don\'t think I can perform this action due to you banning the owner, you idiot.'
       );
 
     if (member instanceof Member) {
@@ -156,8 +156,8 @@ export default class VoiceUnmuteCommand extends Command {
         }** has been unmuted in voice channels.${
           reason.length
             ? ` *for ${reason.join(' ')}${
-                time !== undefined ? `, for ${time}*` : '*'
-              }`
+              time !== undefined ? `, for ${time}*` : '*'
+            }`
             : '.'
         }`
       );

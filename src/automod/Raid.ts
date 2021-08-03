@@ -29,7 +29,6 @@ import { isObject } from '@augu/utils';
 import { Automod } from '../structures';
 import * as luxon from 'luxon';
 import { Inject } from '@augu/lilith';
-import RedisLock from '../util/RedisLock';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
 import Redis from '../components/Redis';
@@ -68,13 +67,6 @@ const bigintDeserializer = (_: string, value: unknown) => {
 };
 
 export default class RaidAutomod implements Automod {
-  /* eslint-disable @typescript-eslint/indent */
-  public _raidLocks: Record<
-    string,
-    { lock: RedisLock; timeout: NodeJS.Timeout }
-  > = {};
-  /* eslint-enable @typescript-eslint/indent */
-
   public name = 'raid';
 
   @Inject

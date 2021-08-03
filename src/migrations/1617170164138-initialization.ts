@@ -30,19 +30,19 @@ export class initialization1617170164138 implements MigrationInterface {
       'CREATE TABLE "automod" ("blacklistWords" text array NOT NULL, "blacklist" boolean NOT NULL DEFAULT false, "mentions" boolean NOT NULL DEFAULT false, "invites" boolean NOT NULL DEFAULT false, "dehoist" boolean NOT NULL DEFAULT false, "guild_id" character varying NOT NULL, "spam" boolean NOT NULL DEFAULT false, "raid" boolean NOT NULL DEFAULT false, CONSTRAINT "PK_8592ba75741fd8ff52adde5de53" PRIMARY KEY ("guild_id"))'
     );
     await queryRunner.query(
-      "CREATE TYPE \"blacklists_type_enum\" AS ENUM('0', '1')"
+      'CREATE TYPE "blacklists_type_enum" AS ENUM(\'0\', \'1\')'
     );
     await queryRunner.query(
       'CREATE TABLE "blacklists" ("reason" character varying, "issuer" character varying NOT NULL, "type" "blacklists_type_enum" NOT NULL, "id" character varying NOT NULL, CONSTRAINT "PK_69894f41b74b226aae9ea763bc2" PRIMARY KEY ("id"))'
     );
     await queryRunner.query(
-      "CREATE TYPE \"punishments_type_enum\" AS ENUM('warning.removed', 'voice.undeafen', 'warning.added', 'voice.unmute', 'voice.deafen', 'voice.mute', 'unmute', 'unban', 'kick', 'mute', 'ban')"
+      'CREATE TYPE "punishments_type_enum" AS ENUM(\'warning.removed\', \'voice.undeafen\', \'warning.added\', \'voice.unmute\', \'voice.deafen\', \'voice.mute\', \'unmute\', \'unban\', \'kick\', \'mute\', \'ban\')'
     );
     await queryRunner.query(
       'CREATE TABLE "punishments" ("warnings" integer NOT NULL DEFAULT \'1\', "guild_id" character varying NOT NULL, "index" SERIAL NOT NULL, "soft" boolean NOT NULL DEFAULT false, "time" integer, "type" "punishments_type_enum" NOT NULL, CONSTRAINT "PK_b08854374ef88515861c1bf6cd8" PRIMARY KEY ("guild_id", "index"))'
     );
     await queryRunner.query(
-      "CREATE TYPE \"cases_type_enum\" AS ENUM('warning.removed', 'voice.undeafen', 'warning.added', 'voice.unmute', 'voice.deafen', 'voice.mute', 'unmute', 'unban', 'kick', 'mute', 'ban')"
+      'CREATE TYPE "cases_type_enum" AS ENUM(\'warning.removed\', \'voice.undeafen\', \'warning.added\', \'voice.unmute\', \'voice.deafen\', \'voice.mute\', \'unmute\', \'unban\', \'kick\', \'mute\', \'ban\')'
     );
     await queryRunner.query(
       'CREATE TABLE "cases" ("moderator_id" character varying NOT NULL, "message_id" character varying, "victim_id" character varying NOT NULL, "guild_id" character varying NOT NULL, "reason" character varying, "index" integer NOT NULL, "type" "cases_type_enum" NOT NULL, "soft" boolean NOT NULL DEFAULT false, "time" integer, CONSTRAINT "PK_70fc7fe12ee1488af12aaea83af" PRIMARY KEY ("guild_id", "index"))'
@@ -51,7 +51,7 @@ export class initialization1617170164138 implements MigrationInterface {
       'CREATE TABLE "guilds" ("modlog_channel_id" character varying DEFAULT null, "muted_role_id" character varying DEFAULT null, "prefixes" text array NOT NULL, "language" character varying NOT NULL DEFAULT \'en_US\', "guild_id" character varying NOT NULL, CONSTRAINT "PK_e8887ee637b1f465673e957dd0a" PRIMARY KEY ("guild_id"))'
     );
     await queryRunner.query(
-      "CREATE TYPE \"logging_events_enum\" AS ENUM('voice_channel_switch', 'voice_channel_left', 'voice_channel_join', 'message_delete', 'message_update', 'settings_update')"
+      'CREATE TYPE "logging_events_enum" AS ENUM(\'voice_channel_switch\', \'voice_channel_left\', \'voice_channel_join\', \'message_delete\', \'message_update\', \'settings_update\')'
     );
     await queryRunner.query(
       'CREATE TABLE "logging" ("ignoreChannels" text array NOT NULL DEFAULT \'{}\'::text[], "ignoreUsers" text array NOT NULL DEFAULT \'{}\'::text[], "channel_id" character varying, "enabled" boolean NOT NULL DEFAULT false, "events" "logging_events_enum" array NOT NULL DEFAULT \'{}\', "guild_id" character varying NOT NULL, CONSTRAINT "PK_cbd7eb1495206472bb71b7a6d68" PRIMARY KEY ("guild_id"))'

@@ -98,7 +98,7 @@ export default class LocaleCommand extends Command {
     );
   }
 
-  @Subcommand('<locale>')
+  @Subcommand('<locale>', { permissions: 'manageGuild' })
   async set(msg: CommandMessage, [locale]: [string]) {
     if (!locale)
       return msg.reply(
@@ -121,7 +121,7 @@ export default class LocaleCommand extends Command {
     );
   }
 
-  @Subcommand()
+  @Subcommand(undefined, { permissions: 'manageGuild' })
   async reset(msg: CommandMessage) {
     const flags = msg.flags<Flags>();
     const isUser = flags.user === true || flags.u === true;

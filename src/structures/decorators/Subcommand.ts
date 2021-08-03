@@ -26,14 +26,21 @@ import { MetadataKeys } from '../../util/Constants';
 export const getSubcommandsIn = (target: any) =>
   Reflect.getMetadata<SubcommandInfo[]>(MetadataKeys.Subcommand, target) ?? [];
 
+interface SubcommandDecoratorOptions {
+  aliases?: string[];
+  permissions?: SubcommandInfo['permissions'];
+}
+
 export default function Subcommand(
   usage?: string,
-  aliases?: string[]
+  aliasesOrOptions?: SubcommandDecoratorOptions | string[]
 ): MethodDecorator {
   return (target, methodName, descriptor: TypedPropertyDescriptor<any>) => {
     const subcommands = getSubcommandsIn(target);
+
     subcommands.push({
-      aliases,
+      permissions: Array.isArray(aliasesOrOptions) ? undefined : aliasesOrOptions?.permissions,
+      aliases: Array.isArray(aliasesOrOptions) ? aliasesOrOptions : aliasesOrOptions?.aliases,
       methodName: String(methodName),
       usage: usage ?? '',
       run: descriptor.value!,

@@ -98,14 +98,14 @@ export default class PunishmentsCommand extends Command {
     }
 
     if (punishments.length > 10)
-      return msg.reply("Yea, I think you're fine with 10 punishments...");
+      return msg.reply('Yea, I think you\'re fine with 10 punishments...');
 
     if (isNaN(Number(index)))
       return msg.reply('The amount of warnings you specified was not a number');
 
     if (Number(index) === 0)
       return msg.reply(
-        "You need to specify an amount of warnings, `0` isn't gonna cut it you know."
+        'You need to specify an amount of warnings, `0` isn\'t gonna cut it you know.'
       );
 
     if (Number(index) > 10)
@@ -126,8 +126,8 @@ export default class PunishmentsCommand extends Command {
       flags.days !== undefined
         ? flags.days
         : flags.d !== undefined
-        ? flags.d
-        : undefined;
+          ? flags.d
+          : undefined;
     let timeStamp: number | undefined = undefined;
 
     try {

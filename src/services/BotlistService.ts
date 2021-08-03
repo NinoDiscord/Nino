@@ -51,7 +51,7 @@ export default class BotlistsService {
     const botlists = this.config.getProperty('botlists');
     if (botlists === undefined) {
       this.logger.warn(
-        "`botlists` is missing, don't need to add it if running privately."
+        '`botlists` is missing, don\'t need to add it if running privately.'
       );
       return Promise.resolve();
     }
@@ -67,12 +67,12 @@ export default class BotlistsService {
   async post() {
     const list: {
       name:
-        | 'Discord Services'
-        | 'Discord Boats'
-        | 'Discord Bots'
-        | 'top.gg'
-        | 'Delly'
-        | 'Bots for Discord';
+      | 'Discord Services'
+      | 'Discord Boats'
+      | 'Discord Bots'
+      | 'top.gg'
+      | 'Delly'
+      | 'Bots for Discord';
       success: boolean;
       data: Record<string, any>;
     }[] = [];

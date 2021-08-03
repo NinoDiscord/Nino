@@ -1,18 +1,3 @@
 {
-  "extends": ["@augu/eslint-config/ts.js", "prettier"],
-  "plugins": ["prettier"],
-  "rules": {
-    "prettier/prettier": [
-      "error",
-      {
-        "semi": true,
-        "tabWidth": 2,
-        "singleQuote": true,
-        "endOfLine": "lf"
-      },
-      {
-        "usePrettierrc": false
-      }
-    ]
-  }
+  "extends": ["@augu/eslint-config/ts.js"]
 }

@@ -38,14 +38,14 @@ export default class InviteCommand extends Command {
   }
 
   run(msg: CommandMessage) {
-    return msg.reply(
+    return msg.translate(
+      'commands.invite',
       [
-        ':wave: Wanting to invite me? Use the link below to do so:',
-        `**<https://discord.com/oauth2/authorize?client_id=${this.discord.client.user.id}&scope=bot>**`,
-        '',
-        ':question: Have questions about me? Join the support server under the <#824071651486335036> channel:',
-        'https://discord.gg/ATmjFH9kMH',
-      ].join('\n')
+        msg.author.tag,
+        `https://discord.com/oauth2/authorize?client_id=${this.discord.client.user.id}&scope=bot`,
+        'https://discord.com/oauth2/authorize?client_id=613907896622907425&scope=bot',
+        'https://discord.gg/ATmjFH9kMH'
+      ]
     );
   }
 }

@@ -118,7 +118,7 @@ export default class PurgeCommand extends Command {
         /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command.`
       );
 
-      return msg.reply(this._generateEmbed(msg, messages), false);
+      return msg.reply(this._generateEmbed(msg, messages));
     }
 
     const user = await this.discord.getUser(userIdOrAmount).catch(() => null);
@@ -134,8 +134,8 @@ export default class PurgeCommand extends Command {
         !isNaN(Number(userIdOrAmount))
           ? Number(userIdOrAmount)
           : amount !== undefined && !isNaN(Number(amount))
-          ? Number(amount)
-          : 50
+            ? Number(amount)
+            : 50
       );
   }
 
@@ -176,7 +176,7 @@ export default class PurgeCommand extends Command {
       /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${amountToDelete} messages from ${user.username}#${user.discriminator})`
     );
 
-    return msg.reply(this._generateEmbed(msg, messages), false);
+    return msg.reply(this._generateEmbed(msg, messages));
   }
 
   private async _deleteAmount(msg: CommandMessage, amount: number) {
@@ -206,7 +206,7 @@ export default class PurgeCommand extends Command {
       /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${amount} messages from all users)`
     );
 
-    return msg.reply(this._generateEmbed(msg, messages), false);
+    return msg.reply(this._generateEmbed(msg, messages));
   }
 
   @Subcommand('[amount]', ['images', 'imgs'])

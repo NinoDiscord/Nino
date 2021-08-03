@@ -51,9 +51,9 @@ export default class ModLogCommand extends Command {
       const chan =
         msg.settings.modlogChannelID !== null
           ? await this.discord.getChannel<TextChannel>(
-              msg.settings.modlogChannelID!,
-              msg.guild
-            )
+            msg.settings.modlogChannelID!,
+            msg.guild
+          )
           : null;
       return msg.reply(
         chan === null

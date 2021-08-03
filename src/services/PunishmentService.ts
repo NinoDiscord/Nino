@@ -167,15 +167,15 @@ export default class PunishmentService {
     return member instanceof Member
       ? member
       : member.guild.members.has(member.id)
-      ? member.guild.members.get(member.id)!
-      : rest
-      ? await this.discord.client
-          .getRESTGuildMember(member.guild.id, member.id)
-          .catch(
-            () =>
-              new Member({ id: member.id }, member.guild, this.discord.client)
-          )
-      : new Member({ id: member.id }, member.guild, this.discord.client);
+        ? member.guild.members.get(member.id)!
+        : rest
+          ? await this.discord.client
+            .getRESTGuildMember(member.guild.id, member.id)
+            .catch(
+              () =>
+                new Member({ id: member.id }, member.guild, this.discord.client)
+            )
+          : new Member({ id: member.id }, member.guild, this.discord.client);
   }
 
   get timeouts(): TimeoutsManager {
@@ -253,16 +253,16 @@ export default class PunishmentService {
     return results.length > 0
       ? Promise.resolve()
       : this.publishToModLog(
-          {
-            warningsAdded: amount ?? 1,
-            moderator: self.user,
-            reason,
-            victim: member.user,
-            guild: member.guild,
-            type: PunishmentEntryType.WarningAdded,
-          },
-          model
-        );
+        {
+          warningsAdded: amount ?? 1,
+          moderator: self.user,
+          reason,
+          victim: member.user,
+          guild: member.guild,
+          type: PunishmentEntryType.WarningAdded,
+        },
+        model
+      );
   }
 
   async removeWarning(
@@ -277,7 +277,7 @@ export default class PunishmentService {
     );
 
     if (warnings.length === 0)
-      throw new SyntaxError("user doesn't have any punishments to be removed");
+      throw new SyntaxError('user doesn\'t have any punishments to be removed');
 
     const count = warnings.reduce((acc, curr) => acc + curr.amount, 0);
     if (amount === 'all') {

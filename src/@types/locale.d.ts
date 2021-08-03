@@ -138,6 +138,8 @@ declare global {
         usage_title: string;
         usage: string[];
       };
+
+      invite: string[];
     }
 
     export interface Automod {
