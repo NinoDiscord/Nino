@@ -32,7 +32,7 @@ import Discord from '../components/Discord';
 
 export default class Mentions implements Automod {
   private cache: Collection<string, Collection<string, number[]>> =
-    new Collection();
+  new Collection();
   public name: string = 'mentions';
 
   @Inject

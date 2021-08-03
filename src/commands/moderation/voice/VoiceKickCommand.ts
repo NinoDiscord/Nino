@@ -68,7 +68,7 @@ export default class VoiceKickCommand extends Command {
       const id = msg.member.voiceState.channelID; // cache it if they decide to leave
       const voiceChan = await this.discord.getChannel<VoiceChannel>(id);
       if (voiceChan === null)
-        return msg.error("Unknown voice channel you're in.");
+        return msg.error('Unknown voice channel you\'re in.');
 
       if (
         !voiceChan
@@ -232,7 +232,7 @@ export default class VoiceKickCommand extends Command {
       const id = msg.member.voiceState.channelID; // cache it if they decide to leave
       const voiceChan = await this.discord.getChannel<VoiceChannel>(id);
       if (voiceChan === null)
-        return msg.error("Unknown voice channel you're in.");
+        return msg.error('Unknown voice channel you\'re in.');
 
       if (
         !voiceChan

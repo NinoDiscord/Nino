@@ -128,7 +128,7 @@ export default class Config {
       writeFileSync(join(__dirname, '..', '..', 'config.yml'), config);
       return Promise.reject(
         new SyntaxError(
-          "Weird, you didn't have a configuration file... So, I may have provided you a default one, if you don't mind... >W<"
+          'Weird, you didn\'t have a configuration file... So, I may have provided you a default one, if you don\'t mind... >W<'
         )
       );
     }

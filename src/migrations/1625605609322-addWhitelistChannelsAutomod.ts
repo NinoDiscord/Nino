@@ -23,8 +23,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class addWhitelistChannelsAutomod1625605609322
-  implements MigrationInterface
-{
+implements MigrationInterface {
   name = 'addWhitelistChannelsAutomod1625605609322';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -39,7 +38,7 @@ export class addWhitelistChannelsAutomod1625605609322
       'ALTER TYPE "punishments_type_enum" RENAME TO "punishments_type_enum_old"'
     );
     await queryRunner.query(
-      "CREATE TYPE \"punishments_type_enum\" AS ENUM('warning.removed', 'voice.undeafen', 'warning.added', 'voice.unmute', 'voice.deafen', 'voice.mute', 'unmute', 'unban', 'kick', 'mute', 'ban')"
+      'CREATE TYPE "punishments_type_enum" AS ENUM(\'warning.removed\', \'voice.undeafen\', \'warning.added\', \'voice.unmute\', \'voice.deafen\', \'voice.mute\', \'unmute\', \'unban\', \'kick\', \'mute\', \'ban\')'
     );
     await queryRunner.query(
       'ALTER TABLE "punishments" ALTER COLUMN "type" TYPE "punishments_type_enum" USING "type"::"text"::"punishments_type_enum"'
@@ -49,7 +48,7 @@ export class addWhitelistChannelsAutomod1625605609322
       'ALTER TYPE "cases_type_enum" RENAME TO "cases_type_enum_old"'
     );
     await queryRunner.query(
-      "CREATE TYPE \"cases_type_enum\" AS ENUM('warning.removed', 'voice.undeafen', 'warning.added', 'voice.unmute', 'voice.deafen', 'voice.mute', 'unmute', 'unban', 'kick', 'mute', 'ban')"
+      'CREATE TYPE "cases_type_enum" AS ENUM(\'warning.removed\', \'voice.undeafen\', \'warning.added\', \'voice.unmute\', \'voice.deafen\', \'voice.mute\', \'unmute\', \'unban\', \'kick\', \'mute\', \'ban\')'
     );
     await queryRunner.query(
       'ALTER TABLE "cases" ALTER COLUMN "type" TYPE "cases_type_enum" USING "type"::"text"::"cases_type_enum"'
@@ -59,7 +58,7 @@ export class addWhitelistChannelsAutomod1625605609322
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
-      "CREATE TYPE \"cases_type_enum_old\" AS ENUM('warning.removed', 'voice.undeafen', 'warning.added', 'voice.unmute', 'voice.deafen', 'voice.kick', 'voice.mute', 'unmute', 'unban', 'kick', 'mute', 'ban')"
+      'CREATE TYPE "cases_type_enum_old" AS ENUM(\'warning.removed\', \'voice.undeafen\', \'warning.added\', \'voice.unmute\', \'voice.deafen\', \'voice.kick\', \'voice.mute\', \'unmute\', \'unban\', \'kick\', \'mute\', \'ban\')'
     );
     await queryRunner.query(
       'ALTER TABLE "cases" ALTER COLUMN "type" TYPE "cases_type_enum_old" USING "type"::"text"::"cases_type_enum_old"'
@@ -69,7 +68,7 @@ export class addWhitelistChannelsAutomod1625605609322
       'ALTER TYPE "cases_type_enum_old" RENAME TO "cases_type_enum"'
     );
     await queryRunner.query(
-      "CREATE TYPE \"punishments_type_enum_old\" AS ENUM('warning.removed', 'voice.undeafen', 'warning.added', 'voice.unmute', 'voice.deafen', 'voice.kick', 'voice.mute', 'unmute', 'unban', 'kick', 'mute', 'ban')"
+      'CREATE TYPE "punishments_type_enum_old" AS ENUM(\'warning.removed\', \'voice.undeafen\', \'warning.added\', \'voice.unmute\', \'voice.deafen\', \'voice.kick\', \'voice.mute\', \'unmute\', \'unban\', \'kick\', \'mute\', \'ban\')'
     );
     await queryRunner.query(
       'ALTER TABLE "punishments" ALTER COLUMN "type" TYPE "punishments_type_enum_old" USING "type"::"text"::"punishments_type_enum_old"'

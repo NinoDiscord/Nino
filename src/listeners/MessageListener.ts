@@ -319,9 +319,9 @@ export default class MessageListener {
             content += `${embed.footer.text}${
               embed.timestamp !== undefined
                 ? ` (${(embed.timestamp instanceof Date
-                    ? embed.timestamp
-                    : new Date(embed.timestamp)
-                  ).toUTCString()})`
+                  ? embed.timestamp
+                  : new Date(embed.timestamp)
+                ).toUTCString()})`
                 : ''
             }`;
 

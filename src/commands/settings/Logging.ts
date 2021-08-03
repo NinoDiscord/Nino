@@ -120,7 +120,7 @@ export default class ModLogCommand extends Command {
     return msg.reply(
       `Logs will be shown in #${chan.name}!${
         updateEnabled
-          ? "\n:eyes: I saw it wasn't enabled. So, I enabled it myself."
+          ? '\n:eyes: I saw it wasn\'t enabled. So, I enabled it myself.'
           : ''
       }`
     );

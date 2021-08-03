@@ -27,10 +27,9 @@ import {
   CHANNEL_REGEX,
   ROLE_REGEX,
 } from '../util/Constants';
+
 import { Component, Inject, ComponentAPI, Subscribe } from '@augu/lilith';
 import { Client, Role, Guild, AnyChannel } from 'eris';
-import { pluralize } from '@augu/utils';
-import Prometheus from './Prometheus';
 import { Logger } from 'tslog';
 import Config from './Config';
 
@@ -41,10 +40,8 @@ import Config from './Config';
 export default class Discord {
   public mentionRegex?: RegExp;
   public client!: Client;
-  api!: ComponentAPI;
 
-  @Inject
-  private readonly prometheus?: Prometheus;
+  api!: ComponentAPI;
 
   @Inject
   private readonly config!: Config;
@@ -61,7 +58,7 @@ export default class Discord {
     const token = this.config.getProperty('token');
     if (token === undefined) {
       this.logger.fatal(
-        "Property `token` doesn't exist in the config file, please populate it."
+        'Property `token` doesn\'t exist in the config file, please populate it.'
       );
       return;
     }

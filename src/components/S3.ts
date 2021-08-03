@@ -60,7 +60,7 @@ export default class S3 {
     const s3 = this.config.getProperty('s3');
     if (s3 === undefined) {
       this.logger.warn(
-        "S3 client credentials are not provided but this is fine, it isn't needed."
+        'S3 client credentials are not provided but this is fine, it isn\'t needed.'
       );
       return Promise.resolve();
     }

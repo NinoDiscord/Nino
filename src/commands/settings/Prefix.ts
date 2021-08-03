@@ -130,7 +130,7 @@ export default class PrefixCommand extends Command {
     if (index !== -1)
       return msg.reply(
         `Prefix \`${pre}\` already exists as a ${
-          isUser ? 'your' : "the guild's"
+          isUser ? 'your' : 'the guild\'s'
         } prefix.`
       );
 
