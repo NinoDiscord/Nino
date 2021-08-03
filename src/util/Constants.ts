@@ -62,6 +62,8 @@ export const ID_REGEX = /^\d+$/;
  */
 export enum Categories {
   Moderation = 'moderation',
+  ThreadMod = 'thread moderation',
+  VoiceMod = 'voice moderation',
   Settings = 'settings',
   Owner = 'owner',
   Core = 'core',

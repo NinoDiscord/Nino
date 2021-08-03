@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "1.2.5",
+  "version": "1.3.0",
   "private": true,
   "homepage": "https://nino.floofy.dev",
   "license": "MIT",

@@ -254,6 +254,14 @@ export default class CommandService extends Collection<string, NinoCommand> {
       rawArgs = rawArgs.filter((arg) => !FLAG_REGEX.test(arg));
     }
 
+    if (subcommand !== undefined) {
+      if (subcommand.permissions !== undefined) {
+        const perms = msg.channel.permissionsOf(msg.author.id);
+        if (!perms.has(subcommand.permissions))
+          return message.reply(`You are missing the **${subcommand.permissions}** permission.`);
+      }
+    }
+
     try {
       const executor = Reflect.get(command, methodName);
       if (typeof executor !== 'function')
@@ -295,11 +303,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
               ? `Subcommand **${methodName}** (parent **${command.name}**)`
               : `Command **${command.name}**`
           } has failed to execute.`,
-          `If this is a re-occuring issue, contact ${contact} at <https://discord.gg/ATmjFH9kMH>, under the <#747522228714733610> channel.`,
-          '',
-          '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
-          '```',
+          `If this is a re-occuring issue, contact ${contact} at <https://discord.gg/ATmjFH9kMH>, under the <#824071651486335036> channel.`,
         ])
         .build();
 
@@ -309,9 +313,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
           subcommand !== undefined
             ? `Subcommand ${methodName}`
             : `Command ${command.name}`
-        } has failed to execute:`
+        } has failed to execute:`,
+        ex
       );
-      this.logger.error(ex);
 
       this.sentry?.report(ex);
     }

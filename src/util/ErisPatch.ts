@@ -21,8 +21,24 @@
  */
 
 import { Logger } from 'tslog';
+import { User } from 'eris';
 
 const logger = app.$ref<Logger>(Logger);
 logger.info('monkeypatching eris...');
 
-// this file is for later if i need to patch more things into eris that Nino needs :<
+Object.defineProperty(User.prototype, 'tag', {
+  get(this: User) {
+    return `${this.username}#${this.discriminator}`;
+  },
+
+  set: () => {
+    throw new TypeError('cannot set user tags :(');
+  }
+});
+
+logger.info(
+  'Monkey patched the following items:',
+  [
+    'User#tag'
+  ].join('\n')
+);

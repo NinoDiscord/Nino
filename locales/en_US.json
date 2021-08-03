@@ -106,7 +106,17 @@
           "",
           ":question: **Still stuck? There is always examples in the command's short overview to show how you can run that specific command.**"
         ]
-      }
+      },
+      "invite": [
+        ":wave: Heyo **%s**! You want to invite me into your own server? That's pretty cool if I do say so myself~",
+        "You can do so by clicking this link: **%s**",
+        "",
+        "If you want to see bleeding edge features, you can also invite the beta instance:",
+        "**%s**",
+        "",
+        "Need any support? Join the **Noelware** Discord server under <#824071651486335036> to get help with me!",
+        "%s"
+      ]
     },
     "generic": {},
     "automod": {

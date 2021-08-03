@@ -97,6 +97,10 @@ export default class CommandMessage {
     return this._flags;
   }
 
+  translate<K extends ObjectKeysWithSeperator<LocalizationStrings>>(key: K, args?: any[] | Record<string, any>) {
+    return this.reply(this.locale.translate(key, args));
+  }
+
   reply(content: string | EmbedBuilder, components?: ActionRowChild[]) {
     const payload: ComponentsAdvancedMessageContent = {
       components: components !== undefined ? [{ type: 1, components }] : undefined,

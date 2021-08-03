@@ -21,23 +21,27 @@
  */
 
 import type CommandMessage from './CommandMessage';
+import type { Constants } from 'eris';
 import type Command from './Command';
 
 export interface SubcommandInfo {
   run(this: Command, msg: CommandMessage): Promise<any>;
 
+  permissions?: keyof Constants['Permissions'];
   methodName: string;
   aliases?: string[];
   usage: string;
 }
 
 export default class Subcommand {
+  public permissions?: keyof Constants['Permissions'];
   public aliases: string[];
   public usage: string;
   public name: string;
   public run: (this: Command, msg: CommandMessage) => Promise<any>;
 
   constructor(info: SubcommandInfo) {
+    this.permissions = info.permissions;
     this.aliases = info.aliases ?? [];
     this.usage = info.usage;
     this.name = info.methodName;
