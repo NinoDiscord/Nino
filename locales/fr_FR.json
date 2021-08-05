@@ -23,6 +23,7 @@
       "kick": ":boot: Kicks a member from this guild.",
       "mute": "Mutes a member from any textable channel.",
       "pardon": "Removes one or multiple warnings from a user in this guild.",
+      "purge": "Purges a certain amount of messages by user(s), system account, bot(s), or specific messages.",
       "reason": "Changes the reason of a specific case.",
       "softban": "Softly bans a user from this guild.",
       "timeouts": "Returns a list of timeouts based on the type of action.",
