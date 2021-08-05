@@ -29,7 +29,7 @@
     "licenses": "node scripts/add-license.js",
     "prepare": "husky install && yarn clean:node_modules",
     "build": "yarn lint && yarn format && rm -rf build && tsc",
-    "format": "prettier --write --parser typescript --config ./prettierrc.js src/**/*.ts",
+    "format": "prettier --write --parser typescript --config ./.prettierrc.js src/**/*.ts",
     "start": "cd build && node main.js",
     "lint": "eslint src --ext .ts --fix",
     "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
