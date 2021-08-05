@@ -50,9 +50,7 @@ export default class LocalizationService {
     const files = await readdir(directory);
 
     if (!files.length) {
-      this.logger.fatal(
-        'Missing localization files, did you clone the wrong commit?'
-      );
+      this.logger.fatal('Missing localization files, did you clone the wrong commit?');
       process.exit(1);
     }
 
@@ -60,27 +58,16 @@ export default class LocalizationService {
       const contents = readFileSync(files[i], 'utf-8');
       const lang = JSON.parse<Record<string, any>>(contents);
 
-      this.logger.info(
-        `✔ Found language ${lang.meta.full} (${lang.meta.code}) by ${lang.meta.translator}`
-      );
-      this.locales.set(
-        lang.meta.code,
-        new Locale(
-          lang as { meta: LocalizationMeta; strings: LocalizationStrings }
-        )
-      );
+      this.logger.info(`✔ Found language ${lang.meta.full} (${lang.meta.code}) by ${lang.meta.translator}`);
+      this.locales.set(lang.meta.code, new Locale(lang as { meta: LocalizationMeta; strings: LocalizationStrings }));
     }
 
     const defaultLocale = this.config.getProperty('defaultLocale') ?? 'en_US';
-    this.logger.info(
-      `Default localization language was set to ${defaultLocale}, applying...`
-    );
+    this.logger.info(`Default localization language was set to ${defaultLocale}, applying...`);
 
     const locale = this.locales.find((locale) => locale.code === defaultLocale);
     if (locale === null) {
-      this.logger.fatal(
-        `Localization "${defaultLocale}" was not found, defaulting to en_US...`
-      );
+      this.logger.fatal(`Localization "${defaultLocale}" was not found, defaulting to en_US...`);
       this.defaultLocale = this.locales.get('en_US')!;
 
       this.logger.warn(
@@ -99,22 +86,12 @@ export default class LocalizationService {
    */
   get(guild: string, user: string) {
     // this shouldn't happen but you never know
-    if (!this.locales.has(guild) || !this.locales.has(user))
-      return this.defaultLocale;
+    if (!this.locales.has(guild) || !this.locales.has(user)) return this.defaultLocale;
 
     // committing yanderedev over here
-    if (user === this.defaultLocale.code && guild === this.defaultLocale.code)
-      return this.defaultLocale;
-    else if (
-      user !== this.defaultLocale.code &&
-      guild === this.defaultLocale.code
-    )
-      return this.locales.get(user)!;
-    else if (
-      guild !== this.defaultLocale.code &&
-      user === this.defaultLocale.code
-    )
-      return this.locales.get(guild)!;
+    if (user === this.defaultLocale.code && guild === this.defaultLocale.code) return this.defaultLocale;
+    else if (user !== this.defaultLocale.code && guild === this.defaultLocale.code) return this.locales.get(user)!;
+    else if (guild !== this.defaultLocale.code && user === this.defaultLocale.code) return this.locales.get(guild)!;
     else return this.defaultLocale;
   }
 }

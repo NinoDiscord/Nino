@@ -20,9 +20,7 @@
  * SOFTWARE.
  */
 
-import PunishmentEntity, {
-  PunishmentType,
-} from '../entities/PunishmentsEntity';
+import PunishmentEntity, { PunishmentType } from '../entities/PunishmentsEntity';
 import type { QueryDeepPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import Database from '../components/Database';
 
@@ -42,14 +40,7 @@ export default class PunishmentsController {
     return this.database.connection.getRepository(PunishmentEntity);
   }
 
-  async create({
-    warnings,
-    guildID,
-    soft,
-    time,
-    days,
-    type,
-  }: CreatePunishmentOptions) {
+  async create({ warnings, guildID, soft, time, days, type }: CreatePunishmentOptions) {
     const all = await this.getAll(guildID);
     const entry = new PunishmentEntity();
     entry.warnings = warnings;

@@ -38,16 +38,13 @@ export default class UserListener {
 
   @Subscribe('userUpdate', { emitter: 'discord' })
   async onUserUpdate(user: User) {
-    const mutualGuilds = this.discord.client.guilds.filter((guild) =>
-      guild.members.has(user.id)
-    );
+    const mutualGuilds = this.discord.client.guilds.filter((guild) => guild.members.has(user.id));
 
     for (const guild of mutualGuilds) {
       const automod = await this.database.automod.get(guild.id);
       if (!automod) continue;
 
-      if (automod.dehoist === true)
-        await this.automod.run('memberNick', guild.members.get(user.id)!);
+      if (automod.dehoist === true) await this.automod.run('memberNick', guild.members.get(user.id)!);
     }
   }
 }

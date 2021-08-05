@@ -31,8 +31,7 @@ import Database from '../components/Database';
 import Discord from '../components/Discord';
 
 export default class Mentions implements Automod {
-  private cache: Collection<string, Collection<string, number[]>> =
-  new Collection();
+  private cache: Collection<string, Collection<string, number[]>> = new Collection();
   public name: string = 'mentions';
 
   @Inject
@@ -56,11 +55,8 @@ export default class Mentions implements Automod {
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      (msg.member !== null &&
-        !PermissionUtil.isMemberAbove(nino, msg.member)) ||
-      !msg.channel
-        .permissionsOf(this.discord.client.user.id)
-        .has('manageMessages') ||
+      (msg.member !== null && !PermissionUtil.isMemberAbove(nino, msg.member)) ||
+      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
     )
@@ -71,18 +67,14 @@ export default class Mentions implements Automod {
 
     if (queue.length >= 5) {
       const old = queue.shift()!;
-      if (msg.editedTimestamp && msg.editedTimestamp > msg.timestamp)
-        return false;
+      if (msg.editedTimestamp && msg.editedTimestamp > msg.timestamp) return false;
 
       if (msg.timestamp - old <= 3000) {
         const language = this.locales.get(msg.guildID, msg.author.id);
         this.clear(msg.guildID, msg.author.id);
 
         await msg.channel.createMessage(language.translate('automod.spam'));
-        await this.punishments.createWarning(
-          msg.member,
-          `[Automod] Spamming in ${msg.channel.mention} o(╥﹏╥)o`
-        );
+        await this.punishments.createWarning(msg.member, `[Automod] Spamming in ${msg.channel.mention} o(╥﹏╥)o`);
         return true;
       }
     }
@@ -105,8 +97,7 @@ export default class Mentions implements Automod {
   private get(guildID: string, userID: string) {
     if (!this.cache.has(guildID)) this.cache.set(guildID, new Collection());
 
-    if (!this.cache.get(guildID)!.has(userID))
-      this.cache.get(guildID)!.set(userID, []);
+    if (!this.cache.get(guildID)!.has(userID)) this.cache.get(guildID)!.set(userID, []);
 
     return this.cache.get(guildID)!.get(userID)!;
   }

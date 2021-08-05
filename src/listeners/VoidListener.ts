@@ -58,8 +58,7 @@ export default class VoidListener {
         this.logger.info('Received slash command metadata!');
 
         // skip on dm interaction
-        if (data.guild_id === undefined)
-          return;
+        if (data.guild_id === undefined) return;
 
         await this._handleInteractionCreatePacket(data);
       }
@@ -79,38 +78,26 @@ export default class VoidListener {
 
     this.prometheus?.guildCount?.set(this.discord.client.guilds.size);
     await this.botlists?.post();
-    this.discord.mentionRegex = new RegExp(
-      `^<@!?${this.discord.client.user.id}> `
-    );
+    this.discord.mentionRegex = new RegExp(`^<@!?${this.discord.client.user.id}> `);
 
     const prefixes = this.config.getProperty('prefixes') ?? ['x!'];
     const statusType = this.config.getProperty('status.type');
     const status = this.config.getProperty('status.status')!;
 
     for (const shard of this.discord.client.shards.values()) {
-      this.discord.client.editStatus(
-        this.config.getProperty('status.presence') ?? 'online',
-        {
-          name: status
-            .replace(
-              '$prefix$',
-              prefixes[Math.floor(Math.random() * prefixes.length)]
-            )
-            .replace(
-              '$guilds$',
-              this.discord.client.guilds.size.toLocaleString()
-            )
-            .replace('$shard$', `#${shard.id}`),
+      this.discord.client.editStatus(this.config.getProperty('status.presence') ?? 'online', {
+        name: status
+          .replace('$prefix$', prefixes[Math.floor(Math.random() * prefixes.length)])
+          .replace('$guilds$', this.discord.client.guilds.size.toLocaleString())
+          .replace('$shard$', `#${shard.id}`),
 
-          type: statusType ?? 0,
-        }
-      );
+        type: statusType ?? 0,
+      });
     }
   }
 
   private _format(command: ApplicationCommandOption): [content: string, users?: string[], roles?: string[]] {
-    if (!command.options)
-      return [`/${command.name}`, undefined, undefined];
+    if (!command.options) return [`/${command.name}`, undefined, undefined];
 
     const roleMentions: string[] = [];
     const userMentions: string[] = [];
@@ -122,7 +109,7 @@ export default class VoidListener {
         return `${arg.name}${args !== undefined ? ` ${args.join(' ')}` : ''}`;
       }
 
-      if (['member', 'user'].some(a => arg.name.startsWith(a))) {
+      if (['member', 'user'].some((a) => arg.name.startsWith(a))) {
         userMentions.push(arg.value);
         return `<@!${arg.value}>`;
       } else if (arg.name === 'channel') {
@@ -135,8 +122,13 @@ export default class VoidListener {
       }
     };
 
-    command.options?.forEach(option => {
-      const choices = (option.choices?.length ?? false) ? option.choices!.map((c: any) => c !== undefined ? undefined : `${c.name}: ${c.value}`).filter(s => s !== undefined) : null;
+    command.options?.forEach((option) => {
+      const choices =
+        option.choices?.length ?? false
+          ? option
+              .choices!.map((c: any) => (c !== undefined ? undefined : `${c.name}: ${c.value}`))
+              .filter((s) => s !== undefined)
+          : null;
       if (choices !== null) {
         content += ` ${choices.join(', ')}`;
         return;
@@ -154,28 +146,33 @@ export default class VoidListener {
     const channel = await this.discord.getChannel<AnyGuildChannel>(channelID as string);
 
     // not cached, don't care lol
-    if (!guild || channel === null)
-      return;
+    if (!guild || channel === null) return;
 
     this.logger.info(`Received slash command /${(command as APIApplicationCommandInteractionData).name} uwu`);
     const [content, userMentions, roleMentions] = this._format(command as any);
-    const uncachedUsers = userMentions?.filter(s => !this.discord.client.users.has(s)) ?? [];
+    const uncachedUsers = userMentions?.filter((s) => !this.discord.client.users.has(s)) ?? [];
 
     if (uncachedUsers.length > 0) {
-      (await Promise.all(uncachedUsers.map(s => this.discord.client.getRESTUser(s)))).map(user => this.discord.client.users.update(user));
+      (await Promise.all(uncachedUsers.map((s) => this.discord.client.getRESTUser(s)))).map((user) =>
+        this.discord.client.users.update(user)
+      );
     }
 
-    this.discord.client.emit('messageCreate', new Message({
-      id: null as any,
-      timestamp: new Date().toISOString(),
-      channel_id: channelID as string,
-      guild_id: guildID,
-      content,
-      mention_roles: roleMentions,
-      type: 0,
-      author: {
-
-      }
-    }, this.discord.client));
+    this.discord.client.emit(
+      'messageCreate',
+      new Message(
+        {
+          id: null as any,
+          timestamp: new Date().toISOString(),
+          channel_id: channelID as string,
+          guild_id: guildID,
+          content,
+          mention_roles: roleMentions,
+          type: 0,
+          author: {},
+        },
+        this.discord.client
+      )
+    );
   }
 }

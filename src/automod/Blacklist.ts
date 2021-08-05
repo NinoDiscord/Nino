@@ -53,11 +53,8 @@ export default class BlacklistAutomod implements Automod {
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      (msg.member !== null &&
-        !PermissionUtil.isMemberAbove(nino, msg.member)) ||
-      !msg.channel
-        .permissionsOf(this.discord.client.user.id)
-        .has('manageMessages') ||
+      (msg.member !== null && !PermissionUtil.isMemberAbove(nino, msg.member)) ||
+      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
     )
@@ -68,14 +65,9 @@ export default class BlacklistAutomod implements Automod {
       if (content.filter((c) => c === word.toLowerCase()).length > 0) {
         const language = this.locales.get(msg.guildID, msg.author.id);
 
-        await msg.channel.createMessage(
-          language.translate('automod.blacklist')
-        );
+        await msg.channel.createMessage(language.translate('automod.blacklist'));
         await msg.delete();
-        await this.punishments.createWarning(
-          msg.member,
-          '[Automod] User said a word that is blacklisted here (☍﹏⁰)｡'
-        );
+        await this.punishments.createWarning(msg.member, '[Automod] User said a word that is blacklisted here (☍﹏⁰)｡');
 
         return true;
       }

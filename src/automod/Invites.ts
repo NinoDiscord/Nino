@@ -54,11 +54,8 @@ export default class Invites implements Automod {
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      (msg.member !== null &&
-        !PermissionUtil.isMemberAbove(nino, msg.member)) ||
-      !msg.channel
-        .permissionsOf(this.discord.client.user.id)
-        .has('manageMessages') ||
+      (msg.member !== null && !PermissionUtil.isMemberAbove(nino, msg.member)) ||
+      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
     )
@@ -71,10 +68,7 @@ export default class Invites implements Automod {
         .catch(() => [] as unknown as string[]);
 
       // Guild#getInvites doesn't add vanity urls, so we have to do it ourselves
-      if (
-        msg.channel.guild.features.includes('VANITY_URL') &&
-        msg.channel.guild.vanityURL !== null
-      )
+      if (msg.channel.guild.features.includes('VANITY_URL') && msg.channel.guild.vanityURL !== null)
         invites.push(msg.channel.guild.vanityURL);
 
       const regex = Constants.DISCORD_INVITE_REGEX.exec(msg.content);
@@ -93,21 +87,12 @@ export default class Invites implements Automod {
         if (invite === null) {
           invalid = true;
         } else {
-          const hasInvite =
-            invites.filter((inv) => inv === invite.code).length > 0;
-          if (
-            !hasInvite &&
-            invite.guild !== undefined &&
-            invite.guild.id === msg.channel.guild.id
-          )
+          const hasInvite = invites.filter((inv) => inv === invite.code).length > 0;
+          if (!hasInvite && invite.guild !== undefined && invite.guild.id === msg.channel.guild.id)
             invites.push(invite.code);
         }
       } catch (ex) {
-        if (
-          ex instanceof DiscordRESTError &&
-          ex.code === 100006 &&
-          ex.message.includes('Unknown Invite')
-        )
+        if (ex instanceof DiscordRESTError && ex.code === 100006 && ex.message.includes('Unknown Invite'))
           invalid = true;
       }
 
@@ -119,10 +104,7 @@ export default class Invites implements Automod {
 
       await msg.channel.createMessage(language.translate('automod.invites'));
       await msg.delete();
-      await this.punishments.createWarning(
-        msg.member,
-        `[Automod] Advertising in ${msg.channel.mention}`
-      );
+      await this.punishments.createWarning(msg.member, `[Automod] Advertising in ${msg.channel.mention}`);
 
       return true;
     }

@@ -28,7 +28,6 @@ import { firstUpper, humanize } from '@augu/utils';
 import CommandService from '../../services/CommandService';
 import { formatSize } from '../../util';
 import { Inject } from '@augu/lilith';
-import Stopwatch from '../../util/Stopwatch';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
@@ -63,17 +62,10 @@ export default class StatisticsCommand extends Command {
     const database = await this.database.getStatistics();
     const redis = await this.redis.getStatistics();
     const guilds = this.discord.client.guilds.size.toLocaleString();
-    const users = this.discord.client.guilds
-      .reduce((a, b) => a + b.memberCount, 0)
-      .toLocaleString();
-    const channels = Object.keys(
-      this.discord.client.channelGuildMap
-    ).length.toLocaleString();
+    const users = this.discord.client.guilds.reduce((a, b) => a + b.memberCount, 0).toLocaleString();
+    const channels = Object.keys(this.discord.client.channelGuildMap).length.toLocaleString();
     const memoryUsage = process.memoryUsage();
-    const avgPing = this.discord.client.shards.reduce(
-      (a, b) => a + b.latency,
-      0
-    );
+    const avgPing = this.discord.client.shards.reduce((a, b) => a + b.latency, 0);
     const node = process.env.REGION ?? 'unknown';
     const ownerIDs = this.config.getProperty('owners') ?? [];
     const owners = await Promise.all(
@@ -88,14 +80,14 @@ export default class StatisticsCommand extends Command {
       this.discord.client.user.id === '531613242473054229'
         ? 'https://stats.floofy.dev/d/e3KPDLknk/nino-prod?orgId=1'
         : this.discord.client.user.id === '613907896622907425'
-          ? 'https://stats.floofy.dev/d/C5bZHVZ7z/nino-edge?orgId=1'
-          : '';
+        ? 'https://stats.floofy.dev/d/C5bZHVZ7z/nino-edge?orgId=1'
+        : '';
 
     const embed = new EmbedBuilder()
       .setAuthor(
-        `[ ${this.discord.client.user.username}#${
-          this.discord.client.user.discriminator
-        } ~ v${version} (${commitHash ?? '<unknown>'}) ]`,
+        `[ ${this.discord.client.user.username}#${this.discord.client.user.discriminator} ~ v${version} (${
+          commitHash ?? '<unknown>'
+        }) ]`,
         'https://nino.floofy.dev',
         this.discord.client.user.dynamicAvatarURL('png', 1024)
       )
@@ -116,32 +108,20 @@ export default class StatisticsCommand extends Command {
         {
           name: `❯ Process [${process.pid}]`,
           value: [
-            `• **System Memory [Free / Total]**\n${formatSize(
-              os.freemem()
-            )} / ${formatSize(os.totalmem())}`,
-            `• **Memory Usage [RSS / Heap]**\n${formatSize(
-              memoryUsage.rss
-            )} / ${formatSize(memoryUsage.heapUsed)}`,
+            `• **System Memory [Free / Total]**\n${formatSize(os.freemem())} / ${formatSize(os.totalmem())}`,
+            `• **Memory Usage [RSS / Heap]**\n${formatSize(memoryUsage.rss)} / ${formatSize(memoryUsage.heapUsed)}`,
             `• **Current Node**\n${node ?? 'Unknown'}`,
-            `• **Uptime**\n${humanize(
-              Math.floor(process.uptime() * 1000),
-              true
-            )}`,
+            `• **Uptime**\n${humanize(Math.floor(process.uptime() * 1000), true)}`,
           ].join('\n'),
           inline: true,
         },
         {
-          name: `❯ Redis v${redis.server.redis_version} [${firstUpper(
-            redis.server.redis_mode
-          )}]`,
+          name: `❯ Redis v${redis.server.redis_version} [${firstUpper(redis.server.redis_mode)}]`,
           value: [
-            `• **Network I/O**\n${formatSize(
-              redis.stats.total_net_input_bytes
-            )} / ${formatSize(redis.stats.total_net_output_bytes)}`,
-            `• **Uptime**\n${humanize(
-              Number(redis.server.uptime_in_seconds) * 1000,
-              true
+            `• **Network I/O**\n${formatSize(redis.stats.total_net_input_bytes)} / ${formatSize(
+              redis.stats.total_net_output_bytes
             )}`,
+            `• **Uptime**\n${humanize(Number(redis.server.uptime_in_seconds) * 1000, true)}`,
             `• **Ops/s**\n${redis.stats.instantaneous_ops_per_sec.toLocaleString()}`,
             `• **Ping**\n${redis.ping}`,
           ].join('\n'),
@@ -157,14 +137,9 @@ export default class StatisticsCommand extends Command {
           inline: true,
         },
       ])
-      .setFooter(
-        `Owners: ${owners
-          .map((user) => `${user.username}#${user.discriminator}`)
-          .join(', ')}`
-      );
+      .setFooter(`Owners: ${owners.map((user) => `${user.username}#${user.discriminator}`).join(', ')}`);
 
-    if (dashboardUrl !== '')
-      embed.setDescription(`[[**Metrics Dashboard**]](${dashboardUrl})`);
+    if (dashboardUrl !== '') embed.setDescription(`[[**Metrics Dashboard**]](${dashboardUrl})`);
 
     return msg.reply(embed);
   }

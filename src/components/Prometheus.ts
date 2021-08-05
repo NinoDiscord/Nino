@@ -76,9 +76,7 @@ export default class Prometheus {
     });
 
     this.#server = createServer(this.onRequest.bind(this));
-    this.#server.once('listening', () =>
-      this.logger.info(`Prometheus: Listening at http://localhost:${port}`)
-    );
+    this.#server.once('listening', () => this.logger.info(`Prometheus: Listening at http://localhost:${port}`));
     this.#server.on('error', (error) => this.logger.fatal(error));
     this.#server.listen(port);
   }

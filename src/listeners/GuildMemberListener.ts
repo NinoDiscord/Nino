@@ -20,9 +20,7 @@
  * SOFTWARE.
  */
 
-import PunishmentService, {
-  PunishmentEntryType,
-} from '../services/PunishmentService';
+import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, Member } from 'eris';
 import { Inject, Subscribe } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
@@ -51,12 +49,7 @@ export default class GuildMemberListener {
   private readonly automod!: AutomodService;
 
   private async findAuditLog(guild: Guild, member: Member) {
-    if (
-      !guild.members
-        .get(this.discord.client.user.id)
-        ?.permissions.has('viewAuditLogs')
-    )
-      return undefined;
+    if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs')) return undefined;
 
     try {
       const audits = await guild.getAuditLog({
@@ -84,11 +77,7 @@ export default class GuildMemberListener {
     // cannot really do anything if `old` = null
     if (old === null) return;
 
-    if (
-      old.hasOwnProperty('nick') &&
-      (old.nick !== undefined || old.nick !== null) &&
-      member.nick !== old.nick
-    ) {
+    if (old.hasOwnProperty('nick') && (old.nick !== undefined || old.nick !== null) && member.nick !== old.nick) {
       if (settings !== undefined && settings.dehoist === false) return;
 
       const result = await this.automod.run('memberNick', member);
@@ -100,10 +89,7 @@ export default class GuildMemberListener {
     if (gSettings.mutedRoleID === undefined) return;
 
     // taken away
-    if (
-      !member.roles.includes(gSettings.mutedRoleID) &&
-      old.roles.includes(gSettings.mutedRoleID)
-    ) {
+    if (!member.roles.includes(gSettings.mutedRoleID) && old.roles.includes(gSettings.mutedRoleID)) {
       const entry = await this.findAuditLog(guild, member);
       if (!entry) return;
 
@@ -116,10 +102,7 @@ export default class GuildMemberListener {
     }
 
     // added it
-    if (
-      member.roles.includes(gSettings.mutedRoleID) &&
-      !old.roles.includes(gSettings.mutedRoleID)
-    ) {
+    if (member.roles.includes(gSettings.mutedRoleID) && !old.roles.includes(gSettings.mutedRoleID)) {
       const entry = await this.findAuditLog(guild, member);
       if (!entry) return;
 
@@ -138,9 +121,7 @@ export default class GuildMemberListener {
     if (result) return;
 
     const cases = await this.database.cases.getAll(guild.id);
-    const all = cases
-      .filter((c) => c.victimID === member.id)
-      .sort((c) => c.index);
+    const all = cases.filter((c) => c.victimID === member.id).sort((c) => c.index);
 
     if (all.length > 0 && all[all.length - 1]?.type === PunishmentType.Mute) {
       await this.punishments.apply({
@@ -166,9 +147,7 @@ export default class GuildMemberListener {
     if (!logs.entries.length) return;
 
     const entry = logs.entries.find(
-      (entry) =>
-        entry.targetID === member.id &&
-        entry.user.id !== this.discord.client.user.id
+      (entry) => entry.targetID === member.id && entry.user.id !== this.discord.client.user.id
     );
 
     if (!entry) return;

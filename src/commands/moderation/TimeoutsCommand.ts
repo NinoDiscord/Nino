@@ -47,9 +47,7 @@ export default class TimeoutsCommand extends Command {
   }
 
   async run(msg: CommandMessage, [type]: [string]) {
-    return type !== undefined
-      ? this._sendTimeoutsAsSpecific(msg, type)
-      : this._sendTimeouts(msg);
+    return type !== undefined ? this._sendTimeoutsAsSpecific(msg, type) : this._sendTimeouts(msg);
   }
 
   private async _sendTimeoutsAsSpecific(msg: CommandMessage, type: string) {
@@ -58,16 +56,10 @@ export default class TimeoutsCommand extends Command {
       .then((value) => (value !== null ? JSON.parse<Timeout[]>(value) : []))
       .catch(() => [] as Timeout[]);
 
-    if (!timeouts.length)
-      return msg.reply(
-        `Guild **${msg.guild.name}** doesn't have any concurrent timeouts.`
-      );
+    if (!timeouts.length) return msg.reply(`Guild **${msg.guild.name}** doesn't have any concurrent timeouts.`);
 
-    const all = timeouts.filter(
-      (p) => p.type.toLowerCase() === type.toLowerCase()
-    );
-    if (!all.length)
-      return msg.reply(`Punishment type **${type}** didn't have any timeouts.`);
+    const all = timeouts.filter((p) => p.type.toLowerCase() === type.toLowerCase());
+    if (!all.length) return msg.reply(`Punishment type **${type}** didn't have any timeouts.`);
 
     const h = await Promise.all(
       all.slice(0, 10).map(async (pkt, idx) => {
@@ -76,10 +68,10 @@ export default class TimeoutsCommand extends Command {
           .then((user) =>
             user === null
               ? {
-                username: 'Unknown User',
-                discriminator: '0000',
-                id: pkt.user,
-              }
+                  username: 'Unknown User',
+                  discriminator: '0000',
+                  id: pkt.user,
+                }
               : user!
           )
           .catch(() => ({
@@ -124,10 +116,7 @@ export default class TimeoutsCommand extends Command {
       .then((value) => (value !== null ? JSON.parse<Timeout[]>(value) : []))
       .catch(() => [] as Timeout[]);
 
-    if (!timeouts.length)
-      return msg.reply(
-        `Guild **${msg.guild.name}** doesn't have any concurrent timeouts.`
-      );
+    if (!timeouts.length) return msg.reply(`Guild **${msg.guild.name}** doesn't have any concurrent timeouts.`);
 
     const h = await Promise.all(
       timeouts.slice(0, 10).map(async (pkt, idx) => {
@@ -136,10 +125,10 @@ export default class TimeoutsCommand extends Command {
           .then((user) =>
             user === null
               ? {
-                username: 'Unknown User',
-                discriminator: '0000',
-                id: pkt.user,
-              }
+                  username: 'Unknown User',
+                  discriminator: '0000',
+                  id: pkt.user,
+                }
               : user!
           )
           .catch(() => ({

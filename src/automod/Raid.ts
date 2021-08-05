@@ -61,8 +61,7 @@ const bigintSerializer = (_: string, value: unknown) => {
 
 // Deserializer for JSON.parse for bigints
 const bigintDeserializer = (_: string, value: unknown) => {
-  if (isObject<IBigIntSerialized>(value) && value.bigint === true)
-    return BigInt(value.value);
+  if (isObject<IBigIntSerialized>(value) && value.bigint === true) return BigInt(value.value);
   else return value;
 };
 
@@ -94,11 +93,8 @@ export default class RaidAutomod implements Automod {
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      (msg.member !== null &&
-        !PermissionUtil.isMemberAbove(nino, msg.member)) ||
-      !msg.channel
-        .permissionsOf(this.discord.client.user.id)
-        .has('manageMessages') ||
+      (msg.member !== null && !PermissionUtil.isMemberAbove(nino, msg.member)) ||
+      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
     )

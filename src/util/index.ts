@@ -37,9 +37,7 @@ import { QUOTE_REGEX } from './Constants';
  * }
  * ```
  */
-export function* withIndex<T extends any[]>(
-  arr: T
-): Generator<[index: number, item: T[any]]> {
+export function* withIndex<T extends any[]>(arr: T): Generator<[index: number, item: T[any]]> {
   for (let i = 0; i < arr.length; i++) {
     yield [i, arr[i]];
   }

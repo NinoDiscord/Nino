@@ -33,17 +33,8 @@ export default class VoiceStateListener {
   @Inject
   private discord!: Discord;
 
-  private async getAuditLog(
-    guild: Guild,
-    actionType: number,
-    condition?: string
-  ) {
-    if (
-      !guild.members
-        .get(this.discord.client.user.id)
-        ?.permissions.has('viewAuditLogs')
-    )
-      return undefined;
+  private async getAuditLog(guild: Guild, actionType: number, condition?: string) {
+    if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs')) return undefined;
 
     try {
       const audits = await guild.getAuditLog({ limit: 3, actionType });
@@ -63,23 +54,14 @@ export default class VoiceStateListener {
   @Subscribe('voiceChannelJoin', { emitter: 'discord' })
   async onVoiceChannelJoin(member: Member, voice: VoiceChannel) {
     const settings = await this.database.logging.get(member.guild.id);
-    if (
-      !settings.enabled ||
-      !settings.events.includes(LoggingEvents.VoiceChannelJoin)
-    )
-      return;
+    if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin)) return;
 
     const channel =
-      settings.channelID !== undefined
-        ? await this.discord.getChannel<TextChannel>(settings.channelID)
-        : null;
+      settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
     if (
       channel === null ||
       !member.guild.channels.has(settings.channelID!) ||
-      !member.guild.channels
-        .get(settings.channelID!)!
-        .permissionsOf(this.discord.client.user.id)
-        .has('sendMessages')
+      !member.guild.channels.get(settings.channelID!)!.permissionsOf(this.discord.client.user.id).has('sendMessages')
     )
       return;
 
@@ -91,27 +73,18 @@ export default class VoiceStateListener {
   @Subscribe('voiceChannelLeave', { emitter: 'discord' })
   async onVoiceChannelLeave(member: Member, voice: VoiceChannel) {
     const settings = await this.database.logging.get(member.guild.id);
-    if (
-      !settings.enabled ||
-      !settings.events.includes(LoggingEvents.VoiceChannelJoin)
-    )
-      return;
+    if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin)) return;
 
     // Don't log entries if Nino has kicked them
     const entry = await this.getAuditLog(member.guild, 27, '[Voice Kick]');
     if (entry !== undefined) return;
 
     const channel =
-      settings.channelID !== undefined
-        ? await this.discord.getChannel<TextChannel>(settings.channelID)
-        : null;
+      settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
     if (
       channel === null ||
       !member.guild.channels.has(settings.channelID!) ||
-      !member.guild.channels
-        .get(settings.channelID!)!
-        .permissionsOf(this.discord.client.user.id)
-        .has('sendMessages')
+      !member.guild.channels.get(settings.channelID!)!.permissionsOf(this.discord.client.user.id).has('sendMessages')
     )
       return;
 
@@ -121,29 +94,16 @@ export default class VoiceStateListener {
   }
 
   @Subscribe('voiceChannelSwitch', { emitter: 'discord' })
-  async onVoiceChannelSwitch(
-    member: Member,
-    voice: VoiceChannel,
-    old: VoiceChannel
-  ) {
+  async onVoiceChannelSwitch(member: Member, voice: VoiceChannel, old: VoiceChannel) {
     const settings = await this.database.logging.get(member.guild.id);
-    if (
-      !settings.enabled ||
-      !settings.events.includes(LoggingEvents.VoiceChannelJoin)
-    )
-      return;
+    if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin)) return;
 
     const channel =
-      settings.channelID !== undefined
-        ? await this.discord.getChannel<TextChannel>(settings.channelID)
-        : null;
+      settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
     if (
       channel === null ||
       !member.guild.channels.has(settings.channelID!) ||
-      !member.guild.channels
-        .get(settings.channelID!)!
-        .permissionsOf(this.discord.client.user.id)
-        .has('sendMessages')
+      !member.guild.channels.get(settings.channelID!)!.permissionsOf(this.discord.client.user.id).has('sendMessages')
     )
       return;
 

@@ -28,12 +28,17 @@ const { existsSync } = require('fs');
 const { readFile } = require('fs/promises');
 const { createConnection } = require('typeorm');
 
-const { default: PunishmentsEntity } = require('../build/entities/PunishmentsEntity');
+const {
+  default: PunishmentsEntity,
+} = require('../build/entities/PunishmentsEntity');
 const { default: AutomodEntity } = require('../build/entities/AutomodEntity');
 const { default: CaseEntity } = require('../build/entities/CaseEntity');
 const { default: GuildEntity } = require('../build/entities/GuildEntity');
 const { default: WarningsEntity } = require('../build/entities/WarningsEntity');
-const { default: LoggingEntity, LoggingEvents } = require('../build/entities/LoggingEntity');
+const {
+  default: LoggingEntity,
+  LoggingEvents,
+} = require('../build/entities/LoggingEntity');
 const { default: UserEntity } = require('../build/entities/UserEntity');
 
 const argv = process.argv.slice(2);
@@ -44,15 +49,19 @@ const logger = new LoggerWithoutCallSite({
   displayFilePath: false,
   dateTimePattern: '[ day-month-year / hour:minute:second ]',
   instanceName: 'script: v0 -> v1',
-  name: 'scripts'
+  name: 'scripts',
 });
 
 async function main() {
   logger.info('Welcome to the database conversion script!');
-  logger.info('This script takes care of converting the Mongo database to the PostgreSQL one!');
+  logger.info(
+    'This script takes care of converting the Mongo database to the PostgreSQL one!'
+  );
 
   if (argv[0] === undefined) {
-    logger.fatal('You are required to output a directory after `node scripts/migrate.js`.');
+    logger.fatal(
+      'You are required to output a directory after `node scripts/migrate.js`.'
+    );
     process.exit(1);
   }
 
@@ -63,7 +72,7 @@ async function main() {
   }
 
   const files = await readdir(directory);
-  if (!files.every(file => file.endsWith('.json'))) {
+  if (!files.every((file) => file.endsWith('.json'))) {
     logger.fatal('Every file should end with ".json"');
     process.exit(1);
   }
@@ -72,27 +81,33 @@ async function main() {
   const connection = await createConnection();
 
   const startTime = process.hrtime();
-  const guilds = files.find(file => file.endsWith('guilds.json'));
+  const guilds = files.find((file) => file.endsWith('guilds.json'));
   const guildData = await readFile(guilds, 'utf-8');
   const guildDocs = JSON.parse(guildData);
   await convertGuilds(connection, guildDocs);
 
-  const users = files.find(file => file.endsWith('users.json'));
+  const users = files.find((file) => file.endsWith('users.json'));
   const userData = await readFile(users, 'utf-8');
   const userDocs = JSON.parse(userData);
   await convertUsers(connection, userDocs);
 
-  const warnings = files.find(file => file.endsWith('warnings.json'));
+  const warnings = files.find((file) => file.endsWith('warnings.json'));
   const warningData = await readFile(warnings, 'utf-8');
   const warningDocs = JSON.parse(warningData);
   await convertWarnings(connection, warningDocs);
 
-  const cases = files.find(file => file.endsWith('cases.json'));
+  const cases = files.find((file) => file.endsWith('cases.json'));
   const caseData = await readFile(cases, 'utf-8');
   const caseDocs = JSON.parse(caseData);
   await convertCases(connection, caseDocs);
 
-  logger.info(`Converted ${userDocs.length} users, ${guildDocs.length} guilds, ${warningDocs.length} warnings, and ${caseDocs.length} cases in ~${calculateHRTime(startTime)}ms.`);
+  logger.info(
+    `Converted ${userDocs.length} users, ${guildDocs.length} guilds, ${
+      warningDocs.length
+    } warnings, and ${caseDocs.length} cases in ~${calculateHRTime(
+      startTime
+    )}ms.`
+  );
   process.exit(0);
 }
 
@@ -104,14 +119,15 @@ async function convertGuilds(connection, documents) {
   for (let i = 0; i < documents.length; i++) {
     const document = documents[i];
 
-    logger.info(`Guild Entry: ${document.guildID} ${i + 1}/${documents.length}`);
+    logger.info(
+      `Guild Entry: ${document.guildID} ${i + 1}/${documents.length}`
+    );
     const entry = new GuildEntity();
     entry.language = document.locale;
     entry.prefixes = [document.prefix];
     entry.guildID = document.guildID;
 
-    if (document.modlog !== undefined)
-      entry.modlogChannelID = document.modlog;
+    if (document.modlog !== undefined) entry.modlogChannelID = document.modlog;
 
     if (document.mutedRole !== undefined)
       entry.mutedRoleID = document.mutedRole;
@@ -131,8 +147,7 @@ async function convertGuilds(connection, documents) {
       entry.soft = punishment.soft === true;
       entry.type = determineCaseType(punishment.type);
 
-      if (punishment.temp !== null)
-        entry.time = punishment.temp;
+      if (punishment.temp !== null) entry.time = punishment.temp;
 
       await punishments.save(entry);
     }
@@ -177,7 +192,11 @@ async function convertGuilds(connection, documents) {
     }
   }
 
-  logger.info(`Hopefully migrated ${documents.length} guild documents (~${calculateHRTime(start).toFixed(2)}ms)`);
+  logger.info(
+    `Hopefully migrated ${documents.length} guild documents (~${calculateHRTime(
+      start
+    ).toFixed(2)}ms)`
+  );
 }
 
 async function convertUsers(connection, documents) {
@@ -187,7 +206,9 @@ async function convertUsers(connection, documents) {
   const startTime = process.hrtime();
   for (let i = 0; i < documents.length; i++) {
     const document = documents[i];
-    logger.info(`User Entry: ${document.userID} (${i + 1}/${documents.length})`);
+    logger.info(
+      `User Entry: ${document.userID} (${i + 1}/${documents.length})`
+    );
 
     const entry = new UserEntity();
     entry.language = document.locale;
@@ -198,7 +219,11 @@ async function convertUsers(connection, documents) {
     await users.save(entry);
   }
 
-  logger.info(`Hopefully migrated ${documents.length} user documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
+  logger.info(
+    `Hopefully migrated ${documents.length} user documents (~${calculateHRTime(
+      startTime
+    ).toFixed(2)}ms)`
+  );
 }
 
 async function convertWarnings(connection, documents) {
@@ -207,7 +232,11 @@ async function convertWarnings(connection, documents) {
 
   const startTime = process.hrtime();
   for (let i = 0; i < documents.length; i++) {
-    logger.info(`Warning Entry: ${documents[i].guild} | ${documents[i].user} (${i + 1}/${documents.length})`);
+    logger.info(
+      `Warning Entry: ${documents[i].guild} | ${documents[i].user} (${i + 1}/${
+        documents.length
+      })`
+    );
 
     const document = documents[i];
     const entry = new WarningsEntity();
@@ -215,12 +244,11 @@ async function convertWarnings(connection, documents) {
     entry.amount = document.amount;
     entry.guildID = document.guild;
     entry.userID = document.user;
-    if (typeof document.reason === 'string')
-      entry.reason = document.reason;
+    if (typeof document.reason === 'string') entry.reason = document.reason;
 
     try {
       await warnings.save(entry);
-    } catch(ex) {
+    } catch (ex) {
       logger.error('Unable to serialize input, setting to `1`:', ex);
 
       entry.amount = 1;
@@ -228,7 +256,11 @@ async function convertWarnings(connection, documents) {
     }
   }
 
-  logger.info(`Hopefully migrated ${documents.length} warning documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
+  logger.info(
+    `Hopefully migrated ${
+      documents.length
+    } warning documents (~${calculateHRTime(startTime).toFixed(2)}ms)`
+  );
 }
 
 async function convertCases(connection, documents) {
@@ -238,7 +270,9 @@ async function convertCases(connection, documents) {
   const startTime = process.hrtime();
   for (let i = 0; i < documents.length; i++) {
     const document = documents[i];
-    logger.info(`Case Entry: ${document.guild}, ${document.victim}, #${document.id}`);
+    logger.info(
+      `Case Entry: ${document.guild}, ${document.victim}, #${document.id}`
+    );
 
     const entry = new CaseEntity();
     entry.moderatorID = document.moderator;
@@ -249,26 +283,28 @@ async function convertCases(connection, documents) {
     entry.type = determineCaseType(document.type) ?? document.type;
     entry.soft = document.soft === true;
 
-    if (document.reason !== null)
-      entry.reason = document.reason;
+    if (document.reason !== null) entry.reason = document.reason;
 
-    if (document.time !== undefined)
-      entry.time = document.time;
+    if (document.time !== undefined) entry.time = document.time;
 
     try {
       await cases.save(entry);
-    } catch(ex) {
+    } catch (ex) {
       logger.info(`Skipping on entity #${document.id}: `, ex);
       continue;
     }
   }
 
-  logger.info(`Hopefully migrated ${documents.length} case documents (~${calculateHRTime(startTime).toFixed(2)}ms)`);
+  logger.info(
+    `Hopefully migrated ${documents.length} case documents (~${calculateHRTime(
+      startTime
+    ).toFixed(2)}ms)`
+  );
 }
 
 main()
   .then(process.exit)
-  .catch(ex => {
+  .catch((ex) => {
     logger.fatal(ex);
     process.exit(1);
   });

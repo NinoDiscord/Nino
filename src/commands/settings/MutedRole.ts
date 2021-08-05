@@ -51,9 +51,7 @@ export default class MutedRoleCommand extends Command {
   async run(msg: CommandMessage, [roleID]: [string]) {
     if (!roleID)
       return msg.settings.mutedRoleID !== null
-        ? msg.reply(
-          `The muted role in this guild is <@&${msg.settings.mutedRoleID}>`
-        )
+        ? msg.reply(`The muted role in this guild is <@&${msg.settings.mutedRoleID}>`)
         : msg.reply('No muted role is set in this guild.');
 
     const role = await this.discord.getRole(roleID, msg.guild);

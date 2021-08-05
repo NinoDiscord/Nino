@@ -54,16 +54,14 @@ export default class CaseCommand extends Command {
     if (args.length < 1) return msg.reply('No bot or user was found.');
 
     const caseID = args[0];
-    if (isNaN(Number(caseID)))
-      return msg.reply(`Case \`${caseID}\` was not a number.`);
+    if (isNaN(Number(caseID))) return msg.reply(`Case \`${caseID}\` was not a number.`);
 
     const caseModel = await this.database.cases.repository.findOne({
       guildID: msg.guild.id,
       index: Number(caseID),
     });
 
-    if (caseModel === undefined)
-      return msg.reply(`Case #**${caseID}** was not found.`);
+    if (caseModel === undefined) return msg.reply(`Case #**${caseID}** was not found.`);
 
     const moderator = this.discord.client.users.get(caseModel.moderatorID) ?? {
       username: 'Unknown User',
@@ -94,19 +92,12 @@ export default class CaseCommand extends Command {
       ])
       .addField(
         '• Moderator',
-        `${moderator.username}#${moderator.discriminator} (${
-          (moderator as any).id ?? '(unknown)'
-        })`,
+        `${moderator.username}#${moderator.discriminator} (${(moderator as any).id ?? '(unknown)'})`,
         true
       )
       .addField('• Type', caseModel.type, true);
 
-    if (caseModel.time !== null)
-      embed.addField(
-        '• Time',
-        ms(Number(caseModel.time!), { long: true }),
-        true
-      );
+    if (caseModel.time !== null) embed.addField('• Time', ms(Number(caseModel.time!), { long: true }), true);
 
     return msg.reply(embed);
   }

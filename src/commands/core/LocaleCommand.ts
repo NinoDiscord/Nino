@@ -20,12 +20,7 @@
  * SOFTWARE.
  */
 
-import {
-  Command,
-  CommandMessage,
-  EmbedBuilder,
-  Subcommand,
-} from '../../structures';
+import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import LocalizationService from '../../services/LocalizationService';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
@@ -84,18 +79,12 @@ export default class LocaleCommand extends Command {
   list(msg: CommandMessage) {
     const languages = this.languages.locales.map((locale) => {
       const user = this.discord.client.users.get(locale.translator);
-      return `❯ ${locale.flag} **${locale.full} (${locale.code})** by **${
-        user?.username ?? 'Unknown User'
-      }**#**${user?.discriminator ?? '0000'}** (${
-        locale.contributors.length
-      } contributers, \`${msg.settings.prefixes[0]}locale set ${
-        locale.code
-      } -u\`)`;
+      return `❯ ${locale.flag} **${locale.full} (${locale.code})** by **${user?.username ?? 'Unknown User'}**#**${
+        user?.discriminator ?? '0000'
+      }** (${locale.contributors.length} contributers, \`${msg.settings.prefixes[0]}locale set ${locale.code} -u\`)`;
     });
 
-    return msg.reply(
-      EmbedBuilder.create().setTitle('[ Languages ]').setDescription(languages)
-    );
+    return msg.reply(EmbedBuilder.create().setTitle('[ Languages ]').setDescription(languages));
   }
 
   @Subcommand('<locale>', { permissions: 'manageGuild' })
@@ -116,9 +105,7 @@ export default class LocaleCommand extends Command {
     const id = isUser ? msg.author.id : msg.guild.id;
 
     await controller.update(id, { language: locale });
-    return msg.reply(
-      `Language for ${isUser ? 'user' : 'server'} has been set to **${locale}**`
-    );
+    return msg.reply(`Language for ${isUser ? 'user' : 'server'} has been set to **${locale}**`);
   }
 
   @Subcommand(undefined, { permissions: 'manageGuild' })
@@ -132,9 +119,7 @@ export default class LocaleCommand extends Command {
       language: this.languages.defaultLocale.code,
     });
     return msg.reply(
-      `Language for ${isUser ? 'user' : 'server'} has been resetted to **${
-        this.languages.defaultLocale.code
-      }**`
+      `Language for ${isUser ? 'user' : 'server'} has been resetted to **${this.languages.defaultLocale.code}**`
     );
   }
 }

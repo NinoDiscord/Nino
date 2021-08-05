@@ -53,11 +53,8 @@ export default class Mentions implements Automod {
     const nino = msg.channel.guild.members.get(this.discord.client.user.id)!;
 
     if (
-      (msg.member !== null &&
-        !PermissionUtil.isMemberAbove(nino, msg.member)) ||
-      !msg.channel
-        .permissionsOf(this.discord.client.user.id)
-        .has('manageMessages') ||
+      (msg.member !== null && !PermissionUtil.isMemberAbove(nino, msg.member)) ||
+      !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
       msg.channel.permissionsOf(msg.author.id).has('banMembers')
     )

@@ -51,10 +51,7 @@ export default class Locale {
     this.code = meta.code;
   }
 
-  translate<
-    K extends ObjectKeysWithSeperator<LocalizationStrings>,
-    R = KeyToPropType<LocalizationStrings, K>
-  >(
+  translate<K extends ObjectKeysWithSeperator<LocalizationStrings>, R = KeyToPropType<LocalizationStrings, K>>(
     key: K,
     args?: { [x: string]: any } | any[]
   ): R extends string[] ? string : string {
@@ -71,24 +68,18 @@ export default class Locale {
       }
     }
 
-    if (value === undefined || value === NOT_FOUND_SYMBOL)
-      throw new TypeError(`Node '${key}' doesn't exist...`);
+    if (value === undefined || value === NOT_FOUND_SYMBOL) throw new TypeError(`Node '${key}' doesn't exist...`);
 
     if (isObject(value)) throw new TypeError(`Node '${key}' is a object!`);
 
     if (Array.isArray(value)) {
-      return value
-        .map((val) => this.stringify(val, args))
-        .join('\n') as unknown as any;
+      return value.map((val) => this.stringify(val, args)).join('\n') as unknown as any;
     } else {
       return this.stringify(value, args);
     }
   }
 
-  private stringify(
-    value: any,
-    rawArgs?: { [x: string]: any } | (string | number)[]
-  ) {
+  private stringify(value: any, rawArgs?: { [x: string]: any } | (string | number)[]) {
     // If no arguments are provided, best to assume to return the string
     if (!rawArgs) return value;
 
@@ -106,10 +97,7 @@ export default class Locale {
           _i++;
           return value.replace(/%s/g, () => String(rawArgs.shift()));
         } else if (match === '%d') {
-          if (isNaN(Number(rawArgs[_i])))
-            throw new TypeError(
-              `Value "${rawArgs[_i]}" was not a number (index: ${_i})`
-            );
+          if (isNaN(Number(rawArgs[_i]))) throw new TypeError(`Value "${rawArgs[_i]}" was not a number (index: ${_i})`);
 
           _i++;
           return value.replace(/%d/g, () => String(rawArgs.shift()));

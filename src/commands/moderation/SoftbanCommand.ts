@@ -67,9 +67,7 @@ export default class SoftbanCommand extends Command {
       user = await this.discord.getUser(userID);
     } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10013)
-        return msg.reply(
-          `User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`
-        );
+        return msg.reply(`User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`);
 
       return msg.reply(
         [
@@ -92,43 +90,31 @@ export default class SoftbanCommand extends Command {
 
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
-      return msg.reply(
-        'I don\'t think I can perform this action due to you banning the owner, you idiot.'
-      );
+      return msg.reply("I don't think I can perform this action due to you banning the owner, you idiot.");
 
     if (member.id === this.discord.client.user.id)
       return msg.reply(';w; why would you soft-ban me from here? **(／。＼)**');
 
     if (member instanceof Member) {
       // this won't work for banning members not in this guild
-      if (
-        member.permissions.has('administrator') ||
-        member.permissions.has('banMembers')
-      )
+      if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
         return msg.reply(
           `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
         );
 
       if (!Permissions.isMemberAbove(msg.member, member))
-        return msg.reply(
-          `User **${user.username}#${user.discriminator}** is the same or above you.`
-        );
+        return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above you.`);
 
       if (!Permissions.isMemberAbove(msg.self!, member))
-        return msg.reply(
-          `User **${user.username}#${user.discriminator}** is the same or above me.`
-        );
+        return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
     }
 
     const flags = msg.flags<Flags>();
     if (typeof flags.days === 'boolean' || typeof flags.d === 'boolean')
-      return msg.reply(
-        'The `--days` flag must have a value appended. Example: `--days=7` or `-d 7`'
-      );
+      return msg.reply('The `--days` flag must have a value appended. Example: `--days=7` or `-d 7`');
 
     const days = flags.days ?? flags.d ?? 7;
-    if (Number(days) > 7)
-      return msg.reply('You can only concat 7 days worth of messages');
+    if (Number(days) > 7) return msg.reply('You can only concat 7 days worth of messages');
 
     try {
       await this.punishments.apply({
@@ -146,9 +132,9 @@ export default class SoftbanCommand extends Command {
       });
 
       return msg.reply(
-        `${user.bot ? 'Bot' : 'User'} **${user.username}#${
-          user.discriminator
-        }** has been banned${reason ? ` *for ${reason}*` : ''}`
+        `${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been banned${
+          reason ? ` *for ${reason}*` : ''
+        }`
       );
     } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10007) {

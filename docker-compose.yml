@@ -57,7 +57,7 @@ services:
       - nino
     environment:
       AUTH: ${TIMEOUTS_AUTH}
-    
+
 volumes:
   redis:
   postgres:

@@ -55,23 +55,11 @@ export default class MessageListener {
     if (!msg.author || ![0, 5].includes(msg.channel.type)) return;
 
     const settings = await this.database.logging.get(msg.guildID);
-    if (
-      !settings.enabled ||
-      !settings.events.includes(LoggingEvents.MessageDeleted)
-    )
-      return;
+    if (!settings.enabled || !settings.events.includes(LoggingEvents.MessageDeleted)) return;
 
-    if (
-      settings.ignoreChannels.length > 0 &&
-      settings.ignoreChannels.includes(msg.channel.id)
-    )
-      return;
+    if (settings.ignoreChannels.length > 0 && settings.ignoreChannels.includes(msg.channel.id)) return;
 
-    if (
-      settings.ignoreUsers.length > 0 &&
-      settings.ignoreUsers.includes(msg.author.id)
-    )
-      return;
+    if (settings.ignoreUsers.length > 0 && settings.ignoreUsers.includes(msg.author.id)) return;
 
     if (
       settings.channelID !== undefined &&
@@ -91,11 +79,7 @@ export default class MessageListener {
 
     // It's in a closure so we don't have to use `return;` on the outer scope
     const auditLog = await (async () => {
-      if (
-        !msg.channel.guild.members
-          .get(this.discord.client.user.id)
-          ?.permissions.has('viewAuditLogs')
-      )
+      if (!msg.channel.guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
         return undefined;
 
       const audits = await msg.channel.guild.getAuditLog({
@@ -110,12 +94,8 @@ export default class MessageListener {
       );
     })();
 
-    const channel = msg.channel.guild.channels.get<TextChannel>(
-      settings.channelID!
-    );
-    const author = msg.author.system
-      ? 'System'
-      : `${msg.author.username}#${msg.author.discriminator}`;
+    const channel = msg.channel.guild.channels.get<TextChannel>(settings.channelID!);
+    const author = msg.author.system ? 'System' : `${msg.author.username}#${msg.author.discriminator}`;
     const embed = new EmbedBuilder().setColor(Color);
 
     if (auditLog !== undefined)
@@ -125,25 +105,17 @@ export default class MessageListener {
 
     if (msg.embeds.length > 0) {
       const em = msg.embeds[0];
-      if (em.author)
-        embed.setAuthor(em.author.name, em.author.url, em.author.icon_url);
+      if (em.author) embed.setAuthor(em.author.name, em.author.url, em.author.icon_url);
       if (em.description)
-        embed.setDescription(
-          em.description.length > 2000
-            ? `${em.description.slice(0, 1993)}...`
-            : em.description
-        );
+        embed.setDescription(em.description.length > 2000 ? `${em.description.slice(0, 1993)}...` : em.description);
       if (em.fields && em.fields.length > 0) {
-        for (const field of em.fields)
-          embed.addField(field.name, field.value, field.inline || false);
+        for (const field of em.fields) embed.addField(field.name, field.value, field.inline || false);
       }
 
       if (em.footer) {
         const footer = embed.footer;
         embed.setFooter(
-          footer !== undefined
-            ? `${em.footer.text} (${footer.text})`
-            : em.footer.text,
+          footer !== undefined ? `${em.footer.text} (${footer.text})` : em.footer.text,
           em.footer.icon_url
         );
       }
@@ -181,23 +153,11 @@ export default class MessageListener {
     if (result) return;
 
     const settings = await this.database.logging.get(msg.channel.guild.id);
-    if (
-      !settings.enabled ||
-      !settings.events.includes(LoggingEvents.MessageUpdated)
-    )
-      return;
+    if (!settings.enabled || !settings.events.includes(LoggingEvents.MessageUpdated)) return;
 
-    if (
-      settings.ignoreChannels.length > 0 &&
-      settings.ignoreChannels.includes(msg.channel.id)
-    )
-      return;
+    if (settings.ignoreChannels.length > 0 && settings.ignoreChannels.includes(msg.channel.id)) return;
 
-    if (
-      settings.ignoreUsers.length > 0 &&
-      settings.ignoreUsers.includes(msg.author.id)
-    )
-      return;
+    if (settings.ignoreUsers.length > 0 && settings.ignoreUsers.includes(msg.author.id)) return;
 
     if (
       settings.channelID !== undefined &&
@@ -216,12 +176,8 @@ export default class MessageListener {
     // discord being shit part 2
     if (HTTP_REGEX.test(old.content)) return;
 
-    const channel = msg.channel.guild.channels.get<TextChannel>(
-      settings.channelID!
-    );
-    const author = msg.author.system
-      ? 'System'
-      : `${msg.author.username}#${msg.author.discriminator}`;
+    const channel = msg.channel.guild.channels.get<TextChannel>(settings.channelID!);
+    const author = msg.author.system ? 'System' : `${msg.author.username}#${msg.author.discriminator}`;
     const jumpUrl = `https://discord.com/channels/${msg.guildID}/${msg.channel.id}/${msg.id}`;
     const embed = new EmbedBuilder()
       .setColor(Color)
@@ -248,18 +204,11 @@ export default class MessageListener {
   async onMessageDeleteBulk(messages: Message<TextChannel>[]) {
     const allMsgs = messages
       .filter((msg) => msg.guildID !== undefined)
-      .sort(
-        (a, b) =>
-          new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-      );
+      .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
     const msg = allMsgs[0];
     const settings = await this.database.logging.get(msg.channel.guild.id);
-    if (
-      !settings.enabled ||
-      !settings.events.includes(LoggingEvents.MessageUpdated)
-    )
-      return;
+    if (!settings.enabled || !settings.events.includes(LoggingEvents.MessageUpdated)) return;
 
     if (!settings.channelID) return;
 
@@ -297,31 +246,20 @@ export default class MessageListener {
           const embed = msg.embeds[j];
           let content = `[ Embed ${j + 1}/${msg.embeds.length} ]\n`;
           if (embed.author !== undefined)
-            content += `❯ ${embed.author.name}${
-              embed.author.url !== undefined ? ` (${embed.author.url})` : ''
-            }\n`;
+            content += `❯ ${embed.author.name}${embed.author.url !== undefined ? ` (${embed.author.url})` : ''}\n`;
 
           if (embed.title !== undefined)
-            content += `❯ ${embed.title}${
-              embed.url !== undefined ? ` (${embed.url})` : ''
-            }\n`;
+            content += `❯ ${embed.title}${embed.url !== undefined ? ` (${embed.url})` : ''}\n`;
 
-          if (embed.description !== undefined)
-            content += `${embed.description}\n\n`;
+          if (embed.description !== undefined) content += `${embed.description}\n\n`;
 
           if (embed.fields !== undefined)
-            content +=
-              embed.fields
-                .map((field) => `• ${field.name}: ${field.value}`)
-                .join('\n') + '\n';
+            content += embed.fields.map((field) => `• ${field.name}: ${field.value}`).join('\n') + '\n';
 
           if (embed.footer !== undefined)
             content += `${embed.footer.text}${
               embed.timestamp !== undefined
-                ? ` (${(embed.timestamp instanceof Date
-                  ? embed.timestamp
-                  : new Date(embed.timestamp)
-                ).toUTCString()})`
+                ? ` (${(embed.timestamp instanceof Date ? embed.timestamp : new Date(embed.timestamp)).toUTCString()})`
                 : ''
             }`;
 
@@ -338,14 +276,8 @@ export default class MessageListener {
     if (buffers.length > 0) return;
 
     const buffer = Buffer.concat(buffers);
-    const channel = msg.channel.guild.channels.get<TextChannel>(
-      settings.channelID!
-    );
-    const users: string[] = [
-      ...new Set(
-        allMsgs.map((m) => `${m.author.username}#${m.author.discriminator}`)
-      ),
-    ];
+    const channel = msg.channel.guild.channels.get<TextChannel>(settings.channelID!);
+    const users: string[] = [...new Set(allMsgs.map((m) => `${m.author.username}#${m.author.discriminator}`))];
     const embed = new EmbedBuilder()
       .setColor(Color)
       .setDescription([

@@ -20,13 +20,7 @@
  * SOFTWARE.
  */
 
-import {
-  USER_MENTION_REGEX,
-  USERNAME_DISCRIM_REGEX,
-  ID_REGEX,
-  CHANNEL_REGEX,
-  ROLE_REGEX,
-} from '../util/Constants';
+import { USER_MENTION_REGEX, USERNAME_DISCRIM_REGEX, ID_REGEX, CHANNEL_REGEX, ROLE_REGEX } from '../util/Constants';
 
 import { Component, Inject, ComponentAPI, Subscribe } from '@augu/lilith';
 import { Client, Role, Guild, AnyChannel } from 'eris';
@@ -57,9 +51,7 @@ export default class Discord {
 
     const token = this.config.getProperty('token');
     if (token === undefined) {
-      this.logger.fatal(
-        'Property `token` doesn\'t exist in the config file, please populate it.'
-      );
+      this.logger.fatal("Property `token` doesn't exist in the config file, please populate it.");
       return;
     }
 
@@ -68,13 +60,7 @@ export default class Discord {
       getAllUsers: true,
       maxShards: 'auto',
       restMode: true,
-      intents: [
-        'guilds',
-        'guildBans',
-        'guildMembers',
-        'guildMessages',
-        'guildVoiceStates',
-      ],
+      intents: ['guilds', 'guildBans', 'guildMembers', 'guildMessages', 'guildVoiceStates'],
     });
 
     this.api.container.addEmitter('discord', this.client);
@@ -87,11 +73,7 @@ export default class Discord {
 
   get emojis() {
     return this.client.guilds
-      .map((guild) =>
-        guild.emojis.map(
-          (emoji) => `<${emoji.animated ? 'a:' : ':'}${emoji.name}:${emoji.id}>`
-        )
-      )
+      .map((guild) => guild.emojis.map((emoji) => `<${emoji.animated ? 'a:' : ':'}${emoji.name}:${emoji.id}>`))
       .flat();
   }
 
@@ -111,9 +93,7 @@ export default class Discord {
     if (USERNAME_DISCRIM_REGEX.test(query)) {
       const match = query.match(USERNAME_DISCRIM_REGEX)!;
       const users = this.client.users.filter(
-        (user) =>
-          user.username === match[1] &&
-          Number(user.discriminator) === Number(match[2])
+        (user) => user.username === match[1] && Number(user.discriminator) === Number(match[2])
       );
 
       // TODO: pagination?
@@ -136,40 +116,28 @@ export default class Discord {
         if (match === null) return resolve(null);
 
         if (guild) {
-          return resolve(
-            guild.channels.has(match[1])
-              ? (guild.channels.get(match[1])! as T)
-              : null
-          );
+          return resolve(guild.channels.has(match[1]) ? (guild.channels.get(match[1])! as T) : null);
         } else {
           const channel =
             match[1] in this.client.channelGuildMap &&
-            this.client.guilds
-              .get(this.client.channelGuildMap[match[1]])
-              ?.channels.get(match[1]);
+            this.client.guilds.get(this.client.channelGuildMap[match[1]])?.channels.get(match[1]);
           return resolve((channel as T) || null);
         }
       }
 
       if (ID_REGEX.test(query)) {
         if (guild) {
-          return resolve(
-            guild.channels.has(query) ? (guild.channels.get(query)! as T) : null
-          );
+          return resolve(guild.channels.has(query) ? (guild.channels.get(query)! as T) : null);
         } else {
           const channel =
             query in this.client.channelGuildMap &&
-            this.client.guilds
-              .get(this.client.channelGuildMap[query])
-              ?.channels.get(query);
+            this.client.guilds.get(this.client.channelGuildMap[query])?.channels.get(query);
           return resolve((channel as T) || null);
         }
       }
 
       if (guild !== undefined) {
-        const channels = guild.channels.filter((chan) =>
-          chan.name.toLowerCase().includes(query.toLowerCase())
-        );
+        const channels = guild.channels.filter((chan) => chan.name.toLowerCase().includes(query.toLowerCase()));
         if (channels.length > 0) {
           return resolve(channels[0] as T);
         }
@@ -190,12 +158,9 @@ export default class Discord {
         if (role !== undefined) return resolve(role);
       }
 
-      if (ID_REGEX.test(query))
-        return resolve(guild.roles.has(query) ? guild.roles.get(query)! : null);
+      if (ID_REGEX.test(query)) return resolve(guild.roles.has(query) ? guild.roles.get(query)! : null);
 
-      const roles = guild.roles.filter(
-        (role) => role.name.toLowerCase() === query.toLowerCase()
-      );
+      const roles = guild.roles.filter((role) => role.name.toLowerCase() === query.toLowerCase());
 
       // TODO: pagination?
       resolve(roles.length > 0 ? roles[0] : null);

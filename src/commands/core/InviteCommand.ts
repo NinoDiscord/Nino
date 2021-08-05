@@ -38,14 +38,11 @@ export default class InviteCommand extends Command {
   }
 
   run(msg: CommandMessage) {
-    return msg.translate(
-      'commands.invite',
-      [
-        msg.author.tag,
-        `https://discord.com/oauth2/authorize?client_id=${this.discord.client.user.id}&scope=bot`,
-        'https://discord.com/oauth2/authorize?client_id=613907896622907425&scope=bot',
-        'https://discord.gg/ATmjFH9kMH'
-      ]
-    );
+    return msg.translate('commands.invite', [
+      msg.author.tag,
+      `https://discord.com/oauth2/authorize?client_id=${this.discord.client.user.id}&scope=bot`,
+      'https://discord.com/oauth2/authorize?client_id=613907896622907425&scope=bot',
+      'https://discord.gg/ATmjFH9kMH',
+    ]);
   }
 }

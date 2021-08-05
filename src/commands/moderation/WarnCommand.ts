@@ -59,9 +59,7 @@ export default class WarnCommand extends Command {
       user = await this.discord.getUser(userID);
     } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10013)
-        return msg.reply(
-          `User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`
-        );
+        return msg.reply(`User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`);
 
       return msg.reply(
         [
@@ -77,35 +75,24 @@ export default class WarnCommand extends Command {
 
     if (user === null) return msg.reply('Bot or user was not found.');
 
-    if (!msg.guild.members.has(user.id))
-      return msg.reply('Cannot warn members outside the server.');
+    if (!msg.guild.members.has(user.id)) return msg.reply('Cannot warn members outside the server.');
 
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
-      return msg.reply(
-        'I don\'t think I can perform this action due to you kicking the owner, you idiot.'
-      );
+      return msg.reply("I don't think I can perform this action due to you kicking the owner, you idiot.");
 
-    if (member.id === this.discord.client.user.id)
-      return msg.reply(';w; why would you warn me? **(／。＼)**');
+    if (member.id === this.discord.client.user.id) return msg.reply(';w; why would you warn me? **(／。＼)**');
 
-    if (
-      member.permissions.has('administrator') ||
-      member.permissions.has('banMembers')
-    )
+    if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
       return msg.reply(
         `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
       );
 
     if (!Permissions.isMemberAbove(msg.member, member))
-      return msg.reply(
-        `User **${user.username}#${user.discriminator}** is the same or above as you.`
-      );
+      return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above as you.`);
 
     if (!Permissions.isMemberAbove(msg.self!, member))
-      return msg.reply(
-        `User **${user.username}#${user.discriminator}** is the same or above me.`
-      );
+      return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
 
     try {
       await this.punishments.createWarning(

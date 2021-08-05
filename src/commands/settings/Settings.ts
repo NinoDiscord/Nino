@@ -57,17 +57,13 @@ export default class SettingsCommand extends Command {
     ]);
 
     const embed = EmbedBuilder.create()
-      .setTitle(
-        `[ :pencil2: Settings for ${msg.guild.name} (${msg.guild.id}) ]`
-      )
+      .setTitle(`[ :pencil2: Settings for ${msg.guild.name} (${msg.guild.id}) ]`)
       .addFields([
         {
           name: '❯ Settings',
           value: [
             `• **Muted Role**: ${
-              settings.mutedRoleID !== null
-                ? `<@&${settings.mutedRoleID}> (**${settings.mutedRoleID}**)`
-                : 'None'
+              settings.mutedRoleID !== null ? `<@&${settings.mutedRoleID}> (**${settings.mutedRoleID}**)` : 'None'
             }`,
             `• **Mod Log**: ${
               settings.modlogChannelID !== null
@@ -80,21 +76,11 @@ export default class SettingsCommand extends Command {
         {
           name: '❯ Automod',
           value: [
-            `• ${
-              automod!.shortLinks ? msg.successEmote : msg.errorEmote
-            } **Short Links**`,
-            `• ${
-              automod!.blacklist ? msg.successEmote : msg.errorEmote
-            } **Blacklist Words**`,
-            `• ${
-              automod!.mentions ? msg.successEmote : msg.errorEmote
-            } **Mentions**`,
-            `• ${
-              automod!.dehoist ? msg.successEmote : msg.errorEmote
-            } **Dehoisting**`,
-            `• ${
-              automod!.invites ? msg.successEmote : msg.errorEmote
-            } **Invites**`,
+            `• ${automod!.shortLinks ? msg.successEmote : msg.errorEmote} **Short Links**`,
+            `• ${automod!.blacklist ? msg.successEmote : msg.errorEmote} **Blacklist Words**`,
+            `• ${automod!.mentions ? msg.successEmote : msg.errorEmote} **Mentions**`,
+            `• ${automod!.dehoist ? msg.successEmote : msg.errorEmote} **Dehoisting**`,
+            `• ${automod!.invites ? msg.successEmote : msg.errorEmote} **Invites**`,
             `• ${automod!.raid ? msg.successEmote : msg.errorEmote} **Raid**`,
             `• ${automod!.spam ? msg.successEmote : msg.errorEmote} **Spam**`,
           ].join('\n'),
@@ -106,17 +92,10 @@ export default class SettingsCommand extends Command {
             `• **Channels Ignored**: ${logging.ignoreChannels.length}`,
             `• **Users Ignored**: ${logging.ignoreUsers.length}`,
             `• **Channel**: ${
-              logging.channelID !== null
-                ? `<#${logging.channelID}> (**${logging.channelID}**)`
-                : 'None'
+              logging.channelID !== null ? `<#${logging.channelID}> (**${logging.channelID}**)` : 'None'
             }`,
-            `• **Enabled**: ${
-              logging.enabled ? msg.successEmote : msg.errorEmote
-            }`,
-            `• **Events**: ${
-              logging.events.map((ev) => humanizedEvents[ev]).join(', ') ||
-              'None'
-            }`,
+            `• **Enabled**: ${logging.enabled ? msg.successEmote : msg.errorEmote}`,
+            `• **Events**: ${logging.events.map((ev) => humanizedEvents[ev]).join(', ') || 'None'}`,
           ].join('\n'),
           inline: true,
         },

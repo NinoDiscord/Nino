@@ -41,8 +41,7 @@ export default class Stopwatch {
   }
 
   start() {
-    if (this.startTime !== undefined)
-      throw new SyntaxError('Stopwatch has already started');
+    if (this.startTime !== undefined) throw new SyntaxError('Stopwatch has already started');
 
     this.startTime = performance.now();
   }

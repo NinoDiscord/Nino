@@ -20,12 +20,7 @@
  * SOFTWARE.
  */
 
-import {
-  Command,
-  CommandMessage,
-  Subcommand,
-  EmbedBuilder,
-} from '../../structures';
+import { Command, CommandMessage, Subcommand, EmbedBuilder } from '../../structures';
 import { Categories, Color } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
@@ -54,23 +49,21 @@ export default class AutomodCommand extends Command {
     const embed = new EmbedBuilder()
       .setColor(Color)
       .setDescription([
-        `• ${
-          settings!.shortLinks ? msg.successEmote : msg.errorEmote
-        } **Short Links** (\`${msg.settings.prefixes[0]}automod shortlinks\`)`,
-        `• ${
-          settings!.blacklist ? msg.successEmote : msg.errorEmote
-        } **Blacklist Words** (\`${
+        `• ${settings!.shortLinks ? msg.successEmote : msg.errorEmote} **Short Links** (\`${
+          msg.settings.prefixes[0]
+        }automod shortlinks\`)`,
+        `• ${settings!.blacklist ? msg.successEmote : msg.errorEmote} **Blacklist Words** (\`${
           msg.settings.prefixes[0]
         }automod blacklist\`)`,
-        `• ${
-          settings!.mentions ? msg.successEmote : msg.errorEmote
-        } **Mentions** (\`${msg.settings.prefixes[0]}automod mentions\`)`,
-        `• ${
-          settings!.dehoist ? msg.successEmote : msg.errorEmote
-        } **Dehoisting** (\`${msg.settings.prefixes[0]}automod dehoist\`)`,
-        `• ${
-          settings!.invites ? msg.successEmote : msg.errorEmote
-        } **Invites** (\`${msg.settings.prefixes[0]}automod invites\`)`,
+        `• ${settings!.mentions ? msg.successEmote : msg.errorEmote} **Mentions** (\`${
+          msg.settings.prefixes[0]
+        }automod mentions\`)`,
+        `• ${settings!.dehoist ? msg.successEmote : msg.errorEmote} **Dehoisting** (\`${
+          msg.settings.prefixes[0]
+        }automod dehoist\`)`,
+        `• ${settings!.invites ? msg.successEmote : msg.errorEmote} **Invites** (\`${
+          msg.settings.prefixes[0]
+        }automod invites\`)`,
         `• ${settings!.raid ? msg.successEmote : msg.errorEmote} **Raids** (\`${
           msg.settings.prefixes[0]
         }automod raid\`)`,
@@ -91,11 +84,7 @@ export default class AutomodCommand extends Command {
       shortLinks: enabled,
     });
 
-    return msg.reply(
-      `${
-        enabled ? msg.successEmote : msg.errorEmote
-      } the Shortlinks automod feature`
-    );
+    return msg.reply(`${enabled ? msg.successEmote : msg.errorEmote} the Shortlinks automod feature`);
   }
 
   @Subcommand('[...words]')
@@ -110,11 +99,7 @@ export default class AutomodCommand extends Command {
 
       const suffix = res ? 'd' : '';
       return msg.reply(
-        `${
-          res
-            ? `${msg.successEmote} Successfully`
-            : `${msg.errorEmote} Unable to`
-        } **${
+        `${res ? `${msg.successEmote} Successfully` : `${msg.errorEmote} Unable to`} **${
           type ? `enable${suffix}` : `disable${suffix}`
         }** the Blacklist automod feature.`
       );
@@ -155,11 +140,7 @@ export default class AutomodCommand extends Command {
     });
 
     return msg.reply(
-      `${
-        type
-          ? `${msg.successEmote} **Enabled**`
-          : `${msg.errorEmote} **Disabled**`
-      } Mentions automod feature.`
+      `${type ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Mentions automod feature.`
     );
   }
 
@@ -173,9 +154,7 @@ export default class AutomodCommand extends Command {
     });
 
     return msg.reply(
-      `${
-        t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`
-      } Invites automod feature.`
+      `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Invites automod feature.`
     );
   }
 
@@ -189,9 +168,7 @@ export default class AutomodCommand extends Command {
     });
 
     return msg.reply(
-      `${
-        t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`
-      } Dehoisting automod feature.`
+      `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Dehoisting automod feature.`
     );
   }
 
@@ -205,9 +182,7 @@ export default class AutomodCommand extends Command {
     });
 
     return msg.reply(
-      `${
-        t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`
-      } Spam automod feature.`
+      `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Spam automod feature.`
     );
   }
 
@@ -221,24 +196,15 @@ export default class AutomodCommand extends Command {
       });
 
       return msg.reply(
-        `${
-          t
-            ? `${msg.successEmote} **Enabled**`
-            : `${msg.errorEmote} **Disabled**`
-        } Raid automod feature.`
+        `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Raid automod feature.`
       );
     }
 
     const automod = await this.database.automod.get(msg.guild.id);
-    const found = await Promise.all(
-      channels.map((chanID) => this.discord.getChannel<TextChannel>(chanID))
-    );
-    const chans = found
-      .filter((c) => c !== null && c.type !== 0)
-      .map((s) => s!.id);
+    const found = await Promise.all(channels.map((chanID) => this.discord.getChannel<TextChannel>(chanID)));
+    const chans = found.filter((c) => c !== null && c.type !== 0).map((s) => s!.id);
     const result = await this.database.automod.update(msg.guild.id, {
-      whitelistChannelsDuringRaid:
-        automod!.whitelistChannelsDuringRaid.concat(chans),
+      whitelistChannelsDuringRaid: automod!.whitelistChannelsDuringRaid.concat(chans),
     });
 
     const message =

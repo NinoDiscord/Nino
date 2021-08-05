@@ -20,12 +20,7 @@
  * SOFTWARE.
  */
 
-import {
-  Command,
-  CommandMessage,
-  EmbedBuilder,
-  Subcommand,
-} from '../../structures';
+import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import type { AnyGuildChannel, TextChannel, User } from 'eris';
 import { LoggingEvents } from '../../entities/LoggingEntity';
 import { Categories } from '../../util/Constants';
@@ -93,15 +88,10 @@ export default class ModLogCommand extends Command {
 
     if (chan === null) return msg.reply(`Channel "${channel}" doesn't exist.`);
 
-    if (chan.type !== 0)
-      return msg.reply(`Channel #${chan.name} was not a text channel`);
+    if (chan.type !== 0) return msg.reply(`Channel #${chan.name} was not a text channel`);
 
     const perms = chan.permissionsOf(this.discord.client.user.id);
-    if (
-      !perms.has('sendMessages') ||
-      !perms.has('readMessages') ||
-      !perms.has('embedLinks')
-    )
+    if (!perms.has('sendMessages') || !perms.has('readMessages') || !perms.has('embedLinks'))
       return msg.reply(
         `I am missing the following permissions: **Send Messages**, **Read Messages**, and **Embed Links** in #${chan.name}.`
       );
@@ -119,9 +109,7 @@ export default class ModLogCommand extends Command {
 
     return msg.reply(
       `Logs will be shown in #${chan.name}!${
-        updateEnabled
-          ? '\n:eyes: I saw it wasn\'t enabled. So, I enabled it myself.'
-          : ''
+        updateEnabled ? "\n:eyes: I saw it wasn't enabled. So, I enabled it myself." : ''
       }`
     );
   }
@@ -133,13 +121,9 @@ export default class ModLogCommand extends Command {
     const embed = EmbedBuilder.create().setDescription([
       `• **Channels Ignored**: ${settings.ignoreChannels.length}`,
       `• **Users Ignored**: ${settings.ignoreUsers.length}`,
-      `• **Channel**: ${
-        settings.channelID !== null ? `<#${settings!.channelID}>` : 'None'
-      }`,
+      `• **Channel**: ${settings.channelID !== null ? `<#${settings!.channelID}>` : 'None'}`,
       `• **Enabled**: ${settings.enabled ? msg.successEmote : msg.errorEmote}`,
-      `• **Events**: ${
-        settings.events.map((ev) => humanizedEvents[ev]).join(', ') || 'None'
-      }`,
+      `• **Events**: ${settings.events.map((ev) => humanizedEvents[ev]).join(', ') || 'None'}`,
     ]);
 
     return msg.reply(embed);
@@ -148,8 +132,7 @@ export default class ModLogCommand extends Command {
   @Subcommand()
   async reset(msg: CommandMessage) {
     const settings = await this.database.logging.get(msg.guild.id);
-    if (!settings.channelID)
-      return msg.reply('No mod logs channel has been set.');
+    if (!settings.channelID) return msg.reply('No mod logs channel has been set.');
 
     await this.database.logging.update(msg.guild.id, {
       channelID: undefined,
@@ -165,8 +148,7 @@ export default class ModLogCommand extends Command {
     if (!event)
       return msg.reply(
         `No event was listed, here is the list:\n\n\`\`\`apache\n${LOGGING_EVENTS.map(
-          (event) =>
-            `${event} | ${msg.settings.prefixes[0]}logging event ${event}`
+          (event) => `${event} | ${msg.settings.prefixes[0]}logging event ${event}`
         ).join('\n')}\`\`\``
       );
 
@@ -190,31 +172,19 @@ export default class ModLogCommand extends Command {
     if (!LOGGING_EVENTS.includes(event))
       return msg.reply(
         `Invalid event **${event}**, here is the list:\n\n\`\`\`apache\n${LOGGING_EVENTS.map(
-          (event) =>
-            `${event} | ${msg.settings.prefixes[0]}logging event ${event}`
+          (event) => `${event} | ${msg.settings.prefixes[0]}logging event ${event}`
         ).join('\n')}\`\`\``
       );
 
     const keyedEvent = Object.values(LoggingEvents).find(
-      (val) =>
-        val ===
-        event
-          .replace('voice.', 'voice_channel_')
-          .replace('leave', 'left')
-          .replace('.', '_')
+      (val) => val === event.replace('voice.', 'voice_channel_').replace('leave', 'left').replace('.', '_')
     )!;
     const disabled = settings.events.includes(keyedEvent);
 
-    settings.events = !disabled
-      ? [...settings.events, keyedEvent]
-      : settings.events.filter((r) => r !== keyedEvent);
+    settings.events = !disabled ? [...settings.events, keyedEvent] : settings.events.filter((r) => r !== keyedEvent);
     await this.database.logging['repository'].save(settings);
 
-    return msg.reply(
-      `:thumbsup: **${
-        !disabled ? 'Enabled' : 'Disabled'
-      }** logging event \`${keyedEvent}\`.`
-    );
+    return msg.reply(`:thumbsup: **${!disabled ? 'Enabled' : 'Disabled'}** logging event \`${keyedEvent}\`.`);
   }
 
   @Subcommand('<channel | user id>')
@@ -222,9 +192,7 @@ export default class ModLogCommand extends Command {
     if (!chanOrUserId) return msg.reply('Missing a channel/user ID or mention');
 
     const settings = await this.database.logging.get(msg.guild.id);
-    const channel = await this.discord.getChannel<AnyGuildChannel>(
-      chanOrUserId
-    );
+    const channel = await this.discord.getChannel<AnyGuildChannel>(chanOrUserId);
     let user: User | null = null;
 
     try {
@@ -235,9 +203,7 @@ export default class ModLogCommand extends Command {
 
     if (channel !== null) {
       if (![0, 5].includes(channel.type))
-        return msg.reply(
-          `Channel with ID ${channel.id} was not a Text or News channel`
-        );
+        return msg.reply(`Channel with ID ${channel.id} was not a Text or News channel`);
 
       const enabled = !settings.ignoreChannels.includes(channel.id);
       settings.ignoreChannels = !settings.ignoreChannels.includes(channel.id)
@@ -246,9 +212,7 @@ export default class ModLogCommand extends Command {
       await this.database.logging['repository'].save(settings);
 
       return msg.reply(
-        `:thumbsup: ${enabled ? 'Added' : 'Deleted'} entry for channel **#${
-          channel.name
-        }** to be excluded in logging.`
+        `:thumbsup: ${enabled ? 'Added' : 'Deleted'} entry for channel **#${channel.name}** to be excluded in logging.`
       );
     }
 
@@ -260,9 +224,9 @@ export default class ModLogCommand extends Command {
       await this.database.logging['repository'].save(settings);
 
       return msg.reply(
-        `:thumbsup: ${enabled ? 'Added' : 'Deleted'} entry for user **${
-          user.username
-        }#${user.discriminator}** to be excluded in logging.`
+        `:thumbsup: ${enabled ? 'Added' : 'Deleted'} entry for user **${user.username}#${
+          user.discriminator
+        }** to be excluded in logging.`
       );
     }
 

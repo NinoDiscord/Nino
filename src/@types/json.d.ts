@@ -22,8 +22,5 @@
 
 /** */
 interface JSON {
-  parse<T>(
-    content: string,
-    reviver?: (this: any, key: string, value: any) => any
-  ): T;
+  parse<T>(content: string, reviver?: (this: any, key: string, value: any) => any): T;
 }

@@ -20,17 +20,7 @@
  * SOFTWARE.
  */
 
-import {
-  Constants,
-  Guild,
-  Member,
-  User,
-  VoiceChannel,
-  TextChannel,
-  Message,
-  Attachment,
-  DiscordRESTError,
-} from 'eris';
+import { Constants, Guild, Member, User, VoiceChannel, TextChannel, Message, Attachment, DiscordRESTError } from 'eris';
 import { Inject, Service } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
 import { EmbedBuilder } from '../structures';
@@ -97,8 +87,7 @@ interface ApplyActionOptions {
   self: Member;
 }
 
-interface ApplyGenericVoiceAction
-  extends Exclude<ApplyActionOptions, 'guild' | 'time' | 'self'> {
+interface ApplyGenericVoiceAction extends Exclude<ApplyActionOptions, 'guild' | 'time' | 'self'> {
   statement: PublishModLogOptions;
   moderator: User;
 }
@@ -167,15 +156,12 @@ export default class PunishmentService {
     return member instanceof Member
       ? member
       : member.guild.members.has(member.id)
-        ? member.guild.members.get(member.id)!
-        : rest
-          ? await this.discord.client
-            .getRESTGuildMember(member.guild.id, member.id)
-            .catch(
-              () =>
-                new Member({ id: member.id }, member.guild, this.discord.client)
-            )
-          : new Member({ id: member.id }, member.guild, this.discord.client);
+      ? member.guild.members.get(member.id)!
+      : rest
+      ? await this.discord.client
+          .getRESTGuildMember(member.guild.id, member.id)
+          .catch(() => new Member({ id: member.id }, member.guild, this.discord.client))
+      : new Member({ id: member.id }, member.guild, this.discord.client);
   }
 
   get timeouts(): TimeoutsManager {
@@ -210,10 +196,7 @@ export default class PunishmentService {
 
   async createWarning(member: Member, reason?: string, amount?: number) {
     const self = member.guild.members.get(this.discord.client.user.id)!;
-    const warnings = await this.database.warnings.getAll(
-      member.guild.id,
-      member.id
-    );
+    const warnings = await this.database.warnings.getAll(member.guild.id, member.id);
     const current = warnings.reduce((acc, curr) => acc + curr.amount, 0);
     const count = amount !== undefined ? current + amount : current + 1;
 
@@ -253,31 +236,23 @@ export default class PunishmentService {
     return results.length > 0
       ? Promise.resolve()
       : this.publishToModLog(
-        {
-          warningsAdded: amount ?? 1,
-          moderator: self.user,
-          reason,
-          victim: member.user,
-          guild: member.guild,
-          type: PunishmentEntryType.WarningAdded,
-        },
-        model
-      );
+          {
+            warningsAdded: amount ?? 1,
+            moderator: self.user,
+            reason,
+            victim: member.user,
+            guild: member.guild,
+            type: PunishmentEntryType.WarningAdded,
+          },
+          model
+        );
   }
 
-  async removeWarning(
-    member: Member,
-    reason?: string,
-    amount?: number | 'all'
-  ) {
+  async removeWarning(member: Member, reason?: string, amount?: number | 'all') {
     const self = member.guild.members.get(this.discord.client.user.id)!;
-    const warnings = await this.database.warnings.getAll(
-      member.guild.id,
-      member.id
-    );
+    const warnings = await this.database.warnings.getAll(member.guild.id, member.id);
 
-    if (warnings.length === 0)
-      throw new SyntaxError('user doesn\'t have any punishments to be removed');
+    if (warnings.length === 0) throw new SyntaxError("user doesn't have any punishments to be removed");
 
     const count = warnings.reduce((acc, curr) => acc + curr.amount, 0);
     if (amount === 'all') {
@@ -333,21 +308,11 @@ export default class PunishmentService {
     }
   }
 
-  async apply({
-    attachments,
-    moderator,
-    publish,
-    reason,
-    member,
-    soft,
-    type,
-    days,
-    time,
-  }: ApplyPunishmentOptions) {
+  async apply({ attachments, moderator, publish, reason, member, soft, type, days, time }: ApplyPunishmentOptions) {
     this.logger.info(
-      `Told to apply punishment ${type} on member ${member.id}${
-        reason ? `, with reason: ${reason}` : ''
-      }${publish ? ', publishing to modlog!' : ''}`
+      `Told to apply punishment ${type} on member ${member.id}${reason ? `, with reason: ${reason}` : ''}${
+        publish ? ', publishing to modlog!' : ''
+      }`
     );
 
     const settings = await this.database.guilds.get(member.guild.id);
@@ -360,10 +325,7 @@ export default class PunishmentService {
       return;
 
     let user!: Member;
-    if (
-      type === PunishmentType.Unban ||
-      (type === PunishmentType.Ban && member.guild.members.has(member.id))
-    ) {
+    if (type === PunishmentType.Unban || (type === PunishmentType.Ban && member.guild.members.has(member.id))) {
       user = await this.resolveMember(member, false);
     } else {
       user = await this.resolveMember(member, true);
@@ -394,9 +356,7 @@ export default class PunishmentService {
         break;
 
       case PunishmentType.Kick:
-        await user.kick(
-          reason ? encodeURIComponent(reason) : 'No reason was specified.'
-        );
+        await user.kick(reason ? encodeURIComponent(reason) : 'No reason was specified.');
         break;
 
       case PunishmentType.Mute:
@@ -413,10 +373,7 @@ export default class PunishmentService {
         break;
 
       case PunishmentType.Unban:
-        await member.guild.unbanMember(
-          member.id,
-          reason ? encodeURIComponent(reason) : 'No reason was specified.'
-        );
+        await member.guild.unbanMember(member.id, reason ? encodeURIComponent(reason) : 'No reason was specified.');
         break;
 
       case PunishmentType.Unmute:
@@ -499,22 +456,12 @@ export default class PunishmentService {
     }
   }
 
-  private async applyBan({
-    moderator,
-    reason,
-    member,
-    guild,
-    days,
-    soft,
-    time,
-  }: ApplyBanActionOptions) {
+  private async applyBan({ moderator, reason, member, guild, days, soft, time }: ApplyBanActionOptions) {
     await guild.banMember(member.id, days, reason);
     if (soft) await guild.unbanMember(member.id, reason);
     if (!soft && time !== undefined && time > 0) {
       if (this.timeouts.state !== 'connected')
-        this.logger.warn(
-          'Timeouts service is not connected! Will relay once done...'
-        );
+        this.logger.warn('Timeouts service is not connected! Will relay once done...');
 
       await this.timeouts.apply({
         moderator: moderator.id,
@@ -526,28 +473,13 @@ export default class PunishmentService {
     }
   }
 
-  private async applyUnmute({
-    settings,
-    reason,
-    member,
-    guild,
-  }: ApplyGenericMuteOptions) {
+  private async applyUnmute({ settings, reason, member, guild }: ApplyGenericMuteOptions) {
     const role = guild.roles.get(settings.mutedRoleID!)!;
     if (member.roles.includes(role.id))
-      await member.removeRole(
-        role.id,
-        reason ? encodeURIComponent(reason) : 'No reason was specified.'
-      );
+      await member.removeRole(role.id, reason ? encodeURIComponent(reason) : 'No reason was specified.');
   }
 
-  private async applyMute({
-    moderator,
-    settings,
-    reason,
-    member,
-    guild,
-    time,
-  }: ApplyGenericMuteOptions) {
+  private async applyMute({ moderator, settings, reason, member, guild, time }: ApplyGenericMuteOptions) {
     const roleID = await this.getOrCreateMutedRole(guild, settings);
 
     if (reason) reason = encodeURIComponent(reason);
@@ -557,9 +489,7 @@ export default class PunishmentService {
 
     if (time !== undefined && time > 0) {
       if (this.timeouts.state !== 'connected')
-        this.logger.warn(
-          'Timeouts service is not connected! Will relay once done...'
-        );
+        this.logger.warn('Timeouts service is not connected! Will relay once done...');
 
       await this.timeouts.apply({
         moderator: moderator.id,
@@ -571,26 +501,15 @@ export default class PunishmentService {
     }
   }
 
-  private async applyVoiceMute({
-    moderator,
-    reason,
-    member,
-    guild,
-    statement,
-    time,
-  }: ApplyGenericVoiceAction) {
+  private async applyVoiceMute({ moderator, reason, member, guild, statement, time }: ApplyGenericVoiceAction) {
     if (reason) reason = encodeURIComponent(reason);
     if (member.voiceState.channelID !== null && !member.voiceState.mute)
       await member.edit({ mute: true }, reason ?? 'No reason was specified.');
 
-    statement.channel = (await this.discord.client.getRESTChannel(
-      member.voiceState.channelID!
-    )) as VoiceChannel;
+    statement.channel = (await this.discord.client.getRESTChannel(member.voiceState.channelID!)) as VoiceChannel;
     if (time !== undefined && time > 0) {
       if (this.timeouts.state !== 'connected')
-        this.logger.warn(
-          'Timeouts service is not connected! Will relay once done...'
-        );
+        this.logger.warn('Timeouts service is not connected! Will relay once done...');
 
       await this.timeouts.apply({
         moderator: moderator.id,
@@ -602,26 +521,15 @@ export default class PunishmentService {
     }
   }
 
-  private async applyVoiceDeafen({
-    moderator,
-    reason,
-    member,
-    guild,
-    statement,
-    time,
-  }: ApplyGenericVoiceAction) {
+  private async applyVoiceDeafen({ moderator, reason, member, guild, statement, time }: ApplyGenericVoiceAction) {
     if (reason) reason = encodeURIComponent(reason);
     if (member.voiceState.channelID !== null && !member.voiceState.deaf)
       await member.edit({ deaf: true }, reason ?? 'No reason was specified.');
 
-    statement.channel = (await this.discord.client.getRESTChannel(
-      member.voiceState.channelID!
-    )) as VoiceChannel;
+    statement.channel = (await this.discord.client.getRESTChannel(member.voiceState.channelID!)) as VoiceChannel;
     if (time !== undefined && time > 0) {
       if (this.timeouts.state !== 'connected')
-        this.logger.warn(
-          'Timeouts service is not connected! Will relay once done...'
-        );
+        this.logger.warn('Timeouts service is not connected! Will relay once done...');
 
       await this.timeouts.apply({
         moderator: moderator.id,
@@ -633,32 +541,20 @@ export default class PunishmentService {
     }
   }
 
-  private async applyVoiceUnmute({
-    reason,
-    member,
-    statement,
-  }: ApplyGenericVoiceAction) {
+  private async applyVoiceUnmute({ reason, member, statement }: ApplyGenericVoiceAction) {
     if (reason) reason = encodeURIComponent(reason);
     if (member.voiceState !== undefined && member.voiceState.mute)
       await member.edit({ mute: false }, reason ?? 'No reason was specified.');
 
-    statement.channel = (await this.discord.client.getRESTChannel(
-      member.voiceState.channelID!
-    )) as VoiceChannel;
+    statement.channel = (await this.discord.client.getRESTChannel(member.voiceState.channelID!)) as VoiceChannel;
   }
 
-  private async applyVoiceUndeafen({
-    reason,
-    member,
-    statement,
-  }: ApplyGenericVoiceAction) {
+  private async applyVoiceUndeafen({ reason, member, statement }: ApplyGenericVoiceAction) {
     if (reason) reason = encodeURIComponent(reason);
     if (member.voiceState !== undefined && member.voiceState.deaf)
       await member.edit({ deaf: false }, reason ?? 'No reason was specified.');
 
-    statement.channel = (await this.discord.client.getRESTChannel(
-      member.voiceState.channelID!
-    )) as VoiceChannel;
+    statement.channel = (await this.discord.client.getRESTChannel(member.voiceState.channelID!)) as VoiceChannel;
   }
 
   private async publishToModLog(
@@ -700,9 +596,7 @@ export default class PunishmentService {
       time,
       type: stringifyDBType(caseModel.type)!,
     }).build();
-    const content = `**[** ${emojis[type] ?? ':question:'} **~** Case #**${
-      caseModel.index
-    }** (${type}) ]`;
+    const content = `**[** ${emojis[type] ?? ':question:'} **~** Case #**${caseModel.index}** (${type}) ]`;
     const message = await modlog.createMessage({
       embed,
       content,
@@ -714,27 +608,17 @@ export default class PunishmentService {
   }
 
   async editModLog(model: CaseEntity, message: Message) {
-    const warningRemovedField = message.embeds[0].fields?.find((field) =>
-      field.name.includes('Warnings Removed')
-    );
-    const warningsAddField = message.embeds[0].fields?.find((field) =>
-      field.name.includes('Warnings Added')
-    );
+    const warningRemovedField = message.embeds[0].fields?.find((field) => field.name.includes('Warnings Removed'));
+    const warningsAddField = message.embeds[0].fields?.find((field) => field.name.includes('Warnings Added'));
 
     const obj: Record<string, any> = {};
-    if (warningsAddField !== undefined)
-      obj.warningsAdded = Number(warningsAddField.value);
+    if (warningsAddField !== undefined) obj.warningsAdded = Number(warningsAddField.value);
 
     if (warningRemovedField !== undefined)
-      obj.warningsRemoved =
-        warningRemovedField.value === 'All'
-          ? 'All'
-          : Number(warningRemovedField.value);
+      obj.warningsRemoved = warningRemovedField.value === 'All' ? 'All' : Number(warningRemovedField.value);
 
     return message.edit({
-      content: `**[** ${
-        emojis[stringifyDBType(model.type)!] ?? ':question:'
-      } ~ Case #**${model.index}** (${
+      content: `**[** ${emojis[stringifyDBType(model.type)!] ?? ':question:'} ~ Case #**${model.index}** (${
         stringifyDBType(model.type) ?? '... unknown ...'
       }) **]**`,
       embed: this.getModLogEmbed(model.index, {
@@ -768,15 +652,11 @@ export default class PunishmentService {
 
       muteRole = role.id;
 
-      const topRole = Permissions.getTopRole(
-        guild.members.get(this.discord.client.user.id)!
-      );
+      const topRole = Permissions.getTopRole(guild.members.get(this.discord.client.user.id)!);
       if (topRole !== undefined) {
         await role.editPosition(topRole.position - 1);
         for (const channel of guild.channels.values()) {
-          const permissions = channel.permissionsOf(
-            this.discord.client.user.id
-          );
+          const permissions = channel.permissionsOf(this.discord.client.user.id);
           if (permissions.has('manageChannels'))
             await channel.editPermission(
               /* overwriteID */ role.id,
@@ -795,16 +675,7 @@ export default class PunishmentService {
 
   getModLogEmbed(
     caseID: number,
-    {
-      warningsRemoved,
-      warningsAdded,
-      attachments,
-      moderator,
-      channel,
-      reason,
-      victim,
-      time,
-    }: PublishModLogOptions
+    { warningsRemoved, warningsAdded, attachments, moderator, channel, reason, victim, time }: PublishModLogOptions
   ) {
     const embed = new EmbedBuilder()
       .setColor(0xdaa2c6)
@@ -813,11 +684,7 @@ export default class PunishmentService {
         undefined,
         victim.dynamicAvatarURL('png', 1024)
       )
-      .addField(
-        '• Moderator',
-        `${moderator.username}#${moderator.discriminator} (${moderator.id})`,
-        true
-      );
+      .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${moderator.id})`, true);
 
     const _reason =
       reason !== undefined
@@ -828,29 +695,16 @@ export default class PunishmentService {
       • No reason was provided. Use \`reason ${caseID} <reason>\` to update it!
     `;
 
-    const _attachments =
-      attachments
-        ?.map((url, index) => `• [**\`Attachment #${index}\`**](${url})`)
-        .join('\n') ?? '';
+    const _attachments = attachments?.map((url, index) => `• [**\`Attachment #${index}\`**](${url})`).join('\n') ?? '';
 
     embed.setDescription([_reason, _attachments]);
 
     if (warningsRemoved !== undefined)
-      embed.addField(
-        '• Warnings Removed',
-        warningsRemoved === 'all' ? 'All' : warningsRemoved.toString(),
-        true
-      );
+      embed.addField('• Warnings Removed', warningsRemoved === 'all' ? 'All' : warningsRemoved.toString(), true);
 
-    if (warningsAdded !== undefined)
-      embed.addField('• Warnings Added', warningsAdded.toString(), true);
+    if (warningsAdded !== undefined) embed.addField('• Warnings Added', warningsAdded.toString(), true);
 
-    if (channel !== undefined)
-      embed.addField(
-        '• Voice Channel',
-        `${channel.name} (${channel.id})`,
-        true
-      );
+    if (channel !== undefined) embed.addField('• Voice Channel', `${channel.name} (${channel.id})`, true);
 
     if (time !== undefined || time !== null) {
       try {

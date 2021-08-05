@@ -59,19 +59,18 @@ export default abstract class NinoCommand {
       typeof info.userPermissions === 'string'
         ? [info.userPermissions]
         : Array.isArray(info.userPermissions)
-          ? info.userPermissions
-          : [];
+        ? info.userPermissions
+        : [];
 
     this.botPermissions =
       typeof info.botPermissions === 'string'
         ? [info.botPermissions]
         : Array.isArray(info.botPermissions)
-          ? info.botPermissions
-          : [];
+        ? info.botPermissions
+        : [];
 
     this.description =
-      (info.description as unknown as ObjectKeysWithSeperator<LocalizationStrings>) ??
-      'descriptions.unknown';
+      (info.description as unknown as ObjectKeysWithSeperator<LocalizationStrings>) ?? 'descriptions.unknown';
     this.ownerOnly = info.ownerOnly ?? false;
     this.examples = info.examples ?? [];
     this.category = info.category ?? Categories.Core;
@@ -87,12 +86,8 @@ export default abstract class NinoCommand {
   }
 
   get format() {
-    const subcommands = this.subcommands
-      .map((sub) => `[${sub.name} ${sub.usage.trim()}]`.trim())
-      .join(' | ');
-    return `${this.name}${
-      this.usage !== '' ? ` ${this.usage.trim()}` : ''
-    } ${subcommands}`;
+    const subcommands = this.subcommands.map((sub) => `[${sub.name} ${sub.usage.trim()}]`.trim()).join(' | ');
+    return `${this.name}${this.usage !== '' ? ` ${this.usage.trim()}` : ''} ${subcommands}`;
   }
 
   abstract run(msg: CommandMessage, ...args: any[]): any;

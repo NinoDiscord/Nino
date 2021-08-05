@@ -62,29 +62,19 @@ export default class VoiceKickCommand extends Command {
   async run(msg: CommandMessage, [channelOrAmount]: [string?]) {
     if (!channelOrAmount) {
       const message = await msg.reply('Kicking all members...');
-      if (!msg.member.voiceState.channelID)
-        return msg.reply('You must be in a voice channel.');
+      if (!msg.member.voiceState.channelID) return msg.reply('You must be in a voice channel.');
 
       const id = msg.member.voiceState.channelID; // cache it if they decide to leave
       const voiceChan = await this.discord.getChannel<VoiceChannel>(id);
-      if (voiceChan === null)
-        return msg.error('Unknown voice channel you\'re in.');
+      if (voiceChan === null) return msg.error("Unknown voice channel you're in.");
 
       if (
-        !voiceChan
-          .permissionsOf(this.discord.client.user.id)
-          .has('voiceConnect') ||
-        !voiceChan
-          .permissionsOf(this.discord.client.user.id)
-          .has('voiceMoveMembers')
+        !voiceChan.permissionsOf(this.discord.client.user.id).has('voiceConnect') ||
+        !voiceChan.permissionsOf(this.discord.client.user.id).has('voiceMoveMembers')
       )
-        return msg.reply(
-          'I do not have permissions to **Connect** or **Move Members**.'
-        );
+        return msg.reply('I do not have permissions to **Connect** or **Move Members**.');
 
-      const members = voiceChan.voiceMembers.filter((c) =>
-        condition(this.discord, c)
-      );
+      const members = voiceChan.voiceMembers.filter((c) => condition(this.discord, c));
       if (members.length === 0)
         return msg.error(
           'No users were in this channel. (excluding myself, the owner, and people with **`Voice Mute Members`** permission)'
@@ -100,9 +90,7 @@ export default class VoiceKickCommand extends Command {
             )
           );
         } catch {
-          return msg.error(
-            `Unable to kick **${members[0].username}#${members[0].discriminator}**.`
-          );
+          return msg.error(`Unable to kick **${members[0].username}#${members[0].discriminator}**.`);
         }
       }
 
@@ -116,9 +104,7 @@ export default class VoiceKickCommand extends Command {
           success++;
           await member.edit(
             { channelID: null },
-            encodeURIComponent(
-              `[Voice Kick] Told to kick ${member.username}#${member.discriminator} (${member.id})`
-            )
+            encodeURIComponent(`[Voice Kick] Told to kick ${member.username}#${member.discriminator} (${member.id})`)
           );
         } catch {
           errored++;
@@ -140,31 +126,21 @@ export default class VoiceKickCommand extends Command {
       );
     }
 
-    const channel = await this.discord.getChannel<VoiceChannel>(
-      channelOrAmount
-    );
+    const channel = await this.discord.getChannel<VoiceChannel>(channelOrAmount);
 
     // if I can recall correctly, IDs are around 15-21 but I could be wrong.
     //     ~ Noel
-    if (channel === null)
-      return msg.reply(`Channel with ID **${channelOrAmount}** was not found.`);
+    if (channel === null) return msg.reply(`Channel with ID **${channelOrAmount}** was not found.`);
 
-    if (channel.type !== 2)
-      return msg.reply('Channel was not a voice channel.');
+    if (channel.type !== 2) return msg.reply('Channel was not a voice channel.');
 
     if (
       !channel.permissionsOf(this.discord.client.user.id).has('voiceConnect') ||
-      !channel
-        .permissionsOf(this.discord.client.user.id)
-        .has('voiceMoveMembers')
+      !channel.permissionsOf(this.discord.client.user.id).has('voiceMoveMembers')
     )
-      return msg.reply(
-        'I do not have permissions to **Connect** or **Move Members**.'
-      );
+      return msg.reply('I do not have permissions to **Connect** or **Move Members**.');
 
-    const members = channel.voiceMembers.filter((c) =>
-      condition(this.discord, c)
-    );
+    const members = channel.voiceMembers.filter((c) => condition(this.discord, c));
     if (members.length === 0)
       return msg.error(
         'No users were in this channel. (excluding myself, the owner, and people with **`Voice Mute Members`** permission)'
@@ -180,15 +156,11 @@ export default class VoiceKickCommand extends Command {
           )
         );
       } catch {
-        return msg.error(
-          `Unable to kick **${members[0].username}#${members[0].discriminator}**.`
-        );
+        return msg.error(`Unable to kick **${members[0].username}#${members[0].discriminator}**.`);
       }
     }
 
-    const message = await msg.reply(
-      `ℹ️ Kicking all members in <#${channel.id}> (${members.length} members)`
-    );
+    const message = await msg.reply(`ℹ️ Kicking all members in <#${channel.id}> (${members.length} members)`);
     await this.discord.client.joinVoiceChannel(channel.id);
 
     let success = 0;
@@ -198,9 +170,7 @@ export default class VoiceKickCommand extends Command {
         success++;
         await member.edit(
           { channelID: null },
-          encodeURIComponent(
-            `[Voice Kick] Told to kick ${member.username}#${member.discriminator} (${member.id})`
-          )
+          encodeURIComponent(`[Voice Kick] Told to kick ${member.username}#${member.discriminator} (${member.id})`)
         );
       } catch {
         errored++;
@@ -226,31 +196,20 @@ export default class VoiceKickCommand extends Command {
   async bots(msg: CommandMessage, [channelOrAmount]: [string?]) {
     if (!channelOrAmount) {
       const message = await msg.reply('Kicking all bots...');
-      if (!msg.member.voiceState.channelID)
-        return msg.reply('You must be in a voice channel.');
+      if (!msg.member.voiceState.channelID) return msg.reply('You must be in a voice channel.');
 
       const id = msg.member.voiceState.channelID; // cache it if they decide to leave
       const voiceChan = await this.discord.getChannel<VoiceChannel>(id);
-      if (voiceChan === null)
-        return msg.error('Unknown voice channel you\'re in.');
+      if (voiceChan === null) return msg.error("Unknown voice channel you're in.");
 
       if (
-        !voiceChan
-          .permissionsOf(this.discord.client.user.id)
-          .has('voiceConnect') ||
-        !voiceChan
-          .permissionsOf(this.discord.client.user.id)
-          .has('voiceMoveMembers')
+        !voiceChan.permissionsOf(this.discord.client.user.id).has('voiceConnect') ||
+        !voiceChan.permissionsOf(this.discord.client.user.id).has('voiceMoveMembers')
       )
-        return msg.reply(
-          'I do not have permissions to **Connect** or **Move Members**.'
-        );
+        return msg.reply('I do not have permissions to **Connect** or **Move Members**.');
 
-      const members = voiceChan.voiceMembers.filter((c) =>
-        botCondition(this.discord, c)
-      );
-      if (members.length === 0)
-        return msg.error('No bots were in this channel. (excluding myself)');
+      const members = voiceChan.voiceMembers.filter((c) => botCondition(this.discord, c));
+      if (members.length === 0) return msg.error('No bots were in this channel. (excluding myself)');
 
       if (members.length === 1) {
         await this.discord.client.joinVoiceChannel(id);
@@ -262,9 +221,7 @@ export default class VoiceKickCommand extends Command {
             )
           );
         } catch {
-          return msg.error(
-            `Unable to kick bot **${members[0].username}#${members[0].discriminator}**.`
-          );
+          return msg.error(`Unable to kick bot **${members[0].username}#${members[0].discriminator}**.`);
         }
       }
 
@@ -278,9 +235,7 @@ export default class VoiceKickCommand extends Command {
           success++;
           await member.edit(
             { channelID: null },
-            encodeURIComponent(
-              `[Voice Kick] Told to kick ${member.username}#${member.discriminator} (${member.id})`
-            )
+            encodeURIComponent(`[Voice Kick] Told to kick ${member.username}#${member.discriminator} (${member.id})`)
           );
         } catch {
           errored++;
@@ -302,31 +257,21 @@ export default class VoiceKickCommand extends Command {
       );
     }
 
-    const channel = await this.discord.getChannel<VoiceChannel>(
-      channelOrAmount
-    );
+    const channel = await this.discord.getChannel<VoiceChannel>(channelOrAmount);
 
     // if I can recall correctly, IDs are around 15-21 but I could be wrong.
     //     ~ Noel
-    if (channel === null)
-      return msg.reply(`Channel with ID **${channelOrAmount}** was not found.`);
+    if (channel === null) return msg.reply(`Channel with ID **${channelOrAmount}** was not found.`);
 
-    if (channel.type !== 2)
-      return msg.reply('Channel was not a voice channel.');
+    if (channel.type !== 2) return msg.reply('Channel was not a voice channel.');
 
     if (
       !channel.permissionsOf(this.discord.client.user.id).has('voiceConnect') ||
-      !channel
-        .permissionsOf(this.discord.client.user.id)
-        .has('voiceMoveMembers')
+      !channel.permissionsOf(this.discord.client.user.id).has('voiceMoveMembers')
     )
-      return msg.reply(
-        'I do not have permissions to **Connect** or **Move Members**.'
-      );
+      return msg.reply('I do not have permissions to **Connect** or **Move Members**.');
 
-    const members = channel.voiceMembers.filter((c) =>
-      botCondition(this.discord, c)
-    );
+    const members = channel.voiceMembers.filter((c) => botCondition(this.discord, c));
     if (members.length === 0)
       return msg.error(
         'No users were in this channel. (excluding myself, the owner, and people with **`Voice Mute Members`** permission)'
@@ -342,15 +287,11 @@ export default class VoiceKickCommand extends Command {
           )
         );
       } catch {
-        return msg.error(
-          `Unable to kick **${members[0].username}#${members[0].discriminator}**.`
-        );
+        return msg.error(`Unable to kick **${members[0].username}#${members[0].discriminator}**.`);
       }
     }
 
-    const message = await msg.reply(
-      `ℹ️ Kicking all members in <#${channel.id}> (${members.length} members)`
-    );
+    const message = await msg.reply(`ℹ️ Kicking all members in <#${channel.id}> (${members.length} members)`);
     await this.discord.client.joinVoiceChannel(channel.id);
 
     let success = 0;
@@ -360,9 +301,7 @@ export default class VoiceKickCommand extends Command {
         success++;
         await member.edit(
           { channelID: null },
-          encodeURIComponent(
-            `[Voice Kick] Told to kick ${member.username}#${member.discriminator} (${member.id})`
-          )
+          encodeURIComponent(`[Voice Kick] Told to kick ${member.username}#${member.discriminator} (${member.id})`)
         );
       } catch {
         errored++;

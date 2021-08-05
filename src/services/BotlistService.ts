@@ -50,9 +50,7 @@ export default class BotlistsService {
   async load() {
     const botlists = this.config.getProperty('botlists');
     if (botlists === undefined) {
-      this.logger.warn(
-        '`botlists` is missing, don\'t need to add it if running privately.'
-      );
+      this.logger.warn("`botlists` is missing, don't need to add it if running privately.");
       return Promise.resolve();
     }
 
@@ -66,13 +64,7 @@ export default class BotlistsService {
 
   async post() {
     const list: {
-      name:
-      | 'Discord Services'
-      | 'Discord Boats'
-      | 'Discord Bots'
-      | 'top.gg'
-      | 'Delly'
-      | 'Bots for Discord';
+      name: 'Discord Services' | 'Discord Boats' | 'Discord Bots' | 'top.gg' | 'Delly' | 'Bots for Discord';
       success: boolean;
       data: Record<string, any>;
     }[] = [];
@@ -95,7 +87,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dservices,
+            'Authorization': botlists.dservices,
           },
         })
         .then((res) => {
@@ -106,9 +98,7 @@ export default class BotlistsService {
             data: res.json(),
           });
         })
-        .catch((ex) =>
-          this.logger.warn('Unable to parse JSON [discordservices.net]:', ex)
-        );
+        .catch((ex) => this.logger.warn('Unable to parse JSON [discordservices.net]:', ex));
     }
 
     if (botlists.dboats !== undefined) {
@@ -123,7 +113,7 @@ export default class BotlistsService {
           url: `https://discord.boats/api/bot/${this.discord.client.user.id}`,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dboats,
+            'Authorization': botlists.dboats,
           },
         })
         .then((res) => {
@@ -134,9 +124,7 @@ export default class BotlistsService {
             data: res.json(),
           });
         })
-        .catch((ex) =>
-          this.logger.warn('Unable to parse JSON [discord.boats]:', ex)
-        );
+        .catch((ex) => this.logger.warn('Unable to parse JSON [discord.boats]:', ex));
     }
 
     if (botlists.dbots !== undefined) {
@@ -152,7 +140,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dbots,
+            'Authorization': botlists.dbots,
           },
         })
         .then((res) => {
@@ -163,9 +151,7 @@ export default class BotlistsService {
             data: res.json(),
           });
         })
-        .catch((ex) =>
-          this.logger.warn('Unable to parse JSON [discord.bots.gg]:', ex)
-        );
+        .catch((ex) => this.logger.warn('Unable to parse JSON [discord.bots.gg]:', ex));
     }
 
     if (botlists.topgg !== undefined) {
@@ -181,7 +167,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.topgg,
+            'Authorization': botlists.topgg,
           },
         })
         .then((res) => {
@@ -209,7 +195,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.delly,
+            'Authorization': botlists.delly,
           },
         })
         .then((res) => {
@@ -235,7 +221,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.bfd,
+            'Authorization': botlists.bfd,
           },
         })
         .then((res) => {
@@ -246,9 +232,7 @@ export default class BotlistsService {
             data: res.json(),
           });
         })
-        .catch((ex) =>
-          this.logger.warn('Unable to parse JSON [Bots for Discord]:', ex)
-        );
+        .catch((ex) => this.logger.warn('Unable to parse JSON [Bots for Discord]:', ex));
     }
 
     const successRate = ((success / list.length) * 100).toFixed(2);
@@ -260,10 +244,7 @@ export default class BotlistsService {
     );
 
     for (const botlist of list) {
-      this.logger.info(
-        `${botlist.success ? '✔' : '❌'} ${botlist.name}`,
-        botlist.data
-      );
+      this.logger.info(`${botlist.success ? '✔' : '❌'} ${botlist.name}`, botlist.data);
     }
   }
 }

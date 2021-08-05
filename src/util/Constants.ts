@@ -42,9 +42,7 @@ export const commitHash: string | null = (() => {
 })();
 
 export const SHORT_LINKS = JSON.parse<string[]>(
-  readFileSync(join(process.cwd(), '..', 'assets', 'shortlinks.json'), 'utf8')
-    .split(/\n\r?/)
-    .join('\n')
+  readFileSync(join(process.cwd(), '..', 'assets', 'shortlinks.json'), 'utf8').split(/\n\r?/).join('\n')
 );
 export const Color = 0xdaa2c6;
 

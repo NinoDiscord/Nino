@@ -31,15 +31,9 @@ const app = new Container({
   singletons: [http, logger],
 });
 
-app.on('onBeforeChildInit', (cls, child) =>
-  logger.debug(`>> ${cls.name}->${child.constructor.name}: initializing...`)
-);
-app.on('onAfterChildInit', (cls, child) =>
-  logger.debug(`>> ✔ ${cls.name}->${child.constructor.name}: initialized`)
-);
-app.on('onBeforeInit', (cls) =>
-  logger.debug(`>> ${cls.name}: initializing...`)
-);
+app.on('onBeforeChildInit', (cls, child) => logger.debug(`>> ${cls.name}->${child.constructor.name}: initializing...`));
+app.on('onAfterChildInit', (cls, child) => logger.debug(`>> ✔ ${cls.name}->${child.constructor.name}: initialized`));
+app.on('onBeforeInit', (cls) => logger.debug(`>> ${cls.name}: initializing...`));
 app.on('onAfterInit', (cls) => logger.debug(`>> ✔ ${cls.name}: initialized`));
 app.on('debug', (message) => logger.debug(`lilith: ${message}`));
 
