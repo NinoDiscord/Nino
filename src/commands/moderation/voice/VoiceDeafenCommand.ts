@@ -40,7 +40,7 @@ export default class VoiceDeafenCommand extends Command {
   constructor() {
     super({
       userPermissions: 'voiceMuteMembers',
-      description: 'descriptions.voice_deaf',
+      description: 'descriptions.voice_deafen',
       category: Categories.Moderation,
       examples: ['vcdeaf <@256548545856545896>', 'vcdeaf 3', 'vcdeaf 3 some reason!', 'vcdeaf 3 some reason! | 3d'],
       aliases: ['deafvc', 'vcdeaf'],

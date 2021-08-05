@@ -37,13 +37,15 @@
       "voice_deafen": "Deafens a person in the voice channel you're in.",
       "voice_undeafen": "Undeafens a person in the voice channel you're in.",
       "voice_unmute": "Unmutes a person in the voice channel you're in.",
+      "voice_kick": "Kicks any member(s) or bot(s) in a voice channel you're in.",
 
       "automod": "Enables, disables, or views any automod utility available.",
       "logging": "Enables or disable the Logging feature.",
       "modlog": "Set or reset the mod log channel.",
       "muted_role": "Sets or resets the Muted role.",
       "prefix": "View, change, or reset a guild or user prefix.",
-      "punishments": "View, change, or remove a guild punishment."
+      "punishments": "View, change, or remove a guild punishment.",
+      "settings": "Views a list of all the settings in this guild."
     },
     "commands": {
       "help": {

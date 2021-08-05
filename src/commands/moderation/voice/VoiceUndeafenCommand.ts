@@ -39,7 +39,7 @@ export default class VoiceUndeafenCommand extends Command {
 
   constructor() {
     super({
-      description: 'descriptions.voice_undeaf',
+      description: 'descriptions.voice_undeafen',
       category: Categories.Moderation,
       examples: ['vcundeaf <@256548545856545896>', 'vcundeaf 3 some reason!'],
       aliases: ['undeafvc'],

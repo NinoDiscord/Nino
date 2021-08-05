@@ -41,6 +41,7 @@ import Discord from './components/Discord';
 import Sentry from './components/Sentry';
 import logger from './singletons/Logger';
 import app from './container';
+import Api from './api/API';
 import ts from 'typescript';
 
 (async () => {
@@ -53,6 +54,7 @@ import ts from 'typescript';
     // call patch before container load
     await import('./util/ErisPatch');
     await app.load();
+    await app.addComponent(Api);
   } catch (ex) {
     logger.fatal('Unable to load container');
     console.error(ex);

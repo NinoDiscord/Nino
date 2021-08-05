@@ -149,7 +149,7 @@ export default class Config {
       ksoft: config.ksoft,
       redis: config.redis,
       token: config.token,
-      api: false,
+      api: config.api,
     };
 
     if (this.config.token === '-- replace me --')
