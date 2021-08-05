@@ -45,9 +45,5 @@ declare namespace Reflect {
    * @param propertyKey The property key for the target.
    * @returns The metadata value for the metadata key if found; otherwise, `undefined`.
    */
-  function getMetadata<T>(
-    metadataKey: any,
-    target: any,
-    propertyKey: string | symbol
-  ): T;
+  function getMetadata<T>(metadataKey: any, target: any, propertyKey: string | symbol): T;
 }

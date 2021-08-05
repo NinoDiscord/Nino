@@ -29,9 +29,7 @@ export class initialization1617170164138 implements MigrationInterface {
     await queryRunner.query(
       'CREATE TABLE "automod" ("blacklistWords" text array NOT NULL, "blacklist" boolean NOT NULL DEFAULT false, "mentions" boolean NOT NULL DEFAULT false, "invites" boolean NOT NULL DEFAULT false, "dehoist" boolean NOT NULL DEFAULT false, "guild_id" character varying NOT NULL, "spam" boolean NOT NULL DEFAULT false, "raid" boolean NOT NULL DEFAULT false, CONSTRAINT "PK_8592ba75741fd8ff52adde5de53" PRIMARY KEY ("guild_id"))'
     );
-    await queryRunner.query(
-      'CREATE TYPE "blacklists_type_enum" AS ENUM(\'0\', \'1\')'
-    );
+    await queryRunner.query('CREATE TYPE "blacklists_type_enum" AS ENUM(\'0\', \'1\')');
     await queryRunner.query(
       'CREATE TABLE "blacklists" ("reason" character varying, "issuer" character varying NOT NULL, "type" "blacklists_type_enum" NOT NULL, "id" character varying NOT NULL, CONSTRAINT "PK_69894f41b74b226aae9ea763bc2" PRIMARY KEY ("id"))'
     );

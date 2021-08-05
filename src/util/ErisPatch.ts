@@ -33,12 +33,7 @@ Object.defineProperty(User.prototype, 'tag', {
 
   set: () => {
     throw new TypeError('cannot set user tags :(');
-  }
+  },
 });
 
-logger.info(
-  'Monkey patched the following items:',
-  [
-    'User#tag'
-  ].join('\n')
-);
+logger.info('Monkey patched the following items:', ['User#tag'].join('\n'));

@@ -51,16 +51,7 @@ export default class CasesController {
     return this.repository.find({ guildID });
   }
 
-  async create({
-    attachments,
-    moderatorID,
-    victimID,
-    guildID,
-    reason,
-    soft,
-    time,
-    type,
-  }: CreateCaseOptions) {
+  async create({ attachments, moderatorID, victimID, guildID, reason, soft, time, type }: CreateCaseOptions) {
     const cases = await this.getAll(guildID);
     const index = (cases[cases.length - 1]?.index ?? 0) + 1;
 
@@ -80,11 +71,7 @@ export default class CasesController {
     return this.repository.save(entry);
   }
 
-  update(
-    guildID: string,
-    index: number,
-    values: QueryDeepPartialEntity<CaseEntity>
-  ) {
+  update(guildID: string, index: number, values: QueryDeepPartialEntity<CaseEntity>) {
     return this.database.connection
       .createQueryBuilder()
       .update(CaseEntity)

@@ -41,12 +41,7 @@ export default class Dehoisting implements Automod {
 
     if (member.nick === null) return false;
 
-    if (
-      !member.guild.members
-        .get(this.discord.client.user.id)
-        ?.permissions.has('manageNicknames')
-    )
-      return false;
+    if (!member.guild.members.get(this.discord.client.user.id)?.permissions.has('manageNicknames')) return false;
 
     if (member.nick[0] < '0') {
       const origin = member.nick;

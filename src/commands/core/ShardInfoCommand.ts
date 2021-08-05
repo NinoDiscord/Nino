@@ -62,12 +62,8 @@ export default class ShardInfoCommand extends Command {
     const shards = this.discord.client.shards.map<ShardInfo>((shard) => ({
       current: msg.guild.shard.id === shard.id,
       status: shard.status,
-      guilds: this.discord.client.guilds.filter(
-        (guild) => guild.shard.id === shard.id
-      ).length,
-      users: this.discord.client.guilds
-        .filter((guild) => guild.shard.id === shard.id)
-        .reduce((a, b) => a + b.memberCount, 0),
+      guilds: this.discord.client.guilds.filter((guild) => guild.shard.id === shard.id).length,
+      users: this.discord.client.guilds.filter((guild) => guild.shard.id === shard.id).reduce((a, b) => a + b.memberCount, 0),
       heart: hearts[shard.status],
       id: shard.id,
     }));
@@ -76,9 +72,7 @@ export default class ShardInfoCommand extends Command {
       shards.map((shard) => ({
         name: `❯ Shard #${shard.id}`,
         value: [
-          `${shard.heart} **${firstUpper(shard.status)}**${
-            shard.current ? ' (current)' : ''
-          }`,
+          `${shard.heart} **${firstUpper(shard.status)}**${shard.current ? ' (current)' : ''}`,
           '',
           `• **Guilds**: ${shard.guilds}`,
           `• **Users**: ${shard.users}`,

@@ -20,12 +20,20 @@
  * SOFTWARE.
  */
 
-const { default: PunishmentsEntity } = require('../../build/entities/PunishmentsEntity');
-const { default: AutomodEntity } = require('../../build/entities/AutomodEntity');
+const {
+  default: PunishmentsEntity,
+} = require('../../build/entities/PunishmentsEntity');
+const {
+  default: AutomodEntity,
+} = require('../../build/entities/AutomodEntity');
 const { default: CaseEntity } = require('../../build/entities/CaseEntity');
 const { default: GuildEntity } = require('../../build/entities/GuildEntity');
-const { default: WarningsEntity } = require('../../build/entities/WarningsEntity');
-const { default: LoggingEntity } = require('../../build/entities/LoggingEntity');
+const {
+  default: WarningsEntity,
+} = require('../../build/entities/WarningsEntity');
+const {
+  default: LoggingEntity,
+} = require('../../build/entities/LoggingEntity');
 const { default: UserEntity } = require('../../build/entities/UserEntity');
 
 /**
@@ -39,5 +47,5 @@ module.exports = (connection) => ({
   automod: connection.getRepository(AutomodEntity),
   guilds: connection.getRepository(GuildEntity),
   cases: connection.getRepository(CaseEntity),
-  users: connection.getRepository(UserEntity)
+  users: connection.getRepository(UserEntity),
 });

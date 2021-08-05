@@ -13,9 +13,9 @@ const config = parse({
     DATABASE_PORT: 'int',
     NODE_ENV: {
       type: 'string',
-      default: ['development', 'production']
-    }
-  }
+      default: ['development', 'production'],
+    },
+  },
 });
 
 module.exports = {
@@ -30,6 +30,6 @@ module.exports = {
   port: config.DATABASE_PORT,
 
   cli: {
-    migrationsDir: 'src/migrations'
-  }
+    migrationsDir: 'src/migrations',
+  },
 };

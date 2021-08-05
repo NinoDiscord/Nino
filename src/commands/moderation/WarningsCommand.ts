@@ -52,9 +52,7 @@ export default class WarningsCommand extends Command {
       user = await this.discord.getUser(userID);
     } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10013)
-        return msg.reply(
-          `User with ID "${userID}" was not found. (assuming it's a deleted user)`
-        );
+        return msg.reply(`User with ID "${userID}" was not found. (assuming it's a deleted user)`);
 
       return msg.reply(
         [
@@ -70,48 +68,31 @@ export default class WarningsCommand extends Command {
 
     if (user === null) return msg.reply('Bot or user was not found.');
 
-    if (!msg.guild.members.has(user.id))
-      return msg.reply('Cannot view warnings outside of this guild.');
+    if (!msg.guild.members.has(user.id)) return msg.reply('Cannot view warnings outside of this guild.');
 
     if (user.bot) return msg.reply('Bots cannot be warned.');
 
     const member = msg.guild.members.get(user.id)!;
-    if (member.id === msg.guild.ownerID)
-      return msg.reply('Why would the server owner have any warnings...?');
+    if (member.id === msg.guild.ownerID) return msg.reply('Why would the server owner have any warnings...?');
 
-    if (member.id === this.discord.client.user.id)
-      return msg.reply('W-why would I have any warnings?!');
+    if (member.id === this.discord.client.user.id) return msg.reply('W-why would I have any warnings?!');
 
-    if (
-      member.permissions.has('administrator') ||
-      member.permissions.has('banMembers')
-    )
-      return msg.reply(
-        'Moderators or administrators don\'t have warnings attached to them.'
-      );
+    if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
+      return msg.reply('Moderators or administrators don\'t have warnings attached to them.');
 
     const warnings = await this.database.warnings
       .getAll(msg.guild.id, user.id)
       .then((warnings) => warnings.filter((warn) => warn.amount > 0));
     if (warnings.length === 0)
-      return msg.reply(
-        `User **${user.username}#${user.discriminator}** doesn't have any warnings attached to them.`
-      );
+      return msg.reply(`User **${user.username}#${user.discriminator}** doesn't have any warnings attached to them.`);
 
     const embed = EmbedBuilder.create()
-      .setTitle(
-        `[ ${user.username}#${user.discriminator} (${user.id}) <~> Warnings ]`
-      )
-      .setDescription(
-        `They have a total of **${warnings.length}** warnings attached`
-      )
+      .setTitle(`[ ${user.username}#${user.discriminator} (${user.id}) <~> Warnings ]`)
+      .setDescription(`They have a total of **${warnings.length}** warnings attached`)
       .addFields(
         warnings.map((warn, idx) => ({
           name: `❯ Warning #${idx + 1}`,
-          value: [
-            `• **Amount**: ${warn.amount}`,
-            `• **Reason**: ${warn.reason ?? '(no reason was provided)'}`,
-          ].join('\n'),
+          value: [`• **Amount**: ${warn.amount}`, `• **Reason**: ${warn.reason ?? '(no reason was provided)'}`].join('\n'),
           inline: true,
         }))
       );

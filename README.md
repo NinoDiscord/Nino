@@ -86,8 +86,8 @@ $ npm start
 ### Migrating from v0.x -> v1.x
 If you used v0.x in the past, this is the process on how to migrate:
 
-1. Run `rei convert ...` to convert the documents into JSON, this process should take a while if there is a lot of cases or warnings.
-2. Run `node scripts/migrate.js <directory>`, where `<directory>` is the directory Rei converted your database to.
+- Run `rei convert ...` to convert the documents into JSON, this process should take a while if there is a lot of cases or warnings.
+- Run `node scripts/migrate.js <directory>`, where `<directory>` is the directory Rei converted your database to.
 
 ## Example `config.yml` file
 - Replace `<discord token>` with your Discord bot's token

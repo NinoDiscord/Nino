@@ -27,8 +27,7 @@ interface Subscription {
   event: string;
 }
 
-export const getSubscriptionsIn = (target: any) =>
-  Reflect.getMetadata<Subscription[]>(MetadataKeys.Subscribe, target) ?? [];
+export const getSubscriptionsIn = (target: any) => Reflect.getMetadata<Subscription[]>(MetadataKeys.Subscribe, target) ?? [];
 export default function Subscribe(event: string): MethodDecorator {
   return (target, _, descriptor: TypedPropertyDescriptor<any>) => {
     const subscriptions = getSubscriptionsIn(target);

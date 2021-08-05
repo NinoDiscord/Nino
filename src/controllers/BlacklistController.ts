@@ -62,11 +62,6 @@ export default class BlacklistController {
   }
 
   update(id: string, values: QueryDeepPartialEntity<BlacklistEntity>) {
-    return this.database.connection
-      .createQueryBuilder()
-      .update(BlacklistEntity)
-      .set(values)
-      .where('id = :id', { id })
-      .execute();
+    return this.database.connection.createQueryBuilder().update(BlacklistEntity).set(values).where('id = :id', { id }).execute();
   }
 }

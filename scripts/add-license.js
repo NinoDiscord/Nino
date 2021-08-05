@@ -48,12 +48,12 @@ const LICENSE = `/**
 
 `;
 
-const main = async() => {
+const main = async () => {
   console.log('adding licenses at the top of files...');
   const files = await Promise.all([
     readdir(path.join(__dirname, '..', 'src')),
-    readdir(path.join(__dirname, '..', 'scripts'))
-  ]).then(arr => arr.flat());
+    readdir(path.join(__dirname, '..', 'scripts')),
+  ]).then((arr) => arr.flat());
 
   for (const file of files) {
     console.log(`Adding license to ${file}...`);
@@ -62,10 +62,7 @@ const main = async() => {
       ? content.split('\n').slice(22).join('\n')
       : content;
 
-    await fs.promises.writeFile(
-      file,
-      LICENSE + raw
-    );
+    await fs.promises.writeFile(file, LICENSE + raw);
 
     console.log(`Added license to ${file} :D`);
   }
@@ -73,7 +70,7 @@ const main = async() => {
 
 main()
   .then(() => process.exit(0))
-  .catch(error => {
+  .catch((error) => {
     console.error(error);
     process.exit(1);
   });

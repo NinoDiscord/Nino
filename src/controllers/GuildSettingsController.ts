@@ -63,11 +63,6 @@ export default class GuildSettingsController {
   }
 
   update(guildID: string, values: QueryDeepPartialEntity<GuildEntity>) {
-    return this.database.connection
-      .createQueryBuilder()
-      .update(GuildEntity)
-      .set(values)
-      .where('guild_id = :id', { id: guildID })
-      .execute();
+    return this.database.connection.createQueryBuilder().update(GuildEntity).set(values).where('guild_id = :id', { id: guildID }).execute();
   }
 }

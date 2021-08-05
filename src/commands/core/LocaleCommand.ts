@@ -20,12 +20,7 @@
  * SOFTWARE.
  */
 
-import {
-  Command,
-  CommandMessage,
-  EmbedBuilder,
-  Subcommand,
-} from '../../structures';
+import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import LocalizationService from '../../services/LocalizationService';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
@@ -49,14 +44,7 @@ export default class LocaleCommand extends Command {
   constructor() {
     super({
       description: 'descriptions.locale',
-      examples: [
-        'locale',
-        'locale list',
-        'locale set fr_FR --user',
-        'locale set fr_FR',
-        'locale reset --user',
-        'locale reset',
-      ],
+      examples: ['locale', 'locale list', 'locale set fr_FR --user', 'locale set fr_FR', 'locale reset --user', 'locale reset'],
       aliases: ['language', 'lang'],
       name: 'locale',
     });
@@ -84,31 +72,20 @@ export default class LocaleCommand extends Command {
   list(msg: CommandMessage) {
     const languages = this.languages.locales.map((locale) => {
       const user = this.discord.client.users.get(locale.translator);
-      return `❯ ${locale.flag} **${locale.full} (${locale.code})** by **${
-        user?.username ?? 'Unknown User'
-      }**#**${user?.discriminator ?? '0000'}** (${
-        locale.contributors.length
-      } contributers, \`${msg.settings.prefixes[0]}locale set ${
-        locale.code
-      } -u\`)`;
+      return `❯ ${locale.flag} **${locale.full} (${locale.code})** by **${user?.username ?? 'Unknown User'}**#**${
+        user?.discriminator ?? '0000'
+      }** (${locale.contributors.length} contributers, \`${msg.settings.prefixes[0]}locale set ${locale.code} -u\`)`;
     });
 
-    return msg.reply(
-      EmbedBuilder.create().setTitle('[ Languages ]').setDescription(languages)
-    );
+    return msg.reply(EmbedBuilder.create().setTitle('[ Languages ]').setDescription(languages));
   }
 
   @Subcommand('<locale>', { permissions: 'manageGuild' })
   async set(msg: CommandMessage, [locale]: [string]) {
-    if (!locale)
-      return msg.reply(
-        `No locale has been specified, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`
-      );
+    if (!locale) return msg.reply(`No locale has been specified, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`);
 
     if (!this.languages.locales.has(locale))
-      return msg.reply(
-        `Locale \`${locale}\` doesn't exist, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`
-      );
+      return msg.reply(`Locale \`${locale}\` doesn't exist, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`);
 
     const flags = msg.flags<Flags>();
     const isUser = flags.user === true || flags.u === true;
@@ -116,9 +93,7 @@ export default class LocaleCommand extends Command {
     const id = isUser ? msg.author.id : msg.guild.id;
 
     await controller.update(id, { language: locale });
-    return msg.reply(
-      `Language for ${isUser ? 'user' : 'server'} has been set to **${locale}**`
-    );
+    return msg.reply(`Language for ${isUser ? 'user' : 'server'} has been set to **${locale}**`);
   }
 
   @Subcommand(undefined, { permissions: 'manageGuild' })
@@ -131,10 +106,6 @@ export default class LocaleCommand extends Command {
     await controller.update(id, {
       language: this.languages.defaultLocale.code,
     });
-    return msg.reply(
-      `Language for ${isUser ? 'user' : 'server'} has been resetted to **${
-        this.languages.defaultLocale.code
-      }**`
-    );
+    return msg.reply(`Language for ${isUser ? 'user' : 'server'} has been resetted to **${this.languages.defaultLocale.code}**`);
   }
 }

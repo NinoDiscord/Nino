@@ -22,13 +22,7 @@
 
 /* eslint-disable camelcase */
 
-import type {
-  APIEmbedAuthor,
-  APIEmbedField,
-  APIEmbedFooter,
-  APIEmbedImage,
-  APIEmbedThumbnail,
-} from 'discord-api-types';
+import type { APIEmbedAuthor, APIEmbedField, APIEmbedFooter, APIEmbedImage, APIEmbedThumbnail } from 'discord-api-types';
 import { omitUndefinedOrNull } from '@augu/utils';
 import type { EmbedOptions } from 'eris';
 import { Color } from '../util/Constants';
@@ -70,9 +64,7 @@ export default class EmbedBuilder {
   }
 
   setDescription(description: string | string[]) {
-    this.description = Array.isArray(description)
-      ? description.join('\n')
-      : description;
+    this.description = Array.isArray(description) ? description.join('\n') : description;
     return this;
   }
 
@@ -98,8 +90,7 @@ export default class EmbedBuilder {
 
   addField(name: string, value: string, inline: boolean = false) {
     if (this.fields === undefined) this.fields = [];
-    if (this.fields.length > 25)
-      throw new RangeError('Maximum amount of fields reached.');
+    if (this.fields.length > 25) throw new RangeError('Maximum amount of fields reached.');
 
     this.fields.push({ name, value, inline });
     return this;
@@ -110,20 +101,12 @@ export default class EmbedBuilder {
   }
 
   addFields(fields: APIEmbedField[]) {
-    for (let i = 0; i < fields.length; i++)
-      this.addField(fields[i].name, fields[i].value, fields[i].inline);
+    for (let i = 0; i < fields.length; i++) this.addField(fields[i].name, fields[i].value, fields[i].inline);
 
     return this;
   }
 
-  setColor(
-    color:
-    | string
-    | number
-    | [r: number, g: number, b: number]
-    | 'random'
-    | 'default'
-  ) {
+  setColor(color: string | number | [r: number, g: number, b: number] | 'random' | 'default') {
     if (typeof color === 'number') {
       this.color = color;
       return this;
@@ -147,8 +130,7 @@ export default class EmbedBuilder {
     }
 
     if (Array.isArray(color)) {
-      if (color.length > 2)
-        throw new RangeError('RGB value cannot exceed to 3 or more elements');
+      if (color.length > 2) throw new RangeError('RGB value cannot exceed to 3 or more elements');
 
       const [r, g, b] = color;
       this.color = (r << 16) + (g << 8) + b;
@@ -156,9 +138,7 @@ export default class EmbedBuilder {
       return this;
     }
 
-    throw new TypeError(
-      `'color' argument was not a hexadecimal, number, RGB value, 'random', or 'default' (${typeof color})`
-    );
+    throw new TypeError(`'color' argument was not a hexadecimal, number, RGB value, 'random', or 'default' (${typeof color})`);
   }
 
   setTitle(title: string) {

@@ -32,9 +32,7 @@ import { join } from 'path';
   children: join(process.cwd(), 'automod'),
   name: 'automod',
 })
-export default class AutomodService
-  extends Collection<string, Automod>
-  implements ComponentOrServiceHooks<Automod> {
+export default class AutomodService extends Collection<string, Automod> implements ComponentOrServiceHooks<Automod> {
   @Inject
   private logger!: Logger;
 
@@ -60,9 +58,7 @@ export default class AutomodService
       }
 
       case 'memberNick': {
-        const automod = this.filter(
-          (am) => am.onMemberNickUpdate !== undefined
-        );
+        const automod = this.filter((am) => am.onMemberNickUpdate !== undefined);
         for (const am of automod) {
           const res = await am.onMemberNickUpdate!(args[0]);
           if (res === true) return true;

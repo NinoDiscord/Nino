@@ -2,8 +2,8 @@ global:
   scrape_interval: 15s
   scrape_timeout: 15s
 scrape_configs:
-  - job_name: "Nino"
+  - job_name: 'Nino'
     scrape_interval: 15s
     metrics_path: /metrics
     static_configs:
-      - targets: ["prometheus:17290"]
+      - targets: ['prometheus:17290']

@@ -8,6 +8,7 @@
   "repository": "https://github.com/NinoDiscord/Nino",
   "main": "build/main.js",
   "author": "August <cutie@floofy.dev>",
+  "prettier": "@augu/prettier-config",
   "maintainers": [
     {
       "email": "cutie@floofy.dev",
@@ -28,6 +29,7 @@
     "licenses": "node scripts/add-license.js",
     "prepare": "npm run clean:node_modules",
     "build": "npm run lint && rm -rf build && tsc",
+    "format": "prettier --write --parser typescript --config ./.prettierrc.json src/**/*.ts && prettier --write --config ./.prettierrc.json *.md *.json *.yml",
     "start": "cd build && node main.js",
     "lint": "eslint src --ext .ts --fix",
     "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
@@ -41,6 +43,8 @@
     "@aws-sdk/client-s3": "3.24.0",
     "@sentry/node": "6.10.0",
     "eris": "github:abalabahaha/eris#dev",
+    "fastify": "3.20.1",
+    "fastify-no-icon": "4.0.0",
     "ioredis": "4.27.6",
     "js-yaml": "4.1.0",
     "luxon": "2.0.1",
@@ -56,7 +60,7 @@
   },
   "devDependencies": {
     "@augu/eslint-config": "2.1.2",
-    "@augu/prettier-config": "1.0.0",
+    "@augu/prettier-config": "1.0.1",
     "@augu/tsconfig": "1.1.1",
     "@types/ioredis": "4.26.6",
     "@types/js-yaml": "4.0.2",
@@ -68,7 +72,6 @@
     "@typescript-eslint/parser": "4.29.0",
     "discord-api-types": "0.22.0",
     "eslint": "7.32.0",
-    "eslint-config-prettier": "8.3.0",
     "eslint-plugin-prettier": "3.4.0",
     "husky": "7.0.1",
     "nodemon": "2.0.12",

@@ -60,12 +60,7 @@ export default class UnbanCommand extends Command {
       });
 
       const timeouts = await this.redis.getTimeouts(msg.guild.id);
-      const available = timeouts.filter(
-        (pkt) =>
-          pkt.type !== 'unban' &&
-          pkt.user !== userID &&
-          pkt.guild === msg.guild.id
-      );
+      const available = timeouts.filter((pkt) => pkt.type !== 'unban' && pkt.user !== userID && pkt.guild === msg.guild.id);
 
       await this.redis.client.hmset('nino:timeouts', [msg.guild.id, available]);
       return msg.reply('User or bot has been unbanned successfully.');

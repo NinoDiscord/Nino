@@ -134,10 +134,7 @@ export default class Config {
     }
 
     this.logger.info('Loading configuration...');
-    const contents = await readFile(
-      join(__dirname, '..', '..', 'config.yml'),
-      'utf8'
-    );
+    const contents = await readFile(join(__dirname, '..', '..', 'config.yml'), 'utf8');
     const config = yaml.load(contents) as unknown as Configuration;
 
     this.config = {
@@ -163,17 +160,13 @@ export default class Config {
     };
 
     if (this.config.token === '-- replace me --')
-      return Promise.reject(
-        new TypeError('Restore `token` in config with your discord bot token.')
-      );
+      return Promise.reject(new TypeError('Restore `token` in config with your discord bot token.'));
 
     // resolve the promise
     return Promise.resolve();
   }
 
-  getProperty<K extends ObjectKeysWithSeperator<Configuration>>(
-    key: K
-  ): KeyToPropType<Configuration, K> | undefined {
+  getProperty<K extends ObjectKeysWithSeperator<Configuration>>(key: K): KeyToPropType<Configuration, K> | undefined {
     const nodes = key.split('.');
     let value: any = this.config;
 

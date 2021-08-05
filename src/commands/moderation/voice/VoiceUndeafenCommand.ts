@@ -55,9 +55,7 @@ export default class VoiceUndeafenCommand extends Command {
       user = await this.discord.getUser(userID);
     } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10013)
-        return msg.reply(
-          `User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`
-        );
+        return msg.reply(`User or bot with ID "${userID}" was not found. (assuming it's a deleted bot or user)`);
 
       return msg.reply(
         [
@@ -78,51 +76,29 @@ export default class VoiceUndeafenCommand extends Command {
       guild: msg.guild,
     };
     if (member.id === msg.guild.ownerID)
-      return msg.reply(
-        'I don\'t think I can perform this action due to you banning the owner, you idiot.'
-      );
+      return msg.reply('I don\'t think I can perform this action due to you banning the owner, you idiot.');
 
     if (member instanceof Member) {
-      if (
-        member.permissions.has('administrator') ||
-        member.permissions.has('banMembers')
-      )
-        return msg.reply(
-          `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
-        );
+      if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
+        return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
 
       if (!Permissions.isMemberAbove(msg.member, member))
-        return msg.reply(
-          `User **${user.username}#${user.discriminator}** is the same or above as you.`
-        );
+        return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above as you.`);
 
       if (!Permissions.isMemberAbove(msg.self!, member))
-        return msg.reply(
-          `User **${user.username}#${user.discriminator}** is the same or above me.`
-        );
+        return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
     }
 
-    if (msg.member.voiceState.channelID === null)
-      return msg.reply(
-        'You must be in a voice channel to perform this action.'
-      );
+    if (msg.member.voiceState.channelID === null) return msg.reply('You must be in a voice channel to perform this action.');
 
-    const channel = this.discord.client.getChannel(
-      msg.member.voiceState.channelID
-    ) as VoiceChannel;
-    if (channel.voiceMembers.size === 1)
-      return msg.reply('You must be in an active voice channel.');
+    const channel = this.discord.client.getChannel(msg.member.voiceState.channelID) as VoiceChannel;
+    if (channel.voiceMembers.size === 1) return msg.reply('You must be in an active voice channel.');
 
     if (!channel.voiceMembers.has(user.id))
-      return msg.reply(
-        `Member **${user.username}#${user.discriminator}** is not in this voice channel.`
-      );
+      return msg.reply(`Member **${user.username}#${user.discriminator}** is not in this voice channel.`);
 
     const voiceState = channel.voiceMembers.get(user.id)!.voiceState;
-    if (!voiceState.deaf)
-      return msg.reply(
-        `Member **${user.username}#${user.discriminator}** is already not deafened.`
-      );
+    if (!voiceState.deaf) return msg.reply(`Member **${user.username}#${user.discriminator}** is already not deafened.`);
 
     const areason = reason.join(' ');
     let actualReason: string | undefined = undefined;
@@ -151,14 +127,8 @@ export default class VoiceUndeafenCommand extends Command {
 
       this.discord.client.leaveVoiceChannel(msg.member.voiceState.channelID);
       return msg.reply(
-        `:thumbsup: Member **${user.username}#${
-          user.discriminator
-        }** has been server undeafen in voice channels.${
-          reason.length
-            ? ` *for ${reason.join(' ')}${
-              time !== undefined ? `, for ${time}*` : '*'
-            }`
-            : '.'
+        `:thumbsup: Member **${user.username}#${user.discriminator}** has been server undeafen in voice channels.${
+          reason.length ? ` *for ${reason.join(' ')}${time !== undefined ? `, for ${time}*` : '*'}` : '.'
         }`
       );
     } catch (ex) {

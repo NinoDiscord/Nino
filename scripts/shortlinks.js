@@ -29,7 +29,7 @@ const { join } = require('path');
 const fs = require('fs/promises');
 
 const http = new HttpClient({
-  userAgent: `Nino/DiscordBot (https://github.com/NinoDiscord/Nino, v${version})`
+  userAgent: `Nino/DiscordBot (https://github.com/NinoDiscord/Nino, v${version})`,
 });
 
 const logger = new LoggerWithoutCallSite({
@@ -39,7 +39,7 @@ const logger = new LoggerWithoutCallSite({
   displayFilePath: false,
   dateTimePattern: '[ day-month-year / hour:minute:second ]',
   instanceName: 'script: shortlinks',
-  name: 'scripts'
+  name: 'scripts',
 });
 
 const otherUrls = [
@@ -89,27 +89,47 @@ const otherUrls = [
   'kek.gg',
   'waa.ai',
   'steamcommunity.ru',
-  'steanconmunity.ru'
+  'steanconmunity.ru',
 ];
 
 const startTime = process.hrtime();
-(async() => {
-  logger.info('Now reading list from https://raw.githubusercontent.com/sambokai/ShortURL-Services-List/master/shorturl-services-list.csv...');
+(async () => {
+  logger.info(
+    'Now reading list from https://raw.githubusercontent.com/sambokai/ShortURL-Services-List/master/shorturl-services-list.csv...'
+  );
 
   const requestTime = process.hrtime();
-  const res = await http.get('https://raw.githubusercontent.com/sambokai/ShortURL-Services-List/master/shorturl-services-list.csv');
+  const res = await http.get(
+    'https://raw.githubusercontent.com/sambokai/ShortURL-Services-List/master/shorturl-services-list.csv'
+  );
 
   const requestEnd = calculateHRTime(requestTime);
-  logger.debug(`It took ~${requestEnd}ms to get a "${res.statusCode}" response.`);
+  logger.debug(
+    `It took ~${requestEnd}ms to get a "${res.statusCode}" response.`
+  );
 
   const data = res.body().split(/\n\r?/);
   data.shift();
 
-  const shortlinks = [...new Set([].concat(data.map(s => s.slice(0, s.length - 1)), otherUrls))].filter(s => s !== '');
+  const shortlinks = [
+    ...new Set(
+      [].concat(
+        data.map((s) => s.slice(0, s.length - 1)),
+        otherUrls
+      )
+    ),
+  ].filter((s) => s !== '');
   if (!existsSync(join(__dirname, '..', 'assets')))
     await fs.mkdir(join(__dirname, '..', 'assets'));
 
-  await fs.writeFile(join(__dirname, '..', 'assets', 'shortlinks.json'), `${JSON.stringify(shortlinks, null, '\t')}\n`);
-  logger.info(`It took about ~${calculateHRTime(startTime)}ms to retrieve ${shortlinks.length} short-links.`);
+  await fs.writeFile(
+    join(__dirname, '..', 'assets', 'shortlinks.json'),
+    `${JSON.stringify(shortlinks, null, '\t')}\n`
+  );
+  logger.info(
+    `It took about ~${calculateHRTime(startTime)}ms to retrieve ${
+      shortlinks.length
+    } short-links.`
+  );
   process.exit(0);
 })();

@@ -46,11 +46,7 @@ export default class ReasonCommand extends Command {
       botPermissions: 'manageMessages',
       description: 'descriptions.reason',
       category: Categories.Moderation,
-      examples: [
-        'reason 69 some reason!',
-        'reason latest another reason',
-        'reason l another reason that is the recent case',
-      ],
+      examples: ['reason 69 some reason!', 'reason latest another reason', 'reason l another reason that is the recent case'],
       usage: '[caseID | "l" | "latest"] [...reason]',
       aliases: ['set-reason', 'r'],
       name: 'reason',
@@ -66,10 +62,7 @@ export default class ReasonCommand extends Command {
     let caseModel = await this.database.cases.get(msg.guild.id, id);
     if (!caseModel) return msg.reply(`Case with ID #**${id}** was not found.`);
 
-    if (
-      reason.includes(' | ') &&
-      ms(reason.join(' ').split(' | ')[1]) !== undefined
-    )
+    if (reason.includes(' | ') && ms(reason.join(' ').split(' | ')[1]) !== undefined)
       await msg.reply(
         'Due to infrastructure issues with some internal stuff, editing times will be deprecated & removed in a future release.'
       );
@@ -78,50 +71,28 @@ export default class ReasonCommand extends Command {
       reason: reason.join(' ') || 'No reason was provided.',
     });
 
-    caseModel = (await this.database.cases.get(
-      msg.guild.id,
-      id
-    )) as unknown as CaseEntity;
+    caseModel = (await this.database.cases.get(msg.guild.id, id)) as unknown as CaseEntity;
     if (caseModel.messageID !== null && msg.settings.modlogChannelID !== null) {
-      const channel = await this.discord.getChannel<TextChannel>(
-        msg.settings.modlogChannelID!
-      );
+      const channel = await this.discord.getChannel<TextChannel>(msg.settings.modlogChannelID!);
 
       if (channel === null)
-        return msg.reply(
-          'unknown error occured, report to devs here under <#824071651486335036>: https://discord.gg/ATmjFH9kMH'
-        );
+        return msg.reply('unknown error occured, report to devs here under <#824071651486335036>: https://discord.gg/ATmjFH9kMH');
 
-      const message = await this.discord.client.getMessage(
-        channel!.id,
-        caseModel.messageID!
-      );
+      const message = await this.discord.client.getMessage(channel!.id, caseModel.messageID!);
       await this.punishments.editModLog(caseModel, message);
 
-      return msg.reply(
-        `Updated case #**${caseModel.index}** with reason **${
-          reason.join(' ') || '(unknown)'
-        }**`
-      );
+      return msg.reply(`Updated case #**${caseModel.index}** with reason **${reason.join(' ') || '(unknown)'}**`);
     }
 
-    return msg.reply(
-      'Unable to edit case due to no mod-log channel or that case didn\'t create a message in the mod-log.'
-    );
+    return msg.reply('Unable to edit case due to no mod-log channel or that case didn\'t create a message in the mod-log.');
   }
 
   @Subcommand('<...reason>', ['l'])
   async latest(msg: CommandMessage, reason: string[]) {
     const latestCases = await this.database.cases.getAll(msg.guild.id);
-    if (!latestCases.length)
-      return msg.reply(
-        'There are no recent cases to edit, maybe punish someone?'
-      );
+    if (!latestCases.length) return msg.reply('There are no recent cases to edit, maybe punish someone?');
 
-    if (
-      reason.includes(' | ') &&
-      ms(reason.join(' ').split(' | ')[1]) !== undefined
-    )
+    if (reason.includes(' | ') && ms(reason.join(' ').split(' | ')[1]) !== undefined)
       await msg.reply(
         'Due to infrastructure issues with some internal stuff, editing times will be deprecated & removed in a future release.'
       );
@@ -131,37 +102,19 @@ export default class ReasonCommand extends Command {
       reason: reason.join(' ') || 'No reason was provided.',
     });
 
-    latestCaseModel = await this.database.cases
-      .get(msg.guild.id, latestCaseModel.index)
-      .then((r) => r!);
-    if (
-      latestCaseModel.messageID !== null &&
-      msg.settings.modlogChannelID !== null
-    ) {
-      const channel = await this.discord.getChannel<TextChannel>(
-        msg.settings.modlogChannelID!
-      );
+    latestCaseModel = await this.database.cases.get(msg.guild.id, latestCaseModel.index).then((r) => r!);
+    if (latestCaseModel.messageID !== null && msg.settings.modlogChannelID !== null) {
+      const channel = await this.discord.getChannel<TextChannel>(msg.settings.modlogChannelID!);
 
       if (channel === null)
-        return msg.reply(
-          'unknown error occured, report to devs here under <#824071651486335036>: https://discord.gg/ATmjFH9kMH'
-        );
+        return msg.reply('unknown error occured, report to devs here under <#824071651486335036>: https://discord.gg/ATmjFH9kMH');
 
-      const message = await this.discord.client.getMessage(
-        channel!.id,
-        latestCaseModel.messageID!
-      );
+      const message = await this.discord.client.getMessage(channel!.id, latestCaseModel.messageID!);
       await this.punishments.editModLog(latestCaseModel, message);
 
-      return msg.reply(
-        `Updated case #**${latestCaseModel.index}** with reason **${
-          reason.join(' ') || '(unknown)'
-        }**`
-      );
+      return msg.reply(`Updated case #**${latestCaseModel.index}** with reason **${reason.join(' ') || '(unknown)'}**`);
     }
 
-    return msg.reply(
-      'Unable to edit case due to no mod-log channel or that case didn\'t create a message in the mod-log.'
-    );
+    return msg.reply('Unable to edit case due to no mod-log channel or that case didn\'t create a message in the mod-log.');
   }
 }

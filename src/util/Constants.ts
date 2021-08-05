@@ -42,15 +42,12 @@ export const commitHash: string | null = (() => {
 })();
 
 export const SHORT_LINKS = JSON.parse<string[]>(
-  readFileSync(join(process.cwd(), '..', 'assets', 'shortlinks.json'), 'utf8')
-    .split(/\n\r?/)
-    .join('\n')
+  readFileSync(join(process.cwd(), '..', 'assets', 'shortlinks.json'), 'utf8').split(/\n\r?/).join('\n')
 );
 export const Color = 0xdaa2c6;
 
 export const USERNAME_DISCRIM_REGEX = /^(.+)#(\d{4})$/;
-export const DISCORD_INVITE_REGEX =
-  /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg)\/\w+/;
+export const DISCORD_INVITE_REGEX = /(http(s)?:\/\/(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg)\/\w+/;
 export const USER_MENTION_REGEX = /^<@!?([0-9]+)>$/;
 export const CHANNEL_REGEX = /<#([0-9]+)>$/;
 export const QUOTE_REGEX = /['"]/;

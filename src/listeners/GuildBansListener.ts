@@ -20,9 +20,7 @@
  * SOFTWARE.
  */
 
-import PunishmentService, {
-  PunishmentEntryType,
-} from '../services/PunishmentService';
+import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, User } from 'eris';
 import { Inject, Subscribe } from '@augu/lilith';
 import { PunishmentType } from '../entities/PunishmentsEntity';
@@ -41,11 +39,7 @@ export default class GuildBansListener {
 
   @Subscribe('guildBanAdd', { emitter: 'discord' })
   async onGuildBanAdd(guild: Guild, user: User) {
-    if (
-      !guild.members
-        .get(this.discord.client.user.id)
-        ?.permissions.has('viewAuditLogs')
-    ) {
+    if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs')) {
       return;
     }
 
@@ -54,11 +48,7 @@ export default class GuildBansListener {
       limit: 3,
     });
 
-    const entry = audits.entries.find(
-      (entry) =>
-        entry.targetID === user.id &&
-        entry.user.id !== this.discord.client.user.id
-    );
+    const entry = audits.entries.find((entry) => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
 
     if (entry === undefined) return;
 
@@ -85,23 +75,14 @@ export default class GuildBansListener {
 
   @Subscribe('guildBanRemove', { emitter: 'discord' })
   async onGuildBanRemove(guild: Guild, user: User) {
-    if (
-      !guild.members
-        .get(this.discord.client.user.id)
-        ?.permissions.has('viewAuditLogs')
-    )
-      return;
+    if (!guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs')) return;
 
     const audits = await guild.getAuditLog({
       actionType: Constants.AuditLogActions.MEMBER_BAN_REMOVE,
       limit: 3,
     });
 
-    const entry = audits.entries.find(
-      (entry) =>
-        entry.targetID === user.id &&
-        entry.user.id !== this.discord.client.user.id
-    );
+    const entry = audits.entries.find((entry) => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
 
     if (entry === undefined) return;
 

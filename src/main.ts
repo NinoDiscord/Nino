@@ -47,8 +47,7 @@ import ts from 'typescript';
   logger.info(`Loading Nino v${version} (${commitHash ?? '<unknown>'})`);
   logger.info(`-> TypeScript: ${ts.version}`);
   logger.info(`->    Node.js: ${process.version}`);
-  if (process.env.REGION !== undefined)
-    logger.info(`->     Region: ${process.env.REGION}`);
+  if (process.env.REGION !== undefined) logger.info(`->     Region: ${process.env.REGION}`);
 
   try {
     // call patch before container load
@@ -76,7 +75,7 @@ const ReconnectCodes = [
 
 const OtherPossibleReconnectCodes = [
   'WebSocket was closed before the connection was established',
-  'Server didn\'t acknowledge previous heartbeat, possible lost connection'
+  'Server didn\'t acknowledge previous heartbeat, possible lost connection',
 ];
 
 process.on('unhandledRejection', (error) => {
@@ -91,13 +90,8 @@ process.on('uncaughtException', async (error) => {
   const sentry = app.$ref<Sentry>(Sentry);
 
   if ((error as any).code !== undefined) {
-    if (
-      ReconnectCodes.includes((error as any).code) ||
-      OtherPossibleReconnectCodes.includes(error.message)
-    ) {
-      logger.fatal(
-        'Disconnected due to peer to peer connection ended, restarting client...'
-      );
+    if (ReconnectCodes.includes((error as any).code) || OtherPossibleReconnectCodes.includes(error.message)) {
+      logger.fatal('Disconnected due to peer to peer connection ended, restarting client...');
 
       const discord = app.$ref<Discord>(Discord);
       discord.client.disconnect({ reconnect: false });

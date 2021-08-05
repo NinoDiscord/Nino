@@ -59,11 +59,7 @@ export default class WarningsController {
     return this.repository.save(entry);
   }
 
-  update(
-    guildID: string,
-    userID: string,
-    values: QueryDeepPartialEntity<WarningEntity>
-  ) {
+  update(guildID: string, userID: string, values: QueryDeepPartialEntity<WarningEntity>) {
     return this.database.connection
       .createQueryBuilder()
       .update(WarningEntity)

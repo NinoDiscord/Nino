@@ -49,31 +49,17 @@ export default class ModLogCommand extends Command {
   async run(msg: CommandMessage, [channel]: [string]) {
     if (!channel) {
       const chan =
-        msg.settings.modlogChannelID !== null
-          ? await this.discord.getChannel<TextChannel>(
-            msg.settings.modlogChannelID!,
-            msg.guild
-          )
-          : null;
-      return msg.reply(
-        chan === null
-          ? 'No mod-log has been set.'
-          : `Mod Logs are set in **#${chan.name}**`
-      );
+        msg.settings.modlogChannelID !== null ? await this.discord.getChannel<TextChannel>(msg.settings.modlogChannelID!, msg.guild) : null;
+      return msg.reply(chan === null ? 'No mod-log has been set.' : `Mod Logs are set in **#${chan.name}**`);
     }
 
     const chan = await this.discord.getChannel<TextChannel>(channel, msg.guild);
     if (chan === null) return msg.reply(`Channel "${channel}" doesn't exist.`);
 
-    if (chan.type !== 0)
-      return msg.reply(`Channel #${chan.name} was not a text channel`);
+    if (chan.type !== 0) return msg.reply(`Channel #${chan.name} was not a text channel`);
 
     const perms = chan.permissionsOf(this.discord.client.user.id);
-    if (
-      !perms.has('sendMessages') ||
-      !perms.has('readMessages') ||
-      !perms.has('embedLinks')
-    )
+    if (!perms.has('sendMessages') || !perms.has('readMessages') || !perms.has('embedLinks'))
       return msg.reply(
         `I am missing the following permissions: **Send Messages**, **Read Messages**, and **Embed Links** in #${chan.name}.`
       );
@@ -87,8 +73,7 @@ export default class ModLogCommand extends Command {
 
   @Subcommand()
   async reset(msg: CommandMessage) {
-    if (!msg.settings.modlogChannelID)
-      return msg.reply('No mod logs channel has been set.');
+    if (!msg.settings.modlogChannelID) return msg.reply('No mod logs channel has been set.');
 
     await this.database.guilds.update(msg.guild.id, {
       modlogChannelID: undefined,

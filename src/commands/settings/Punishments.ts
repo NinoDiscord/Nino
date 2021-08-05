@@ -20,12 +20,7 @@
  * SOFTWARE.
  */
 
-import {
-  Command,
-  CommandMessage,
-  EmbedBuilder,
-  Subcommand,
-} from '../../structures';
+import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import { PunishmentType } from '../../entities/PunishmentsEntity';
 import { Categories } from '../../util/Constants';
 import { firstUpper } from '@augu/utils';
@@ -34,9 +29,7 @@ import Database from '../../components/Database';
 import ms = require('ms');
 
 // Punishments shouldn't be chained with warnings and voice-related shit
-const TYPES = Object.values(PunishmentType).filter(
-  (w) => !w.startsWith('warning.') && !w.startsWith('voice.')
-);
+const TYPES = Object.values(PunishmentType).filter((w) => !w.startsWith('warning.') && !w.startsWith('voice.'));
 
 interface Flags {
   soft?: string | true;
@@ -65,15 +58,11 @@ export default class PunishmentsCommand extends Command {
     });
   }
 
-  async run(
-    msg: CommandMessage,
-    [index, type, time]: [string, string, string?]
-  ) {
+  async run(msg: CommandMessage, [index, type, time]: [string, string, string?]) {
     const punishments = await this.database.punishments.getAll(msg.guild.id);
 
     if (!index) {
-      if (!punishments.length)
-        return msg.reply('There are no punishments setup in this guild.');
+      if (!punishments.length) return msg.reply('There are no punishments setup in this guild.');
 
       const embed = EmbedBuilder.create()
         .setTitle(`:pencil2: ~ Punishments for ${msg.guild.name}`)
@@ -83,11 +72,7 @@ export default class PunishmentsCommand extends Command {
             value: [
               `• **Warnings**: ${punishment.warnings}`,
               `• **Soft**: ${punishment.soft ? 'Yes' : 'No'}`,
-              `• **Time**: ${
-                punishment.time !== null
-                  ? ms(punishment.time!)
-                  : 'No time duration'
-              }`,
+              `• **Time**: ${punishment.time !== null ? ms(punishment.time!) : 'No time duration'}`,
               `• **Type**: ${firstUpper(punishment.type)}`,
             ].join('\n'),
             inline: true,
@@ -97,21 +82,13 @@ export default class PunishmentsCommand extends Command {
       return msg.reply(embed);
     }
 
-    if (punishments.length > 10)
-      return msg.reply('Yea, I think you\'re fine with 10 punishments...');
+    if (punishments.length > 10) return msg.reply('Yea, I think you\'re fine with 10 punishments...');
 
-    if (isNaN(Number(index)))
-      return msg.reply('The amount of warnings you specified was not a number');
+    if (isNaN(Number(index))) return msg.reply('The amount of warnings you specified was not a number');
 
-    if (Number(index) === 0)
-      return msg.reply(
-        'You need to specify an amount of warnings, `0` isn\'t gonna cut it you know.'
-      );
+    if (Number(index) === 0) return msg.reply('You need to specify an amount of warnings, `0` isn\'t gonna cut it you know.');
 
-    if (Number(index) > 10)
-      return msg.reply(
-        'Uh-oh! The guild has reached the maximum amount of 10 warnings, sorry.'
-      );
+    if (Number(index) > 10) return msg.reply('Uh-oh! The guild has reached the maximum amount of 10 warnings, sorry.');
 
     if (type === undefined || !TYPES.includes(type as any))
       return msg.reply(
@@ -122,12 +99,7 @@ export default class PunishmentsCommand extends Command {
 
     const flags = msg.flags<Flags>();
     const soft = flags.soft === true || flags.s === true;
-    const days =
-      flags.days !== undefined
-        ? flags.days
-        : flags.d !== undefined
-          ? flags.d
-          : undefined;
+    const days = flags.days !== undefined ? flags.days : flags.d !== undefined ? flags.d : undefined;
     let timeStamp: number | undefined = undefined;
 
     try {
@@ -137,9 +109,7 @@ export default class PunishmentsCommand extends Command {
     }
 
     if (type !== PunishmentType.Ban && soft === true)
-      return msg.reply(
-        `The \`--soft\` argument only works on bans only, you specified \`${type}\`.`
-      );
+      return msg.reply(`The \`--soft\` argument only works on bans only, you specified \`${type}\`.`);
 
     const entry = await this.database.punishments.create({
       warnings: Number(index),
@@ -162,10 +132,7 @@ export default class PunishmentsCommand extends Command {
 
     if (isNaN(Number(index))) return msg.reply(`\`${index}\` was not a number`);
 
-    const punishment = await this.database.punishments.get(
-      msg.guild.id,
-      Number(index)
-    );
+    const punishment = await this.database.punishments.get(msg.guild.id, Number(index));
     if (punishment === undefined)
       return msg.reply(
         `Punishment #**${index}** warnings was not found. Run \`${msg.settings.prefixes[0]}punishments\` to see which one you want removed.`
@@ -175,8 +142,6 @@ export default class PunishmentsCommand extends Command {
       guildID: msg.guild.id,
       index: Number(index),
     });
-    return msg.reply(
-      `:thumbsup: Punishment #**${punishment.index}** has been removed.`
-    );
+    return msg.reply(`:thumbsup: Punishment #**${punishment.index}** has been removed.`);
   }
 }

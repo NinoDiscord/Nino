@@ -50,8 +50,6 @@ export default class AddCommandsToS3 extends Command {
     await this.s3.publishCommands();
     const endTime = stopwatch.end();
 
-    return message.edit(
-      `:timer: Took ~**${endTime}** to upload commands to S3.`
-    );
+    return message.edit(`:timer: Took ~**${endTime}** to upload commands to S3.`);
   }
 }

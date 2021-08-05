@@ -20,12 +20,7 @@
  * SOFTWARE.
  */
 
-import {
-  S3Client,
-  ListBucketsCommand,
-  CreateBucketCommand,
-  PutObjectCommand,
-} from '@aws-sdk/client-s3';
+import { S3Client, ListBucketsCommand, CreateBucketCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { Component, ComponentAPI, Inject } from '@augu/lilith';
 import type { Provider, Credentials } from '@aws-sdk/types';
 import CommandService from '../services/CommandService';
@@ -59,9 +54,7 @@ export default class S3 {
   async load() {
     const s3 = this.config.getProperty('s3');
     if (s3 === undefined) {
-      this.logger.warn(
-        'S3 client credentials are not provided but this is fine, it isn\'t needed.'
-      );
+      this.logger.warn('S3 client credentials are not provided but this is fine, it isn\'t needed.');
       return Promise.resolve();
     }
 
@@ -72,33 +65,19 @@ export default class S3 {
       region: s3.region ?? 'us-east-1',
     });
 
-    this.logger.info(
-      `Created S3 client on region ${s3.region ?? 'us-east-1'}.`
-    );
+    this.logger.info(`Created S3 client on region ${s3.region ?? 'us-east-1'}.`);
     const buckets = await this.client.send(new ListBucketsCommand({}));
 
     if (!buckets.Buckets) {
-      this.logger.warn(
-        'Unable to retrieve buckets from S3, do you have the list buckets permission?'
-      );
+      this.logger.warn('Unable to retrieve buckets from S3, do you have the list buckets permission?');
       this.client = undefined; // set it as undefined
 
       return Promise.resolve();
     }
 
-    this.logger.info(
-      `S3 authentication was successful, retrieved ${
-        buckets.Buckets!.length
-      } buckets.`
-    );
-    if (
-      !buckets.Buckets!.find(
-        (s) => s.Name !== undefined && s.Name === s3.bucket
-      )
-    ) {
-      this.logger.info(
-        `Bucket with name ${s3.bucket} was not found, creating...`
-      );
+    this.logger.info(`S3 authentication was successful, retrieved ${buckets.Buckets!.length} buckets.`);
+    if (!buckets.Buckets!.find((s) => s.Name !== undefined && s.Name === s3.bucket)) {
+      this.logger.info(`Bucket with name ${s3.bucket} was not found, creating...`);
       try {
         await this.client.send(
           new CreateBucketCommand({

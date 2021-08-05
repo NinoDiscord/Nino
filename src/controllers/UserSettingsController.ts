@@ -47,11 +47,6 @@ export default class UserSettingsController {
   }
 
   update(userID: string, values: QueryDeepPartialEntity<UserEntity>) {
-    return this.database.connection
-      .createQueryBuilder()
-      .update(UserEntity)
-      .set(values)
-      .where('user_id = :id', { id: userID })
-      .execute();
+    return this.database.connection.createQueryBuilder().update(UserEntity).set(values).where('user_id = :id', { id: userID }).execute();
   }
 }
