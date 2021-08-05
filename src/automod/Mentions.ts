@@ -65,7 +65,10 @@ export default class Mentions implements Automod {
 
       await msg.channel.createMessage(language.translate('automod.mentions'));
       await msg.delete();
-      await this.punishments.createWarning(msg.member, `[Automod] Mentioned 4 or more people in ${msg.channel.mention}`);
+      await this.punishments.createWarning(
+        msg.member,
+        `[Automod] Mentioned 4 or more people in ${msg.channel.mention}`
+      );
 
       return true;
     }

@@ -63,7 +63,9 @@ export default class ShardInfoCommand extends Command {
       current: msg.guild.shard.id === shard.id,
       status: shard.status,
       guilds: this.discord.client.guilds.filter((guild) => guild.shard.id === shard.id).length,
-      users: this.discord.client.guilds.filter((guild) => guild.shard.id === shard.id).reduce((a, b) => a + b.memberCount, 0),
+      users: this.discord.client.guilds
+        .filter((guild) => guild.shard.id === shard.id)
+        .reduce((a, b) => a + b.memberCount, 0),
       heart: hearts[shard.status],
       id: shard.id,
     }));

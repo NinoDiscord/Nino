@@ -80,9 +80,15 @@ export default class VoidListener {
 
     if (channel !== undefined && channel.type === 0) {
       const embed = EmbedBuilder.create()
-        .setAuthor(`[ Joined ${guild.name} (${guild.id}) ]`, undefined, this.discord.client.user.dynamicAvatarURL('png', 1024))
+        .setAuthor(
+          `[ Joined ${guild.name} (${guild.id}) ]`,
+          undefined,
+          this.discord.client.user.dynamicAvatarURL('png', 1024)
+        )
         .setDescription([
-          `• **Members [Bots / Total]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${guild.large ? 'Yes' : 'No'})`,
+          `• **Members [Bots / Total]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${
+            guild.large ? 'Yes' : 'No'
+          })`,
           `• **Owner**: ${owner ? `${owner.username}#${owner.discriminator} (${owner.id})` : 'Not cached'}`,
         ])
         .setFooter(`✔ Now at ${this.discord.client.guilds.size.toLocaleString()} Guilds`);
@@ -122,9 +128,15 @@ export default class VoidListener {
 
     if (channel !== undefined && channel.type === 0) {
       const embed = EmbedBuilder.create()
-        .setAuthor(`[ Left ${guild.name} (${guild.id}) ]`, undefined, this.discord.client.user.dynamicAvatarURL('png', 1024))
+        .setAuthor(
+          `[ Left ${guild.name} (${guild.id}) ]`,
+          undefined,
+          this.discord.client.user.dynamicAvatarURL('png', 1024)
+        )
         .setDescription([
-          `• **Members [Bots / Total]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${guild.large ? 'Yes' : 'No'})`,
+          `• **Members [Bots / Total]**: ${humans.toLocaleString()} members with ${bots} bots (large?: ${
+            guild.large ? 'Yes' : 'No'
+          })`,
           `• **Owner**: ${owner ? `${owner.username}#${owner.discriminator} (${owner.id})` : 'Not cached'}`,
         ])
         .setFooter(`✔ Now at ${this.discord.client.guilds.size.toLocaleString()} Guilds`);

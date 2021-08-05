@@ -51,7 +51,7 @@ export default class Discord {
 
     const token = this.config.getProperty('token');
     if (token === undefined) {
-      this.logger.fatal('Property `token` doesn\'t exist in the config file, please populate it.');
+      this.logger.fatal("Property `token` doesn't exist in the config file, please populate it.");
       return;
     }
 
@@ -92,7 +92,9 @@ export default class Discord {
 
     if (USERNAME_DISCRIM_REGEX.test(query)) {
       const match = query.match(USERNAME_DISCRIM_REGEX)!;
-      const users = this.client.users.filter((user) => user.username === match[1] && Number(user.discriminator) === Number(match[2]));
+      const users = this.client.users.filter(
+        (user) => user.username === match[1] && Number(user.discriminator) === Number(match[2])
+      );
 
       // TODO: pagination?
       if (users.length > 0) return users[0];
@@ -128,7 +130,8 @@ export default class Discord {
           return resolve(guild.channels.has(query) ? (guild.channels.get(query)! as T) : null);
         } else {
           const channel =
-            query in this.client.channelGuildMap && this.client.guilds.get(this.client.channelGuildMap[query])?.channels.get(query);
+            query in this.client.channelGuildMap &&
+            this.client.guilds.get(this.client.channelGuildMap[query])?.channels.get(query);
           return resolve((channel as T) || null);
         }
       }
@@ -171,7 +174,10 @@ export default class Discord {
 
   @Subscribe('shardDisconnect', { emitter: 'discord' })
   private onShardDisconnect(error: any, id: number) {
-    this.logger.fatal(`Shard #${id} has disconnected from the universe\n`, error || 'Connection has been reset by peer.');
+    this.logger.fatal(
+      `Shard #${id} has disconnected from the universe\n`,
+      error || 'Connection has been reset by peer.'
+    );
   }
 
   @Subscribe('shardResume', { emitter: 'discord' })

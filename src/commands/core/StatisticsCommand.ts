@@ -28,7 +28,6 @@ import { firstUpper, humanize } from '@augu/utils';
 import CommandService from '../../services/CommandService';
 import { formatSize } from '../../util';
 import { Inject } from '@augu/lilith';
-import Stopwatch from '../../util/Stopwatch';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
 import Config from '../../components/Config';
@@ -81,12 +80,14 @@ export default class StatisticsCommand extends Command {
       this.discord.client.user.id === '531613242473054229'
         ? 'https://stats.floofy.dev/d/e3KPDLknk/nino-prod?orgId=1'
         : this.discord.client.user.id === '613907896622907425'
-          ? 'https://stats.floofy.dev/d/C5bZHVZ7z/nino-edge?orgId=1'
-          : '';
+        ? 'https://stats.floofy.dev/d/C5bZHVZ7z/nino-edge?orgId=1'
+        : '';
 
     const embed = new EmbedBuilder()
       .setAuthor(
-        `[ ${this.discord.client.user.username}#${this.discord.client.user.discriminator} ~ v${version} (${commitHash ?? '<unknown>'}) ]`,
+        `[ ${this.discord.client.user.username}#${this.discord.client.user.discriminator} ~ v${version} (${
+          commitHash ?? '<unknown>'
+        }) ]`,
         'https://nino.floofy.dev',
         this.discord.client.user.dynamicAvatarURL('png', 1024)
       )
@@ -117,7 +118,9 @@ export default class StatisticsCommand extends Command {
         {
           name: `❯ Redis v${redis.server.redis_version} [${firstUpper(redis.server.redis_mode)}]`,
           value: [
-            `• **Network I/O**\n${formatSize(redis.stats.total_net_input_bytes)} / ${formatSize(redis.stats.total_net_output_bytes)}`,
+            `• **Network I/O**\n${formatSize(redis.stats.total_net_input_bytes)} / ${formatSize(
+              redis.stats.total_net_output_bytes
+            )}`,
             `• **Uptime**\n${humanize(Number(redis.server.uptime_in_seconds) * 1000, true)}`,
             `• **Ops/s**\n${redis.stats.instantaneous_ops_per_sec.toLocaleString()}`,
             `• **Ping**\n${redis.ping}`,

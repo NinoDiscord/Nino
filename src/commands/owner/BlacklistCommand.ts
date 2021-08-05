@@ -65,7 +65,8 @@ export default class BlacklistCommand extends Command {
       );
     }
 
-    if (!['guild', 'user'].includes(type)) return msg.reply('Missing the type to blacklist. Available options: `user` and `guild`.');
+    if (!['guild', 'user'].includes(type))
+      return msg.reply('Missing the type to blacklist. Available options: `user` and `guild`.');
 
     if (type === 'guild') {
       const guild = this.discord.client.guilds.get(id);
@@ -92,7 +93,8 @@ export default class BlacklistCommand extends Command {
       if (owners.includes(id)) return msg.reply('Cannot blacklist a owner');
 
       const entry = await this.database.blacklists.get(user.id);
-      if (entry !== undefined) return msg.reply(`User **${user.username}#${user.discriminator}** is already on the blacklist.`);
+      if (entry !== undefined)
+        return msg.reply(`User **${user.username}#${user.discriminator}** is already on the blacklist.`);
 
       await this.database.blacklists.create({
         issuer: msg.author.id,
@@ -102,7 +104,9 @@ export default class BlacklistCommand extends Command {
       });
 
       return msg.reply(
-        `:thumbsup: Blacklisted user ${user.username}#${user.discriminator} for *${reason?.join(' ') ?? 'no reason, just felt like it.'}*`
+        `:thumbsup: Blacklisted user ${user.username}#${user.discriminator} for *${
+          reason?.join(' ') ?? 'no reason, just felt like it.'
+        }*`
       );
     }
   }

@@ -46,7 +46,9 @@ export default class Prometheus {
   load() {
     const port = this.config.getProperty('prometheusPort');
     if (port === undefined) {
-      this.logger.warn('Prometheus will not be available! This is not recommended for private instances unless you want analytics.');
+      this.logger.warn(
+        'Prometheus will not be available! This is not recommended for private instances unless you want analytics.'
+      );
       return Promise.resolve();
     }
 

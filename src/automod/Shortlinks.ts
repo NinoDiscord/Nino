@@ -81,7 +81,10 @@ export default class Shortlinks implements Automod {
 
         await msg.delete();
         await msg.channel.createMessage(language.translate('automod.shortlinks'));
-        await this.punishments.createWarning(msg.member, `[Automod] Sending a blacklisted URL in ${msg.channel.mention}`);
+        await this.punishments.createWarning(
+          msg.member,
+          `[Automod] Sending a blacklisted URL in ${msg.channel.mention}`
+        );
 
         return true;
       }

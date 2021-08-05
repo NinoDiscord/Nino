@@ -23,14 +23,18 @@
 import type { SubcommandInfo } from '../Subcommand';
 import { MetadataKeys } from '../../util/Constants';
 
-export const getSubcommandsIn = (target: any) => Reflect.getMetadata<SubcommandInfo[]>(MetadataKeys.Subcommand, target) ?? [];
+export const getSubcommandsIn = (target: any) =>
+  Reflect.getMetadata<SubcommandInfo[]>(MetadataKeys.Subcommand, target) ?? [];
 
 interface SubcommandDecoratorOptions {
   aliases?: string[];
   permissions?: SubcommandInfo['permissions'];
 }
 
-export default function Subcommand(usage?: string, aliasesOrOptions?: SubcommandDecoratorOptions | string[]): MethodDecorator {
+export default function Subcommand(
+  usage?: string,
+  aliasesOrOptions?: SubcommandDecoratorOptions | string[]
+): MethodDecorator {
   return (target, methodName, descriptor: TypedPropertyDescriptor<any>) => {
     const subcommands = getSubcommandsIn(target);
 

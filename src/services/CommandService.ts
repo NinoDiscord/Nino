@@ -122,7 +122,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
       const issuer = this.discord.client.users.get(guildBlacklist.issuer);
       await msg.channel.createMessage(
         [
-          `:pencil2: **This guild is blacklisted by ${issuer?.username ?? 'Unknown User'}#${issuer?.discriminator ?? '0000'}**`,
+          `:pencil2: **This guild is blacklisted by ${issuer?.username ?? 'Unknown User'}#${
+            issuer?.discriminator ?? '0000'
+          }**`,
           `> ${guildBlacklist.reason ?? '*(no reason provided)*'}`,
           '',
           'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.',
@@ -140,7 +142,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
       const issuer = this.discord.client.users.get(userBlacklist.issuer);
       return msg.channel.createMessage(
         [
-          `:pencil2: **You were blacklisted by ${issuer?.username ?? 'Unknown User'}#${issuer?.discriminator ?? '0000'}**`,
+          `:pencil2: **You were blacklisted by ${issuer?.username ?? 'Unknown User'}#${
+            issuer?.discriminator ?? '0000'
+          }**`,
           `> ${userBlacklist.reason ?? '*(no reason provided)*'}`,
           '',
           'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.',
@@ -220,14 +224,17 @@ export default class CommandService extends Collection<string, NinoCommand> {
     if (subcommand !== undefined) {
       if (subcommand.permissions !== undefined) {
         const perms = msg.channel.permissionsOf(msg.author.id);
-        if (!perms.has(subcommand.permissions)) return message.reply(`You are missing the **${subcommand.permissions}** permission.`);
+        if (!perms.has(subcommand.permissions))
+          return message.reply(`You are missing the **${subcommand.permissions}** permission.`);
       }
     }
 
     try {
       const executor = Reflect.get(command, methodName);
       if (typeof executor !== 'function')
-        throw new SyntaxError(`${subcommand ? 'Subc' : 'C'}ommand "${subcommand ? methodName : command.name}" was not a function.`);
+        throw new SyntaxError(
+          `${subcommand ? 'Subc' : 'C'}ommand "${subcommand ? methodName : command.name}" was not a function.`
+        );
 
       this.prometheus.commandsExecuted?.labels(command.name).inc();
       this.commandsExecuted++;
@@ -252,14 +259,19 @@ export default class CommandService extends Collection<string, NinoCommand> {
         .setColor(0xdaa2c6)
         .setDescription([
           `${
-            subcommand !== undefined ? `Subcommand **${methodName}** (parent **${command.name}**)` : `Command **${command.name}**`
+            subcommand !== undefined
+              ? `Subcommand **${methodName}** (parent **${command.name}**)`
+              : `Command **${command.name}**`
           } has failed to execute.`,
           `If this is a re-occuring issue, contact ${contact} at <https://discord.gg/ATmjFH9kMH>, under the <#824071651486335036> channel.`,
         ])
         .build();
 
       await msg.channel.createMessage({ embed });
-      this.logger.error(`${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute:`, ex);
+      this.logger.error(
+        `${subcommand !== undefined ? `Subcommand ${methodName}` : `Command ${command.name}`} has failed to execute:`,
+        ex
+      );
 
       this.sentry?.report(ex);
     }

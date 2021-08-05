@@ -71,19 +71,23 @@ export default class PrefixCommand extends Command {
       '```',
     ]);
 
-    if (defaultPrefixes.length > 0) embed.setFooter(`Prefixes ${defaultPrefixes.join(', ')} will always work no matter what.`);
+    if (defaultPrefixes.length > 0)
+      embed.setFooter(`Prefixes ${defaultPrefixes.join(', ')} will always work no matter what.`);
 
     return msg.reply(embed);
   }
 
   @Subcommand('<prefix> [--user | -u]')
   async set(msg: CommandMessage, [...prefix]: [...string[]]) {
-    if (!prefix) return msg.reply('Missing a prefix to set! You can use `"` to make spaced ones, example: `"nino "` -> `nino `.');
+    if (!prefix)
+      return msg.reply('Missing a prefix to set! You can use `"` to make spaced ones, example: `"nino "` -> `nino `.');
 
     const pre = prefix.join(' ').replaceAll(/['"]/g, '');
     if (pre.length > 25)
       return msg.reply(
-        `Prefix \`${pre}\` is over the limit of 25 characters, you went over ${pre.length - 25} characters (excluding \`"\`).`
+        `Prefix \`${pre}\` is over the limit of 25 characters, you went over ${
+          pre.length - 25
+        } characters (excluding \`"\`).`
       );
 
     const flags = msg.flags<Flags>();
@@ -95,10 +99,12 @@ export default class PrefixCommand extends Command {
     if (!isUser && (!msg.member.permissions.has('manageGuild') || !owners.includes(msg.author.id)))
       return msg.reply('Missing the **Manage Guild** permission.');
 
-    if (data.prefixes.length > 5) return msg.reply(`${isUser ? 'You' : 'The guild'} has exceeded the amount of prefixes.`);
+    if (data.prefixes.length > 5)
+      return msg.reply(`${isUser ? 'You' : 'The guild'} has exceeded the amount of prefixes.`);
 
     const index = data.prefixes.findIndex((prefix) => prefix.toLowerCase() === pre.toLowerCase());
-    if (index !== -1) return msg.reply(`Prefix \`${pre}\` already exists as a ${isUser ? 'your' : 'the guild\'s'} prefix.`);
+    if (index !== -1)
+      return msg.reply(`Prefix \`${pre}\` already exists as a ${isUser ? 'your' : "the guild's"} prefix.`);
 
     data.prefixes.push(pre);
 
@@ -109,12 +115,15 @@ export default class PrefixCommand extends Command {
 
   @Subcommand('<index> [--user | -u]')
   async reset(msg: CommandMessage, [...prefix]: [...string[]]) {
-    if (!prefix) return msg.reply('Missing a prefix to set! You can use `"` to make spaced ones, example: `"nino "` -> `nino `.');
+    if (!prefix)
+      return msg.reply('Missing a prefix to set! You can use `"` to make spaced ones, example: `"nino "` -> `nino `.');
 
     const pre = prefix.join(' ').replaceAll(/['"]/g, '');
     if (pre.length > 25)
       return msg.reply(
-        `Prefix \`${pre}\` is over the limit of 25 characters, you went over ${pre.length - 25} characters (excluding \`"\`).`
+        `Prefix \`${pre}\` is over the limit of 25 characters, you went over ${
+          pre.length - 25
+        } characters (excluding \`"\`).`
       );
 
     const flags = msg.flags<Flags>();

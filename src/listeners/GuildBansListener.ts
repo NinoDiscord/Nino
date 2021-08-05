@@ -48,7 +48,9 @@ export default class GuildBansListener {
       limit: 3,
     });
 
-    const entry = audits.entries.find((entry) => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
+    const entry = audits.entries.find(
+      (entry) => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id
+    );
 
     if (entry === undefined) return;
 
@@ -82,7 +84,9 @@ export default class GuildBansListener {
       limit: 3,
     });
 
-    const entry = audits.entries.find((entry) => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id);
+    const entry = audits.entries.find(
+      (entry) => entry.targetID === user.id && entry.user.id !== this.discord.client.user.id
+    );
 
     if (entry === undefined) return;
 

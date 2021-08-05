@@ -125,7 +125,9 @@ export default class VoidListener {
     command.options?.forEach((option) => {
       const choices =
         option.choices?.length ?? false
-          ? option.choices!.map((c: any) => (c !== undefined ? undefined : `${c.name}: ${c.value}`)).filter((s) => s !== undefined)
+          ? option
+              .choices!.map((c: any) => (c !== undefined ? undefined : `${c.name}: ${c.value}`))
+              .filter((s) => s !== undefined)
           : null;
       if (choices !== null) {
         content += ` ${choices.join(', ')}`;

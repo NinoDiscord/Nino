@@ -70,7 +70,9 @@ export default class TimeoutsManager {
       this._readyPromise = { resolve, reject };
       this.state = types.SocketState.Connecting;
       this.logger.info(
-        this._reconnectTimeout !== undefined ? 'Reconnecting to the timeouts service...' : 'Connecting to the timeouts service!'
+        this._reconnectTimeout !== undefined
+          ? 'Reconnecting to the timeouts service...'
+          : 'Connecting to the timeouts service!'
       );
 
       const host = this.config.getProperty('timeouts.host');
@@ -179,7 +181,9 @@ export default class TimeoutsManager {
           this.logger.info('Authenicated successfully, now sending timeouts...');
           const timeouts = await this.redis.client
             .hvals('nino:timeouts')
-            .then((value) => (value[0] !== '' ? value.map((val) => JSON.parse<types.Timeout>(val)).flat() : ([] as types.Timeout[])));
+            .then((value) =>
+              value[0] !== '' ? value.map((val) => JSON.parse<types.Timeout>(val)).flat() : ([] as types.Timeout[])
+            );
           this.logger.info(`Received ${timeouts.length} timeouts to relay`);
 
           this.send(types.OPCodes.Acknowledged, timeouts);
@@ -199,7 +203,10 @@ export default class TimeoutsManager {
 
           const timeouts = await this.redis.getTimeouts(packet.d.guild);
           const available = timeouts.filter(
-            (pkt) => packet.d.user !== pkt.user && packet.d.type.toLowerCase() !== pkt.type.toLowerCase() && pkt.guild === packet.d.guild
+            (pkt) =>
+              packet.d.user !== pkt.user &&
+              packet.d.type.toLowerCase() !== pkt.type.toLowerCase() &&
+              pkt.guild === packet.d.guild
           );
 
           await this.redis.client.hmset('nino:timeouts', [guild.id, JSON.stringify(available)]);

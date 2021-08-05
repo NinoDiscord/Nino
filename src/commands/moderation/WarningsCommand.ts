@@ -78,7 +78,7 @@ export default class WarningsCommand extends Command {
     if (member.id === this.discord.client.user.id) return msg.reply('W-why would I have any warnings?!');
 
     if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
-      return msg.reply('Moderators or administrators don\'t have warnings attached to them.');
+      return msg.reply("Moderators or administrators don't have warnings attached to them.");
 
     const warnings = await this.database.warnings
       .getAll(msg.guild.id, user.id)
@@ -92,7 +92,9 @@ export default class WarningsCommand extends Command {
       .addFields(
         warnings.map((warn, idx) => ({
           name: `❯ Warning #${idx + 1}`,
-          value: [`• **Amount**: ${warn.amount}`, `• **Reason**: ${warn.reason ?? '(no reason was provided)'}`].join('\n'),
+          value: [`• **Amount**: ${warn.amount}`, `• **Reason**: ${warn.reason ?? '(no reason was provided)'}`].join(
+            '\n'
+          ),
           inline: true,
         }))
       );

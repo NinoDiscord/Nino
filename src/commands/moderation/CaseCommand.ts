@@ -90,7 +90,11 @@ export default class CaseCommand extends Command {
           ? `[**\`[Jump Here]\`**](https://discord.com/channels/${msg.guild.id}/${msg.settings.modlogChannelID}/${caseModel.messageID})`
           : '',
       ])
-      .addField('• Moderator', `${moderator.username}#${moderator.discriminator} (${(moderator as any).id ?? '(unknown)'})`, true)
+      .addField(
+        '• Moderator',
+        `${moderator.username}#${moderator.discriminator} (${(moderator as any).id ?? '(unknown)'})`,
+        true
+      )
       .addField('• Type', caseModel.type, true);
 
     if (caseModel.time !== null) embed.addField('• Time', ms(Number(caseModel.time!), { long: true }), true);

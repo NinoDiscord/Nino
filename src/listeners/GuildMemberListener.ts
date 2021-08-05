@@ -146,7 +146,9 @@ export default class GuildMemberListener {
 
     if (!logs.entries.length) return;
 
-    const entry = logs.entries.find((entry) => entry.targetID === member.id && entry.user.id !== this.discord.client.user.id);
+    const entry = logs.entries.find(
+      (entry) => entry.targetID === member.id && entry.user.id !== this.discord.client.user.id
+    );
 
     if (!entry) return;
 

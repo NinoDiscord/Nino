@@ -84,18 +84,23 @@ export default class SoftbanCommand extends Command {
     if (user === null) return msg.reply('Bot or user was not found.');
 
     if (!msg.guild.members.has(user.id))
-      return msg.reply(`Bot or user **${user.username}#${user.discriminator}** must be in the guild to perform this action.`);
+      return msg.reply(
+        `Bot or user **${user.username}#${user.discriminator}** must be in the guild to perform this action.`
+      );
 
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
-      return msg.reply('I don\'t think I can perform this action due to you banning the owner, you idiot.');
+      return msg.reply("I don't think I can perform this action due to you banning the owner, you idiot.");
 
-    if (member.id === this.discord.client.user.id) return msg.reply(';w; why would you soft-ban me from here? **(／。＼)**');
+    if (member.id === this.discord.client.user.id)
+      return msg.reply(';w; why would you soft-ban me from here? **(／。＼)**');
 
     if (member instanceof Member) {
       // this won't work for banning members not in this guild
       if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
-        return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
+        return msg.reply(
+          `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
+        );
 
       if (!Permissions.isMemberAbove(msg.member, member))
         return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above you.`);
@@ -127,7 +132,9 @@ export default class SoftbanCommand extends Command {
       });
 
       return msg.reply(
-        `${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been banned${reason ? ` *for ${reason}*` : ''}`
+        `${user.bot ? 'Bot' : 'User'} **${user.username}#${user.discriminator}** has been banned${
+          reason ? ` *for ${reason}*` : ''
+        }`
       );
     } catch (ex) {
       if (ex instanceof DiscordRESTError && ex.code === 10007) {

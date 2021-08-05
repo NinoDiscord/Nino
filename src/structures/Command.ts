@@ -56,12 +56,21 @@ export default abstract class NinoCommand {
 
   constructor(info: CommandInfo) {
     this.userPermissions =
-      typeof info.userPermissions === 'string' ? [info.userPermissions] : Array.isArray(info.userPermissions) ? info.userPermissions : [];
+      typeof info.userPermissions === 'string'
+        ? [info.userPermissions]
+        : Array.isArray(info.userPermissions)
+        ? info.userPermissions
+        : [];
 
     this.botPermissions =
-      typeof info.botPermissions === 'string' ? [info.botPermissions] : Array.isArray(info.botPermissions) ? info.botPermissions : [];
+      typeof info.botPermissions === 'string'
+        ? [info.botPermissions]
+        : Array.isArray(info.botPermissions)
+        ? info.botPermissions
+        : [];
 
-    this.description = (info.description as unknown as ObjectKeysWithSeperator<LocalizationStrings>) ?? 'descriptions.unknown';
+    this.description =
+      (info.description as unknown as ObjectKeysWithSeperator<LocalizationStrings>) ?? 'descriptions.unknown';
     this.ownerOnly = info.ownerOnly ?? false;
     this.examples = info.examples ?? [];
     this.category = info.category ?? Categories.Core;

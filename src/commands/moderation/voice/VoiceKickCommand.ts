@@ -66,7 +66,7 @@ export default class VoiceKickCommand extends Command {
 
       const id = msg.member.voiceState.channelID; // cache it if they decide to leave
       const voiceChan = await this.discord.getChannel<VoiceChannel>(id);
-      if (voiceChan === null) return msg.error('Unknown voice channel you\'re in.');
+      if (voiceChan === null) return msg.error("Unknown voice channel you're in.");
 
       if (
         !voiceChan.permissionsOf(this.discord.client.user.id).has('voiceConnect') ||
@@ -85,7 +85,9 @@ export default class VoiceKickCommand extends Command {
         try {
           await members[0].edit(
             { channelID: null },
-            encodeURIComponent(`[Voice Kick] Told to kick ${members[0].username}#${members[0].discriminator} (${members[0].id})`)
+            encodeURIComponent(
+              `[Voice Kick] Told to kick ${members[0].username}#${members[0].discriminator} (${members[0].id})`
+            )
           );
         } catch {
           return msg.error(`Unable to kick **${members[0].username}#${members[0].discriminator}**.`);
@@ -140,14 +142,18 @@ export default class VoiceKickCommand extends Command {
 
     const members = channel.voiceMembers.filter((c) => condition(this.discord, c));
     if (members.length === 0)
-      return msg.error('No users were in this channel. (excluding myself, the owner, and people with **`Voice Mute Members`** permission)');
+      return msg.error(
+        'No users were in this channel. (excluding myself, the owner, and people with **`Voice Mute Members`** permission)'
+      );
 
     if (members.length === 1) {
       await this.discord.client.joinVoiceChannel(channel.id);
       try {
         await members[0].edit(
           { channelID: null },
-          encodeURIComponent(`[Voice Kick] Told to kick ${members[0].username}#${members[0].discriminator} (${members[0].id})`)
+          encodeURIComponent(
+            `[Voice Kick] Told to kick ${members[0].username}#${members[0].discriminator} (${members[0].id})`
+          )
         );
       } catch {
         return msg.error(`Unable to kick **${members[0].username}#${members[0].discriminator}**.`);
@@ -194,7 +200,7 @@ export default class VoiceKickCommand extends Command {
 
       const id = msg.member.voiceState.channelID; // cache it if they decide to leave
       const voiceChan = await this.discord.getChannel<VoiceChannel>(id);
-      if (voiceChan === null) return msg.error('Unknown voice channel you\'re in.');
+      if (voiceChan === null) return msg.error("Unknown voice channel you're in.");
 
       if (
         !voiceChan.permissionsOf(this.discord.client.user.id).has('voiceConnect') ||
@@ -210,7 +216,9 @@ export default class VoiceKickCommand extends Command {
         try {
           await members[0].edit(
             { channelID: null },
-            encodeURIComponent(`[Voice Kick] Told to kick ${members[0].username}#${members[0].discriminator} (${members[0].id})`)
+            encodeURIComponent(
+              `[Voice Kick] Told to kick ${members[0].username}#${members[0].discriminator} (${members[0].id})`
+            )
           );
         } catch {
           return msg.error(`Unable to kick bot **${members[0].username}#${members[0].discriminator}**.`);
@@ -265,14 +273,18 @@ export default class VoiceKickCommand extends Command {
 
     const members = channel.voiceMembers.filter((c) => botCondition(this.discord, c));
     if (members.length === 0)
-      return msg.error('No users were in this channel. (excluding myself, the owner, and people with **`Voice Mute Members`** permission)');
+      return msg.error(
+        'No users were in this channel. (excluding myself, the owner, and people with **`Voice Mute Members`** permission)'
+      );
 
     if (members.length === 1) {
       await this.discord.client.joinVoiceChannel(channel.id);
       try {
         await members[0].edit(
           { channelID: null },
-          encodeURIComponent(`[Voice Kick] Told to kick ${members[0].username}#${members[0].discriminator} (${members[0].id})`)
+          encodeURIComponent(
+            `[Voice Kick] Told to kick ${members[0].username}#${members[0].discriminator} (${members[0].id})`
+          )
         );
       } catch {
         return msg.error(`Unable to kick **${members[0].username}#${members[0].discriminator}**.`);

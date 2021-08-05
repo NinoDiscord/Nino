@@ -49,15 +49,27 @@ export default class AutomodCommand extends Command {
     const embed = new EmbedBuilder()
       .setColor(Color)
       .setDescription([
-        `• ${settings!.shortLinks ? msg.successEmote : msg.errorEmote} **Short Links** (\`${msg.settings.prefixes[0]}automod shortlinks\`)`,
+        `• ${settings!.shortLinks ? msg.successEmote : msg.errorEmote} **Short Links** (\`${
+          msg.settings.prefixes[0]
+        }automod shortlinks\`)`,
         `• ${settings!.blacklist ? msg.successEmote : msg.errorEmote} **Blacklist Words** (\`${
           msg.settings.prefixes[0]
         }automod blacklist\`)`,
-        `• ${settings!.mentions ? msg.successEmote : msg.errorEmote} **Mentions** (\`${msg.settings.prefixes[0]}automod mentions\`)`,
-        `• ${settings!.dehoist ? msg.successEmote : msg.errorEmote} **Dehoisting** (\`${msg.settings.prefixes[0]}automod dehoist\`)`,
-        `• ${settings!.invites ? msg.successEmote : msg.errorEmote} **Invites** (\`${msg.settings.prefixes[0]}automod invites\`)`,
-        `• ${settings!.raid ? msg.successEmote : msg.errorEmote} **Raids** (\`${msg.settings.prefixes[0]}automod raid\`)`,
-        `• ${settings!.spam ? msg.successEmote : msg.errorEmote} **Spam** (\`${msg.settings.prefixes[0]}automod spam\`)`,
+        `• ${settings!.mentions ? msg.successEmote : msg.errorEmote} **Mentions** (\`${
+          msg.settings.prefixes[0]
+        }automod mentions\`)`,
+        `• ${settings!.dehoist ? msg.successEmote : msg.errorEmote} **Dehoisting** (\`${
+          msg.settings.prefixes[0]
+        }automod dehoist\`)`,
+        `• ${settings!.invites ? msg.successEmote : msg.errorEmote} **Invites** (\`${
+          msg.settings.prefixes[0]
+        }automod invites\`)`,
+        `• ${settings!.raid ? msg.successEmote : msg.errorEmote} **Raids** (\`${
+          msg.settings.prefixes[0]
+        }automod raid\`)`,
+        `• ${settings!.spam ? msg.successEmote : msg.errorEmote} **Spam** (\`${
+          msg.settings.prefixes[0]
+        }automod spam\`)`,
       ]);
 
     return msg.reply(embed);
@@ -127,7 +139,9 @@ export default class AutomodCommand extends Command {
       mentions: type,
     });
 
-    return msg.reply(`${type ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Mentions automod feature.`);
+    return msg.reply(
+      `${type ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Mentions automod feature.`
+    );
   }
 
   @Subcommand()
@@ -139,7 +153,9 @@ export default class AutomodCommand extends Command {
       invites: !settings!.invites,
     });
 
-    return msg.reply(`${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Invites automod feature.`);
+    return msg.reply(
+      `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Invites automod feature.`
+    );
   }
 
   @Subcommand()
@@ -151,7 +167,9 @@ export default class AutomodCommand extends Command {
       dehoist: !settings!.dehoist,
     });
 
-    return msg.reply(`${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Dehoisting automod feature.`);
+    return msg.reply(
+      `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Dehoisting automod feature.`
+    );
   }
 
   @Subcommand()
@@ -163,7 +181,9 @@ export default class AutomodCommand extends Command {
       spam: t,
     });
 
-    return msg.reply(`${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Spam automod feature.`);
+    return msg.reply(
+      `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Spam automod feature.`
+    );
   }
 
   @Subcommand('[...channels]')
@@ -175,7 +195,9 @@ export default class AutomodCommand extends Command {
         raid: !settings!.raid,
       });
 
-      return msg.reply(`${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Raid automod feature.`);
+      return msg.reply(
+        `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Raid automod feature.`
+      );
     }
 
     const automod = await this.database.automod.get(msg.guild.id);

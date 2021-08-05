@@ -22,7 +22,13 @@
 
 /* eslint-disable camelcase */
 
-import type { APIEmbedAuthor, APIEmbedField, APIEmbedFooter, APIEmbedImage, APIEmbedThumbnail } from 'discord-api-types';
+import type {
+  APIEmbedAuthor,
+  APIEmbedField,
+  APIEmbedFooter,
+  APIEmbedImage,
+  APIEmbedThumbnail,
+} from 'discord-api-types';
 import { omitUndefinedOrNull } from '@augu/utils';
 import type { EmbedOptions } from 'eris';
 import { Color } from '../util/Constants';
@@ -138,7 +144,9 @@ export default class EmbedBuilder {
       return this;
     }
 
-    throw new TypeError(`'color' argument was not a hexadecimal, number, RGB value, 'random', or 'default' (${typeof color})`);
+    throw new TypeError(
+      `'color' argument was not a hexadecimal, number, RGB value, 'random', or 'default' (${typeof color})`
+    );
   }
 
   setTitle(title: string) {
@@ -173,10 +181,10 @@ export default class EmbedBuilder {
       footer: this.footer,
       author: this.author
         ? {
-          name: this.author.name!,
-          url: this.author.url,
-          icon_url: this.author.icon_url,
-        }
+            name: this.author.name!,
+            url: this.author.url,
+            icon_url: this.author.icon_url,
+          }
         : undefined,
       fields: this.fields,
       image: this.image,

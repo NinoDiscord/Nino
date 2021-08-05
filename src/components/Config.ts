@@ -46,7 +46,7 @@ interface Configuration {
   ksoft?: string;
   redis: RedisConfig;
   token: string;
-  s3?: S3Config;
+  api?: boolean;
 }
 
 interface BotlistConfig {
@@ -91,13 +91,6 @@ interface StatusConfig {
 // eslint-disable-next-line
 interface RedisSentinelConfig extends Pick<RedisConfig, 'host' | 'port'> {}
 
-interface S3Config {
-  accessKey: string;
-  secretKey: string;
-  region?: string;
-  bucket: string;
-}
-
 @Component({
   priority: 0,
   name: 'config',
@@ -106,7 +99,7 @@ export default class Config {
   private config!: Configuration;
 
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
 
   async load() {
     if (!existsSync(join(__dirname, '..', '..', 'config.yml'))) {
@@ -128,7 +121,7 @@ export default class Config {
       writeFileSync(join(__dirname, '..', '..', 'config.yml'), config);
       return Promise.reject(
         new SyntaxError(
-          'Weird, you didn\'t have a configuration file... So, I may have provided you a default one, if you don\'t mind... >W<'
+          "Weird, you didn't have a configuration file... So, I may have provided you a default one, if you don't mind... >W<"
         )
       );
     }
@@ -156,7 +149,7 @@ export default class Config {
       ksoft: config.ksoft,
       redis: config.redis,
       token: config.token,
-      s3: config.s3,
+      api: false,
     };
 
     if (this.config.token === '-- replace me --')

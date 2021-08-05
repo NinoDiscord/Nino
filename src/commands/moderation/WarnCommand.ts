@@ -79,12 +79,14 @@ export default class WarnCommand extends Command {
 
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID)
-      return msg.reply('I don\'t think I can perform this action due to you kicking the owner, you idiot.');
+      return msg.reply("I don't think I can perform this action due to you kicking the owner, you idiot.");
 
     if (member.id === this.discord.client.user.id) return msg.reply(';w; why would you warn me? **(／。＼)**');
 
     if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
-      return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
+      return msg.reply(
+        `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
+      );
 
     if (!Permissions.isMemberAbove(msg.member, member))
       return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above as you.`);
@@ -93,7 +95,11 @@ export default class WarnCommand extends Command {
       return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
 
     try {
-      await this.punishments.createWarning(msg.guild.members.get(user.id)!, reason.join(' ') || 'No reason was provided.', 1);
+      await this.punishments.createWarning(
+        msg.guild.members.get(user.id)!,
+        reason.join(' ') || 'No reason was provided.',
+        1
+      );
 
       const warnings = await this.database.warnings
         .getAll(msg.guild.id, user.id)

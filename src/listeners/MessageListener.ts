@@ -64,7 +64,10 @@ export default class MessageListener {
     if (
       settings.channelID !== undefined &&
       (!msg.channel.guild.channels.has(settings.channelID) ||
-        !msg.channel.guild.channels.get<TextChannel>(settings.channelID)?.permissionsOf(this.discord.client.user.id).has('sendMessages'))
+        !msg.channel.guild.channels
+          .get<TextChannel>(settings.channelID)
+          ?.permissionsOf(this.discord.client.user.id)
+          .has('sendMessages'))
     )
       return;
 
@@ -76,14 +79,18 @@ export default class MessageListener {
 
     // It's in a closure so we don't have to use `return;` on the outer scope
     const auditLog = await (async () => {
-      if (!msg.channel.guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs')) return undefined;
+      if (!msg.channel.guild.members.get(this.discord.client.user.id)?.permissions.has('viewAuditLogs'))
+        return undefined;
 
       const audits = await msg.channel.guild.getAuditLog({
         limit: 3,
         actionType: Constants.AuditLogActions.MESSAGE_DELETE,
       });
       return audits.entries.find(
-        (entry) => entry.targetID === msg.author.id && entry.user.id !== msg.author.id && entry.user.id !== this.discord.client.user.id
+        (entry) =>
+          entry.targetID === msg.author.id &&
+          entry.user.id !== msg.author.id &&
+          entry.user.id !== this.discord.client.user.id
       );
     })();
 
@@ -92,26 +99,34 @@ export default class MessageListener {
     const embed = new EmbedBuilder().setColor(Color);
 
     if (auditLog !== undefined)
-      embed.setFooter(`Message was actually deleted by ${auditLog.user.username}#${auditLog.user.discriminator} (${auditLog.user.id})`);
+      embed.setFooter(
+        `Message was actually deleted by ${auditLog.user.username}#${auditLog.user.discriminator} (${auditLog.user.id})`
+      );
 
     if (msg.embeds.length > 0) {
       const em = msg.embeds[0];
       if (em.author) embed.setAuthor(em.author.name, em.author.url, em.author.icon_url);
-      if (em.description) embed.setDescription(em.description.length > 2000 ? `${em.description.slice(0, 1993)}...` : em.description);
+      if (em.description)
+        embed.setDescription(em.description.length > 2000 ? `${em.description.slice(0, 1993)}...` : em.description);
       if (em.fields && em.fields.length > 0) {
         for (const field of em.fields) embed.addField(field.name, field.value, field.inline || false);
       }
 
       if (em.footer) {
         const footer = embed.footer;
-        embed.setFooter(footer !== undefined ? `${em.footer.text} (${footer.text})` : em.footer.text, em.footer.icon_url);
+        embed.setFooter(
+          footer !== undefined ? `${em.footer.text} (${footer.text})` : em.footer.text,
+          em.footer.icon_url
+        );
       }
 
       if (em.title) embed.setTitle(em.title);
       if (em.url) embed.setURL(em.url);
     } else {
       embed.setDescription(
-        msg.content.length > 1997 ? `${msg.content.slice(0, 1995)}...` : msg.content || 'Nothing was provided (probably attachments)'
+        msg.content.length > 1997
+          ? `${msg.content.slice(0, 1995)}...`
+          : msg.content || 'Nothing was provided (probably attachments)'
       );
     }
 
@@ -147,7 +162,10 @@ export default class MessageListener {
     if (
       settings.channelID !== undefined &&
       (!msg.channel.guild.channels.has(settings.channelID) ||
-        !msg.channel.guild.channels.get<TextChannel>(settings.channelID)?.permissionsOf(this.discord.client.user.id).has('sendMessages'))
+        !msg.channel.guild.channels
+          .get<TextChannel>(settings.channelID)
+          ?.permissionsOf(this.discord.client.user.id)
+          .has('sendMessages'))
     )
       return;
 
@@ -198,7 +216,10 @@ export default class MessageListener {
 
     if (
       !msg.channel.guild.channels.has(settings.channelID) ||
-      !msg.channel.guild.channels.get<TextChannel>(settings.channelID)?.permissionsOf(this.discord.client.user.id).has('sendMessages')
+      !msg.channel.guild.channels
+        .get<TextChannel>(settings.channelID)
+        ?.permissionsOf(this.discord.client.user.id)
+        .has('sendMessages')
     )
       return;
 
@@ -227,11 +248,13 @@ export default class MessageListener {
           if (embed.author !== undefined)
             content += `❯ ${embed.author.name}${embed.author.url !== undefined ? ` (${embed.author.url})` : ''}\n`;
 
-          if (embed.title !== undefined) content += `❯ ${embed.title}${embed.url !== undefined ? ` (${embed.url})` : ''}\n`;
+          if (embed.title !== undefined)
+            content += `❯ ${embed.title}${embed.url !== undefined ? ` (${embed.url})` : ''}\n`;
 
           if (embed.description !== undefined) content += `${embed.description}\n\n`;
 
-          if (embed.fields !== undefined) content += embed.fields.map((field) => `• ${field.name}: ${field.value}`).join('\n') + '\n';
+          if (embed.fields !== undefined)
+            content += embed.fields.map((field) => `• ${field.name}: ${field.value}`).join('\n') + '\n';
 
           if (embed.footer !== undefined)
             content += `${embed.footer.text}${
@@ -261,7 +284,10 @@ export default class MessageListener {
         `${allMsgs.length} messages were deleted in ${msg.channel.mention}, view the file below to read all messages`,
         '',
         '```apache',
-        `❯ Messages Deleted ~> ${allMsgs.length}/${messages.length} (${((allMsgs.length / messages.length) * 100).toFixed(1)}% cached)`,
+        `❯ Messages Deleted ~> ${allMsgs.length}/${messages.length} (${(
+          (allMsgs.length / messages.length) *
+          100
+        ).toFixed(1)}% cached)`,
         `❯ Affected Users   ~> ${users.join(', ')}`,
         '```',
       ]);

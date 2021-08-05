@@ -56,7 +56,8 @@ export default class VoiceStateListener {
     const settings = await this.database.logging.get(member.guild.id);
     if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin)) return;
 
-    const channel = settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
+    const channel =
+      settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
     if (
       channel === null ||
       !member.guild.channels.has(settings.channelID!) ||
@@ -78,7 +79,8 @@ export default class VoiceStateListener {
     const entry = await this.getAuditLog(member.guild, 27, '[Voice Kick]');
     if (entry !== undefined) return;
 
-    const channel = settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
+    const channel =
+      settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
     if (
       channel === null ||
       !member.guild.channels.has(settings.channelID!) ||
@@ -96,7 +98,8 @@ export default class VoiceStateListener {
     const settings = await this.database.logging.get(member.guild.id);
     if (!settings.enabled || !settings.events.includes(LoggingEvents.VoiceChannelJoin)) return;
 
-    const channel = settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
+    const channel =
+      settings.channelID !== undefined ? await this.discord.getChannel<TextChannel>(settings.channelID) : null;
     if (
       channel === null ||
       !member.guild.channels.has(settings.channelID!) ||

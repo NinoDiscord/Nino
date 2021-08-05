@@ -68,10 +68,10 @@ export default class TimeoutsCommand extends Command {
           .then((user) =>
             user === null
               ? {
-                username: 'Unknown User',
-                discriminator: '0000',
-                id: pkt.user,
-              }
+                  username: 'Unknown User',
+                  discriminator: '0000',
+                  id: pkt.user,
+                }
               : user!
           )
           .catch(() => ({
@@ -99,7 +99,11 @@ export default class TimeoutsCommand extends Command {
     );
 
     const embed = EmbedBuilder.create()
-      .setAuthor(`[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`, undefined, msg.guild.dynamicIconURL('png', 1024))
+      .setAuthor(
+        `[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`,
+        undefined,
+        msg.guild.dynamicIconURL('png', 1024)
+      )
       .addFields(h)
       .setFooter('Only showing 10 entries.');
 
@@ -121,10 +125,10 @@ export default class TimeoutsCommand extends Command {
           .then((user) =>
             user === null
               ? {
-                username: 'Unknown User',
-                discriminator: '0000',
-                id: pkt.user,
-              }
+                  username: 'Unknown User',
+                  discriminator: '0000',
+                  id: pkt.user,
+                }
               : user!
           )
           .catch(() => ({
@@ -153,7 +157,11 @@ export default class TimeoutsCommand extends Command {
     );
 
     const embed = EmbedBuilder.create()
-      .setAuthor(`[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`, undefined, msg.guild.dynamicIconURL('png', 1024))
+      .setAuthor(
+        `[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`,
+        undefined,
+        msg.guild.dynamicIconURL('png', 1024)
+      )
       .addFields(h)
       .setFooter('Only showing 10 entries.');
 

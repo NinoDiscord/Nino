@@ -76,11 +76,13 @@ export default class VoiceMuteCommand extends Command {
       guild: msg.guild,
     };
     if (member.id === msg.guild.ownerID)
-      return msg.reply('I don\'t think I can perform this action due to you banning the owner, you idiot.');
+      return msg.reply("I don't think I can perform this action due to you banning the owner, you idiot.");
 
     if (member instanceof Member) {
       if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
-        return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
+        return msg.reply(
+          `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
+        );
 
       if (!Permissions.isMemberAbove(msg.member, member))
         return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above as you.`);
@@ -89,7 +91,8 @@ export default class VoiceMuteCommand extends Command {
         return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above me.`);
     }
 
-    if (msg.member.voiceState.channelID === null) return msg.reply('You must be in a voice channel to perform this action.');
+    if (msg.member.voiceState.channelID === null)
+      return msg.reply('You must be in a voice channel to perform this action.');
 
     const channel = this.discord.client.getChannel(msg.member.voiceState.channelID) as VoiceChannel;
     if (channel.voiceMembers.size === 1) return msg.reply('You must be in an active voice channel.');
@@ -98,7 +101,8 @@ export default class VoiceMuteCommand extends Command {
       return msg.reply(`Member **${user.username}#${user.discriminator}** is not in this voice channel.`);
 
     const voiceState = channel.voiceMembers.get(user.id)!.voiceState;
-    if (voiceState.mute === true) return msg.reply(`Member **${user.username}#${user.discriminator}** is already server muted.`);
+    if (voiceState.mute === true)
+      return msg.reply(`Member **${user.username}#${user.discriminator}** is already server muted.`);
 
     const areason = reason.join(' ');
     let actualReason: string | undefined = undefined;

@@ -44,7 +44,14 @@ export default class LocaleCommand extends Command {
   constructor() {
     super({
       description: 'descriptions.locale',
-      examples: ['locale', 'locale list', 'locale set fr_FR --user', 'locale set fr_FR', 'locale reset --user', 'locale reset'],
+      examples: [
+        'locale',
+        'locale list',
+        'locale set fr_FR --user',
+        'locale set fr_FR',
+        'locale reset --user',
+        'locale reset',
+      ],
       aliases: ['language', 'lang'],
       name: 'locale',
     });
@@ -82,10 +89,15 @@ export default class LocaleCommand extends Command {
 
   @Subcommand('<locale>', { permissions: 'manageGuild' })
   async set(msg: CommandMessage, [locale]: [string]) {
-    if (!locale) return msg.reply(`No locale has been specified, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`);
+    if (!locale)
+      return msg.reply(
+        `No locale has been specified, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`
+      );
 
     if (!this.languages.locales.has(locale))
-      return msg.reply(`Locale \`${locale}\` doesn't exist, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`);
+      return msg.reply(
+        `Locale \`${locale}\` doesn't exist, use \`${msg.settings.prefixes[0]}locale list\` to list all of them`
+      );
 
     const flags = msg.flags<Flags>();
     const isUser = flags.user === true || flags.u === true;
@@ -106,6 +118,8 @@ export default class LocaleCommand extends Command {
     await controller.update(id, {
       language: this.languages.defaultLocale.code,
     });
-    return msg.reply(`Language for ${isUser ? 'user' : 'server'} has been resetted to **${this.languages.defaultLocale.code}**`);
+    return msg.reply(
+      `Language for ${isUser ? 'user' : 'server'} has been resetted to **${this.languages.defaultLocale.code}**`
+    );
   }
 }

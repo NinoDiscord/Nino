@@ -49,7 +49,9 @@ export default class ModLogCommand extends Command {
   async run(msg: CommandMessage, [channel]: [string]) {
     if (!channel) {
       const chan =
-        msg.settings.modlogChannelID !== null ? await this.discord.getChannel<TextChannel>(msg.settings.modlogChannelID!, msg.guild) : null;
+        msg.settings.modlogChannelID !== null
+          ? await this.discord.getChannel<TextChannel>(msg.settings.modlogChannelID!, msg.guild)
+          : null;
       return msg.reply(chan === null ? 'No mod-log has been set.' : `Mod Logs are set in **#${chan.name}**`);
     }
 

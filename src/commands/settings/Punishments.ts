@@ -82,11 +82,12 @@ export default class PunishmentsCommand extends Command {
       return msg.reply(embed);
     }
 
-    if (punishments.length > 10) return msg.reply('Yea, I think you\'re fine with 10 punishments...');
+    if (punishments.length > 10) return msg.reply("Yea, I think you're fine with 10 punishments...");
 
     if (isNaN(Number(index))) return msg.reply('The amount of warnings you specified was not a number');
 
-    if (Number(index) === 0) return msg.reply('You need to specify an amount of warnings, `0` isn\'t gonna cut it you know.');
+    if (Number(index) === 0)
+      return msg.reply("You need to specify an amount of warnings, `0` isn't gonna cut it you know.");
 
     if (Number(index) > 10) return msg.reply('Uh-oh! The guild has reached the maximum amount of 10 warnings, sorry.');
 

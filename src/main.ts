@@ -75,7 +75,7 @@ const ReconnectCodes = [
 
 const OtherPossibleReconnectCodes = [
   'WebSocket was closed before the connection was established',
-  'Server didn\'t acknowledge previous heartbeat, possible lost connection',
+  "Server didn't acknowledge previous heartbeat, possible lost connection",
 ];
 
 process.on('unhandledRejection', (error) => {

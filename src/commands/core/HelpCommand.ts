@@ -89,7 +89,9 @@ export default class HelpCommand extends Command {
   }
 
   private async renderDoc(msg: CommandMessage, cmdOrMod: string) {
-    const command = this.parent.filter((cmd) => (!cmd.hidden && cmd.name === cmdOrMod) || cmd.aliases.includes(cmdOrMod))[0];
+    const command = this.parent.filter(
+      (cmd) => (!cmd.hidden && cmd.name === cmdOrMod) || cmd.aliases.includes(cmdOrMod)
+    )[0];
     const prefix = msg.settings.prefixes[msg.settings.prefixes.length - 1];
 
     if (command !== undefined) {
@@ -126,17 +128,23 @@ export default class HelpCommand extends Command {
           {
             name: msg.locale.translate('commands.help.command.embed.fields.user_perms'),
             value:
-              Permissions.stringify(command.userPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0n)) || 'None',
+              Permissions.stringify(
+                command.userPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0n)
+              ) || 'None',
             inline: true,
           },
           {
             name: msg.locale.translate('commands.help.command.embed.fields.bot_perms'),
-            value: Permissions.stringify(command.botPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0n)) || 'None',
+            value:
+              Permissions.stringify(
+                command.botPermissions.reduce((acc, curr) => acc | ErisConstants.Permissions[curr], 0n)
+              ) || 'None',
             inline: true,
           },
           {
             name: msg.locale.translate('commands.help.command.embed.fields.examples'),
-            value: command.examples.map((example) => `• **${prefix}${example}**`).join('\n') || 'No examples are available.',
+            value:
+              command.examples.map((example) => `• **${prefix}${example}**`).join('\n') || 'No examples are available.',
             inline: false,
           },
         ]);
@@ -157,7 +165,10 @@ export default class HelpCommand extends Command {
           .setAuthor(msg.locale.translate('commands.help.module.embed.title', [firstUpper(cmdOrMod)]))
           .setDescription(
             mod.map(
-              (command) => `**\`${prefix}${command.format}\`** ~  \u200b \u200b**${msg.locale.translate(command.description as any)}**`
+              (command) =>
+                `**\`${prefix}${command.format}\`** ~  \u200b \u200b**${msg.locale.translate(
+                  command.description as any
+                )}**`
             )
           );
 

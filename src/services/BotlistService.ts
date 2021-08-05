@@ -50,7 +50,7 @@ export default class BotlistsService {
   async load() {
     const botlists = this.config.getProperty('botlists');
     if (botlists === undefined) {
-      this.logger.warn('`botlists` is missing, don\'t need to add it if running privately.');
+      this.logger.warn("`botlists` is missing, don't need to add it if running privately.");
       return Promise.resolve();
     }
 
@@ -87,7 +87,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dservices,
+            'Authorization': botlists.dservices,
           },
         })
         .then((res) => {
@@ -113,7 +113,7 @@ export default class BotlistsService {
           url: `https://discord.boats/api/bot/${this.discord.client.user.id}`,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dboats,
+            'Authorization': botlists.dboats,
           },
         })
         .then((res) => {
@@ -140,7 +140,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dbots,
+            'Authorization': botlists.dbots,
           },
         })
         .then((res) => {
@@ -167,7 +167,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.topgg,
+            'Authorization': botlists.topgg,
           },
         })
         .then((res) => {
@@ -195,7 +195,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.delly,
+            'Authorization': botlists.delly,
           },
         })
         .then((res) => {
@@ -221,7 +221,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.bfd,
+            'Authorization': botlists.bfd,
           },
         })
         .then((res) => {
@@ -237,9 +237,10 @@ export default class BotlistsService {
 
     const successRate = ((success / list.length) * 100).toFixed(2);
     this.logger.info(
-      [`ℹ️ listly posted to ${list.length} botlists with a success rate of ${successRate}%`, 'Serialized output will be displayed:'].join(
-        '\n'
-      )
+      [
+        `ℹ️ listly posted to ${list.length} botlists with a success rate of ${successRate}%`,
+        'Serialized output will be displayed:',
+      ].join('\n')
     );
 
     for (const botlist of list) {

@@ -77,7 +77,9 @@ export default class ModLogCommand extends Command {
       });
 
       return msg.reply(
-        `${type ? msg.successEmote : msg.errorEmote} Successfully **${type ? 'enabled' : 'disabled'}** the Logging feature.`
+        `${type ? msg.successEmote : msg.errorEmote} Successfully **${
+          type ? 'enabled' : 'disabled'
+        }** the Logging feature.`
       );
     }
 
@@ -106,7 +108,9 @@ export default class ModLogCommand extends Command {
     });
 
     return msg.reply(
-      `Logs will be shown in #${chan.name}!${updateEnabled ? '\n:eyes: I saw it wasn\'t enabled. So, I enabled it myself.' : ''}`
+      `Logs will be shown in #${chan.name}!${
+        updateEnabled ? "\n:eyes: I saw it wasn't enabled. So, I enabled it myself." : ''
+      }`
     );
   }
 
@@ -198,7 +202,8 @@ export default class ModLogCommand extends Command {
     }
 
     if (channel !== null) {
-      if (![0, 5].includes(channel.type)) return msg.reply(`Channel with ID ${channel.id} was not a Text or News channel`);
+      if (![0, 5].includes(channel.type))
+        return msg.reply(`Channel with ID ${channel.id} was not a Text or News channel`);
 
       const enabled = !settings.ignoreChannels.includes(channel.id);
       settings.ignoreChannels = !settings.ignoreChannels.includes(channel.id)
@@ -206,7 +211,9 @@ export default class ModLogCommand extends Command {
         : settings.ignoreChannels.filter((chanID) => chanID !== channel.id);
       await this.database.logging['repository'].save(settings);
 
-      return msg.reply(`:thumbsup: ${enabled ? 'Added' : 'Deleted'} entry for channel **#${channel.name}** to be excluded in logging.`);
+      return msg.reply(
+        `:thumbsup: ${enabled ? 'Added' : 'Deleted'} entry for channel **#${channel.name}** to be excluded in logging.`
+      );
     }
 
     if (user !== null) {
@@ -217,7 +224,9 @@ export default class ModLogCommand extends Command {
       await this.database.logging['repository'].save(settings);
 
       return msg.reply(
-        `:thumbsup: ${enabled ? 'Added' : 'Deleted'} entry for user **${user.username}#${user.discriminator}** to be excluded in logging.`
+        `:thumbsup: ${enabled ? 'Added' : 'Deleted'} entry for user **${user.username}#${
+          user.discriminator
+        }** to be excluded in logging.`
       );
     }
 

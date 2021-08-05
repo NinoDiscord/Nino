@@ -88,10 +88,12 @@ export default class Invites implements Automod {
           invalid = true;
         } else {
           const hasInvite = invites.filter((inv) => inv === invite.code).length > 0;
-          if (!hasInvite && invite.guild !== undefined && invite.guild.id === msg.channel.guild.id) invites.push(invite.code);
+          if (!hasInvite && invite.guild !== undefined && invite.guild.id === msg.channel.guild.id)
+            invites.push(invite.code);
         }
       } catch (ex) {
-        if (ex instanceof DiscordRESTError && ex.code === 100006 && ex.message.includes('Unknown Invite')) invalid = true;
+        if (ex instanceof DiscordRESTError && ex.code === 100006 && ex.message.includes('Unknown Invite'))
+          invalid = true;
       }
 
       if (invalid) return false;

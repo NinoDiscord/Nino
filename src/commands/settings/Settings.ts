@@ -62,9 +62,13 @@ export default class SettingsCommand extends Command {
         {
           name: '❯ Settings',
           value: [
-            `• **Muted Role**: ${settings.mutedRoleID !== null ? `<@&${settings.mutedRoleID}> (**${settings.mutedRoleID}**)` : 'None'}`,
+            `• **Muted Role**: ${
+              settings.mutedRoleID !== null ? `<@&${settings.mutedRoleID}> (**${settings.mutedRoleID}**)` : 'None'
+            }`,
             `• **Mod Log**: ${
-              settings.modlogChannelID !== null ? `<#${settings.modlogChannelID}> (**${settings.modlogChannelID}**)` : 'None'
+              settings.modlogChannelID !== null
+                ? `<#${settings.modlogChannelID}> (**${settings.modlogChannelID}**)`
+                : 'None'
             }`,
           ].join('\n'),
           inline: true,
@@ -87,7 +91,9 @@ export default class SettingsCommand extends Command {
           value: [
             `• **Channels Ignored**: ${logging.ignoreChannels.length}`,
             `• **Users Ignored**: ${logging.ignoreUsers.length}`,
-            `• **Channel**: ${logging.channelID !== null ? `<#${logging.channelID}> (**${logging.channelID}**)` : 'None'}`,
+            `• **Channel**: ${
+              logging.channelID !== null ? `<#${logging.channelID}> (**${logging.channelID}**)` : 'None'
+            }`,
             `• **Enabled**: ${logging.enabled ? msg.successEmote : msg.errorEmote}`,
             `• **Events**: ${logging.events.map((ev) => humanizedEvents[ev]).join(', ') || 'None'}`,
           ].join('\n'),

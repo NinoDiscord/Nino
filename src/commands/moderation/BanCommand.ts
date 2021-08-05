@@ -49,7 +49,12 @@ export default class BanCommand extends Command {
       botPermissions: 'banMembers',
       description: 'descriptions.ban',
       category: Categories.Moderation,
-      examples: ['ban @Nino', 'ban @Nino some reason!', 'ban @Nino some reason! | 1d', 'ban @Nino some reason! | 1d -d 7'],
+      examples: [
+        'ban @Nino',
+        'ban @Nino some reason!',
+        'ban @Nino some reason! | 1d',
+        'ban @Nino some reason! | 1d -d 7',
+      ],
       aliases: ['banne', 'bent', 'bean'],
       usage: '<user> [reason [| time]]',
       name: 'ban',
@@ -86,14 +91,16 @@ export default class BanCommand extends Command {
       guild: msg.guild,
     };
     if (member.id === msg.guild.ownerID)
-      return msg.reply('I don\'t think I can perform this action due to you banning the owner, you idiot.');
+      return msg.reply("I don't think I can perform this action due to you banning the owner, you idiot.");
 
     if (member.id === this.discord.client.user.id) return msg.reply(';w; why would you ban me from here? **(／。＼)**');
 
     if (member instanceof Member) {
       // this won't work for banning members not in this guild
       if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
-        return msg.reply(`I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`);
+        return msg.reply(
+          `I can't perform this action due to **${user.username}#${user.discriminator}** being a server moderator.`
+        );
 
       if (!Permissions.isMemberAbove(msg.member, member))
         return msg.reply(`User **${user.username}#${user.discriminator}** is the same or above you.`);
@@ -103,7 +110,10 @@ export default class BanCommand extends Command {
     }
 
     const ban = await msg.guild.getBan(user.id).catch(() => null);
-    if (ban !== null) return msg.reply(`${user.bot ? 'Bot' : 'User'} was previously banned for ${ban.reason ?? '*(no reason provided)*'}`);
+    if (ban !== null)
+      return msg.reply(
+        `${user.bot ? 'Bot' : 'User'} was previously banned for ${ban.reason ?? '*(no reason provided)*'}`
+      );
 
     args.shift(); // remove user ID
 
@@ -124,7 +134,9 @@ export default class BanCommand extends Command {
     if (Number(days) > 7) return msg.reply('You can only concat 7 days worth of messages');
 
     if (flags.soft !== undefined)
-      await msg.reply('Flag `--soft` is deprecated and will be removed in a future release, use the `softban` command.');
+      await msg.reply(
+        'Flag `--soft` is deprecated and will be removed in a future release, use the `softban` command.'
+      );
 
     try {
       await this.punishments.apply({

@@ -95,7 +95,11 @@ export default class EvalCommand extends Command {
       if (slient) return;
 
       const res = this.redact(result);
-      return msg.reply([`:timer: **${asyncTimer !== undefined ? `${time}<${asyncTimer}>` : time}**`, '', '```js', res, '```'].join('\n'));
+      return msg.reply(
+        [`:timer: **${asyncTimer !== undefined ? `${time}<${asyncTimer}>` : time}**`, '', '```js', res, '```'].join(
+          '\n'
+        )
+      );
     } catch (ex) {
       const time = stopwatch.end();
       return msg.reply([`:timer: **${time}**`, '', '```js', ex.stack ?? '<... no stacktrace ...>', '```'].join('\n'));

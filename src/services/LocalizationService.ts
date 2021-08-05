@@ -70,7 +70,9 @@ export default class LocalizationService {
       this.logger.fatal(`Localization "${defaultLocale}" was not found, defaulting to en_US...`);
       this.defaultLocale = this.locales.get('en_US')!;
 
-      this.logger.warn(`Due to locale "${defaultLocale}" not being found and want to translate, read up on our translating guide:`);
+      this.logger.warn(
+        `Due to locale "${defaultLocale}" not being found and want to translate, read up on our translating guide:`
+      );
     } else {
       this.logger.info(`Localization "${defaultLocale}" was found!`);
       this.defaultLocale = locale;

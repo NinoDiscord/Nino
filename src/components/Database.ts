@@ -87,23 +87,23 @@ export default class Database {
     const config: ConnectionOptions =
       url !== undefined
         ? {
-          migrations: ['./migrations/*.ts'],
-          entities,
-          type: 'postgres',
-          name: 'Nino',
-          url,
-        }
+            migrations: ['./migrations/*.ts'],
+            entities,
+            type: 'postgres',
+            name: 'Nino',
+            url,
+          }
         : {
-          migrations: ['./migrations/*.ts'],
-          username: this.config.getProperty('database.username'),
-          password: this.config.getProperty('database.password'),
-          database: this.config.getProperty('database.database'),
-          entities,
-          host: this.config.getProperty('database.host'),
-          port: this.config.getProperty('database.port'),
-          type: 'postgres',
-          name: 'Nino',
-        };
+            migrations: ['./migrations/*.ts'],
+            username: this.config.getProperty('database.username'),
+            password: this.config.getProperty('database.password'),
+            database: this.config.getProperty('database.database'),
+            entities,
+            host: this.config.getProperty('database.host'),
+            port: this.config.getProperty('database.port'),
+            type: 'postgres',
+            name: 'Nino',
+          };
 
     this.connection = await createConnection(config);
     this.initRepos();
