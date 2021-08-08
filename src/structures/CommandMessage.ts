@@ -28,6 +28,7 @@ import type UserEntity from '../entities/UserEntity';
 import type Locale from './Locale';
 import { Inject } from '@augu/lilith';
 import Discord from '../components/Discord';
+import { Filter } from './MessageCollector';
 
 interface ComponentsAdvancedMessageContent extends AdvancedMessageContent {
   components?: ActionRow[];
@@ -133,5 +134,21 @@ export default class CommandMessage {
 
   error(content: string) {
     return this.reply(`${this.errorEmote} ${content}`);
+  }
+
+  async awaitReply(content: string | EmbedBuilder, time: number, filter: Filter) {
+    const message = await this.reply(content);
+    const replied = await this.#message.collector.awaitMessage(filter, {
+      channel: this.channel.id,
+      author: this.author.id,
+      time,
+    });
+
+    if (replied === null) {
+      await message.delete();
+      return this.error("**Didn't receive anything, assuming to cancel.**");
+    }
+
+    return replied;
   }
 }

@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
+import MessageCollector from '../structures/MessageCollector';
+import { Message, User } from 'eris';
 import { Logger } from 'tslog';
-import { User } from 'eris';
 
 const logger = app.$ref<Logger>(Logger);
 logger.info('monkeypatching eris...');
@@ -36,4 +37,9 @@ Object.defineProperty(User.prototype, 'tag', {
   },
 });
 
-logger.info('Monkey patched the following items:', ['User#tag'].join('\n'));
+Object.defineProperty(Message.prototype, 'collector', {
+  value: new MessageCollector(app.get('discord')),
+  writable: false,
+});
+
+logger.info('Monkey patched the following items:', ['User#tag', 'Message#collector'].join('\n'));

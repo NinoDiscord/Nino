@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, BaseEntity } from 'typeorm';
 import { PunishmentType } from './PunishmentsEntity';
 
 @Entity({ name: 'cases' })
-export default class CaseEntity {
+export default class CaseEntity extends BaseEntity {
   @Column({ default: '{}', array: true, type: 'text' })
   public attachments!: string[];
 

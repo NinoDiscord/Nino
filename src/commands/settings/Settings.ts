@@ -20,11 +20,11 @@
  * SOFTWARE.
  */
 
-import { Command, CommandMessage, EmbedBuilder } from '../../structures';
+import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
 import { LoggingEvents } from '../../entities/LoggingEntity';
+import { Categories } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
-import { Categories } from '../../util/Constants';
 
 const humanizedEvents = {
   [LoggingEvents.VoiceChannelSwitch]: 'Voice Channel Switch',

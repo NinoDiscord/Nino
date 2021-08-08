@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2021 Noel
+ * Copyright (c) 2019-2021 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,25 @@
  * SOFTWARE.
  */
 
-module.exports = {
-  semi: true,
-  tabWidth: 2,
-  singleQuote: true,
-  endOfLine: 'lf',
-  printWidth: 120,
-  trailingComma: 'es5',
-  bracketSpacing: true,
-  jsxBracketSameLine: false,
-};
+import { Inject, Subscribe } from '@augu/lilith';
+import type { Guild, Role } from 'eris';
+import { Logger } from 'tslog';
+import Database from '../components/Database';
+
+export default class GuildRoleListener {
+  @Inject
+  private readonly database!: Database;
+
+  @Inject
+  private readonly logger!: Logger;
+
+  @Subscribe('guildRoleDelete', { emitter: 'discord' })
+  async onGuildRoleDelete(guild: Guild, role: Role) {
+    const settings = await this.database.guilds.get(guild.id);
+    if (!settings.mutedRoleID) return;
+    if (role.id !== settings.mutedRoleID) return;
+
+    this.logger.warn(`Muted role ${settings.mutedRoleID} was accidently deleted, so I deleted it in the database. :)`);
+    await this.database.guilds.update(guild.id, { mutedRoleID: role.id });
+  }
+}

@@ -27,6 +27,7 @@ import CommandService from '../../services/CommandService';
 import Permissions from '../../util/Permissions';
 import { Inject } from '@augu/lilith';
 import Discord from '../../components/Discord';
+import { Button, ButtonStyle, LinkButton } from 'slash-commands';
 
 interface CommandCategories {
   moderation?: Command[];
@@ -92,6 +93,7 @@ export default class HelpCommand extends Command {
     const command = this.parent.filter(
       (cmd) => (!cmd.hidden && cmd.name === cmdOrMod) || cmd.aliases.includes(cmdOrMod)
     )[0];
+
     const prefix = msg.settings.prefixes[msg.settings.prefixes.length - 1];
 
     if (command !== undefined) {

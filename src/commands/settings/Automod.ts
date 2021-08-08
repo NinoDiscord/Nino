@@ -87,7 +87,7 @@ export default class AutomodCommand extends Command {
     return msg.reply(`${enabled ? msg.successEmote : msg.errorEmote} the Shortlinks automod feature`);
   }
 
-  @Subcommand('[...words]')
+  @Subcommand('[...words | "remove" ...words | "list"]')
   async blacklist(msg: CommandMessage, [...words]: [...string[]]) {
     const settings = await this.database.automod.get(msg.guild.id);
 
@@ -120,6 +120,21 @@ export default class AutomodCommand extends Command {
       });
 
       return msg.success('Successfully removed the blacklisted words. :D');
+    }
+
+    if (words[0] === 'list') {
+      const automod = await this.database.automod.get(msg.guild.id);
+      const embed = EmbedBuilder.create()
+        .setTitle('Blacklisted Words')
+        .setDescription([
+          `:eyes: Hi **${msg.author.tag}**, I would like to inform you that I'll be deleting this message in 10 seconds`,
+          'due to the words that are probably blacklisted, don\'t want to offend anyone. :c',
+          '',
+          ...automod!.blacklistWords.map(s => `\`${s}\``).join(', ')
+        ]);
+
+      return msg.reply(embed)
+        .then(m => setTimeout(() => m.delete(), 10_000));
     }
 
     const curr = settings!.blacklistWords.concat(words);

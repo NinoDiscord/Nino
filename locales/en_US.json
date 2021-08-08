@@ -45,6 +45,7 @@
       "muted_role": "Sets or resets the Muted role.",
       "prefix": "View, change, or reset a guild or user prefix.",
       "punishments": "View, change, or remove a guild punishment.",
+      "reset": "Resets all guild settings!",
       "settings": "Views a list of all the settings in this guild."
     },
     "commands": {

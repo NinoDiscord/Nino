@@ -55,7 +55,9 @@ export default class ModLogCommand extends Command {
         'logging | Enable / Disable the feature',
         'logging list | List the current configuration',
         'logging reset | Reset the mod log channel',
-        'logging events | Enable all logging events',
+        'logging events | Lists all logging events',
+        'logging events * | Enables all logging events',
+        'logging events -* | Disables all logging events',
         'logging event message.update | Enable / Disable a specific event',
         'logging 236987412589632587 | Specify a logs channel',
         'logging ignore 5246968653214587563 | Ignores a channel from displaying logs',
@@ -87,7 +89,6 @@ export default class ModLogCommand extends Command {
     const settings = await this.database.logging.get(msg.guild.id);
 
     if (chan === null) return msg.reply(`Channel "${channel}" doesn't exist.`);
-
     if (chan.type !== 0) return msg.reply(`Channel #${chan.name} was not a text channel`);
 
     const perms = chan.permissionsOf(this.discord.client.user.id);

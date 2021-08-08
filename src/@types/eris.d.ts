@@ -21,6 +21,7 @@
  */
 
 import Eris from 'eris';
+import MessageCollector from '../structures/MessageCollector';
 
 declare module 'eris' {
   interface Collection<T> extends Map<string | number, T> {
@@ -40,5 +41,9 @@ declare module 'eris' {
 
   interface User {
     tag: string;
+  }
+
+  interface Message {
+    collector: MessageCollector;
   }
 }
