@@ -87,7 +87,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dservices,
+            'Authorization': botlists.dservices,
           },
         })
         .then((res) => {
@@ -113,7 +113,7 @@ export default class BotlistsService {
           url: `https://discord.boats/api/bot/${this.discord.client.user.id}`,
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dboats,
+            'Authorization': botlists.dboats,
           },
         })
         .then((res) => {
@@ -140,7 +140,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.dbots,
+            'Authorization': botlists.dbots,
           },
         })
         .then((res) => {
@@ -167,7 +167,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.topgg,
+            'Authorization': botlists.topgg,
           },
         })
         .then((res) => {
@@ -195,7 +195,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.delly,
+            'Authorization': botlists.delly,
           },
         })
         .then((res) => {
@@ -221,7 +221,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            Authorization: botlists.bfd,
+            'Authorization': botlists.bfd,
           },
         })
         .then((res) => {
