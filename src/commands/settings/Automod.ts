@@ -128,13 +128,12 @@ export default class AutomodCommand extends Command {
         .setTitle('Blacklisted Words')
         .setDescription([
           `:eyes: Hi **${msg.author.tag}**, I would like to inform you that I'll be deleting this message in 10 seconds`,
-          'due to the words that are probably blacklisted, don\'t want to offend anyone. :c',
+          "due to the words that are probably blacklisted, don't want to offend anyone. :c",
           '',
-          ...automod!.blacklistWords.map(s => `\`${s}\``).join(', ')
+          ...automod!.blacklistWords.map((s) => `\`${s}\``).join(', '),
         ]);
 
-      return msg.reply(embed)
-        .then(m => setTimeout(() => m.delete(), 10_000));
+      return msg.reply(embed).then((m) => setTimeout(() => m.delete(), 10_000));
     }
 
     const curr = settings!.blacklistWords.concat(words);

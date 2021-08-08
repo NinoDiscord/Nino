@@ -32,7 +32,7 @@ import Config from '../components/Config';
 
 @Component({
   priority: 0,
-  name: 'api'
+  name: 'api',
 })
 export default class API {
   @Inject
@@ -51,7 +51,7 @@ export default class API {
   async load() {
     const enabled = this.config.getProperty('api');
     if (!enabled) {
-      this.logger.warn('Internal API is not enabled, this isn\'t recommended on self-hosted instances.');
+      this.logger.warn("Internal API is not enabled, this isn't recommended on self-hosted instances.");
       return;
     }
 
@@ -82,8 +82,7 @@ export default class API {
   private setupRoutes() {
     this.logger.info('🚀 Setting up routing...');
 
-    this
-      .instance
+    this.instance
       .get('/', (_, res) => void res.redirect('https://nino.sh'))
       .get('/commands', (req, res) => {
         this._handleAllCommandsRoute.call(this, req, res);
@@ -94,57 +93,71 @@ export default class API {
   }
 
   private _handleAllCommandsRoute(req: FastifyRequest, reply: FastifyReply) {
-    const query = (req.query as Record<'locale' | 'l', string>);
-    let locale = query['l'] !== undefined || query['locale'] !== undefined
-      ? this.localization.locales.find(l => (l.code === query.l || l.code === query.locale) || (l.aliases.includes(query.l) || l.aliases.includes(query.locale)))
-      : this.localization.defaultLocale;
+    const query = req.query as Record<'locale' | 'l', string>;
+    let locale =
+      query['l'] !== undefined || query['locale'] !== undefined
+        ? this.localization.locales.find(
+            (l) =>
+              l.code === query.l ||
+              l.code === query.locale ||
+              l.aliases.includes(query.l) ||
+              l.aliases.includes(query.locale)
+          )
+        : this.localization.defaultLocale;
 
-    if (locale === null)
-      locale = this.localization.defaultLocale;
+    if (locale === null) locale = this.localization.defaultLocale;
 
     const prefix = this.config.getProperty('prefixes')?.[0] ?? 'x!';
-    const commands = this.commands.filter(s => !s.ownerOnly || !s.hidden).map(command => ({
-      name: command.name,
-      description: locale!.translate(command.description),
-      examples: command.examples.map(s => `${prefix}${s}`),
-      usage: command.format,
-      aliases: command.aliases,
-      cooldown: pluralize('second', command.cooldown),
-      category: command.category,
-      user_permissions: command.userPermissions,
-      bot_permissions: command.botPermissions
-    }));
+    const commands = this.commands
+      .filter((s) => !s.ownerOnly || !s.hidden)
+      .map((command) => ({
+        name: command.name,
+        description: locale!.translate(command.description),
+        examples: command.examples.map((s) => `${prefix}${s}`),
+        usage: command.format,
+        aliases: command.aliases,
+        cooldown: pluralize('second', command.cooldown),
+        category: command.category,
+        user_permissions: command.userPermissions,
+        bot_permissions: command.botPermissions,
+      }));
 
     return reply.status(200).send(commands);
   }
 
   private _handleSingleCommandLookup(req: FastifyRequest, reply: FastifyReply) {
-    const query = (req.query as Record<'locale' | 'l', string>) ?? {} as Record<'locale' | 'l', string>;
-    const params = (req.params as Record<'name', string>);
-    let locale = query['l'] !== undefined || query['locale'] !== undefined
-      ? this.localization.locales.find(l => (l.code === query.l || l.code === query.locale) || (l.aliases.includes(query.l) || l.aliases.includes(query.locale)))
-      : this.localization.defaultLocale;
+    const query = (req.query as Record<'locale' | 'l', string>) ?? ({} as Record<'locale' | 'l', string>);
+    const params = req.params as Record<'name', string>;
+    let locale =
+      query['l'] !== undefined || query['locale'] !== undefined
+        ? this.localization.locales.find(
+            (l) =>
+              l.code === query.l ||
+              l.code === query.locale ||
+              l.aliases.includes(query.l) ||
+              l.aliases.includes(query.locale)
+          )
+        : this.localization.defaultLocale;
 
-    if (locale === null)
-      locale = this.localization.defaultLocale;
+    if (locale === null) locale = this.localization.defaultLocale;
 
     const prefix = this.config.getProperty('prefixes')?.[0] ?? 'x!';
-    const command = this.commands.filter(s => !s.ownerOnly || !s.hidden).filter(s => s.name === params.name)[0];
+    const command = this.commands.filter((s) => !s.ownerOnly || !s.hidden).filter((s) => s.name === params.name)[0];
     if (!command)
       return void reply.status(404).send({
-        message: `Command ${params.name} was not found.`
+        message: `Command ${params.name} was not found.`,
       });
 
     return void reply.status(200).send({
       name: command.name,
       description: command.description,
-      examples: command.examples.map(s => `${prefix}${s}`),
+      examples: command.examples.map((s) => `${prefix}${s}`),
       usage: command.format,
       aliases: command.aliases,
       cooldown: pluralize('second', command.cooldown),
       category: command.category,
       user_permissions: command.userPermissions,
-      bot_permissions: command.botPermissions
+      bot_permissions: command.botPermissions,
     });
   }
 }

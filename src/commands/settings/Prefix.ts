@@ -132,12 +132,12 @@ export default class PrefixCommand extends Command {
     const data = await controller.get(isUser ? msg.author.id : msg.guild.id);
     const owners = this.config.getProperty('owners') ?? [];
 
-    const canManageGuild = msg.guild.ownerID === msg.author.id
-      ? true
-      : msg.member.permissions.has('manageGuild') || owners.includes(msg.author.id);
+    const canManageGuild =
+      msg.guild.ownerID === msg.author.id
+        ? true
+        : msg.member.permissions.has('manageGuild') || owners.includes(msg.author.id);
 
-    if (!isUser && !canManageGuild)
-      return msg.reply('Missing the **Manage Guild** permission.');
+    if (!isUser && !canManageGuild) return msg.reply('Missing the **Manage Guild** permission.');
 
     const index = data.prefixes.findIndex((prefix) => prefix.toLowerCase() === pre.toLowerCase());
     if (index === -1) return msg.reply('Prefix was not found');

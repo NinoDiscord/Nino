@@ -45,6 +45,7 @@ import AutomodEntity from '../entities/AutomodEntity';
 import GuildEntity from '../entities/GuildEntity';
 import CaseEntity from '../entities/CaseEntity';
 import UserEntity from '../entities/UserEntity';
+import { collapseTextChangeRangesAcrossMultipleVersions } from 'typescript';
 
 @Component({
   priority: 1,
@@ -121,14 +122,17 @@ export default class Database {
         const ran = await this.connection.runMigrations({ transaction: 'all' });
         this.logger.info(`Ran ${ran.length} migrations! You're all to go.`);
       } catch (ex) {
-        this.logger.fatal(ex);
-
         if (ex.message.indexOf('already exists') !== -1) {
           this.logger.warn('Seems like relations or indexes existed!');
           return Promise.resolve();
         }
 
-        return Promise.reject(ex);
+        try {
+          this.logger.error('Rolling back changes...', ex);
+          await this.connection.undoLastMigration({ transaction: 'all' });
+        } catch (ex2) {
+          return Promise.reject(ex2);
+        }
       }
     } else {
       this.logger.info('No migrations needs to be ran and the connection to the database is healthy.');

@@ -37,13 +37,13 @@ export default class CaseEntity extends BaseEntity {
   @Column({ name: 'victim_id' })
   public victimID!: string;
 
-  @PrimaryColumn({ name: 'guild_id' })
+  @PrimaryColumn({ name: 'guild_id', unique: true })
   public guildID!: string;
 
   @Column({ nullable: true, default: undefined })
   public reason?: string;
 
-  @PrimaryColumn()
+  @Column()
   public index!: number;
 
   @Column({
