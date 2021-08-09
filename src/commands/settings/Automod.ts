@@ -199,33 +199,4 @@ export default class AutomodCommand extends Command {
       `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Spam automod feature.`
     );
   }
-
-  @Subcommand('[...channels]')
-  async raid(msg: CommandMessage, [...channels]: string[]) {
-    if (!channels.length) {
-      const settings = await this.database.automod.get(msg.guild.id);
-      const t = !settings!.raid;
-      const result = await this.database.automod.update(msg.guild.id, {
-        raid: !settings!.raid,
-      });
-
-      return msg.reply(
-        `${t ? `${msg.successEmote} **Enabled**` : `${msg.errorEmote} **Disabled**`} Raid automod feature.`
-      );
-    }
-
-    const automod = await this.database.automod.get(msg.guild.id);
-    const found = await Promise.all(channels.map((chanID) => this.discord.getChannel<TextChannel>(chanID)));
-    const chans = found.filter((c) => c !== null && c.type !== 0).map((s) => s!.id);
-    const result = await this.database.automod.update(msg.guild.id, {
-      whitelistChannelsDuringRaid: automod!.whitelistChannelsDuringRaid.concat(chans),
-    });
-
-    const message =
-      result.affected === 1
-        ? `${msg.successEmote} Added **${chans.length}** channels to the whitelist.`
-        : `${msg.errorEmote} Unable to add **${chans.length}** channels to the whitelist.`;
-
-    return msg.reply(message);
-  }
 }

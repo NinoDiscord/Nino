@@ -69,7 +69,6 @@ export default class ResetCommand extends Command {
         }),
 
         this.database.automod.update(msg.guild.id, {
-          whitelistChannelsDuringRaid: [],
           blacklistWords: [],
           shortLinks: false,
           blacklist: false,
