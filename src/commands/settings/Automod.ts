@@ -130,7 +130,7 @@ export default class AutomodCommand extends Command {
           `:eyes: Hi **${msg.author.tag}**, I would like to inform you that I'll be deleting this message in 10 seconds`,
           "due to the words that are probably blacklisted, don't want to offend anyone. :c",
           '',
-          ...automod!.blacklistWords.map((s) => `\`${s}\``).join(', '),
+          automod!.blacklistWords.map((s) => `\`${s}\``).join(', '),
         ]);
 
       return msg.reply(embed).then((m) => setTimeout(() => m.delete(), 10_000));
