@@ -82,7 +82,9 @@ const main = async () => {
   // First, let's do cases (since some might be broken...)
   logger.info(`Found ${cases.length} cases~`);
   for (const model of cases) {
-    data.data.cases = {
+    if (!data.data.hasOwnProperty('cases')) data.data.cases = [];
+
+    data.data.cases.push({
       attachments: model.attachments,
       moderator_id: model.moderatorID,
       message_id: model.messageID,
@@ -92,7 +94,7 @@ const main = async () => {
       index: model.index,
       soft: model.soft,
       time: model.time,
-    };
+    });
   }
 
   await writeFile(key, JSON.stringify(data, null, '\t'));
