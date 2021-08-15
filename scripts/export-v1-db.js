@@ -76,14 +76,19 @@ const main = async () => {
     version: 1,
     ran_at: Date.now(),
     blame: require('os').userInfo().username.replace('cutie', 'Noel'),
-    data: {},
+    data: {
+      automod: [],
+      cases: [],
+      logging: [],
+      guilds: [],
+      punishments: [],
+      warnings: [],
+      users: [],
+    },
   };
 
-  // First, let's do cases (since some might be broken...)
-  logger.info(`Found ${cases.length} cases~`);
+  logger.info(`Found ${cases.length} cases to export!`);
   for (const model of cases) {
-    if (!data.data.hasOwnProperty('cases')) data.data.cases = [];
-
     data.data.cases.push({
       attachments: model.attachments,
       moderator_id: model.moderatorID,
@@ -97,7 +102,79 @@ const main = async () => {
     });
   }
 
+  logger.info(`Found ${guilds.length.toLocaleString()} guilds to export.`);
+  for (const guild of guilds) {
+    data.data.guilds.push({
+      guild_id: guild.guildID,
+      prefixes: guild.prefixes,
+      language: guild.language,
+      modlog_channel_id: guild.modlogChannelID,
+      muted_role_id: guild.mutedRoleID,
+    });
+  }
+
+  logger.info(`Found ${users.length.toLocaleString()} users.`);
+  for (const user of users) {
+    data.data.users.push({
+      user_id: user.id,
+      language: user.language,
+      prefixes: user.prefixes,
+    });
+  }
+
+  logger.info(`Found ${punishments.length.toLocaleString()} punishments.`);
+  for (const punishment of punishments) {
+    data.data.punishments.push({
+      warnings: punishment.warnings,
+      guild_id: punishment.guildID,
+      index: punishment.index,
+      soft: punishment.soft,
+      time: punishment.time,
+      days: punishment.days,
+      type: punishment.type,
+    });
+  }
+
+  logger.info(`Found ${automod.length.toLocaleString()} guild automod settings.`);
+  for (const auto of automod) {
+    data.data.automod.push({
+      blacklisted_words: auto.blacklistWords,
+      short_links: auto.shortLinks,
+      blacklist: auto.blacklist,
+      mentions: auto.mentions,
+      invites: auto.invites,
+      dehoisting: auto.dehoist,
+      guild_id: auto.guildID,
+      spam: auto.spam,
+      raid: auto.raid,
+    });
+  }
+
+  logger.info(`Found ${warnings.length.toLocaleString()} warnings.`);
+  for (const warning of warnings) {
+    data.data.warnings.push({
+      guild_id: warning.guildID,
+      reason: warning.reason,
+      amount: warning.amount,
+      user_id: warning.userID,
+      id: warning.id,
+    });
+  }
+
+  logger.info(`Found ${logging.length.toLocaleString()} guild logging settings.`);
+  for (const log of logging) {
+    data.data.logging.push({
+      ignore_channel_ids: log.ignoreChannels,
+      ignore_user_ids: log.ignoreUsers,
+      channel_id: log.channelID,
+      enabled: log.enabled,
+      events: log.events,
+      guild_id: log.guildID,
+    });
+  }
+
   await writeFile(key, JSON.stringify(data, null, '\t'));
+  logger.info(`File has been exported to ${key}!`);
 };
 
 main();
