@@ -20,3 +20,6 @@ launch.json
 # Ignore user-config
 .vscode/
 .idea/
+
+# v1 export
+.nino

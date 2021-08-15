@@ -53,14 +53,12 @@ const main = async () => {
   const files = await Promise.all([
     readdir(path.join(__dirname, '..', 'src')),
     readdir(path.join(__dirname, '..', 'scripts')),
-  ]).then((arr) => arr.flat());
+  ]).then((arr) => arr.flat().filter((s) => s.endsWith('.js') || s.endsWith('.ts')));
 
   for (const file of files) {
     console.log(`Adding license to ${file}...`);
     const content = fs.readFileSync(file, 'utf8');
-    const raw = content.includes('* Copyright (c)')
-      ? content.split('\n').slice(22).join('\n')
-      : content;
+    const raw = content.includes('* Copyright (c)') ? content.split('\n').slice(22).join('\n') : content;
 
     await fs.promises.writeFile(file, LICENSE + raw);
 
