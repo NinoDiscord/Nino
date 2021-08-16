@@ -53,7 +53,7 @@
     "reflect-metadata": "0.1.13",
     "slash-commands": "1.5.0",
     "source-map-support": "0.5.19",
-    "tslog": "3.2.0",
+    "tslog": "3.2.1",
     "typeorm": "0.2.31",
     "ws": "8.1.0"
   },
