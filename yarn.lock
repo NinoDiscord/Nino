@@ -1000,9 +1000,9 @@ enquirer@^2.3.5:
   dependencies:
     ansi-colors "^4.1.1"
 
-"eris@github:abalabahaha/eris#dev":
+"eris@github:DonovanDMC/eris#everything":
   version "0.15.2-dev"
-  resolved "https://codeload.github.com/abalabahaha/eris/tar.gz/ee960c06a5c274ba9d3eb491466239eb3cac3647"
+  resolved "https://codeload.github.com/DonovanDMC/eris/tar.gz/d6c3631bbc3c49aa6d3c2f8c81e922a1b1524fef"
   dependencies:
     ws "^7.4.6"
   optionalDependencies:

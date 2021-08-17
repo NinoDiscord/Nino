@@ -20,14 +20,16 @@
  * SOFTWARE.
  */
 
+import type { ApplicationCommandOptionBuilder } from 'slash-commands';
+import { Categories, MetadataKeys } from '../util/Constants';
 import { getSubcommandsIn } from './decorators/Subcommand';
+import SlashCommandMessage from './SlashCommandMessage';
 import type CommandMessage from './CommandMessage';
 import type { Constants } from 'eris';
-import { Categories } from '../util/Constants';
 import Subcommand from './Subcommand';
 
 export type PermissionField = keyof Constants['Permissions'];
-interface CommandInfo {
+export interface CommandInfo {
   userPermissions?: PermissionField | PermissionField[];
   botPermissions?: PermissionField | PermissionField[];
   description?: string;
@@ -35,6 +37,7 @@ interface CommandInfo {
   examples?: string[];
   category?: Categories;
   cooldown?: number;
+  options?: ReturnType<ApplicationCommandOptionBuilder['build']>[];
   aliases?: string[];
   hidden?: boolean;
   usage?: string;
@@ -49,12 +52,16 @@ export default abstract class NinoCommand {
   public examples: string[];
   public category: Categories;
   public cooldown: number;
+  public options: ReturnType<ApplicationCommandOptionBuilder['build']>[];
   public aliases: string[];
   public hidden: boolean;
   public usage: string;
   public name: string;
 
   constructor(info: CommandInfo) {
+    if (info.options !== undefined && Reflect.getMetadata(MetadataKeys.HasSlashVariant, this) !== true)
+      throw new TypeError(`Slash commands only have \`options\` injected to construct. (name=${info.name})`);
+
     this.userPermissions =
       typeof info.userPermissions === 'string'
         ? [info.userPermissions]
@@ -75,14 +82,25 @@ export default abstract class NinoCommand {
     this.examples = info.examples ?? [];
     this.category = info.category ?? Categories.Core;
     this.cooldown = info.cooldown ?? 5;
+    this.options = info.options ?? [];
     this.aliases = info.aliases ?? [];
     this.hidden = info.hidden ?? false;
     this.usage = info.usage ?? '';
     this.name = info.name;
   }
 
+  /**
+   * Returns the list of subcommands available.
+   */
   get subcommands() {
     return getSubcommandsIn(this).map((sub) => new Subcommand(sub));
+  }
+
+  /**
+   * Returns if this base command is a slash command also
+   */
+  get hasSlashVariant() {
+    return Reflect.getMetadata(MetadataKeys.HasSlashVariant, this) === true;
   }
 
   get format() {
@@ -91,4 +109,9 @@ export default abstract class NinoCommand {
   }
 
   abstract run(msg: CommandMessage, ...args: any[]): any;
+
+  async slashRun(msg: SlashCommandMessage, ...args: any[]) {
+    // `slashRun` is not required unless it has the @HasSlashVariant decorator.
+    throw new SyntaxError('Missing slash command functionality.');
+  }
 }

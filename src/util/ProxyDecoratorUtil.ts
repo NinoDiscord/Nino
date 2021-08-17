@@ -20,22 +20,17 @@
  * SOFTWARE.
  */
 
-import { AbstractArgumentResolver } from './AbstractArgumentResolver';
-
-export default class MultiArgumentResolver<T> extends AbstractArgumentResolver<T> {
-  #conditions: RegExp[];
-
-  constructor(id: string, conditions: RegExp[]) {
-    super(id);
-
-    this.#conditions = conditions;
-  }
-
-  override parse(msg, arg, value) {
-    return '' as unknown as T;
-  }
-
-  override validate(msg, arg, value) {
-    return false;
-  }
+/**
+ * Creates a proxy decorator without modifying prototypes
+ * with in a `AbstractCommand`.
+ */
+// Credit: https://github.com/skyra-project/decorators/blob/main/src/utils.ts#L92
+export function createProxyDecorator<T extends object>(target: T, handler: Omit<ProxyHandler<T>, 'get'>) {
+  return new Proxy(target, {
+    ...handler,
+    get(target, property) {
+      const value = Reflect.get(target, property);
+      return typeof value === 'function' ? (...args: unknown[]) => value.call(target, ...args) : value;
+    },
+  });
 }

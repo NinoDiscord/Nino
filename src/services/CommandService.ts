@@ -277,6 +277,10 @@ export default class CommandService extends Collection<string, NinoCommand> {
     }
   }
 
+  async onSlashMessage(message: Message<TextChannel>) {
+    // todo: this
+  }
+
   // credit for regex: Ice <3
   private parseFlags(content: string): Record<string, string | true> {
     const record: Record<string, string | true> = {};

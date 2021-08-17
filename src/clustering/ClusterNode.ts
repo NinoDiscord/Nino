@@ -19,3 +19,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+import ClusterOperator from './ClusterOperator';
+
+export default class ClusterNode {
+  constructor(private operator: ClusterOperator) {}
+}
