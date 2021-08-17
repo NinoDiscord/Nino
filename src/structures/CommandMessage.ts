@@ -21,18 +21,13 @@
  */
 
 import type { AdvancedMessageContent, Message, TextChannel } from 'eris';
-import type { ActionRow, ActionRowChild } from 'slash-commands';
 import type GuildEntity from '../entities/GuildEntity';
 import { EmbedBuilder } from '.';
+import type { Filter } from './MessageCollector';
 import type UserEntity from '../entities/UserEntity';
 import type Locale from './Locale';
 import { Inject } from '@augu/lilith';
 import Discord from '../components/Discord';
-import { Filter } from './MessageCollector';
-
-interface ComponentsAdvancedMessageContent extends AdvancedMessageContent {
-  components?: ActionRow[];
-}
 
 export default class CommandMessage {
   public userSettings: UserEntity;
@@ -91,9 +86,8 @@ export default class CommandMessage {
     return this.reply(this.locale.translate(key, args));
   }
 
-  reply(content: string | EmbedBuilder, components?: ActionRowChild[]) {
-    const payload: ComponentsAdvancedMessageContent = {
-      components: components !== undefined ? [{ type: 1, components }] : undefined,
+  reply(content: string | EmbedBuilder) {
+    const payload: AdvancedMessageContent = {
       messageReference: { messageID: this.#message.id },
       allowedMentions: {
         repliedUser: false,

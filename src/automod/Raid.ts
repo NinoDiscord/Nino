@@ -96,7 +96,8 @@ export default class RaidAutomod implements Automod {
       (msg.member !== null && !PermissionUtil.isMemberAbove(nino, msg.member)) ||
       !msg.channel.permissionsOf(this.discord.client.user.id).has('manageMessages') ||
       msg.author.bot ||
-      msg.channel.permissionsOf(msg.author.id).has('banMembers')
+      msg.channel.permissionsOf(msg.author.id).has('banMembers') ||
+      msg.member.joinedAt === null // in v9, it can be null for some reason?
     )
       return false;
 

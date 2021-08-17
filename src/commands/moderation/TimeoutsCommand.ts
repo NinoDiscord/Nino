@@ -102,7 +102,7 @@ export default class TimeoutsCommand extends Command {
       .setAuthor(
         `[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`,
         undefined,
-        msg.guild.dynamicIconURL('png', 1024)
+        msg.guild.dynamicIconURL?.('png', 1024) ?? undefined
       )
       .addFields(h)
       .setFooter('Only showing 10 entries.');
@@ -160,7 +160,7 @@ export default class TimeoutsCommand extends Command {
       .setAuthor(
         `[ Timeouts in ${msg.guild.name} (${msg.guild.id}) ]`,
         undefined,
-        msg.guild.dynamicIconURL('png', 1024)
+        msg.guild.dynamicIconURL?.('png', 1024) ?? undefined
       )
       .addFields(h)
       .setFooter('Only showing 10 entries.');
