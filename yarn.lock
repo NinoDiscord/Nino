@@ -32,10 +32,10 @@
     "@typescript-eslint/eslint-plugin" "4.29.0"
     "@typescript-eslint/parser" "4.29.0"
 
-"@augu/lilith@5.0.4":
-  version "5.0.4"
-  resolved "https://registry.yarnpkg.com/@augu/lilith/-/lilith-5.0.4.tgz#e629e1cbdff6eb440b92343413d250169170c99e"
-  integrity sha512-hDIuW6CL3UMuu7Qo+cGb3CQimnt0dClir9NR2XyDXP5HhNrp0eHPh70YxkaIH74WZW70XVrEBrPO0jDKivE9rg==
+"@augu/lilith@5.1.0":
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/@augu/lilith/-/lilith-5.1.0.tgz#60a08fe0eace4ade8455cb58fa561b10f19c250b"
+  integrity sha512-Ad04TYUbpfC0eLuG5P0D/PaETlOo34JaKfNIpQ1M0mIsRyjprj7cI+SwqPalJuTcjyGCLUNZnxwWthX69uZEuw==
   dependencies:
     "@augu/collections" "1.0.12"
     "@augu/utils" "1.5.3"
