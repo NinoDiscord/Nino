@@ -20,17 +20,17 @@
     "node": ">=14"
   },
   "scripts": {
-    "clean:node_modules": "rm -rf node_modules/**/node_modules && rm -rf node_modules/@types/**/node_modules && rm -rf node_modules/@augu/**/node_modules",
+    "clean:node_modules": "rimraf node_modules/**/node_modules && rimraf node_modules/@types/**/node_modules && rimraf node_modules/@augu/**/node_modules",
     "clean:win:tar": "cp node_modules/@augu/collections/build/index.js.* node_modules/@augu/collections/build/index.js && rm node_modules/@augu/collections/build/index.js.*",
     "husky:install": "husky install && rm .husky/.gitignore",
-    "build:no-lint": "eslint src --ext .ts && rm -rf build && tsc",
+    "build:no-lint": "eslint src --ext .ts && rimraf build && tsc",
     "migrations": "yarn build && typeorm migration:run",
     "shortlinks": "node scripts/shortlinks.js",
     "licenses": "node scripts/add-license.js",
     "prepare": "husky install && yarn clean:node_modules",
-    "build": "yarn lint && yarn format && rm -rf build && tsc",
+    "build": "yarn lint && yarn format && rimraf build && tsc",
     "format": "prettier --write --parser typescript --config ./.prettierrc.json src/**/*.ts",
-    "start": "cd build && node main.js",
+    "start": "cd build/src && node main.js",
     "lint": "eslint src --ext .ts --fix",
     "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
   },
@@ -40,6 +40,7 @@
     "@augu/lilith": "5.0.4",
     "@augu/orchid": "3.1.1",
     "@augu/utils": "1.5.3",
+    "@prisma/client": "2.29.1",
     "@sentry/node": "6.11.0",
     "eris": "github:DonovanDMC/eris#everything",
     "fastify": "3.20.2",
@@ -51,7 +52,7 @@
     "pg": "8.7.1",
     "prom-client": "13.2.0",
     "reflect-metadata": "0.1.13",
-    "slash-commands": "1.5.0",
+    "slash-create": "4.0.1",
     "source-map-support": "0.5.19",
     "tslog": "3.2.1",
     "typeorm": "0.2.31",
@@ -76,6 +77,8 @@
     "husky": "7.0.1",
     "nodemon": "2.0.12",
     "prettier": "2.3.2",
+    "prisma": "2.29.1",
+    "rimraf": "3.0.2",
     "ts-node": "10.2.0",
     "typescript": "4.3.5"
   }

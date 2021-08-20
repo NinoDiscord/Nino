@@ -87,7 +87,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': botlists.dservices,
+            Authorization: botlists.dservices,
           },
         })
         .then((res) => {
@@ -113,7 +113,7 @@ export default class BotlistsService {
           url: `https://discord.boats/api/bot/${this.discord.client.user.id}`,
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': botlists.dboats,
+            Authorization: botlists.dboats,
           },
         })
         .then((res) => {
@@ -140,7 +140,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': botlists.dbots,
+            Authorization: botlists.dbots,
           },
         })
         .then((res) => {
@@ -167,7 +167,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': botlists.topgg,
+            Authorization: botlists.topgg,
           },
         })
         .then((res) => {
@@ -195,7 +195,7 @@ export default class BotlistsService {
           },
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': botlists.delly,
+            Authorization: botlists.delly,
           },
         })
         .then((res) => {
@@ -212,16 +212,16 @@ export default class BotlistsService {
     if (botlists.bfd !== undefined) {
       this.logger.info('Found Bots for Discord token, now posting...');
 
-      const res = await this.http
+      await this.http
         .request({
           method: 'POST',
-          url: `https://botsfordiscord.com/api/bot/${this.discord.client.user.id}`,
+          url: `https://discords.com/bots/api/bot/${this.discord.client.user.id}`,
           data: {
             server_count: this.discord.client.guilds.size,
           },
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': botlists.bfd,
+            Authorization: botlists.bfd,
           },
         })
         .then((res) => {
@@ -238,7 +238,7 @@ export default class BotlistsService {
     const successRate = ((success / list.length) * 100).toFixed(2);
     this.logger.info(
       [
-        `ℹ️ listly posted to ${list.length} botlists with a success rate of ${successRate}%`,
+        `ℹ️ Successfully posted to ${list.length} botlists with a success rate of ${successRate}%`,
         'Serialized output will be displayed:',
       ].join('\n')
     );

@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+export { SlashCommand as SlashCommandInfo } from './decorators/SlashCommand';
+export { Command as CommandInfo } from './decorators/Command';
 export { default as Subcommand } from './decorators/Subcommand';
 export { default as Subscribe } from './decorators/Subscribe';
 

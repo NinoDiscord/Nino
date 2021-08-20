@@ -20,26 +20,15 @@
  * SOFTWARE.
  */
 
-import MessageCollector from '../structures/MessageCollector';
-import { Message, User } from 'eris';
-import { Logger } from 'tslog';
+import { CommandContext, SlashCommand, SlashCommandOptions, SlashCreator } from 'slash-create';
+import { SlashCommandInfo } from '../../structures';
 
-const logger = app.$ref<Logger>(Logger);
-logger.info('monkeypatching eris...');
-
-Object.defineProperty(User.prototype, 'tag', {
-  get(this: User) {
-    return `${this.username}#${this.discriminator}`;
-  },
-
-  set: () => {
-    throw new TypeError('cannot set user tags :(');
-  },
-});
-
-Object.defineProperty(Message.prototype, 'collector', {
-  value: new MessageCollector(app.get('discord')),
-  writable: false,
-});
-
-logger.info('Monkey patched the following items:', ['User#tag', 'Message#collector'].join('\n'));
+@SlashCommandInfo({
+  description: 'Shows a bit information about myself!',
+  name: 'about',
+})
+export default class AboutCommand extends SlashCommand {
+  override async run(ctx: CommandContext) {
+    return ctx.send('ur mom!!!', { ephemeral: true });
+  }
+}

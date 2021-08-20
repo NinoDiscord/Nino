@@ -27,7 +27,7 @@ import { join } from 'path';
 /**
  * Returns the current version of Nino
  */
-export const version: string = require('../../package.json').version;
+export { version } from '@/package.json';
 
 /**
  * Returns the commit hash of the bot.

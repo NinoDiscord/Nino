@@ -20,11 +20,14 @@
  * SOFTWARE.
  */
 
-import { MetadataKeys } from '../../util/Constants';
+import { Command, CommandInfo, CommandMessage } from '../../structures';
 
-/**
- * Marks this class having a slash command variant and needs to be registered
- * in all guilds.
- */
-export const HasSlashVariant: ClassDecorator = (target) =>
-  Reflect.defineMetadata(MetadataKeys.HasSlashVariant, true, target);
+@CommandInfo({
+  description: 'descriptions.help',
+  name: 'about',
+})
+export default class AboutCommand extends Command {
+  override run(msg: CommandMessage) {
+    return msg.reply('heck');
+  }
+}

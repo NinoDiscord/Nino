@@ -20,10 +20,13 @@
  * SOFTWARE.
  */
 
-import { Component } from '@augu/lilith';
+import { SlashCommandOptions, SlashCreator } from 'slash-create';
+import { createProxyDecorator } from '../../util/proxy/ProxyDecoratorUtil';
+import app from '../../container';
 
-@Component({
-  name: 'cluster:operator',
-  priority: 2,
-})
-export default class ClusterOperator {}
+export function SlashCommand(options: SlashCommandOptions): ClassDecorator {
+  return (target) =>
+    createProxyDecorator(target, {
+      construct: (ctor: any) => new ctor(app.$ref(SlashCreator), options),
+    });
+}

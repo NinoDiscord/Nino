@@ -20,17 +20,15 @@
  * SOFTWARE.
  */
 
-import { Command as BaseCommand } from '..';
-import { createProxyDecorator } from '../../util/ProxyDecoratorUtil';
+import { createProxyDecorator } from '../../util/proxy/ProxyDecoratorUtil';
 import type { CommandInfo } from '../Command';
 
 /**
  * Class decorator to apply metadata within a {@link Command}.
  */
-export function Command(metadata: CommandInfo) {
-  return (target: Ctor<BaseCommand>) => {
+export function Command(metadata: CommandInfo): ClassDecorator {
+  return (target) =>
     createProxyDecorator(target, {
-      construct: (ctor) => new ctor(metadata),
+      construct: (ctor: any) => new ctor(metadata),
     });
-  };
 }

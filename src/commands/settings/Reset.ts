@@ -34,7 +34,7 @@ export default class ResetCommand extends Command {
     super({
       userPermissions: 'manageGuild',
       description: 'descriptions.reset',
-      category: Categories.Moderation,
+      category: Categories.Settings,
       name: 'reset',
     });
   }

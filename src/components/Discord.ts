@@ -24,6 +24,7 @@ import { USER_MENTION_REGEX, USERNAME_DISCRIM_REGEX, ID_REGEX, CHANNEL_REGEX, RO
 
 import { Component, Inject, ComponentAPI, Subscribe } from '@augu/lilith';
 import { Client, Role, Guild, AnyChannel } from 'eris';
+import type { SlashCreator } from 'slash-create';
 import { Logger } from 'tslog';
 import Config from './Config';
 
@@ -32,6 +33,7 @@ import Config from './Config';
   name: 'discord',
 })
 export default class Discord {
+  public slashCreator!: SlashCreator;
   public mentionRegex?: RegExp;
   public client!: Client;
 

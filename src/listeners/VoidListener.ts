@@ -22,15 +22,15 @@
 
 /* eslint-disable camelcase */
 
-import type { GatewayInteractionCreateDispatchData, APIApplicationCommandInteractionData } from 'discord-api-types';
-import { RawPacket, AnyGuildChannel, Message } from 'eris';
-import type { ApplicationCommandOption } from 'slash-commands';
+import { SlashCreator, GatewayServer } from 'slash-create';
 import { Inject, Subscribe } from '@augu/lilith';
+import type { RawPacket } from 'eris';
 import BotlistsService from '../services/BotlistService';
 import { Logger } from 'tslog';
 import Discord from '../components/Discord';
 import Config from '../components/Config';
 import Prom from '../components/Prometheus';
+import { join } from 'path';
 
 export default class VoidListener {
   @Inject
@@ -52,18 +52,6 @@ export default class VoidListener {
   async onRawWS(packet: RawPacket) {
     if (!packet.t) return;
 
-    if (packet.t === 'INTERACTION_CREATE') {
-      const data = packet.d as GatewayInteractionCreateDispatchData;
-      if (data.type === 2) {
-        this.logger.info('Received slash command metadata!');
-
-        // skip on dm interaction
-        if (data.guild_id === undefined) return;
-
-        await this._handleInteractionCreatePacket(data);
-      }
-    }
-
     this.prometheus?.rawWSEvents?.labels(packet.t).inc();
   }
 
@@ -84,6 +72,18 @@ export default class VoidListener {
     const statusType = this.config.getProperty('status.type');
     const status = this.config.getProperty('status.status')!;
 
+    const slash = new SlashCreator({
+      applicationID: this.discord.client.user.id,
+      token: this.config.getProperty('token')!,
+    });
+
+    slash
+      .withServer(new GatewayServer((handler) => this.discord.client.on('interactionCreate', handler)))
+      .registerCommandsIn(join(process.cwd(), 'slash'))
+      .syncCommands({ deleteCommands: true, syncGuilds: true, syncPermissions: true });
+
+    this.discord.slashCreator = slash;
+
     for (const shard of this.discord.client.shards.values()) {
       this.discord.client.editStatus(this.config.getProperty('status.presence') ?? 'online', {
         name: status
@@ -94,85 +94,5 @@ export default class VoidListener {
         type: statusType ?? 0,
       });
     }
-  }
-
-  private _format(command: ApplicationCommandOption): [content: string, users?: string[], roles?: string[]] {
-    if (!command.options) return [`/${command.name}`, undefined, undefined];
-
-    const roleMentions: string[] = [];
-    const userMentions: string[] = [];
-    let content = `/${command.name}`;
-
-    const formatArg = (arg: ApplicationCommandOption & { value: any }) => {
-      if (arg.options !== undefined) {
-        const args = arg.options?.map(formatArg as any);
-        return `${arg.name}${args !== undefined ? ` ${args.join(' ')}` : ''}`;
-      }
-
-      if (['member', 'user'].some((a) => arg.name.startsWith(a))) {
-        userMentions.push(arg.value);
-        return `<@!${arg.value}>`;
-      } else if (arg.name === 'channel') {
-        return `<@#${arg.value}>`;
-      } else if (arg.name === 'role') {
-        roleMentions.push(arg.value);
-        return `<@&${arg.value}>`;
-      } else {
-        return arg.value;
-      }
-    };
-
-    command.options?.forEach((option) => {
-      const choices =
-        option.choices?.length ?? false
-          ? option
-              .choices!.map((c: any) => (c !== undefined ? undefined : `${c.name}: ${c.value}`))
-              .filter((s) => s !== undefined)
-          : null;
-      if (choices !== null) {
-        content += ` ${choices.join(', ')}`;
-        return;
-      }
-
-      content += ` ${formatArg(option as any)}`;
-    });
-
-    return [content, roleMentions, userMentions];
-  }
-
-  private async _handleInteractionCreatePacket(data: GatewayInteractionCreateDispatchData) {
-    const { data: command, guild_id: guildID, channel_id: channelID } = data;
-    const guild = this.discord.client.guilds.get(guildID as string);
-    const channel = await this.discord.getChannel<AnyGuildChannel>(channelID as string);
-
-    // not cached, don't care lol
-    if (!guild || channel === null) return;
-
-    this.logger.info(`Received slash command /${(command as APIApplicationCommandInteractionData).name} uwu`);
-    const [content, userMentions, roleMentions] = this._format(command as any);
-    const uncachedUsers = userMentions?.filter((s) => !this.discord.client.users.has(s)) ?? [];
-
-    if (uncachedUsers.length > 0) {
-      (await Promise.all(uncachedUsers.map((s) => this.discord.client.getRESTUser(s)))).map((user) =>
-        this.discord.client.users.update(user)
-      );
-    }
-
-    this.discord.client.emit(
-      'messageCreate',
-      new Message(
-        {
-          id: null as any,
-          timestamp: new Date().toISOString(),
-          channel_id: channelID as string,
-          guild_id: guildID,
-          content,
-          mention_roles: roleMentions,
-          type: 0,
-          author: {},
-        },
-        this.discord.client
-      )
-    );
   }
 }

@@ -20,7 +20,10 @@
  * SOFTWARE.
  */
 
-import { Service } from '@augu/lilith';
+import { Collection } from '@augu/collections';
+import { Inject, Service } from '@augu/lilith';
+import { firstUpper } from '@augu/utils';
+import { Logger } from 'tslog';
 import { join } from 'path';
 
 @Service({
@@ -29,4 +32,14 @@ import { join } from 'path';
   name: 'listeners',
 })
 // a noop service to register all listeners
-export default class ListenerService {}
+export default class ListenerService extends Collection<string, any> {
+  @Inject
+  private readonly logger!: Logger;
+
+  onChildLoad(listener: any) {
+    const name = firstUpper(listener.constructor.name.replace('Listener', ''));
+    this.logger.info(`Registered listener ${listener.constructor.name}`);
+
+    this.set(name, listener);
+  }
+}

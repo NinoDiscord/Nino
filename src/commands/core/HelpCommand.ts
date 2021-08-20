@@ -27,7 +27,6 @@ import CommandService from '../../services/CommandService';
 import Permissions from '../../util/Permissions';
 import { Inject } from '@augu/lilith';
 import Discord from '../../components/Discord';
-import { Button, ButtonStyle, LinkButton } from 'slash-commands';
 
 interface CommandCategories {
   moderation?: Command[];

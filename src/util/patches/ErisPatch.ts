@@ -20,8 +20,26 @@
  * SOFTWARE.
  */
 
-import ClusterOperator from './ClusterOperator';
+import MessageCollector from '../../structures/MessageCollector';
+import { Message, User } from 'eris';
+import { Logger } from 'tslog';
 
-export default class ClusterNode {
-  constructor(private operator: ClusterOperator) {}
-}
+const logger = app.$ref<Logger>(Logger);
+logger.info('monkeypatching eris...');
+
+Object.defineProperty(User.prototype, 'tag', {
+  get(this: User) {
+    return `${this.username}#${this.discriminator}`;
+  },
+
+  set: () => {
+    throw new TypeError('cannot set user tags :(');
+  },
+});
+
+Object.defineProperty(Message.prototype, 'collector', {
+  value: new MessageCollector(app.get('discord')),
+  writable: false,
+});
+
+logger.info('Monkey patched the following items:', ['User#tag', 'Message#collector'].join('\n'));
