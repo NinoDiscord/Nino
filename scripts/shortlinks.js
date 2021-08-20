@@ -90,6 +90,7 @@ const otherUrls = [
   'waa.ai',
   'steamcommunity.ru',
   'steanconmunity.ru',
+  'discord-nitro.link',
 ];
 
 const startTime = process.hrtime();
@@ -104,9 +105,7 @@ const startTime = process.hrtime();
   );
 
   const requestEnd = calculateHRTime(requestTime);
-  logger.debug(
-    `It took ~${requestEnd}ms to get a "${res.statusCode}" response.`
-  );
+  logger.debug(`It took ~${requestEnd}ms to get a "${res.statusCode}" response.`);
 
   const data = res.body().split(/\n\r?/);
   data.shift();
@@ -119,17 +118,9 @@ const startTime = process.hrtime();
       )
     ),
   ].filter((s) => s !== '');
-  if (!existsSync(join(__dirname, '..', 'assets')))
-    await fs.mkdir(join(__dirname, '..', 'assets'));
+  if (!existsSync(join(__dirname, '..', 'assets'))) await fs.mkdir(join(__dirname, '..', 'assets'));
 
-  await fs.writeFile(
-    join(__dirname, '..', 'assets', 'shortlinks.json'),
-    `${JSON.stringify(shortlinks, null, '\t')}\n`
-  );
-  logger.info(
-    `It took about ~${calculateHRTime(startTime)}ms to retrieve ${
-      shortlinks.length
-    } short-links.`
-  );
+  await fs.writeFile(join(__dirname, '..', 'assets', 'shortlinks.json'), `${JSON.stringify(shortlinks, null, '\t')}\n`);
+  logger.info(`It took about ~${calculateHRTime(startTime)}ms to retrieve ${shortlinks.length} short-links.`);
   process.exit(0);
 })();
