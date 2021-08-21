@@ -30,7 +30,7 @@
     "prepare": "husky install && yarn clean:node_modules",
     "build": "yarn lint && yarn format && rimraf build && tsc",
     "format": "prettier --write --parser typescript --config ./.prettierrc.json src/**/*.ts",
-    "start": "cd build/src && node main.js",
+    "start": "cd build && node main.js",
     "lint": "eslint src --ext .ts --fix",
     "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
   },

@@ -125,4 +125,6 @@ model Warning {
   reason  String?
   amount  Int
   userId  String  @map("user_id")
+
+  @@map("warnings")
 }

@@ -46,18 +46,10 @@ const logger = new LoggerWithoutCallSite({
   name: 'scripts',
 });
 
-/*
-export function* withIndex<T extends any[]>(arr: T): Generator<[index: number, item: T[any]]> {
-  for (let i = 0; i < arr.length; i++) {
-    yield [i, arr[i]];
-  }
-}
-*/
-
 const main = async () => {
   logger.info('Welcome to the export script for migrating from v1 -> v2.');
 
-  const key = `.nino/migration-${Date.now()}.json`;
+  const key = `.nino/migration.json`;
   const connection = await createConnection();
   logger.info(`Established the connection with PostgreSQL. I will be exporting data in ${key}, hold tight!`);
 

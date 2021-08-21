@@ -62,7 +62,7 @@ CREATE TABLE "logging" (
 );
 
 -- CreateTable
-CREATE TABLE "Punishments" (
+CREATE TABLE "punishments" (
     "warnings" INTEGER NOT NULL,
     "guild_id" TEXT NOT NULL,
     "index" INTEGER NOT NULL,
@@ -103,10 +103,10 @@ CREATE UNIQUE INDEX "guilds.guild_id_unique" ON "guilds"("guild_id");
 CREATE UNIQUE INDEX "logging.guild_id_unique" ON "logging"("guild_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Punishments.guild_id_unique" ON "Punishments"("guild_id");
+CREATE UNIQUE INDEX "punishments.guild_id_unique" ON "punishments"("guild_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Punishments.index_unique" ON "Punishments"("index");
+CREATE UNIQUE INDEX "punishments.index_unique" ON "punishments"("index");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "users.user_id_unique" ON "users"("user_id");
