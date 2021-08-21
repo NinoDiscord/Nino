@@ -24,7 +24,7 @@
     "clean:win:tar": "cp node_modules/@augu/collections/build/index.js.* node_modules/@augu/collections/build/index.js && rm node_modules/@augu/collections/build/index.js.*",
     "husky:install": "husky install && rm .husky/.gitignore",
     "build:no-lint": "eslint src --ext .ts && rimraf build && tsc",
-    "migrations": "yarn build && typeorm migration:run",
+    "export:v1:db": "node scripts/export-v1-db.js",
     "shortlinks": "node scripts/shortlinks.js",
     "licenses": "node scripts/add-license.js",
     "prepare": "husky install && yarn clean:node_modules",

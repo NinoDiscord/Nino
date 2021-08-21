@@ -255,6 +255,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
         .map((r, index) => `${index + 1 === owners.length ? 'or ' : ''}**${r.username}#${r.discriminator}**`)
         .join(', ');
 
+      const codeblock =
+        process.env.NODE_ENV === 'development' ? ['```js', ex.stack ?? '// (... no stacktrace ...)', '```'] : [];
+
       const embed = new EmbedBuilder()
         .setColor(0xdaa2c6)
         .setDescription([
@@ -264,6 +267,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
               : `Command **${command.name}**`
           } has failed to execute.`,
           `If this is a re-occuring issue, contact ${contact} at <https://discord.gg/ATmjFH9kMH>, under the <#824071651486335036> channel.`,
+          ...codeblock,
         ])
         .build();
 

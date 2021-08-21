@@ -21,7 +21,6 @@
  */
 
 import './util/patches/RequirePatch';
-import 'source-map-support/register';
 import 'reflect-metadata';
 
 (require('@augu/dotenv') as typeof import('@augu/dotenv')).parse({
@@ -37,12 +36,12 @@ import 'reflect-metadata';
   },
 });
 
-import { commitHash, version } from '~/util/Constants';
-import Discord from '~/components/Discord';
-import Sentry from '~/components/Sentry';
-import logger from '~/singletons/Logger';
-import app from '~/container';
-import Api from '~/api/API';
+import { commitHash, version } from './util/Constants';
+import Discord from './components/Discord';
+import Sentry from './components/Sentry';
+import logger from './singletons/Logger';
+import app from './container';
+import Api from './api/API';
 import ts from 'typescript';
 
 (async () => {

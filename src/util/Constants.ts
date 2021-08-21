@@ -24,10 +24,12 @@ import { readFileSync } from 'fs';
 import { execSync } from 'child_process';
 import { join } from 'path';
 
+const { version: pkgVersion } = require('@/package.json');
+
 /**
  * Returns the current version of Nino
  */
-export { version } from '@/package.json';
+export const version: string = pkgVersion;
 
 /**
  * Returns the commit hash of the bot.

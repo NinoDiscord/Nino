@@ -3,16 +3,11 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "typeRoots": ["./src/@types", "./node_modules/@types"],
+    "rootDir": "./src",
     "types": ["node", "reflect-metadata"],
-    "skipLibCheck": true,
-    "outDir": "build/",
-    "resolveJsonModule": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./*"],
-      "~/*": ["./src/*"]
-    }
+    "outDir": "./build",
+    "skipLibCheck": true
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts"]
+  "include": ["src/**/*.ts"]
 }
