@@ -21,9 +21,14 @@
  */
 
 import { PrismaClient } from '.prisma/client';
+import { Container } from '@augu/lilith';
+import { Logger } from 'tslog';
 
-export const teardown = () => {
-  return null;
-};
+export async function teardown(this: Container, $prisma: PrismaClient) {
+  const logger = this.get<Logger>('logger');
+  logger.warn('Disconnecting Prisma client...');
+
+  await $prisma.$disconnect();
+}
 
 export default new PrismaClient();

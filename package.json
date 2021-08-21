@@ -55,7 +55,7 @@
     "slash-create": "4.0.1",
     "source-map-support": "0.5.19",
     "tslog": "3.2.1",
-    "typeorm": "0.2.37",
+    "typeorm": "0.2.31",
     "ws": "8.2.0"
   },
   "devDependencies": {

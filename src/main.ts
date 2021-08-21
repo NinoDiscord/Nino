@@ -40,6 +40,7 @@ import { commitHash, version } from './util/Constants';
 import Discord from './components/Discord';
 import Sentry from './components/Sentry';
 import logger from './singletons/Logger';
+import Prisma from './singletons/Prisma';
 import app from './container';
 import Api from './api/API';
 import ts from 'typescript';
@@ -51,6 +52,8 @@ import ts from 'typescript';
   if (process.env.REGION !== undefined) logger.info(`->     Region: ${process.env.REGION}`);
 
   try {
+    // @ts-ignore i fucked up typings :D
+    await app.importSingleton<any>(() => import('./singletons/Prisma'));
     await app.load();
     await import('./util/patches/ErisPatch');
     await app.addComponent(Api);
