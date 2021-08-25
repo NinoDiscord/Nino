@@ -47,21 +47,23 @@ model Automod {
   shortlinks        Boolean @default(false)
   blacklist         Boolean @default(false)
   mentions          Boolean @default(false)
-  guildId           String  @unique @map("guild_id")
+  guildId           String  @map("guild_id")
   invites           Boolean @default(false)
   spam              Boolean @default(false)
   raid              Boolean @default(false)
 
   @@map("automod")
+  @@unique([guildId])
 }
 
 model GlobalBans {
   reason String?
   issuer String
   type   GlobalBanType
-  id     String @unique
+  id     String
 
   @@map("global_bans")
+  @@unique([id])
 }
 
 model Cases {
@@ -69,7 +71,7 @@ model Cases {
   moderatorId String  @map("moderator_id")
   message_id  String? @map("message_id")
   victimId    String  @map("victim_id")
-  guildId     String  @unique
+  guildId     String
   reason      String?
   index       Int
   type        PunishmentType
@@ -77,6 +79,7 @@ model Cases {
   time        Int?
 
   @@map("cases")
+  @@unique([guildId])
 }
 
 model Guild {
@@ -84,9 +87,10 @@ model Guild {
   mutedRoleId     String? @map("muted_role_id")
   prefixes        String[]
   language        String
-  guildId         String @unique @map("guild_id")
+  guildId         String @map("guild_id")
 
   @@map("guilds")
+  @@unique([guildId])
 }
 
 model Logging {
@@ -95,36 +99,40 @@ model Logging {
   channelId      String?  @map("channel_id")
   enabled        Boolean
   events         LogEvent[]
-  guildId        String   @unique @map("guild_id")
+  guildId        String  @map("guild_id")
 
   @@map("logging")
+  @@unique([guildId])
 }
 
 model Punishments {
   warnings Int
-  guildId  String @unique @map("guild_id")
-  index    Int    @unique
+  guildId  String @map("guild_id")
+  index    Int
   extra    Json?
   soft     Boolean
   time     String?
   type     PunishmentType
 
   @@map("punishments")
+  @@unique([guildId, index])
 }
 
 model User {
   prefixes        String[]
   language        String
-  userId          String @unique @map("user_id")
+  userId          String @map("user_id")
 
   @@map("users")
+  @@unique([userId])
 }
 
 model Warning {
-  guildId String  @unique @map("guild_id")
+  guildId String  @map("guild_id")
   reason  String?
   amount  Int
   userId  String  @map("user_id")
 
   @@map("warnings")
+  @@unique([guildId, userId])
 }

@@ -20,4 +20,62 @@
  * SOFTWARE.
  */
 
+require('../../build/util/patches/RequirePatch');
+
+const {
+  promises: { readFile },
+  existsSync,
+} = require('fs');
+
 const { PrismaClient } = require('.prisma/client');
+const { withIndex } = require('~/build/util');
+const { join } = require('path');
+
+const prisma = new PrismaClient();
+
+const main = async () => {
+  console.log('migrations: v1: migrating...');
+
+  const MIGRATION_DATA_PATH = join(process.cwd(), '.nino', 'migration.json');
+  if (!existsSync(MIGRATION_DATA_PATH)) {
+    console.warn('migrations: v1: run `yarn export:v1:db` before migrating...');
+    await prisma.$disconnect();
+
+    process.exit(1);
+  }
+
+  const contents = await readFile(MIGRATION_DATA_PATH, 'utf-8');
+  const data = JSON.parse(contents);
+
+  console.log(
+    `migrations: v1: running v1 -> v2 migrations that was executed at ${new Date(
+      Date.now() - data.ran_at
+    ).toString()} by ${data.blame}`
+  );
+
+  console.log(`migrations: v1: bulk insert ${data.data.automod.length} automod objects.`);
+  for (const [index, automod] of withIndex(data.data.automod)) {
+    console.log(`#${index}:`, automod);
+
+    await prisma.automod.create({
+      data: {
+        blacklistedWords: automod.blacklisted_words,
+        shortlinks: automod.shortlinks,
+        blacklist: automod.blacklist,
+        mentions: automod.mentions,
+        invites: automod.invites,
+        dehoisting: automod.dehoisting,
+        guildId: automod.guild_id,
+        spam: automod.spam,
+        raid: automod.raid,
+      },
+    });
+  }
+
+  console.log('we are now done here!');
+  await prisma.$disconnect();
+
+  process.exit(0);
+};
+
+main();

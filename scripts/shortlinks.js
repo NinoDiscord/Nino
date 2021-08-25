@@ -110,16 +110,25 @@ const startTime = process.hrtime();
   const data = res.body().split(/\n\r?/);
   data.shift();
 
+  const res2 = await http
+    .get('https://raw.githubusercontent.com/Andre601/anti-scam-database/main/database/summary.json')
+    .header('Accept', 'application/json');
+
+  // We don't care if one of the affiliate links is Steam, since
+  // Nino only operates on Discord.
+  const data2 = res2.json().filter((s) => s.affected_platforms.includes('discord'));
+
   const shortlinks = [
     ...new Set(
       [].concat(
         data.map((s) => s.slice(0, s.length - 1)),
-        otherUrls
+        otherUrls,
+        data2.map((s) => s.domain)
       )
     ),
   ].filter((s) => s !== '');
-  if (!existsSync(join(__dirname, '..', 'assets'))) await fs.mkdir(join(__dirname, '..', 'assets'));
 
+  if (!existsSync(join(__dirname, '..', 'assets'))) await fs.mkdir(join(__dirname, '..', 'assets'));
   await fs.writeFile(join(__dirname, '..', 'assets', 'shortlinks.json'), `${JSON.stringify(shortlinks, null, '\t')}\n`);
   logger.info(`It took about ~${calculateHRTime(startTime)}ms to retrieve ${shortlinks.length} short-links.`);
   process.exit(0);

@@ -1,7 +1,15 @@
 #!/bin/bash
 
+echo 'Checking migration details...'
+yarn prisma migrate status
+
 echo 'Running migrations'
-typeorm migration:run
+yarn prisma migrate deploy
+
+echo '[Legacy] Running TypeORM migrations...'
+if type "typeorm" > /dev/null; then
+  yarn typeorm migration:run
+fi
 
 echo 'Migrations and schemas should be synced.'
 npm start

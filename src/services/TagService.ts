@@ -20,17 +20,44 @@
  * SOFTWARE.
  */
 
-import { hostname } from 'os';
+import { Inject, Service } from '@augu/lilith';
+import { HttpClient } from '@augu/orchid';
 import { Logger } from 'tslog';
+import Config from '../components/Config';
 
-export default new Logger({
-  displayFunctionName: false,
-  exposeErrorCodeFrame: true,
-  displayInstanceName: true,
-  dateTimePattern: '[hour:minute:second @ day/month/year]',
-  displayFilePath: 'hideNodeModulesOnly',
-  displayTypes: false,
-  instanceName: hostname(),
-  minLevel: process.env.NODE_ENV === 'production' ? 'info' : 'silly',
-  name: 'Nino',
-});
+/**
+ * Represents a tag service, which is used for [Misu](https://github.com/NinoDiscord/Misu).
+ * If the configuration is set to use the Misu API, this service will be used to fetch, edit, recover
+ * and delete tags.
+ *
+ * This is simply a wrapper around the Misu API.
+ * @example
+ * ```js
+ * tags.get('guild', 'name'); // => MisuTag?
+ * tags.create({
+ *  guild: 'guild',
+ *  name: 'name',
+ *  author: 'author!',
+ *  script: `
+ *     return "This is an example of creating the **$(tag.name)** tag.";
+ *  `
+ * }); // => MisuTag
+ *
+ * tags.delete('guild', 'name'); // => MisuRecoveryTagDetails
+ * tags.recover('recovery id'); // => MisuRecoveryResult
+ * ```
+ */
+@Service({
+  priority: 1,
+  name: 'misu',
+})
+export default class TagService {
+  @Inject
+  private readonly logger!: Logger;
+
+  @Inject
+  private readonly config!: Config;
+
+  @Inject
+  private readonly http!: HttpClient;
+}

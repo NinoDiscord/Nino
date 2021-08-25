@@ -40,7 +40,6 @@ import { commitHash, version } from './util/Constants';
 import Discord from './components/Discord';
 import Sentry from './components/Sentry';
 import logger from './singletons/Logger';
-import Prisma from './singletons/Prisma';
 import app from './container';
 import Api from './api/API';
 import ts from 'typescript';

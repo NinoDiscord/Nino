@@ -235,7 +235,7 @@ export default class BotlistsService {
         .catch((ex) => this.logger.warn('Unable to parse JSON [Bots for Discord]:', ex));
     }
 
-    const successRate = ((success / list.length) * 100).toFixed(2);
+    const successRate = ((errored / success) * 100).toFixed(2);
     this.logger.info(
       [
         `ℹ️ Successfully posted to ${list.length} botlists with a success rate of ${successRate}%`,
