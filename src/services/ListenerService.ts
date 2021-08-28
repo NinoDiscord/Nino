@@ -20,8 +20,8 @@
  * SOFTWARE.
  */
 
-import { Collection } from '@augu/collections';
 import { Inject, Service } from '@augu/lilith';
+import { Collection } from '@augu/collections';
 import { firstUpper } from '@augu/utils';
 import { Logger } from 'tslog';
 import { join } from 'path';

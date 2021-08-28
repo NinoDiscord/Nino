@@ -23,9 +23,9 @@
 import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, User } from 'eris';
 import { Inject, Subscribe } from '@augu/lilith';
-import { PunishmentType } from '../entities/PunishmentsEntity';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
+import { PrismaClient, PunishmentType } from '.prisma/client';
 
 export default class GuildBansListener {
   @Inject
@@ -36,6 +36,9 @@ export default class GuildBansListener {
 
   @Inject
   private readonly discord!: Discord;
+
+  @Inject
+  private readonly prisma!: PrismaClient;
 
   @Subscribe('guildBanAdd', { emitter: 'discord' })
   async onGuildBanAdd(guild: Guild, user: User) {
@@ -54,20 +57,34 @@ export default class GuildBansListener {
 
     if (entry === undefined) return;
 
-    const caseModel = await this.database.cases.create({
-      attachments: [],
-      moderatorID: entry.user.id,
-      victimID: entry.targetID,
-      guildID: entry.guild.id,
-      reason: entry.reason ?? 'No reason was provided',
-      type: PunishmentType.Ban,
+    // get case index
+    const newest = await this.prisma.cases.findMany({
+      where: {
+        guildId: guild.id,
+      },
+      orderBy: {
+        index: 'asc',
+      },
+    });
+
+    const index = newest[0] !== undefined ? newest[0].index + 1 : 1;
+    const caseModel = await this.prisma.cases.create({
+      data: {
+        moderatorId: this.discord.client.user.id,
+        victimId: entry.user.id,
+        reason: entry.reason ?? '[Automod] Moderator has banned the invidiual with no reasoning.',
+        guildId: guild.id,
+        index,
+        soft: false,
+        type: PunishmentType.BAN,
+      },
     });
 
     await this.punishments['publishToModLog'](
       {
         moderator: this.discord.client.users.get(entry.user.id)!,
         victim: this.discord.client.users.get(entry.targetID)!,
-        reason: entry.reason ?? 'No reason was provided',
+        reason: entry.reason ?? '[Automod] Moderator has banned the invidiual with no reasoning.',
         guild: entry.guild,
         type: PunishmentEntryType.Banned,
       },
@@ -90,13 +107,27 @@ export default class GuildBansListener {
 
     if (entry === undefined) return;
 
-    const caseModel = await this.database.cases.create({
-      attachments: [],
-      moderatorID: entry.user.id,
-      victimID: entry.targetID,
-      guildID: entry.guild.id,
-      reason: entry.reason ?? 'No reason was provided',
-      type: PunishmentType.Unban,
+    // get case index
+    const newest = await this.prisma.cases.findMany({
+      where: {
+        guildId: guild.id,
+      },
+      orderBy: {
+        index: 'asc',
+      },
+    });
+
+    const index = newest[0] !== undefined ? newest[0].index + 1 : 1;
+    const caseModel = await this.prisma.cases.create({
+      data: {
+        moderatorId: this.discord.client.user.id,
+        victimId: entry.user.id,
+        reason: 'Moderator has unbanned on their own accord.',
+        guildId: guild.id,
+        index,
+        soft: false,
+        type: PunishmentType.UNBAN,
+      },
     });
 
     await this.punishments['publishToModLog'](

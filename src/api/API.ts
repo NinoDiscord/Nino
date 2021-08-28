@@ -56,7 +56,9 @@ export default class API {
     }
 
     const server = fastify();
-    server.register(require('fastify-no-icon'));
+    server
+      .register(require('fastify-no-icon'))
+      .register(require('fastify-cors'));
 
     this.instance = server;
     this.setupRoutes();

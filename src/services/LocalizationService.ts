@@ -21,13 +21,13 @@
  */
 
 import { Service, Inject } from '@augu/lilith';
+import { readFileSync } from 'fs';
 import { Collection } from '@augu/collections';
 import { readdir } from '@augu/utils';
 import { Logger } from 'tslog';
 import { join } from 'path';
 import Locale from '../structures/Locale';
 import Config from '../components/Config';
-import { readFileSync } from 'fs';
 
 @Service({
   priority: 1,

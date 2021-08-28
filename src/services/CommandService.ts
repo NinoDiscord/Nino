@@ -25,6 +25,7 @@ import type { Message, TextChannel } from 'eris';
 import { Service, Inject } from '@augu/lilith';
 import LocalizationService from './LocalizationService';
 import type NinoCommand from '../structures/Command';
+import { PrismaClient } from '.prisma/client';
 import AutomodService from './AutomodService';
 import { Collection } from '@augu/collections';
 import Subcommand from '../structures/Subcommand';
@@ -72,6 +73,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
   @Inject
   private readonly sentry?: Sentry;
 
+  @Inject
+  private readonly prisma!: PrismaClient;
+
   onChildLoad(command: NinoCommand) {
     if (!command.name) {
       this.logger.warn(`Unfinished command: ${command.constructor.name}`);
@@ -91,11 +95,30 @@ export default class CommandService extends Collection<string, NinoCommand> {
     if (msg.author.bot) return;
     if (![0, 5].includes(msg.channel.type)) return;
 
-    const settings = await this.database.guilds.get(msg.channel.guild.id);
-    const userSettings = await this.database.users.get(msg.author.id);
+    const settings = await this.prisma.guild.findFirst({
+      where: {
+        guildId: msg.guildID,
+      },
+    });
+
+    let userSettings = await this.prisma.user.findFirst({
+      where: {
+        userId: msg.author.id,
+      },
+    });
+
+    if (userSettings === null) {
+      userSettings = await this.prisma.user.create({
+        data: {
+          language: 'en_US',
+          prefixes: [],
+          userId: msg.author.id,
+        },
+      });
+    }
 
     const _prefixes = ([] as string[])
-      .concat(settings.prefixes, userSettings.prefixes, this.config.getProperty('prefixes')!)
+      .concat(settings!.prefixes, userSettings.prefixes, this.config.getProperty('prefixes')!)
       .filter(Boolean);
 
     const mentionRegex = this.discord.mentionRegex ?? new RegExp(`<@!?${this.discord.client.user.id}> `);
@@ -116,44 +139,70 @@ export default class CommandService extends Collection<string, NinoCommand> {
 
     if (command === null) return;
 
-    // Check for if the guild is blacklisted
-    const guildBlacklist = await this.database.blacklists.get(msg.guildID);
-    if (guildBlacklist !== undefined) {
-      const issuer = this.discord.client.users.get(guildBlacklist.issuer);
-      await msg.channel.createMessage(
-        [
-          `:pencil2: **This guild is blacklisted by ${issuer?.username ?? 'Unknown User'}#${
-            issuer?.discriminator ?? '0000'
-          }**`,
-          `> ${guildBlacklist.reason ?? '*(no reason provided)*'}`,
-          '',
-          'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.',
-          'I will attempt to leave this guild, goodbye. :wave:',
-        ].join('\n')
-      );
+    // Check global ban list
+    const guildBan = await this.prisma.globalBans.findFirst({
+      where: {
+        id: msg.guildID,
+      },
+    });
 
+    if (guildBan !== null) {
+      const issuer = this.discord.client.users.get(guildBan.issuer) ?? {
+        username: 'Unknown User',
+        discriminator: '0000',
+        id: '0',
+      };
+
+      const embed = EmbedBuilder.create()
+        .setTitle(`Guild ${msg.channel.guild.name} is globally banned!`)
+        .setDescription([
+          `This guild was detected as a non-safe guild by **${issuer.username}#${issuer.discriminator}**`,
+          `I think... their reasoning was **${guildBan.reason ?? '(no reason provided)'}**!`,
+          '',
+          issuer.id === '0'
+            ? 'Unfortunately, the issuer is not available at this moment.'
+            : `You can contact <@${issuer.id}> in the Noelware server under <#824071651486335036>!`,
+          issuer.id !== '0' ? 'https://discord.gg/ATmjFH9kMH' : '',
+        ])
+        .setFooter('I will now leave this guild, ohayo!');
+
+      await msg.channel.createMessage({ embeds: [embed.build()] });
       await msg.channel.guild.leave();
       return;
     }
 
-    // Check if the user is blacklisted
-    const userBlacklist = await this.database.blacklists.get(msg.author.id);
-    if (userBlacklist !== undefined) {
-      const issuer = this.discord.client.users.get(userBlacklist.issuer);
-      return msg.channel.createMessage(
-        [
-          `:pencil2: **You were blacklisted by ${issuer?.username ?? 'Unknown User'}#${
-            issuer?.discriminator ?? '0000'
-          }**`,
-          `> ${userBlacklist.reason ?? '*(no reason provided)*'}`,
+    // Check if the user was globally banned
+    const userBan = await this.prisma.globalBans.findFirst({
+      where: {
+        id: msg.author.id,
+      },
+    });
+
+    if (userBan !== null) {
+      const issuer = this.discord.client.users.get(userBan.issuer) ?? {
+        username: 'Unknown User',
+        discriminator: '0000',
+        id: '0',
+      };
+
+      const embed = EmbedBuilder.create()
+        .setTitle(`Oh... ${msg.author.tag}, you've been globally banned. :<`)
+        .setDescription([
+          `You were globally banned by **${issuer.username}#${issuer.discriminator}**`,
+          `I think... their reasoning was **${userBan.reason ?? '(no reason provided)'}**!`,
           '',
-          'If there is a issue or want to be unblacklisted, reach out to the developers here: discord.gg/ATmjFH9kMH in under #support.',
-        ].join('\n')
-      );
+          issuer.id === '0'
+            ? 'Unfortunately, the issuer is not available at this moment.'
+            : `You can contact <@${issuer.id}> in the Noelware server under <#824071651486335036>!`,
+          issuer.id !== '0' ? 'https://discord.gg/ATmjFH9kMH' : '',
+        ]);
+
+      await msg.channel.createMessage({ embeds: [embed.build()] });
+      return;
     }
 
-    const locale = this.localization.get(settings.language, userSettings.language);
-    const message = new CommandMessage(msg, locale, settings, userSettings);
+    const locale = this.localization.get(settings!.language, userSettings.language);
+    const message = new CommandMessage(msg, locale, settings!, userSettings);
     app.addInjections(message);
 
     const owners = this.config.getProperty('owners') ?? [];
@@ -256,7 +305,9 @@ export default class CommandService extends Collection<string, NinoCommand> {
         .join(', ');
 
       const codeblock =
-        process.env.NODE_ENV === 'development' ? ['```js', ex.stack ?? '// (... no stacktrace ...)', '```'] : [];
+        process.env.NODE_ENV === 'development'
+          ? ['```js', (ex as Error).stack ?? '// (... no stacktrace ...)', '```']
+          : [];
 
       const embed = new EmbedBuilder()
         .setColor(0xdaa2c6)
@@ -277,7 +328,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
         ex
       );
 
-      this.sentry?.report(ex);
+      this.sentry?.report(ex as Error);
     }
   }
 

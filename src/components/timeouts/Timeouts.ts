@@ -51,19 +51,19 @@ export default class TimeoutsManager {
   public state: types.SocketState = types.SocketState.Unknown;
 
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   @Inject
-  private logger!: Logger;
+  private readonly logger!: Logger;
 
   @Inject
-  private redis!: Redis;
+  private readonly redis!: Redis;
 
   @Inject
-  private config!: Config;
+  private readonly config!: Config;
 
   load() {
     return new Promise<void>((resolve, reject) => {
