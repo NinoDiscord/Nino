@@ -100,7 +100,7 @@ export default class PurgeCommand extends Command {
         /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command.`
       );
 
-      return msg.reply(this._generateEmbed(msg, messages));
+      return msg.reply(this._generateEmbed(msg, messages), false);
     }
 
     const user = await this.discord.getUser(userIdOrAmount).catch(() => null);
@@ -141,7 +141,7 @@ export default class PurgeCommand extends Command {
       /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${amountToDelete} messages from ${user.username}#${user.discriminator})`
     );
 
-    return msg.reply(this._generateEmbed(msg, messages));
+    return msg.reply(this._generateEmbed(msg, messages), false);
   }
 
   private async _deleteAmount(msg: CommandMessage, amount: number) {
@@ -165,7 +165,7 @@ export default class PurgeCommand extends Command {
       /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${amount} messages from all users)`
     );
 
-    return msg.reply(this._generateEmbed(msg, messages));
+    return msg.reply(this._generateEmbed(msg, messages), false);
   }
 
   @Subcommand('[amount]', ['images', 'imgs'])
@@ -190,7 +190,7 @@ export default class PurgeCommand extends Command {
       /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${toDelete} messages with attachments)`
     );
 
-    return msg.reply(this._generateEmbed(msg, messages));
+    return msg.reply(this._generateEmbed(msg, messages), false);
   }
 
   @Subcommand()
@@ -204,7 +204,7 @@ export default class PurgeCommand extends Command {
       /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete 10 messages that are system-related)`
     );
 
-    return msg.reply(this._generateEmbed(msg, messages));
+    return msg.reply(this._generateEmbed(msg, messages), false);
   }
 
   @Subcommand()
@@ -220,7 +220,7 @@ export default class PurgeCommand extends Command {
       /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete 10 messages that are system-related)`
     );
 
-    return msg.reply(this._generateEmbed(msg, messages));
+    return msg.reply(this._generateEmbed(msg, messages), false);
   }
 
   @Subcommand('[amount]')
@@ -247,6 +247,6 @@ export default class PurgeCommand extends Command {
       /* reason */ `[Purge] User ${msg.author.username}#${msg.author.discriminator} ran the \`purge\` command. (used to delete ${toDelete} messages that I said)`
     );
 
-    return msg.reply(this._generateEmbed(msg, messages));
+    return msg.reply(this._generateEmbed(msg, messages), false);
   }
 }
