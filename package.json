@@ -43,7 +43,7 @@
     "@prisma/client": "2.30.0",
     "@sentry/node": "6.11.0",
     "eris": "github:DonovanDMC/eris#everything",
-    "fastify": "3.20.2",
+    "fastify": "3.21.0",
     "fastify-cors": "6.0.2",
     "fastify-no-icon": "4.0.0",
     "ioredis": "4.27.8",
