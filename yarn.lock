@@ -32,10 +32,10 @@
     "@typescript-eslint/eslint-plugin" "4.29.0"
     "@typescript-eslint/parser" "4.29.0"
 
-"@augu/lilith@5.1.0":
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/@augu/lilith/-/lilith-5.1.0.tgz#60a08fe0eace4ade8455cb58fa561b10f19c250b"
-  integrity sha512-Ad04TYUbpfC0eLuG5P0D/PaETlOo34JaKfNIpQ1M0mIsRyjprj7cI+SwqPalJuTcjyGCLUNZnxwWthX69uZEuw==
+"@augu/lilith@5.3.2":
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/@augu/lilith/-/lilith-5.3.2.tgz#bce31c82534ef9210c0aeb507750a340e9ba703b"
+  integrity sha512-oQ+a5eHXusqL+3MoskRDInyHqCDmu37S2Nh61Dy+2hB0pLxoCrgg09cQwenOkTdoE30bSWYqETQactSG+ff5qA==
   dependencies:
     "@augu/collections" "1.0.12"
     "@augu/utils" "1.5.3"
@@ -1240,7 +1240,7 @@ fast-safe-stringify@^2.0.8:
   resolved "https://registry.yarnpkg.com/fast-safe-stringify/-/fast-safe-stringify-2.0.8.tgz#dc2af48c46cf712b683e849b2bbd446b32de936f"
   integrity sha512-lXatBjf3WPjmWD6DpIZxkeSsCOwqI0maYMpgDlx8g4U2qi4lbjA9oH/HD2a87G+KfsUmo5WbJFmqBZlPxtptag==
 
-fastify-cors@^6.0.2:
+fastify-cors@6.0.2:
   version "6.0.2"
   resolved "https://registry.yarnpkg.com/fastify-cors/-/fastify-cors-6.0.2.tgz#4fd5102549659e9b34d252fd7ee607b63d021390"
   integrity sha512-sE0AOyzmj5hLLRRVgenjA6G2iOGX35/1S3QGYB9rr9TXelMZB3lFrXy4CzwYVOMiujJeMiLgO4J7eRm8sQSv8Q==
