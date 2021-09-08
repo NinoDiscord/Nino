@@ -57,7 +57,7 @@
     "source-map-support": "0.5.19",
     "tslog": "3.2.2",
     "typeorm": "0.2.31",
-    "ws": "8.2.0"
+    "ws": "8.2.1"
   },
   "devDependencies": {
     "@augu/eslint-config": "2.2.0",
@@ -69,8 +69,8 @@
     "@types/ms": "0.7.31",
     "@types/node": "15.3.1",
     "@types/ws": "7.4.7",
-    "@typescript-eslint/eslint-plugin": "4.29.3",
-    "@typescript-eslint/parser": "4.29.3",
+    "@typescript-eslint/eslint-plugin": "4.31.0",
+    "@typescript-eslint/parser": "4.31.0",
     "discord-api-types": "0.23.1",
     "eslint": "7.32.0",
     "eslint-config-prettier": "8.3.0",
