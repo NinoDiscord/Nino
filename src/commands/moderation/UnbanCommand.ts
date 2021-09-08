@@ -21,7 +21,7 @@
  */
 
 import { Command, CommandMessage } from '../../structures';
-import { PunishmentType } from '../../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
@@ -29,10 +29,10 @@ import Redis from '../../components/Redis';
 
 export default class UnbanCommand extends Command {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private redis!: Redis;
+  private readonly redis!: Redis;
 
   constructor() {
     super({
@@ -56,12 +56,12 @@ export default class UnbanCommand extends Command {
         publish: true,
         reason: reason.join(' ') || 'No description was provided.',
         member: { id: userID, guild: msg.guild },
-        type: PunishmentType.Unban,
+        type: PunishmentType.UNBAN,
       });
 
       const timeouts = await this.redis.getTimeouts(msg.guild.id);
       const available = timeouts.filter(
-        (pkt) => pkt.type !== 'unban' && pkt.user !== userID && pkt.guild === msg.guild.id
+        (pkt) => pkt.type !== PunishmentType.UNBAN.toLowerCase() && pkt.user !== userID && pkt.guild === msg.guild.id
       );
 
       await this.redis.client.hmset('nino:timeouts', [msg.guild.id, available]);
@@ -73,7 +73,7 @@ export default class UnbanCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

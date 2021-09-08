@@ -29,6 +29,7 @@ import type {
   APIEmbedImage,
   APIEmbedThumbnail,
 } from 'discord-api-types';
+
 import { omitUndefinedOrNull } from '@augu/utils';
 import type { EmbedOptions } from 'eris';
 import { Color } from '../util/Constants';
@@ -52,6 +53,7 @@ export default class EmbedBuilder {
   patch(data: EmbedOptions) {
     if (data.description !== undefined) this.description = data.description;
 
+    // @ts-ignore
     if (data.thumbnail !== undefined) this.thumbnail = data.thumbnail;
 
     if (data.timestamp !== undefined) this.timestamp = data.timestamp;
@@ -60,6 +62,7 @@ export default class EmbedBuilder {
 
     if (data.fields !== undefined) this.fields = data.fields;
 
+    // @ts-ignore
     if (data.image !== undefined) this.image = data.image;
 
     if (data.color !== undefined) this.color = data.color;

@@ -85,6 +85,7 @@ export default class ReasonCommand extends Command {
         );
 
       const message = await this.discord.client.getMessage(channel!.id, caseModel.messageID!);
+      // @ts-ignore
       await this.punishments.editModLog(caseModel, message);
 
       return msg.reply(`Updated case #**${caseModel.index}** with reason **${reason.join(' ') || '(unknown)'}**`);
@@ -120,6 +121,7 @@ export default class ReasonCommand extends Command {
         );
 
       const message = await this.discord.client.getMessage(channel!.id, latestCaseModel.messageID!);
+      // @ts-ignore
       await this.punishments.editModLog(latestCaseModel, message);
 
       return msg.reply(`Updated case #**${latestCaseModel.index}** with reason **${reason.join(' ') || '(unknown)'}**`);

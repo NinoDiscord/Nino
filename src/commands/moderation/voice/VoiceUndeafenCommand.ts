@@ -22,7 +22,7 @@
 
 import { DiscordRESTError, Member, User, VoiceChannel } from 'eris';
 import { Command, CommandMessage } from '../../../structures';
-import { PunishmentType } from '../../../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import PunishmentService from '../../../services/PunishmentService';
 import { Categories } from '../../../util/Constants';
 import Permissions from '../../../util/Permissions';
@@ -63,7 +63,7 @@ export default class VoiceUndeafenCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
@@ -125,7 +125,7 @@ export default class VoiceUndeafenCommand extends Command {
           id: user.id,
           guild: msg.guild,
         },
-        type: PunishmentType.VoiceUndeafen,
+        type: PunishmentType.VOICE_UNDEAFEN,
         time: time !== undefined ? ms(time!) : undefined,
       });
 
@@ -148,7 +148,7 @@ export default class VoiceUndeafenCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

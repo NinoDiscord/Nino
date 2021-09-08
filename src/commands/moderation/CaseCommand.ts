@@ -21,7 +21,6 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder } from '../../structures';
-import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
@@ -30,13 +29,10 @@ import ms from 'ms';
 
 export default class CaseCommand extends Command {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly database!: Database;
 
   @Inject
-  private database!: Database;
-
-  @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   constructor() {
     super({

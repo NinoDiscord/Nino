@@ -22,7 +22,7 @@
 
 import { Command, CommandMessage } from '../../structures';
 import { DiscordRESTError, User } from 'eris';
-import { PunishmentType } from '../../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
@@ -31,10 +31,10 @@ import Discord from '../../components/Discord';
 
 export default class KickCommand extends Command {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   constructor() {
     super({
@@ -65,7 +65,7 @@ export default class KickCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
@@ -101,7 +101,7 @@ export default class KickCommand extends Command {
         reason: reason.length ? reason.join(' ') : undefined,
         member: msg.guild.members.get(user.id)!,
         soft: false,
-        type: PunishmentType.Kick,
+        type: PunishmentType.KICK,
       });
 
       return msg.reply(
@@ -122,7 +122,7 @@ export default class KickCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

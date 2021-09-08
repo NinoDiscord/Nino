@@ -62,7 +62,7 @@ export default class Locale {
       try {
         value = value[node];
       } catch (ex) {
-        if (ex.message.includes('of undefined')) value = NOT_FOUND_SYMBOL;
+        if ((ex as Error).message.includes('of undefined')) value = NOT_FOUND_SYMBOL;
 
         break;
       }

@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-import { Command, CommandMessage, EmbedBuilder } from '../../structures';
+import { Command, CommandMessage } from '../../structures';
 import { DiscordRESTError, User } from 'eris';
-import { PunishmentType } from '../../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
@@ -67,7 +67,7 @@ export default class UnmuteCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
@@ -104,12 +104,12 @@ export default class UnmuteCommand extends Command {
         publish: true,
         reason: reason.join(' ') || 'No reason was provided',
         member: msg.guild.members.get(user.id)!,
-        type: PunishmentType.Unmute,
+        type: PunishmentType.UNMUTE,
       });
 
       const timeouts = await this.redis.getTimeouts(msg.guild.id);
       const available = timeouts.filter(
-        (pkt) => pkt.type !== 'unmute' && pkt.user !== userID && pkt.guild === msg.guild.id
+        (pkt) => pkt.type !== PunishmentType.UNMUTE.toLowerCase() && pkt.user !== userID && pkt.guild === msg.guild.id
       );
 
       await this.redis.client.hmset('nino:timeouts', [msg.guild.id, available]);
@@ -131,7 +131,7 @@ export default class UnmuteCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

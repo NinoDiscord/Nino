@@ -22,7 +22,7 @@
 
 import { DiscordRESTError, Member, User } from 'eris';
 import { Command, CommandMessage } from '../../structures';
-import { PunishmentType } from '../../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
 import Permissions from '../../util/Permissions';
@@ -38,10 +38,10 @@ interface BanFlags {
 
 export default class BanCommand extends Command {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   constructor() {
     super({
@@ -78,7 +78,7 @@ export default class BanCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
@@ -90,6 +90,7 @@ export default class BanCommand extends Command {
       id: user.id,
       guild: msg.guild,
     };
+
     if (member.id === msg.guild.ownerID)
       return msg.reply("I don't think I can perform this action due to you banning the owner, you idiot.");
 
@@ -149,7 +150,7 @@ export default class BanCommand extends Command {
           guild: msg.guild,
         },
         soft: flags.soft === true,
-        type: PunishmentType.Ban,
+        type: PunishmentType.BAN,
         days: Number(days),
         time: time !== null ? ms(time) : undefined,
       });
@@ -172,7 +173,7 @@ export default class BanCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

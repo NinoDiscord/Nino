@@ -20,9 +20,9 @@
  * SOFTWARE.
  */
 
-import { Constants, Guild, Message, TextChannel, Overwrite } from 'eris';
+import type { Message, TextChannel, Overwrite } from 'eris';
 import LocalizationService from '../services/LocalizationService';
-import { PunishmentType } from '../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import PunishmentService from '../services/PunishmentService';
 import PermissionUtil from '../util/Permissions';
 import { isObject } from '@augu/utils';
@@ -122,7 +122,7 @@ export default class RaidAutomod implements Automod {
             id: msg.author.id,
           },
           soft: false,
-          type: PunishmentType.Ban,
+          type: PunishmentType.BAN,
         });
       } catch {
         // skip if we can't ban the user

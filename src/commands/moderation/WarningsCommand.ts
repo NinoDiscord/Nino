@@ -60,23 +60,19 @@ export default class WarningsCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
     }
 
     if (user === null) return msg.reply('Bot or user was not found.');
-
     if (!msg.guild.members.has(user.id)) return msg.reply('Cannot view warnings outside of this guild.');
-
     if (user.bot) return msg.reply('Bots cannot be warned.');
 
     const member = msg.guild.members.get(user.id)!;
     if (member.id === msg.guild.ownerID) return msg.reply('Why would the server owner have any warnings...?');
-
     if (member.id === this.discord.client.user.id) return msg.reply('W-why would I have any warnings?!');
-
     if (member.permissions.has('administrator') || member.permissions.has('banMembers'))
       return msg.reply("Moderators or administrators don't have warnings attached to them.");
 

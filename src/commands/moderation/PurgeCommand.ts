@@ -21,11 +21,11 @@
  */
 
 import { Command, CommandMessage, EmbedBuilder, Subcommand } from '../../structures';
-import { Inject } from '@augu/lilith';
-import { Categories, DISCORD_INVITE_REGEX, ID_REGEX } from '../../util/Constants';
-import Discord from '../../components/Discord';
-import { Message, User } from 'eris';
+import { Categories, DISCORD_INVITE_REGEX } from '../../util/Constants';
+import type { Message, User } from 'eris';
 import { pluralize } from '@augu/utils';
+import { Inject } from '@augu/lilith';
+import Discord from '../../components/Discord';
 
 // It's a function so it can properly hydrate instead of being in the command scope as a getter.
 const getTwoWeeksFromNow = () => Date.now() - 1000 * 60 * 60 * 24 * 14;

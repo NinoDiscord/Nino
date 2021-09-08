@@ -25,10 +25,10 @@ import { DiscordRESTError, User } from 'eris';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
 import Permissions from '../../util/Permissions';
+import { pluralize } from '@augu/utils';
 import { Inject } from '@augu/lilith';
 import Database from '../../components/Database';
 import Discord from '../../components/Discord';
-import { pluralize } from '@augu/utils';
 
 export default class WarnCommand extends Command {
   @Inject
@@ -67,7 +67,7 @@ export default class WarnCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
@@ -104,6 +104,7 @@ export default class WarnCommand extends Command {
       const warnings = await this.database.warnings
         .getAll(msg.guild.id, user.id)
         .then((warnings) => warnings.filter((warns) => warns.amount > 0));
+
       const count = warnings.reduce((acc, curr) => acc + curr.amount, 0);
 
       return msg.reply(
@@ -124,7 +125,7 @@ export default class WarnCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

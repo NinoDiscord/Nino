@@ -20,15 +20,11 @@
  * SOFTWARE.
  */
 
-import { DiscordRESTError, Member, User, VoiceChannel } from 'eris';
 import { Command, CommandMessage, Subcommand } from '../../../structures';
-import { PunishmentType } from '../../../entities/PunishmentsEntity';
-import PunishmentService from '../../../services/PunishmentService';
-import { Categories, CHANNEL_REGEX } from '../../../util/Constants';
-import Permissions from '../../../util/Permissions';
+import type { Member, VoiceChannel } from 'eris';
+import { Categories } from '../../../util/Constants';
 import { Inject } from '@augu/lilith';
 import Discord from '../../../components/Discord';
-import ms = require('ms');
 
 const condition = (discord: Discord, member: Member) =>
   member.user.id !== discord.client.user.id && // If it's not Nino

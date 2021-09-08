@@ -22,7 +22,7 @@
 
 import { DiscordRESTError, Member, User, VoiceChannel } from 'eris';
 import { Command, CommandMessage } from '../../../structures';
-import { PunishmentType } from '../../../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import PunishmentService from '../../../services/PunishmentService';
 import { Categories } from '../../../util/Constants';
 import Permissions from '../../../util/Permissions';
@@ -64,7 +64,7 @@ export default class VoiceDeafenCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
@@ -97,7 +97,6 @@ export default class VoiceDeafenCommand extends Command {
 
     const channel = this.discord.client.getChannel(msg.member.voiceState.channelID) as VoiceChannel;
     if (channel.voiceMembers.size === 1) return msg.reply('You must be in an active voice channel.');
-
     if (!channel.voiceMembers.has(user.id))
       return msg.reply(`Member **${user.username}#${user.discriminator}** is not in this voice channel.`);
 
@@ -126,7 +125,7 @@ export default class VoiceDeafenCommand extends Command {
           id: user.id,
           guild: msg.guild,
         },
-        type: PunishmentType.VoiceDeafen,
+        type: PunishmentType.VOICE_DEAFEN,
         time: time !== undefined ? ms(time!) : undefined,
       });
 
@@ -149,7 +148,7 @@ export default class VoiceDeafenCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

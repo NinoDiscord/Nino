@@ -67,7 +67,7 @@ export default class PardonCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
@@ -114,7 +114,6 @@ export default class PardonCommand extends Command {
       );
     } catch (ex) {
       if (ex instanceof RangeError || ex instanceof SyntaxError) return msg.error(ex.message);
-
       if (ex instanceof DiscordRESTError && ex.code === 10007) {
         return msg.reply(
           `Member **${user.username}#${user.discriminator}** has left but been detected. Kinda weird if you ask me, to be honest.`
@@ -127,7 +126,7 @@ export default class PardonCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

@@ -21,7 +21,7 @@
  */
 
 import { Constants, Guild, Member, User, VoiceChannel, TextChannel, Message, Attachment } from 'eris';
-import { PunishmentType, Guild as NinoGuild, PrismaClient, Cases } from '.prisma/client';
+import { PunishmentType, Guild as NinoGuild, PrismaClient, Cases } from '@prisma/client';
 import { Inject, Service } from '@augu/lilith';
 import { EmbedBuilder } from '../structures';
 import TimeoutsManager from '../components/timeouts/Timeouts';

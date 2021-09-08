@@ -22,7 +22,7 @@
 
 import { DiscordRESTError, User } from 'eris';
 import { Command, CommandMessage } from '../../structures';
-import { PunishmentType } from '../../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import PunishmentService from '../../services/PunishmentService';
 import { Categories } from '../../util/Constants';
 import { Inject } from '@augu/lilith';
@@ -32,10 +32,10 @@ import ms = require('ms');
 
 export default class MuteCommand extends Command {
   @Inject
-  private punishments!: PunishmentService;
+  private readonly punishments!: PunishmentService;
 
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   constructor() {
     super({
@@ -65,7 +65,7 @@ export default class MuteCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );
@@ -112,7 +112,7 @@ export default class MuteCommand extends Command {
         publish: true,
         reason: actualReason,
         member,
-        type: PunishmentType.Mute,
+        type: PunishmentType.MUTE,
         time: time !== undefined ? ms(time) : undefined,
       });
 
@@ -134,7 +134,7 @@ export default class MuteCommand extends Command {
           'Contact the developers in discord.gg/ATmjFH9kMH under <#824071651486335036>:',
           '',
           '```js',
-          ex.stack ?? '<... no stacktrace? ...>',
+          (ex as any).stack ?? '<... no stacktrace? ...>',
           '```',
         ].join('\n')
       );

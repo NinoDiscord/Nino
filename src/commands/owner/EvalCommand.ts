@@ -102,7 +102,9 @@ export default class EvalCommand extends Command {
       );
     } catch (ex) {
       const time = stopwatch.end();
-      return msg.reply([`:timer: **${time}**`, '', '```js', ex.stack ?? '<... no stacktrace ...>', '```'].join('\n'));
+      return msg.reply(
+        [`:timer: **${time}**`, '', '```js', (ex as any).stack ?? '<... no stacktrace ...>', '```'].join('\n')
+      );
     }
   }
 

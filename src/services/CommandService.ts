@@ -202,6 +202,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
     }
 
     const locale = this.localization.get(settings!.language, userSettings.language);
+    // @ts-ignore
     const message = new CommandMessage(msg, locale, settings!, userSettings);
     app.addInjections(message);
 

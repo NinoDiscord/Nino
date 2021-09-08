@@ -23,7 +23,7 @@
 import PunishmentService, { PunishmentEntryType } from '../services/PunishmentService';
 import { Constants, Guild, Member } from 'eris';
 import { Inject, Subscribe } from '@augu/lilith';
-import { PunishmentType } from '../entities/PunishmentsEntity';
+import { PunishmentType } from '@prisma/client';
 import AutomodService from '../services/AutomodService';
 import Database from '../components/Database';
 import Discord from '../components/Discord';
@@ -97,7 +97,7 @@ export default class GuildMemberListener {
         moderator: entry.user,
         member,
         reason: '[Automod] Moderator has removed the Muted role',
-        type: PunishmentType.Unmute,
+        type: PunishmentType.UNMUTE,
       });
     }
 
@@ -110,7 +110,7 @@ export default class GuildMemberListener {
         moderator: entry.user,
         member,
         reason: '[Automod] Moderator has added the Muted role',
-        type: PunishmentType.Mute,
+        type: PunishmentType.MUTE,
       });
     }
   }
@@ -123,12 +123,12 @@ export default class GuildMemberListener {
     const cases = await this.database.cases.getAll(guild.id);
     const all = cases.filter((c) => c.victimID === member.id).sort((c) => c.index);
 
-    if (all.length > 0 && all[all.length - 1]?.type === PunishmentType.Mute) {
+    if (all.length > 0 && all[all.length - 1]?.type === PunishmentType.MUTE.toLowerCase()) {
       await this.punishments.apply({
         moderator: this.discord.client.user,
         member,
         reason: '[Automod] Mute Evading',
-        type: PunishmentType.Mute,
+        type: PunishmentType.MUTE,
       });
     }
   }
@@ -158,7 +158,8 @@ export default class GuildMemberListener {
       victimID: entry.targetID,
       guildID: guild.id,
       reason: '[Automod] User was kicked by moderator',
-      type: PunishmentType.Kick,
+      // @ts-ignore
+      type: PunishmentType.KICK.toLowerCase(),
     });
 
     await this.punishments['publishToModLog'](
@@ -169,6 +170,8 @@ export default class GuildMemberListener {
         guild,
         type: PunishmentEntryType.Kicked,
       },
+
+      // @ts-ignore
       model
     );
   }

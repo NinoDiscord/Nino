@@ -30,10 +30,10 @@ import Redis from '../../components/Redis';
 
 export default class TimeoutsCommand extends Command {
   @Inject
-  private discord!: Discord;
+  private readonly discord!: Discord;
 
   @Inject
-  private redis!: Redis;
+  private readonly redis!: Redis;
 
   constructor() {
     super({
