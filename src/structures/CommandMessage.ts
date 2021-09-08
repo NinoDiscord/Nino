@@ -86,9 +86,8 @@ export default class CommandMessage {
     return this.reply(this.locale.translate(key, args));
   }
 
-  reply(content: string | EmbedBuilder) {
+  reply(content: string | EmbedBuilder, allowReply: boolean = true) {
     const payload: AdvancedMessageContent = {
-      messageReference: { messageID: this.#message.id },
       allowedMentions: {
         repliedUser: false,
         everyone: false,
@@ -96,6 +95,8 @@ export default class CommandMessage {
         users: false,
       },
     };
+
+    if (allowReply) payload.messageReference = { messageID: this.#message.id };
 
     if (typeof content === 'string') {
       payload.content = content;
