@@ -54,7 +54,7 @@
     "prom-client": "13.2.0",
     "reflect-metadata": "0.1.13",
     "slash-create": "4.0.1",
-    "source-map-support": "0.5.19",
+    "source-map-support": "0.5.20",
     "tslog": "3.2.2",
     "typeorm": "0.2.31",
     "ws": "8.2.2"
