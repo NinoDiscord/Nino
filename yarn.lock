@@ -17,6 +17,11 @@
   resolved "https://registry.yarnpkg.com/@augu/collections/-/collections-1.0.8.tgz#773f4bad2ed4000f007c05bbb98c431e2e01693d"
   integrity sha512-N/cYv0ZdL5uyU2sx+HugleHIYN0WEDQUD/buFGgvC39lMUl0/V909h514EleJaFTLe2MG7Jrl6sVjhpQkbzldA==
 
+"@augu/collections@1.1.0":
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/@augu/collections/-/collections-1.1.0.tgz#afa7a75fb397e94f7fc3c06c68a41ccf95fa3d9d"
+  integrity sha512-WEh0NYdKtmcJEZt3jf2PUGtb9Q5/taNaQmlVTIkFi9up7HNRX3uyGS61zwEHOEwPgUXxO1iDsjLwTKz2q1RqOw==
+
 "@augu/dotenv@1.3.0":
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/@augu/dotenv/-/dotenv-1.3.0.tgz#b9c62df088b4d5b14af54e4c33774983ce1b9fba"
