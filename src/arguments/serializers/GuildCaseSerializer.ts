@@ -20,12 +20,12 @@
  * SOFTWARE.
  */
 
-import type ArgumentSerializer from '../ArgumentSerializer';
+import type { Cases } from '@prisma/client';
+import ArgumentSerializer from '../ArgumentSerializer';
 
-export const createMultiArgSerializer = <T>(name: string, values: T[]): ArgumentSerializer<T[]> => ({
-  id: `multi:${name}`,
+export const GuildCaseSerializer: ArgumentSerializer<Cases> = {
+  id: 'guild:cases',
   serialize(arg, value) {
-    // todo: this
-    return [] as T[];
+    return {} as unknown as Cases;
   },
-});
+};

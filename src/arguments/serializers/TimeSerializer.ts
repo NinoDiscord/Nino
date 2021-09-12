@@ -20,12 +20,11 @@
  * SOFTWARE.
  */
 
-import type ArgumentSerializer from '../ArgumentSerializer';
+import ArgumentSerializer from '../ArgumentSerializer';
 
-export const createMultiArgSerializer = <T>(name: string, values: T[]): ArgumentSerializer<T[]> => ({
-  id: `multi:${name}`,
+export const TimeSerializer: ArgumentSerializer<string> = {
+  id: 'time',
   serialize(arg, value) {
-    // todo: this
-    return [] as T[];
+    return '';
   },
-});
+};
