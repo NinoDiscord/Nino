@@ -33,7 +33,7 @@
     "format": "prettier --write --parser typescript --config ./.prettierrc.json src/**/*.ts",
     "start": "cd build && node main.js",
     "lint": "eslint src --ext .ts --fix",
-    "test": "jest --config jest.config.js --no-cache -i",
+    "test": "jest --config jest.config.ts --no-cache -i",
     "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
   },
   "dependencies": {

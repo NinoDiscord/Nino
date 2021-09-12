@@ -20,15 +20,22 @@
  * SOFTWARE.
  */
 
+import type { ProjectConfig } from '@jest/types/build/Config';
+
 /**
  * Represents the Jest configuration for Nino.
  */
-module.exports = {
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec)).(jsx?|tsx?)$',
+const config: Partial<ProjectConfig> = {
+  testRegex: ['(/__tests__/.*|(\\.|/)(test|spec)).(jsx?|tsx?)$'],
   testEnvironment: 'node',
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-  },
+  // @ts-ignore
+  transform: { '^.+\\.tsx?$': 'ts-jest' },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
   globalSetup: './src/jest-setup.js',
+  displayName: {
+    color: 'magentaBright',
+    name: 'Nino',
+  },
 };
+
+export default config;
