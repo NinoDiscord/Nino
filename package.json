@@ -20,6 +20,7 @@
   },
   "scripts": {
     "clean:node_modules": "rimraf node_modules/**/node_modules && rimraf node_modules/@types/**/node_modules && rimraf node_modules/@augu/**/node_modules",
+    "prisma:generate": "prisma generate",
     "clean:win:tar": "cp node_modules/@augu/collections/build/index.js.* node_modules/@augu/collections/build/index.js && rm node_modules/@augu/collections/build/index.js.*",
     "husky:install": "husky install && rm .husky/.gitignore",
     "build:no-lint": "eslint src --ext .ts && rimraf build && tsc",
@@ -27,12 +28,12 @@
     "shortlinks": "node scripts/shortlinks.js",
     "licenses": "node scripts/add-license.js",
     "generate": "prisma generate",
-    "prepare": "husky install && yarn clean:node_modules",
+    "prepare": "husky install && yarn clean:node_modules && yarn prisma:generate",
     "build": "yarn lint && yarn format && rimraf build && tsc",
     "format": "prettier --write --parser typescript --config ./.prettierrc.json src/**/*.ts",
     "start": "cd build && node main.js",
     "lint": "eslint src --ext .ts --fix",
-    "test": "jest --config jest.config.js",
+    "test": "jest --config jest.config.js --no-cache -i",
     "dev": "cd src && nodemon --exec \"ts-node --project ../tsconfig.json --files\" main.ts"
   },
   "dependencies": {
@@ -43,6 +44,7 @@
     "@augu/utils": "1.5.3",
     "@prisma/client": "3.0.2",
     "@sentry/node": "6.12.0",
+    "consola": "2.15.3",
     "eris": "github:DonovanDMC/eris#everything",
     "fastify": "3.21.0",
     "fastify-cors": "6.0.2",
@@ -55,10 +57,8 @@
     "prom-client": "13.2.0",
     "reflect-metadata": "0.1.13",
     "slash-create": "4.0.1",
-    "source-map-support": "0.5.20",
-    "tslog": "3.2.2",
-    "typeorm": "0.2.31",
-    "ws": "8.2.2"
+    "ws": "8.2.2",
+    "zod": "3.8.2"
   },
   "devDependencies": {
     "@augu/eslint-config": "2.2.0",
@@ -70,6 +70,7 @@
     "@types/luxon": "2.0.3",
     "@types/ms": "0.7.31",
     "@types/node": "15.3.1",
+    "@types/pg": "8.6.1",
     "@types/ws": "7.4.7",
     "@typescript-eslint/eslint-plugin": "4.31.0",
     "@typescript-eslint/parser": "4.31.0",

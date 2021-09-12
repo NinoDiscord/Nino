@@ -21,14 +21,24 @@
  */
 
 /**
- * Represents the Jest configuration for Nino.
+ * The memoization cache.
  */
-module.exports = {
-  testRegex: '(/__tests__/.*|(\\.|/)(test|spec)).(jsx?|tsx?)$',
-  testEnvironment: 'node',
-  transform: {
-    '^.+\\.tsx?$': 'ts-jest',
-  },
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
-  globalSetup: './src/jest-setup.js',
-};
+let cache: any[] = [];
+let lastPerformed = Date.now();
+const DAY = 60 * 60 * 24;
+
+/**
+ * Caches the {@link value}'s result *if* it's not in the memoized
+ * cache, else return it.
+ */
+export default function memoize<T>(value: T): T {
+  if (Date.now() + DAY > lastPerformed) {
+    lastPerformed = Date.now();
+    cache = [];
+  }
+
+  if (cache.includes(value)) return cache[cache.indexOf(value)];
+  cache.push(value);
+
+  return value;
+}
