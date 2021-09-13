@@ -2423,10 +2423,10 @@ signal-exit@^3.0.2:
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.3.tgz#a1410c2edd8f077b08b4e253c8eacfcaf057461c"
   integrity sha512-VUJ49FC8U1OxwZLxIbTTrDvLnf/6TDgxZcK8wxR8zs13xpx7xbG60ndBlhNrFi2EMuFRoeDoJO7wthSLq42EjA==
 
-slash-create@4.0.1:
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/slash-create/-/slash-create-4.0.1.tgz#a89e1a6b70e776a4a548b065bea393d19c5db0f2"
-  integrity sha512-UdQBbLLubYJiH7Zm1asyFL7/iENMCDmrKHQPNyzWp/Iv5ywSB7kIB/Jhszt1sYKMtLbVggx4bcmAkLz5VPFanA==
+slash-create@4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/slash-create/-/slash-create-4.1.1.tgz#a2348c112bde56bbad1cb572d02e10ff56c4c3d9"
+  integrity sha512-drbYQF4Hv/+C2x2eDcgoy7KLPt6+PW606tbWl/e5o9Qdk1jvh9bbGDSlJcSTFrLMHTtGLYq3QNXZZdNd/oJy3Q==
   dependencies:
     "@discordjs/collection" "^0.2.1"
     eventemitter3 "^4.0.7"
