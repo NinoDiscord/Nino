@@ -63,7 +63,7 @@
     "@augu/eslint-config": "2.2.0",
     "@augu/prettier-config": "1.0.2",
     "@augu/tsconfig": "1.1.1",
-    "@types/ioredis": "4.27.2",
+    "@types/ioredis": "4.27.3",
     "@types/js-yaml": "4.0.3",
     "@types/luxon": "2.0.4",
     "@types/ms": "0.7.31",
