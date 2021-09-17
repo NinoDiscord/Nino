@@ -181,7 +181,7 @@ runPendingMigrations: true
 # Production: https://stats.floofy.dev/d/e3KPDLknk/nino-prod?orgId=1
 # Staging: {unknown}
 #
-# DDefault: Not present.
+# Default: Not present.
 prometheusPort: 22043
 
 # Returns the default locale Nino will use to send messages with. Our locales are managed
@@ -286,17 +286,17 @@ timeouts:
 ```
 
 ## Maintainers
-- [**Rodentman87#8787**](https://likesdinosaurs.com) - Web Developer ([GitHub](https://githubc.om/Rodentman87))
-- [**August#5820**](https://floofy.dev) - Project Lead ([GitHub](https://github.com/auguwu))
-- [**Ice#4710**](https://winterfox.tech) - DevOps ([GitHub](https://github.com/IceeMC))
+- [**Maisy ~ Rodentman87#8787**](https://likesdinosaurs.com) - Web Developer ([GitHub](https://githubc.om/Rodentman87))
+- [**Noel  ~ August#5820**](https://floofy.dev) - Project Lead ([GitHub](https://github.com/auguwu))
+- [**Ice   ~ Ice#4710**](https://winterfox.tech) - DevOps ([GitHub](https://github.com/IceeMC))
 
 ## Hackweek Participants
 > Since Nino was a submission towards [Discord's Hackweek](https://blog.discord.com/discord-community-hack-week-build-and-create-alongside-us-6b2a7b7bba33), this is a list of the participants.
 
+- [**davidjcralph#9721**](https://davidjcralph.com) - ([GitHub](https://github.com/davidjcralph))
 - [**August#5820**](https://floofy.dev) - ([GitHub](https://github.com/auguwu))
 - [**dondish#8072**](https://odedshapira.me/) - ([GitHub](https://github.com/dondish))
 - [**Wessel#0498**](https://wessel.meek.moe) - ([GitHub](https://github.com/Wessel))
-- [**davidjcralph#9721**](https://davidjcralph.com) - ([GitHub](https://github.com/davidjcralph))
 - **Kyle** - ([GitHub](https://github.com/scrap))
 
 ## License
