@@ -20,20 +20,18 @@
  * SOFTWARE.
  */
 
-import type { Constants } from 'eris';
+import { parentPort, isMainThread } from 'worker_threads';
 
-/**
- * Represents the command information applied to a {@link AbstractCommand command}.
- */
-export interface CommandInfo {
-  /**
-   * Returns the command's name, this is techincally the first "alias".
-   */
-  name: string;
+if (isMainThread) {
+  console.log('Cannot run `scripts/prisma.migrations.js` in main thread (i.e, `node ...`');
+  process.exit(1);
 }
 
-/**
- * Represents an abstraction for running prefixed commands with Nino. Normally, you cannot
- * apply metadata to this class, it'll be under the `nino::commands` symbol when using `Reflect.getMetadata`.
- */
-export default abstract class AbstractCommand {}
+(async () => {
+  parentPort?.postMessage(
+    JSON.stringify({
+      op: 1,
+      d: { done: true },
+    })
+  );
+})();

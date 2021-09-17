@@ -20,20 +20,13 @@
  * SOFTWARE.
  */
 
-import type { Constants } from 'eris';
+import { Worker } from 'worker_threads';
+import consola from 'consola';
 
-/**
- * Represents the command information applied to a {@link AbstractCommand command}.
- */
-export interface CommandInfo {
-  /**
-   * Returns the command's name, this is techincally the first "alias".
-   */
-  name: string;
+export default class Executors {
+  static readonly logger = consola.withScope('nino:executors');
+
+  static run(filePath: string) {
+    // todo: this
+  }
 }
-
-/**
- * Represents an abstraction for running prefixed commands with Nino. Normally, you cannot
- * apply metadata to this class, it'll be under the `nino::commands` symbol when using `Reflect.getMetadata`.
- */
-export default abstract class AbstractCommand {}

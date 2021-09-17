@@ -20,20 +20,31 @@
  * SOFTWARE.
  */
 
-import type { Constants } from 'eris';
+import { HttpClient } from '@augu/orchid';
+import { version } from '../Constants';
 
 /**
- * Represents the command information applied to a {@link AbstractCommand command}.
+ * Singleton class for accessing `ravy.org/api`.
  */
-export interface CommandInfo {
-  /**
-   * Returns the command's name, this is techincally the first "alias".
-   */
-  name: string;
+export default class RavyApi {
+  public static readonly instance = new RavyApi();
+
+  private readonly http: HttpClient = new HttpClient({
+    userAgent: `Nino/Discord (+https://github.com/NinoDiscord/Nino; v${version})`,
+    baseUrl: 'https://ravy.org',
+    basePath: '/api/v1',
+  });
+
+  getBanInfo(id: string) {
+    return this.http
+      .request('/users/:id/bans', 'GET', {
+        query: {
+          id,
+        },
+        headers: {
+          Authorization: process.env.RAVY_API,
+        },
+      })
+      .then((res) => res.json<Ravy.Ban[]>());
+  }
 }
-
-/**
- * Represents an abstraction for running prefixed commands with Nino. Normally, you cannot
- * apply metadata to this class, it'll be under the `nino::commands` symbol when using `Reflect.getMetadata`.
- */
-export default abstract class AbstractCommand {}

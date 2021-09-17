@@ -50,6 +50,7 @@
     "fastify-cors": "6.0.2",
     "fastify-no-icon": "4.0.0",
     "ioredis": "4.27.9",
+    "is-docker": "2.2.1",
     "js-yaml": "4.1.0",
     "luxon": "2.0.2",
     "ms": "2.1.3",

@@ -20,20 +20,24 @@
  * SOFTWARE.
  */
 
-import type { Constants } from 'eris';
+import { Client, User, Message } from 'eris';
+import consola from 'consola';
 
-/**
- * Represents the command information applied to a {@link AbstractCommand command}.
- */
-export interface CommandInfo {
-  /**
-   * Returns the command's name, this is techincally the first "alias".
-   */
-  name: string;
-}
+const log = consola.withScope('nino:discord');
+const applyPatches = () => {
+  log.info('Apply Eris patches...');
 
-/**
- * Represents an abstraction for running prefixed commands with Nino. Normally, you cannot
- * apply metadata to this class, it'll be under the `nino::commands` symbol when using `Reflect.getMetadata`.
- */
-export default abstract class AbstractCommand {}
+  // Apply `User#tag`
+  Object.defineProperty(User.prototype, 'tag', {
+    get(this: User) {
+      return `${this.username}#${this.discriminator}`;
+    },
+
+    set: () => {
+      throw new SyntaxError('Unable to mutate `User#tag`.');
+    },
+  });
+
+  // Patch `Message#createMessage` to not create a new message
+  // if it's in message cache
+};

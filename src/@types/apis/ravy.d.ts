@@ -20,20 +20,30 @@
  * SOFTWARE.
  */
 
-import type { Constants } from 'eris';
-
-/**
- * Represents the command information applied to a {@link AbstractCommand command}.
- */
-export interface CommandInfo {
+/** */
+export {};
+declare global {
   /**
-   * Returns the command's name, this is techincally the first "alias".
+   * Represents the typings for `api.ravy.org` bans.
    */
-  name: string;
-}
+  namespace Ravy {
+    interface User {
+      pronouns: string;
+      bans: Ban[];
+      trust: TrustLevel;
+      whitelists: []; // don't know what this is
+      rep: RepProvider[];
+    }
 
-/**
- * Represents an abstraction for running prefixed commands with Nino. Normally, you cannot
- * apply metadata to this class, it'll be under the `nino::commands` symbol when using `Reflect.getMetadata`.
- */
-export default abstract class AbstractCommand {}
+    interface RepProvider {
+      type: 'drep' | 'riverside';
+      score: number;
+    }
+
+    interface Ban {
+      provider: 'ravy'; // iirc only 'ravy' is allowed?
+      reason: string;
+      moderator: string;
+    }
+  }
+}
