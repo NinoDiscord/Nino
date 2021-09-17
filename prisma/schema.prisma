@@ -43,9 +43,12 @@ enum PunishmentType {
 
 model Automod {
   blacklistedWords  String[] @map("blacklisted_words")
+  omitChannels      String[] @map("omit_channels")
+  messageLinks      Boolean @default(false)
   dehoisting        Boolean @default(false)
   shortlinks        Boolean @default(false)
   blacklist         Boolean @default(false)
+  omitUsers         String[] @map("omit_users")
   mentions          Boolean @default(false)
   guildId           String  @map("guild_id")
   invites           Boolean @default(false)
@@ -82,7 +85,7 @@ model Cases {
   @@unique([guildId])
 }
 
-model Guild {
+model Guilds {
   modlogChannelId String? @map("modlog_channel_id")
   mutedRoleId     String? @map("muted_role_id")
   prefixes        String[]
@@ -118,7 +121,7 @@ model Punishments {
   @@unique([guildId, index])
 }
 
-model User {
+model Users {
   prefixes        String[]
   language        String
   userId          String @map("user_id")
@@ -127,7 +130,7 @@ model User {
   @@unique([userId])
 }
 
-model Warning {
+model Warnings {
   guildId String  @map("guild_id")
   reason  String?
   amount  Int
@@ -135,4 +138,14 @@ model Warning {
 
   @@map("warnings")
   @@unique([guildId, userId])
+}
+
+model Customizibility {
+  webhook String?
+  logging Json
+  modlog  Json
+  guildId String @map("guild_id")
+
+  @@map("guild_customizibility")
+  @@unique([guildId])
 }

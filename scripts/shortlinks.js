@@ -20,28 +20,21 @@
  * SOFTWARE.
  */
 
-const { LoggerWithoutCallSite } = require('tslog');
 const { calculateHRTime } = require('@augu/utils');
 const { existsSync } = require('fs');
 const { HttpClient } = require('@augu/orchid');
 const { version } = require('../package.json');
 const { join } = require('path');
+
+/** @type {import('consola').default} */
+const consola = require('consola');
 const fs = require('fs/promises');
 
 const http = new HttpClient({
   userAgent: `Nino/DiscordBot (https://github.com/NinoDiscord/Nino, v${version})`,
 });
 
-const logger = new LoggerWithoutCallSite({
-  displayFunctionName: true,
-  exposeErrorCodeFrame: true,
-  displayInstanceName: true,
-  displayFilePath: false,
-  dateTimePattern: '[ day-month-year / hour:minute:second ]',
-  instanceName: 'script: shortlinks',
-  name: 'scripts',
-});
-
+const logger = consola.withScope('nino:scripts:shortlinks');
 const otherUrls = [
   'shorte.st',
   'adf.ly',

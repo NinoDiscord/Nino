@@ -3,6 +3,7 @@ node_modules/
 old_locales/
 .husky/_/
 build/
+!.actions/build/
 
 # Jest
 coverage/

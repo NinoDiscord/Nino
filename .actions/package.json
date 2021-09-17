@@ -1,0 +1,22 @@
+{
+  "name": "@nino/actions-suite",
+  "description": "Miscellaneous GitHub actions tailored for Nino's repository",
+  "version": "0.0.0",
+  "license": "MIT",
+  "author": "Noel <cutie@floofy.dev>",
+  "private": true,
+  "scripts": {
+    "build:shortlinks": "ncc build src/shortlinks.ts -o build -m -C --license LICENSE"
+  },
+  "dependencies": {
+    "@actions/core": "1.5.0",
+    "@actions/github": "5.0.0",
+    "@augu/utils": "1.5.3",
+    "@octokit/core": "3.5.1"
+  },
+  "devDependencies": {
+    "@augu/tsconfig": "1.1.1",
+    "@vercel/ncc": "0.31.1",
+    "typescript": "4.4.3"
+  }
+}

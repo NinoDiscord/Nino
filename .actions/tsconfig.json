@@ -1,0 +1,14 @@
+{
+  "extends": "@augu/tsconfig",
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "typeRoots": ["./src/@types", "./node_modules/@types"],
+    "rootDir": "./src",
+    "types": ["node"],
+    "outDir": "./build",
+    "skipLibCheck": true,
+    "noEmit": true // @vercel/ncc will compile it, so TypeScript won't.
+  },
+  "exclude": ["node_modules"],
+  "include": ["src/**/*.ts"]
+}

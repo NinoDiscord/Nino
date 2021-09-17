@@ -64,3 +64,8 @@ jobs:
 
       - name: Compiles the project to check for any build errors
         run: tsc --noEmit
+
+      - name: Runs Jest and runs all unit tests
+        run: jest --config jest.config.ts --no-cache -i
+        env:
+          TEST_DISCORD_TOKEN: ${{ secrets.TEST_DISCORD_TOKEN }}
