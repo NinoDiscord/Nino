@@ -23,6 +23,7 @@
 /* eslint-disable camelcase */
 
 import { Client, Member, Role, Guild } from 'eris';
+import { gitCommitHash } from '../Constants';
 import PermissionUtil from '../PermissionUtil';
 
 describe('Nino > PermissionUtil', () => {
@@ -44,6 +45,13 @@ describe('Nino > PermissionUtil', () => {
         mockGuild = mockClient.guilds.get('382725233695522816')!;
         mockMember = mockGuild.members.get('280158289667555328')!;
         mockRole = mockGuild.roles.get('476914701863747586')!;
+
+        mockClient.editStatus('dnd', [
+          {
+            name: `🧪 which unit test is correct [commit ${gitCommitHash}]`,
+            type: 5,
+          },
+        ]);
 
         resolve();
       });
