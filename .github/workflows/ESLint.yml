@@ -57,7 +57,7 @@ jobs:
         run: npm install -g eslint typescript jest
 
       - name: Installs local packages
-        run: npm i
+        run: yarn
 
       - name: Lints the repository and checks for linting errors
         run: eslint src --ext .ts
