@@ -1,14 +1,6 @@
-<div align='center'>
-  <h2>Nino</h2>
-  <blockquote><strong>Cute, advanced discord moderation bot made in Eris. Make your server cute and automated with utilities for you and your server moderators! ☆ ～('▽^人)</strong></blockquote>
-  <br />
-  <hr />
-  <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint%20Workflow/master?style=flat-square" />
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <img alt="GitHub License" src="https://img.shields.io/github/license/NinoDiscord/Nino?style=flat-square" />
-  <span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
-  <img alt="Noelware Server" src="https://discord.com/api/v9/guilds/824066105102303232/widget.png?style=shield" />
-</div>
+# [Nino](https://nino.sh) • <img alt="GitHub Workflow Status" src="https://img.shields.io/github/workflow/status/NinoDiscord/Nino/ESLint%20Workflow/master?style=flat-square" /> <img alt="GitHub License" src="https://img.shields.io/github/license/NinoDiscord/Nino?style=flat-square" /> <img alt="Noelware Server" src="https://discord.com/api/v9/guilds/824066105102303232/widget.png?style=shield" /
+
+> :hammer: **Cute, advanced discord moderation bot made in Eris. Make your server cute and automated with utilities for you and your server moderators! ☆ ～('▽^人)**
 
 ## Features
 - 🔨 **Auto Moderation** - Prevent raids, spam, ads, and much more!
