@@ -189,6 +189,12 @@ defaultLocale: "en_US" or "fr_FR" or "pt_BR"
 # Default: "development"
 environment: "development" or "production"
 
+# Enables the `Relay` component to relay information from the bot
+# with the frontend. This isn't recommended for smaller instances.
+#
+# Default: false
+relay: true
+
 # Sets the DSN url for configuring Sentry, this is not recommended on smaller instances!
 #
 # Default: Not present.
@@ -274,6 +280,15 @@ timeouts:
   port: 4025
 
   # Returns the authentication string for authorizing.
+  auth: ...
+
+# Clustering information. THIS IS NOT RECOMMENDED
+# FOR SMALLER INSTANCES.
+clustering:
+  # Returns the port for connecting to the cluster operator.
+  port: ...
+
+  # Returns the authentication header to authorizing with the cluster operator.
   auth: ...
 ```
 

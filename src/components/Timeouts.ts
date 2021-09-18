@@ -19,36 +19,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import { parentPort, isMainThread } from 'worker_threads';
-import { resolve as _pathResolve } from 'path';
-import { spawn } from 'child_process';
-
-if (isMainThread) {
-  console.log('Cannot run `scripts/prisma.migrations.js` in main thread (i.e, `node ...`');
-  process.exit(1);
-}
-
-class Spawner {
-  static async spawn(path: string, args: string[]) {
-    console.log(`Spawning process in path ${_pathResolve(path)}...`);
-    return new Promise<void>((resolve, reject) => {
-      const proc = spawn(_pathResolve(path), args, {
-        env: {
-          ...process.env,
-        },
-      });
-
-      proc.stdout?.on('data', (data) => console.log(data));
-      proc.stderr?.on('data', (data) => console.log(data));
-      proc.on('exit', (code) => {
-        console.log(`exited with code ${code}.`);
-        code === 0 ? resolve() : reject();
-      });
-    });
-  }
-}
-
-Spawner.spawn('./node_modules/prisma/cli/@build/index.js', ['migrate', 'deploy'])
-  .then(() => parentPort?.postMessage('done'))
-  .catch(() => parentPort?.postMessage('error'));
