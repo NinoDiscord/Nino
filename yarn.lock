@@ -71,6 +71,11 @@
   resolved "https://registry.yarnpkg.com/@augu/utils/-/utils-1.5.3.tgz#eb82352e2690b0467ef690885e6496f0e7a12da9"
   integrity sha512-Pyu+JoK7f7AUjZvffCjf6ZLEpwa09ig7WNOn/ozzZDGeWNad9PMj8EsYzVsKLRyP/SnvbLDvpRWGEObgcACtYg==
 
+"@augu/utils@1.5.5":
+  version "1.5.5"
+  resolved "https://registry.yarnpkg.com/@augu/utils/-/utils-1.5.5.tgz#aea7f748c8254f4533dc394d190da470dcf0826a"
+  integrity sha512-MX3cUASPPttAU2LGzMcyw8Fr+HQFeJc+Re0Atem+KQwxd/dA3NM+Sk1A/6u1TQhUDm35ZmDRNORzInySabpkQg==
+
 "@babel/code-frame@7.12.11":
   version "7.12.11"
   resolved "https://registry.yarnpkg.com/@babel/code-frame/-/code-frame-7.12.11.tgz#f4ad435aa263db935b8f10f2c552d23fb716a63f"
