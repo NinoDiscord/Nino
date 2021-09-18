@@ -20,12 +20,24 @@
  * SOFTWARE.
  */
 
-import { getQuotedStrings, formatSize } from '..';
+import { resolve } from 'path';
+import { Worker } from 'worker_threads';
+import consola from 'consola';
 
-describe('Nino > Utilities', () => {
-  it('Returns ["i am cute"] when getting quoted properties.', () =>
-    expect(getQuotedStrings('"i am cute"')).toStrictEqual(['i am cute']));
+/**
+ * Runs `prisma migrate deploy` to deploy migrations.
+ */
+const migrate = () => {
+  const logger = consola.withScope('Migrator Worker');
+  const worker = new Worker(resolve(process.cwd(), 'scripts', 'prisma.migrations'));
 
-  it('should return "5.3MB" when converting 5547048 bytes to a readable format', () =>
-    expect(formatSize(5547048)).toBe('5.3MB'));
-});
+  logger.info(`Spawned with thread #${worker.threadId}.`);
+  worker.stdout?.on('data', (chunk) => logger.info(chunk));
+  worker.stderr?.on('data', (chunk) => logger.warn(chunk));
+  worker.on('message', (data) => {
+    if (data === 'done') logger.info('Worker has completed its work.');
+    if (data === 'error') logger.warn('Worker has encountered an error :(');
+  });
+};
+
+export default migrate;

@@ -69,4 +69,3 @@ jobs:
         run: yarn test
         env:
           TEST_DISCORD_TOKEN: ${{ secrets.TEST_DISCORD_TOKEN }}
-          JEST: 'true'

@@ -75,7 +75,7 @@ export default class PermissionUtil {
    * @param bits The permission bitfield
    */
   static stringify(permission: bigint) {
-    const permissions = new Permission(Number(permission), 0).json;
+    const permissions = new Permission(permission, 0).json;
     const names: string[] = [];
 
     for (const key of Object.keys(Constants.Permissions)) {
@@ -90,7 +90,7 @@ export default class PermissionUtil {
    * @param user The user permission bitfield
    * @param required The required permission bitfield
    */
-  static hasOverlap(user: number, required: number) {
+  static overlaps(user: number, required: number) {
     return (user & 8) !== 0 || (user & required) === required;
   }
 }

@@ -20,13 +20,14 @@
  * SOFTWARE.
  */
 
-import { Worker } from 'worker_threads';
-import consola from 'consola';
+import { SlashCommandOptions, SlashCreator } from 'slash-create';
+import { createProxyDecorator } from '~/utils/createProxyDecorator';
 
-export default class Executors {
-  static readonly logger = consola.withScope('nino:executors');
-
-  static run(filePath: string) {
-    // todo: this
-  }
-}
+export const SlashCommand =
+  (options: SlashCommandOptions): ClassDecorator =>
+  (target) =>
+    createProxyDecorator(target, {
+      construct(ctor: any) {
+        return new ctor(SlashCreator, options);
+      },
+    });

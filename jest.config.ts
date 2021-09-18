@@ -36,6 +36,12 @@ const config: Partial<ProjectConfig> = {
     color: 'magentaBright',
     name: 'Nino',
   },
+  moduleNameMapper: {
+    // @ts-ignore
+    '@/(.*)': '<rootDir>/$1',
+    '~/(.*)': '<rootDir>/src/$1',
+  },
+  resolver: undefined,
 };
 
 export default config;

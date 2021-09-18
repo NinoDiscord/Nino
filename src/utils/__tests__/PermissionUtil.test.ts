@@ -22,7 +22,7 @@
 
 /* eslint-disable camelcase */
 
-import { Client, Member, Role, Guild } from 'eris';
+import { Client, Member, Role, Guild, Constants } from 'eris';
 import { gitCommitHash } from '../Constants';
 import PermissionUtil from '../PermissionUtil';
 
@@ -48,7 +48,7 @@ describe('Nino > PermissionUtil', () => {
 
         mockClient.editStatus('dnd', [
           {
-            name: `🧪 which unit test is correct [commit ${gitCommitHash}]`,
+            name: `🧪 which unit test is successful~ [commit ${gitCommitHash}]`,
             type: 5,
           },
         ]);
@@ -67,7 +67,59 @@ describe('Nino > PermissionUtil', () => {
     expect(PermissionUtil.getTopRole(undefined as any)).toBeUndefined();
   });
 
-  it('should return a boolean if it can', () => {
-    expect(PermissionUtil.getTopRole(mockMember)).toBeTruthy();
+  it('should return the "cute polar dog" role as the top role', () => {
+    expect(PermissionUtil.getTopRole(mockMember)).toStrictEqual(mockRole);
+  });
+
+  it('should return `false` if `Members` is higher than `Staff`', () => {
+    expect(
+      PermissionUtil.isRoleAbove(mockGuild.roles.get('852993128322826261'), mockGuild.roles.get('852997744540516394'))
+    ).toBeFalsy();
+  });
+
+  it('should return `true` if `Staff` is higher than `Members`', () =>
+    expect(
+      PermissionUtil.isRoleAbove(mockGuild.roles.get('852997744540516394'), mockGuild.roles.get('852993128322826261'))
+    ).toBeTruthy());
+
+  it('should return `false` if Polarboi is higher than Noel', () =>
+    expect(
+      PermissionUtil.isMemberAbove(
+        mockGuild.members.get('743701282790834247')!,
+        mockGuild.members.get('280158289667555328')!
+      )
+    ).toBeFalsy());
+
+  it('should return `true` if Polarboi is not higher than Noel', () =>
+    expect(
+      PermissionUtil.isMemberAbove(
+        mockGuild.members.get('280158289667555328')!,
+        mockGuild.members.get('743701282790834247')!
+      )
+    ).toBeFalsy());
+
+  it('should return "sendMessages" on PermissionUtil#stringify', () =>
+    expect(PermissionUtil.stringify(Constants.Permissions.sendMessages)).toStrictEqual('sendMessages'));
+
+  // Stolen from Nino v0
+  // https://github.com/NinoDiscord/Nino/blob/0.x/src/util/PermissionUtils.test.ts
+  it('the admin should overlap an all permission denying channel', () => {
+    expect(PermissionUtil.overlaps(8, 255)).toBe(true);
+  });
+
+  it('a regular user with correct permissions should overlap a channel with less permissions', () => {
+    expect(PermissionUtil.overlaps(255, 17)).toBe(true);
+  });
+
+  it('a regular user should overlap a channel with the same permissions', () => {
+    expect(PermissionUtil.overlaps(19, 19)).toBe(true);
+  });
+
+  it('a regular user should not overlap a channel with more permissions', () => {
+    expect(PermissionUtil.overlaps(4, 20)).toBe(false);
+  });
+
+  it('a regular user should not overlap a channel with different permissions', () => {
+    expect(PermissionUtil.overlaps(4, 16)).toBe(false);
   });
 });
