@@ -2,11 +2,6 @@
 # yarn lockfile v1
 
 
-"@augu/collections@1.0.12":
-  version "1.0.12"
-  resolved "https://registry.yarnpkg.com/@augu/collections/-/collections-1.0.12.tgz#6682bdafbf30ad1071f8335ddcfcfd5fc0517202"
-  integrity sha512-bs+NT4q2t6krJZt6CWn8OCFLGD4fidDnGCTYmnbD5atmOTU2pBUKYqg0QsdZK2vk7+B+mL1ydTj+2Wc7eV43BQ==
-
 "@augu/collections@1.0.3":
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/@augu/collections/-/collections-1.0.3.tgz#435b9880777715fa33f0a9c4d8236d8dcb37d51b"
@@ -37,13 +32,13 @@
     "@typescript-eslint/eslint-plugin" "4.29.0"
     "@typescript-eslint/parser" "4.29.0"
 
-"@augu/lilith@5.3.2":
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/@augu/lilith/-/lilith-5.3.2.tgz#bce31c82534ef9210c0aeb507750a340e9ba703b"
-  integrity sha512-oQ+a5eHXusqL+3MoskRDInyHqCDmu37S2Nh61Dy+2hB0pLxoCrgg09cQwenOkTdoE30bSWYqETQactSG+ff5qA==
+"@augu/lilith@5.3.3":
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/@augu/lilith/-/lilith-5.3.3.tgz#199763052e8a4c820b696cc223d4fea772a4e342"
+  integrity sha512-bOv0d7eHWoKwYpYxAhcr5Ux/pH4kJ74+au+fXgWU1NREgdk9ABexv759iUDU0iHuj6G5MNk3la5XNZFXnpK7Mw==
   dependencies:
-    "@augu/collections" "1.0.12"
-    "@augu/utils" "1.5.3"
+    "@augu/collections" "1.1.0"
+    "@augu/utils" "1.5.5"
     reflect-metadata "0.1.13"
 
 "@augu/orchid@3.1.1":
