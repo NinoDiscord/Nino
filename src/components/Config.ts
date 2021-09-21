@@ -20,51 +20,42 @@
  * SOFTWARE.
  */
 
-/* eslint-disable camelcase */
-
-import { writeFileSync, existsSync } from 'fs';
-import { Component, Inject } from '@augu/lilith';
-import { readFile } from 'fs/promises';
-import { Logger } from 'tslog';
+import { readFile, writeFile } from 'fs/promises';
+import consola, { Consola } from 'consola';
+import { existsSync } from 'fs';
+import { Component } from '@augu/lilith';
 import { join } from 'path';
 import yaml from 'js-yaml';
+import z from 'zod';
 
-const NOT_FOUND_SYMBOL = Symbol.for('$nino::config::not.found');
+const NotFoundSymbol = Symbol('Key: Not Found');
 
 interface Configuration {
   runPendingMigrations?: boolean;
   prometheusPort?: number;
-  defaultLocale?: string;
-  environment: 'development' | 'production';
+  defaultLocale?: 'en_US' | 'fr_FR' | 'pt_BR';
+  environment?: 'development' | 'production';
   sentryDsn?: string;
+  owners?: string[];
+  relay?: boolean;
+  ravy?: string;
+  token: string;
+
+  clustering?: ClusterConfig;
   botlists?: BotlistConfig;
   timeouts: TimeoutsConfig;
-  database: DatabaseConfig;
-  prefixes: string[];
-  status: StatusConfig;
-  owners: string[];
-  ksoft?: string;
+  status?: StatusConfig;
   redis: RedisConfig;
-  token: string;
-  api?: boolean;
 }
 
 interface BotlistConfig {
   dservices?: string;
+  interval?: number;
   dboats?: string;
   topgg?: string;
   delly?: string;
   dbots?: string;
-  bfd?: string;
-}
-
-interface DatabaseConfig {
-  username: string;
-  password: string;
-  database: string;
-  host: string;
-  port: number;
-  url?: string;
+  discords?: string;
 }
 
 interface RedisConfig {
@@ -82,95 +73,170 @@ interface TimeoutsConfig {
   port: number;
 }
 
+interface Status {
+  type: 0 | 1 | 2 | 3 | 5;
+  status: string;
+  presence?: 'online' | 'idle' | 'dnd' | 'offline';
+}
+
 interface StatusConfig {
   presence?: 'online' | 'idle' | 'dnd' | 'offline';
-  status: string;
-  type: 0 | 1 | 2 | 3 | 5;
+  interval?: string;
+  statuses: Status[];
+}
+
+interface ClusterConfig {
+  host?: string;
+  port: number;
+  auth: string;
 }
 
 // eslint-disable-next-line
 interface RedisSentinelConfig extends Pick<RedisConfig, 'host' | 'port'> {}
 
-@Component({
-  priority: 0,
-  name: 'config',
-})
-export default class Config {
-  private config!: Configuration;
+const sentinelSchema = z.object({
+  host: z.string(),
+  port: z.number(),
+});
 
-  @Inject
-  private readonly logger!: Logger;
+const schema = z.object({
+  runPendingMigrations: z.boolean().default(true).optional(),
+  prometheusPort: z.number().min(1024).max(65535).optional().default(22403),
+  defaultLocale: z.literal('en_US').or(z.literal('fr_FR')).or(z.literal('pt_BR')).optional().default('en_US'),
+  environment: z.literal('development').or(z.literal('production')).optional(),
+  sentryDsn: z.string().optional(),
+  owners: z.array(z.string()).optional().default([]),
+  relay: z.boolean().optional().default(false),
+  ravy: z.string().optional(),
+  token: z.string(),
+
+  clustering: z
+    .object({
+      host: z.string().optional(),
+      port: z.number().min(1024).max(65535).optional().default(3010),
+      auth: z.string(),
+    })
+    .optional(),
+
+  botlists: z
+    .object({
+      dservices: z.string().optional(),
+      interval: z.number().min(15000).max(86400000).default(30000).nullable(),
+      dboats: z.string().optional(),
+      topgg: z.string().optional(),
+      delly: z.string().optional(),
+      dbots: z.string().optional(),
+      discords: z.string().optional(),
+    })
+    .optional(),
+
+  redis: z.object({
+    sentinels: z.array(sentinelSchema).optional(),
+    password: z.string().optional(),
+    master: z.string().optional(),
+    index: z.number().default(4).optional(),
+    host: z.string().optional(),
+    port: z.number().optional().default(6379),
+  }),
+
+  timeouts: z
+    .object({
+      host: z.string().optional(),
+      port: z.number().min(1024).max(65535).optional().default(3010),
+      auth: z.string(),
+    })
+    .optional(),
+
+  status: z.object({
+    presence: z
+      .literal('online')
+      .or(z.literal('idle'))
+      .or(z.literal('dnd'))
+      .or(z.literal('offline'))
+      .optional()
+      .default('online'),
+
+    statuses: z
+      .array(
+        z.object({
+          presence: z
+            .literal('online')
+            .or(z.literal('idle'))
+            .or(z.literal('dnd'))
+            .or(z.literal('offline'))
+            .optional()
+            .default('online'),
+
+          status: z.string(),
+        })
+      )
+      .default([]),
+  }),
+});
+
+@Component({ priority: 0, name: 'config' })
+export default class Config {
+  private readonly logger: Consola = consola.withScope('nino:config');
+  #_config!: Configuration;
 
   async load() {
-    if (!existsSync(join(__dirname, '..', '..', 'config.yml'))) {
+    this.logger.info('loading configuration...');
+
+    const configPath = join(__dirname, '..', '..', 'config.yml');
+    if (!existsSync(configPath)) {
       const config = yaml.dump(
         {
           runPendingMigrations: true,
           defaultLocale: 'en_US',
-          environment: 'production',
-          prefixes: ['!'],
+          prefixes: ['x!'],
           owners: [],
-          token: '-- replace me --',
+          token: '--replace me--',
         },
-        {
-          indent: 2,
-          noArrayIndent: false,
-        }
+        { indent: 2, noArrayIndent: true }
       );
 
-      writeFileSync(join(__dirname, '..', '..', 'config.yml'), config);
-      return Promise.reject(
-        new SyntaxError(
-          "Weird, you didn't have a configuration file... So, I may have provided you a default one, if you don't mind... >W<"
-        )
-      );
+      await writeFile(configPath, config);
+      throw new SyntaxError(`You were missing a \`config.yml\` file in "${configPath}", I created one for you!`);
     }
 
-    this.logger.info('Loading configuration...');
-    const contents = await readFile(join(__dirname, '..', '..', 'config.yml'), 'utf8');
-    const config = yaml.load(contents) as unknown as Configuration;
+    const contents = await readFile(configPath, 'utf-8');
+    this.#_config = yaml.load(contents) as unknown as Configuration;
 
-    this.config = {
-      runPendingMigrations: config.runPendingMigrations ?? false,
-      prometheusPort: config.prometheusPort,
-      defaultLocale: config.defaultLocale ?? 'en_US',
-      environment: config.environment ?? 'production',
-      sentryDsn: config.sentryDsn,
-      botlists: config.botlists,
-      database: config.database,
-      timeouts: config.timeouts,
-      prefixes: config.prefixes,
-      owners: config.owners,
-      status: config.status ?? {
-        type: 0,
-        status: '$prefix$help | $guilds$ Guilds',
-        presence: 'online',
-      },
-      ksoft: config.ksoft,
-      redis: config.redis,
-      token: config.token,
-      api: config.api,
-    };
+    // validate it
+    try {
+      await schema.parseAsync(this.#_config);
+    } catch (ex) {
+      const error = ex as z.ZodError;
+      this.logger.error('Unable to validate config:', error);
+    }
 
-    if (this.config.token === '-- replace me --')
-      return Promise.reject(new TypeError('Restore `token` in config with your discord bot token.'));
-
-    // resolve the promise
-    return Promise.resolve();
+    if (this.#_config.token === '--replace me--') throw new Error('Please replace your token to authenticate!');
   }
 
-  getProperty<K extends ObjectKeysWithSeperator<Configuration>>(key: K): KeyToPropType<Configuration, K> | undefined {
-    const nodes = key.split('.');
-    let value: any = this.config;
+  get<K extends ObjectKeysWithSeperator<Configuration>>(key: K): KeyToPropType<Configuration, K> | undefined;
+  get<K extends ObjectKeysWithSeperator<Configuration>>(key: K, throwOnNull: true): KeyToPropType<Configuration, K>;
+  get<K extends ObjectKeysWithSeperator<Configuration>>(
+    key: K,
+    throwOnNull: false
+  ): KeyToPropType<Configuration, K> | undefined;
 
-    for (const frag of nodes) {
+  get<K extends ObjectKeysWithSeperator<Configuration>>(
+    key: K,
+    throwOnNull?: boolean
+  ): KeyToPropType<Configuration, K> | undefined {
+    const nodes = key.split('.');
+    let value: any = this.#_config;
+
+    for (let i = 0; i < nodes.length; i++) {
       try {
-        value = value[frag];
-      } catch {
-        value = NOT_FOUND_SYMBOL;
+        value = value[nodes[i]];
+      } catch (ex) {
+        value = NotFoundSymbol;
+        break; // break the chain
       }
     }
 
-    return value === NOT_FOUND_SYMBOL ? undefined : value;
+    if (throwOnNull === true && value === NotFoundSymbol) throw new Error(`Key ${key} was not found.`);
+    return value === NotFoundSymbol ? undefined : value;
   }
 }

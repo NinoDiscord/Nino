@@ -42,18 +42,21 @@ enum PunishmentType {
 }
 
 model Automod {
-  blacklistedWords  String[] @map("blacklisted_words")
-  dehoisting        Boolean @default(false)
-  shortlinks        Boolean @default(false)
-  blacklist         Boolean @default(false)
-  mentions          Boolean @default(false)
-  guildId           String  @map("guild_id")
-  invites           Boolean @default(false)
-  spam              Boolean @default(false)
-  raid              Boolean @default(false)
+  blacklistedWords String[] @map("blacklisted_words")
+  omitChannels     String[] @map("omit_channels")
+  messageLinks     Boolean  @default(false)
+  dehoisting       Boolean  @default(false)
+  shortlinks       Boolean  @default(false)
+  blacklist        Boolean  @default(false)
+  omitUsers        String[] @map("omit_users")
+  mentions         Boolean  @default(false)
+  guildId          String   @map("guild_id")
+  invites          Boolean  @default(false)
+  spam             Boolean  @default(false)
+  raid             Boolean  @default(false)
 
-  @@map("automod")
   @@unique([guildId])
+  @@map("automod")
 }
 
 model GlobalBans {
@@ -62,15 +65,15 @@ model GlobalBans {
   type   GlobalBanType
   id     String
 
-  @@map("global_bans")
   @@unique([id])
+  @@map("global_bans")
 }
 
 model Cases {
   attachments String[]
-  moderatorId String  @map("moderator_id")
-  message_id  String? @map("message_id")
-  victimId    String  @map("victim_id")
+  moderatorId String         @map("moderator_id")
+  message_id  String?        @map("message_id")
+  victimId    String         @map("victim_id")
   guildId     String
   reason      String?
   index       Int
@@ -78,61 +81,80 @@ model Cases {
   soft        Boolean
   time        Int?
 
-  @@map("cases")
   @@unique([guildId])
+  @@map("cases")
 }
 
-model Guild {
-  modlogChannelId String? @map("modlog_channel_id")
-  mutedRoleId     String? @map("muted_role_id")
+model Guilds {
+  modlogChannelId String?  @map("modlog_channel_id")
+  mutedRoleId     String?  @map("muted_role_id")
   prefixes        String[]
   language        String
-  guildId         String @map("guild_id")
+  guildId         String   @map("guild_id")
 
-  @@map("guilds")
   @@unique([guildId])
+  @@map("guilds")
 }
 
 model Logging {
-  ignoreChannels String[] @map("ignored_channels")
-  ignoredUsers   String[] @map("ignored_users")
-  channelId      String?  @map("channel_id")
+  ignoreChannels String[]   @map("ignored_channels")
+  ignoredUsers   String[]   @map("ignored_users")
+  channelId      String?    @map("channel_id")
   enabled        Boolean
   events         LogEvent[]
-  guildId        String  @map("guild_id")
+  guildId        String     @map("guild_id")
 
-  @@map("logging")
   @@unique([guildId])
+  @@map("logging")
 }
 
 model Punishments {
   warnings Int
-  guildId  String @map("guild_id")
+  guildId  String         @map("guild_id")
   index    Int
   extra    Json?
   soft     Boolean
   time     String?
   type     PunishmentType
 
-  @@map("punishments")
   @@unique([guildId, index])
+  @@map("punishments")
 }
 
-model User {
-  prefixes        String[]
-  language        String
-  userId          String @map("user_id")
+model Users {
+  prefixes String[]
+  language String
+  userId   String   @map("user_id")
 
-  @@map("users")
   @@unique([userId])
+  @@map("users")
 }
 
-model Warning {
+model Warnings {
   guildId String  @map("guild_id")
   reason  String?
   amount  Int
   userId  String  @map("user_id")
 
-  @@map("warnings")
   @@unique([guildId, userId])
+  @@map("warnings")
+}
+
+model Customizibility {
+  webhook String?
+  logging Json
+  modlog  Json
+  guildId String  @map("guild_id")
+
+  @@unique([guildId])
+  @@map("guild_customizibility")
+}
+
+model Policies {
+  do      Json
+  events  String[]
+  guildId String   @map("guild_id")
+
+  @@unique([guildId])
+  @@map("guild_policies")
 }

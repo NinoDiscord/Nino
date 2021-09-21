@@ -3,11 +3,18 @@
   "compilerOptions": {
     "moduleResolution": "node",
     "typeRoots": ["./src/@types", "./node_modules/@types"],
-    "rootDir": "./src",
-    "types": ["node", "reflect-metadata"],
+    "types": ["node", "reflect-metadata", "@types/jest"],
     "outDir": "./build",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": ["./src/*"],
+      "@/*": ["./*"]
+    },
+    "esModuleInterop": true
   },
-  "exclude": ["node_modules"],
-  "include": ["src/**/*.ts"]
+  "exclude": ["node_modules", "jest.config.ts", "tests/**/*.(spec|test).ts"],
+  "include": ["**/*.ts", "**/*.prisma", ".env"] // include .env in emit
 }

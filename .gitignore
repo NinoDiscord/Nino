@@ -3,6 +3,7 @@ node_modules/
 old_locales/
 .husky/_/
 build/
+!.actions/build/
 
 # Jest
 coverage/
@@ -23,3 +24,4 @@ launch.json
 
 # v1 export
 .nino
+old/

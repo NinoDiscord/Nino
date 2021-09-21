@@ -3,6 +3,7 @@
 .idea
 assets
 build
+.actions/build/
 
 .dockerignore
 .env
@@ -14,3 +15,5 @@ package.json
 README.md
 renovate.json
 tsconfig.json
+*.prisma
+yarn.lock

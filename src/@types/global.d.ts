@@ -24,7 +24,6 @@
 
 import { Container } from '@augu/lilith';
 import { APIUser } from 'discord-api-types';
-import { crypto } from '../api/encryption';
 
 declare global {
   /** The current container running */

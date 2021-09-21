@@ -54,7 +54,7 @@ jobs:
           node-version: 16.x
 
       - name: Installs all global packages
-        run: npm install -g eslint typescript
+        run: npm install -g eslint typescript jest
 
       - name: Installs local packages
         run: yarn
@@ -64,3 +64,8 @@ jobs:
 
       - name: Compiles the project to check for any build errors
         run: tsc --noEmit
+
+      - name: Runs Jest and runs all unit tests
+        run: yarn test
+        env:
+          TEST_DISCORD_TOKEN: ${{ secrets.TEST_DISCORD_TOKEN }}

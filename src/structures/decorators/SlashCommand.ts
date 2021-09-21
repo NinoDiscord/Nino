@@ -21,12 +21,13 @@
  */
 
 import { SlashCommandOptions, SlashCreator } from 'slash-create';
-import { createProxyDecorator } from '../../util/proxy/ProxyDecoratorUtil';
-import app from '../../container';
+import { createProxyDecorator } from '~/utils/createProxyDecorator';
 
-export function SlashCommand(options: SlashCommandOptions): ClassDecorator {
-  return (target) =>
+export const SlashCommand =
+  (options: SlashCommandOptions): ClassDecorator =>
+  (target) =>
     createProxyDecorator(target, {
-      construct: (ctor: any) => new ctor(app.$ref(SlashCreator), options),
+      construct(ctor: any) {
+        return new ctor(SlashCreator, options);
+      },
     });
-}
