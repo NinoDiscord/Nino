@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo 'Checking migration details...'
 yarn prisma migrate status
@@ -12,4 +12,4 @@ if type "typeorm" > /dev/null; then
 fi
 
 echo 'Migrations and schemas should be synced.'
-npm start
+yarn start
