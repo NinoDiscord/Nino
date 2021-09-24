@@ -23,7 +23,6 @@
 /* eslint-disable camelcase */
 
 import { Container } from '@augu/lilith';
-import { APIUser } from 'discord-api-types';
 
 declare global {
   /** The current container running */
@@ -36,11 +35,8 @@ declare global {
     }
   }
 
-  interface APITokenResult extends Omit<crypto.EncryptedData, 'token'> {
-    expiryDate: number;
-    data: APIUser;
-    id: string;
-  }
+  // https://github.com/microsoft/TypeScript/issues/29729
+  type StringLiteralUnion<T extends U, U = string> = T | (U & {});
 
   interface RedisInfo {
     total_connections_received: number;

@@ -19,15 +19,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-import { SlashCommandOptions, SlashCreator } from 'slash-create';
-import { createProxyDecorator } from '~/utils/createProxyDecorator';
-
-export const SlashCommand =
-  (options: SlashCommandOptions): ClassDecorator =>
-  (target) =>
-    createProxyDecorator(target, {
-      construct(ctor: any) {
-        return new ctor(SlashCreator, options);
-      },
-    });

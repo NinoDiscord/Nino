@@ -9,10 +9,11 @@
 
 - ⚙️ **Advanced Configuration** - Configure Nino to feel like Nino is a part of your server~
   - Anything to Nino (mod-log messages, automod threshold/messages/prevention, logging) is all customizable!
+  - Implement guild policies to implement custom events Nino will react to!
 
 - ✨ **Simplicity** - Simplicity is key to any discord bot, and Nino is sure of it!
   - Commands are tailored to be powerful but simple to the end user.
-  - Fetch help on a command using `x!help <command>`, `x!<command> --help/-h`, or `x!<command> help`.
+  - Retrieve help on a command using `x!help <command>`, `x!<command> --help/-h`, or `x!<command> help`.
   - Stuck on what command usage is like? You can run `x!help usage` on how arguments are executed.
 
 ...and much more!
@@ -37,8 +38,8 @@ label!
 ### Prerequisites
 Before running your own instance of Nino, you will need the following required tools:
 
+- [cluster-operator](https://github.com/MikaBot/cluster-operator) **~** Easily manages discord clustering between multiple nodes
 - [Timeouts Microservice](https://github.com/NinoDiscord/timeouts) **~** Used for mutes, bans, and more. This will not make Nino operate successfully.
-
 - [PostgreSQL](https://postgresql.org) **~** Main database for holding user or guild data. Recommended version is 10 or higher.
 - [Redis](https://redis.io) **~** Open source in-memory database storage to hold entities for quick retrieval. Recommended version is 5 or higher.
 
@@ -282,14 +283,25 @@ timeouts:
   # Returns the authentication string for authorizing.
   auth: ...
 
-# Clustering information. THIS IS NOT RECOMMENDED
-# FOR SMALLER INSTANCES.
+# Clustering information. This is required in running Nino.
 clustering:
   # Returns the port for connecting to the cluster operator.
   port: ...
 
   # Returns the authentication header to authorizing with the cluster operator.
   auth: ...
+```
+
+You are also required to have a **.env** file when running Nino to connect to the database!
+
+```env
+# Returns the environment to run Nino in, this can be changed here
+# or in the configuration object.
+NODE_ENV=development or production
+
+# Returns the database URL to connect to Postgres. This is required
+# to run Prisma.
+DATABASE_URL=postgresql://user:password@host:port/dbName
 ```
 
 ## Maintainers

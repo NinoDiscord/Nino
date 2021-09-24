@@ -122,5 +122,5 @@ export enum CommandCategory {
 export const enum MetadataKeys {
   Subcommand = 'nino.subcommands',
   Subscriber = 'nino.subscriber',
-  APIRoute = 'nino.api_route',
+  Command = 'nino.command',
 }

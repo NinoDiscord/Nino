@@ -20,7 +20,38 @@
  * SOFTWARE.
  */
 
+import type { Message, TextChannel, Member, User } from 'eris';
+
 /**
- * Represents a proxy towards [Uni](https://github.com/Noelware/Uni).
+ * Represents a Automod class, to run any automated moderation
+ * if the guild has specified it.
  */
-export default class Uni {}
+export interface Automod {
+  /**
+   * Handles any member's nickname updates
+   * @param member The member
+   */
+  onMemberNickUpdate?(member: Member): Promise<boolean>;
+
+  /**
+   * Handles any user updates
+   */
+  onUserUpdate?(user: User): Promise<boolean>;
+
+  /**
+   * Handles any members joining the guild
+   * @param member The member
+   */
+  onMemberJoin?(member: Member): Promise<boolean>;
+
+  /**
+   * Handles any message updates or creation
+   * @param message The message
+   */
+  onMessage?(message: Message<TextChannel>): Promise<boolean>;
+
+  /**
+   * The name for this [Automod] class.
+   */
+  name: string;
+}

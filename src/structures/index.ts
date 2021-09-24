@@ -20,24 +20,12 @@
  * SOFTWARE.
  */
 
-import { Client, User, Message } from 'eris';
-import consola from 'consola';
+// structures/decorators
+export { default as Command } from './decorators/Command';
+export { default as Subcommand } from './decorators/Subcommand';
 
-const log = consola.withScope('nino:discord');
-const applyPatches = () => {
-  log.info('Apply Eris patches...');
-
-  // Apply `User#tag`
-  Object.defineProperty(User.prototype, 'tag', {
-    get(this: User) {
-      return `${this.username}#${this.discriminator}`;
-    },
-
-    set: () => {
-      throw new SyntaxError('Unable to mutate `User#tag`.');
-    },
-  });
-
-  // Patch `Message#createMessage` to not create a new message
-  // if it's in message cache
-};
+// structures
+export { Automod } from './Automod';
+export { default as AbstractCommand } from './AbstractCommand';
+export { default as CommandMessage } from './CommandMessage';
+export { default as EmbedBuilder } from './EmbedBuilder';
