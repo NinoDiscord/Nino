@@ -1,4 +1,4 @@
-name: ESLint Workflow
+name: ktlint
 on:
   push:
     branches:
@@ -42,30 +42,31 @@ on:
       - 'LICENSE'
       - 'renovate.json'
 jobs:
-  lint:
+  ktlint:
     runs-on: ubuntu-latest
     steps:
-      - name: 'Checkout repository'
+      - name: Checks out the repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js v16
-        uses: actions/setup-node@v2
+      - name: Sets up Java v${{ matrix.java-version }}
+        uses: actions/setup-java@v2
         with:
-          node-version: 16.x
+          distribution: adopt # AdoptOpenJDK is <3
+          java-version: 16
 
-      - name: Installs all global packages
-        run: npm install -g eslint typescript jest
+      - name: Setup gradle cache
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-test-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: |
+            ${{ runner.os }}-test-gradle-
 
-      - name: Installs local packages
-        run: yarn
+      - name: Lets ./gradlew be executable
+        run: chmod +x ./gradlew
 
-      - name: Lints the repository and checks for linting errors
-        run: eslint src --ext .ts
+      - name: Lints the repository for any code errors
+        run: ./gradlew spotlessCheck
 
-      - name: Compiles the project to check for any build errors
-        run: tsc --noEmit
-
-      - name: Runs Jest and runs all unit tests
-        run: yarn test
-        env:
-          TEST_DISCORD_TOKEN: ${{ secrets.TEST_DISCORD_TOKEN }}
+      - name: Builds the project for any errors
+        run: ./gradlew compileKotlin
