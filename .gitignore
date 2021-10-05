@@ -4,6 +4,7 @@ old_locales/
 .husky/_/
 build/
 !.actions/build/
+docker/cluster-operator/config.json
 
 # Jest
 coverage/

@@ -12,7 +12,9 @@ services:
     networks:
       - nino
     volumes:
-      - ./config.yml:/opt/Nino/config.yml:ro # Read-only
+      # Change /run/media/noel/Storage/Projects/Nino/Nino to the directory
+      # you're running Nino in.
+      - /run/media/noel/Storage/Projects/Nino/Nino/config.yml:/opt/Nino/config.yml:ro # Read-only
 
   redis:
     container_name: redis
@@ -57,6 +59,17 @@ services:
       - nino
     environment:
       AUTH: ${TIMEOUTS_AUTH}
+
+  cluster-operator:
+    container_name: cluster-operator
+    restart: always
+    image: registry.floofy.dev/nino/cluster-operator:ae175eb398588ff640880dbec9fda59aa3424614
+    ports:
+      - 3010:3010
+    networks:
+      - nino
+    volumes:
+      - /run/media/noel/Storage/Projects/Nino/Nino/docker/cluster-operator/.env:/app/.env
 
 volumes:
   redis:

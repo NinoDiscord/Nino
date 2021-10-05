@@ -20,30 +20,4 @@
  * SOFTWARE.
  */
 
-import Argument from './Argument';
-
-/**
- * Represents an argument serializer, which can be serialized to any value.
- */
-interface ArgumentSerializer<T = unknown> {
-  /**
-   * Represents the serializer's ID.
-   */
-  id: string;
-
-  /**
-   * Serializes the {@link value} and returns the serialized value.
-   * @param arg The argument's information
-   * @param value The raw value to use
-   */
-  serialize(arg: Argument, value: string): T;
-
-  /**
-   * Validates the current {@link value} and check if it is valid with this serializer.
-   * @param arg The argument's information
-   * @param value The raw value to use
-   */
-  validate?(arg: Argument, value: string): boolean | Promise<boolean>;
-}
-
-export default ArgumentSerializer;
+import WebSocket from 'ws';

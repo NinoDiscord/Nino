@@ -4,6 +4,7 @@ node_modules/
 data/
 dist/
 .husky/
+docker/{cluster-operator,prometheus}/**
 
 .travis.yml
 **.md

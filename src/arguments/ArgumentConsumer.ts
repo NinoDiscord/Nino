@@ -77,6 +77,8 @@ export default class ArgumentConsumer {
    * @returns The argument record to use.
    */
   parse(args: string[]): Record<string, unknown> {
+    let isMulti = false;
+
     return {};
   }
 }
