@@ -21,3 +21,22 @@
  */
 
 package sh.nino.discord.utils
+
+import sh.nino.discord.NinoInfo
+import java.io.File
+
+fun showBanner() {
+    val banner = File("./assets/banner.txt").readText().split("\n")
+    for (line in banner) {
+        val l = line
+            .replace("m", "")
+            .replace("r", "[0m")
+            .replace("{{JVM}}", System.getProperty("java.version"))
+            .replace("{{KOTLIN}}", KotlinVersion.CURRENT.toString())
+            .replace("{{BUILD_DATE}}", NinoInfo.BUILD_DATE)
+            .replace("{{VERSION}}", NinoInfo.VERSION)
+            .replace("{{COMMIT_HASH}}", NinoInfo.COMMIT_HASH)
+
+        println(l)
+    }
+}

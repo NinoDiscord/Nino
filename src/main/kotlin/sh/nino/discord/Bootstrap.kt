@@ -21,3 +21,39 @@
  */
 
 package sh.nino.discord
+
+import org.koin.core.context.GlobalContext
+import org.koin.core.context.GlobalContext.startKoin
+import org.koin.dsl.module
+import sh.nino.discord.extensions.inject
+import sh.nino.discord.kotlin.logging
+import sh.nino.discord.utils.showBanner
+
+object Bootstrap {
+    private lateinit var bot: NinoBot
+    private val logger by logging<Bootstrap>()
+
+    init {
+        // bot.addShutdownHook()
+    }
+
+    @JvmStatic
+    fun main(args: Array<String>) {
+        showBanner()
+        logger.info("* Initializing Koin...")
+
+        startKoin {
+            modules(
+                globalModule,
+                module {
+                    single {
+                        NinoBot()
+                    }
+                }
+            )
+        }
+
+        logger.info("* Initialized Koin, now starting Nino...")
+        bot = GlobalContext.inject()
+    }
+}

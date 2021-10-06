@@ -21,3 +21,46 @@
  */
 
 package sh.nino.discord
+
+import dev.floofy.haru.Scheduler
+import io.ktor.client.*
+import io.ktor.client.engine.okhttp.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import kotlinx.serialization.json.Json
+import org.koin.dsl.module
+import org.slf4j.LoggerFactory
+
+val globalModule = module {
+    single {
+        val logger = LoggerFactory.getLogger(Scheduler::class.java)
+        Scheduler {
+            handleError { job, t -> logger.error("Exception has occured while running ${job.name}:", t) }
+        }
+    }
+
+    single {
+        Json {
+            ignoreUnknownKeys = true
+        }
+    }
+
+    single {
+        HttpClient(OkHttp) {
+            engine {
+                config {
+                    followRedirects(true)
+                }
+            }
+
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(get())
+            }
+
+            install(UserAgent) {
+                agent = "Nino/DiscordBot (+https://github.com/NinoDiscord/Nino; v${NinoInfo.VERSION})"
+            }
+        }
+    }
+}
