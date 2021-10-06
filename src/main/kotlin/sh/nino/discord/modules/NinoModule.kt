@@ -21,3 +21,7 @@
  */
 
 package sh.nino.discord.modules
+
+import org.koin.dsl.module
+
+val ninoModule = module {}

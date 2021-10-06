@@ -21,3 +21,12 @@
  */
 
 package sh.nino.discord.data
+
+import dev.kord.common.entity.ActivityType
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class StatusConfig(
+    val status: String,
+    val type: ActivityType
+)

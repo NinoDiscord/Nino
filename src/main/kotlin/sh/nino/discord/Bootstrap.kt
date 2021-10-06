@@ -25,6 +25,7 @@ package sh.nino.discord
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
+import sh.nino.discord.data.configModule
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.utils.showBanner
@@ -34,7 +35,7 @@ object Bootstrap {
     private val logger by logging<Bootstrap>()
 
     init {
-        // bot.addShutdownHook()
+        bot.addShutdownHook()
     }
 
     @JvmStatic
@@ -45,6 +46,7 @@ object Bootstrap {
         startKoin {
             modules(
                 globalModule,
+                configModule,
                 module {
                     single {
                         NinoBot()

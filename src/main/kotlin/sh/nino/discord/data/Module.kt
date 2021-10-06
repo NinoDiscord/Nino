@@ -21,3 +21,14 @@
  */
 
 package sh.nino.discord.data
+
+import com.charleskorn.kaml.Yaml
+import org.koin.dsl.module
+import java.io.File
+
+val configModule = module {
+    single {
+        val file = File("./config.yml")
+        Yaml.default.decodeFromString(Config.serializer(), file.readText())
+    }
+}

@@ -21,3 +21,15 @@
  */
 
 package sh.nino.discord.data
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class BotlistsConfig(
+    val dservices: String? = null,
+    val discords: String? = null,
+    val dboats: String? = null,
+    val dbots: String? = null,
+    val topgg: String? = null,
+    val delly: String? = null
+)

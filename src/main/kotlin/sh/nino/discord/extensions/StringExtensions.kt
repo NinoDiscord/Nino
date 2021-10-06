@@ -21,3 +21,22 @@
  */
 
 package sh.nino.discord.extensions
+
+import dev.kord.common.entity.Snowflake
+import java.io.File
+import java.util.concurrent.TimeUnit
+
+fun String.asSnowflake(): Snowflake = Snowflake(this)
+fun String.titleCase(): String = this.replaceFirstChar { it.toString().uppercase() }
+
+fun String.shell(): String {
+    val parts = this.split("\\s".toRegex())
+    val proc = ProcessBuilder(*parts.toTypedArray())
+        .directory(File("."))
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
+
+    proc.waitFor(60, TimeUnit.MINUTES)
+    return proc.inputStream.bufferedReader().readText()
+}

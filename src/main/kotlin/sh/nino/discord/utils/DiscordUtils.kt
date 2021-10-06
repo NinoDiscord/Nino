@@ -21,3 +21,18 @@
  */
 
 package sh.nino.discord.utils
+
+import dev.kord.core.entity.User
+
+/**
+ * Returns an [List] of [User] objects based from the [args]
+ * provided.
+ *
+ * ## Example
+ * ```kotlin
+ * val users = getMultipleUsersFromArgs(["<@!280158289667555328>", "Polarboi"])
+ * ```
+ */
+fun getMultipleUsersFromArgs(args: List<String>): List<User> {
+    return listOf()
+}

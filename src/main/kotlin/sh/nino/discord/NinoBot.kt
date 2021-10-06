@@ -22,4 +22,28 @@
 
 package sh.nino.discord
 
-class NinoBot
+import sh.nino.discord.core.NinoThreadFactory
+import sh.nino.discord.kotlin.logging
+import java.util.concurrent.Executors
+
+class NinoBot {
+    companion object {
+        val executorPool = Executors.newCachedThreadPool(NinoThreadFactory())
+    }
+
+    private val logger by logging<NinoBot>()
+    val startTime = System.currentTimeMillis()
+
+    suspend fun launch() {
+        val runtime = Runtime.getRuntime()
+        logger.info("================================")
+        logger.info("Displaying runtime info:")
+        logger.info("* Free / Total Memory - ${runtime.freeMemory() / 1024L / 1024L}/${runtime.totalMemory() / 1024L / 1024L}MB")
+        logger.info("* Max Memory - ${runtime.maxMemory() / 1024L / 1024L}MB")
+        logger.info("* JVM Vendor: ${System.getProperty("java.vendor", "<NA>")}")
+
+        // Launch database, migrator, redis, etc etc
+    }
+
+    fun addShutdownHook() {}
+}

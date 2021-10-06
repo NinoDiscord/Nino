@@ -21,3 +21,22 @@
  */
 
 package sh.nino.discord.extensions
+
+import kotlinx.coroutines.launch
+import sh.nino.discord.core.NinoScope
+import java.lang.reflect.Method
+import kotlin.coroutines.suspendCoroutine
+
+/**
+ * Invokes a [Method] under the [NinoScope].
+ */
+fun Method.invokeSuspend(obj: Any, vararg args: Any?): Any? {
+    var result: Any? = null
+    NinoScope.launch {
+        suspendCoroutine {
+            result = invoke(obj, *args, it)
+        }
+    }
+
+    return result
+}

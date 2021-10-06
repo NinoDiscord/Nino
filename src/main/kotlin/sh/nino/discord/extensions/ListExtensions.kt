@@ -21,3 +21,17 @@
  */
 
 package sh.nino.discord.extensions
+
+inline fun <S, T> Iterable<T>.reduce(operation: (S, T) -> S, initialValue: S): S {
+    val iterator = this.iterator()
+    if (!iterator.hasNext()) return initialValue
+
+    var acc: Any? = initialValue
+    while (iterator.hasNext()) {
+        @Suppress("UNCHECKED_CAST")
+        acc = operation(acc as S, iterator.next())
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return acc as S
+}

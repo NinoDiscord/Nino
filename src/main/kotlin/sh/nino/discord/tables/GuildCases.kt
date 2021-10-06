@@ -21,3 +21,13 @@
  */
 
 package sh.nino.discord.tables
+
+import org.ktorm.entity.Entity
+import org.ktorm.schema.Table
+
+interface GuildCase: Entity<GuildCase> {
+    val guildId: String
+    val index: Int
+}
+
+class GuildCasesTable: Table<GuildCase>(tableName = "guild_cases")

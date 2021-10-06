@@ -21,3 +21,36 @@
  */
 
 package sh.nino.discord.data
+
+import dev.kord.common.entity.ActivityType
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class Config(
+    val environment: Environment = Environment.Development,
+    val defaultLocale: String = "en_US",
+    val sentryDsn: String? = null,
+    val owners: List<String> = listOf(),
+    val token: String,
+    val ravy: String? = null,
+
+    val botlists: BotlistsConfig? = null,
+    val clustering: ClusterOperatorConfig? = null,
+    val redis: RedisConfig,
+    val status: StatusConfig = StatusConfig(
+        type = ActivityType.Listening,
+        status = "{guilds} guilds saying {prefix}helo | [#{shard_id}] | https://nino.sh"
+    ),
+
+    val database: DatabaseConfig
+)
+
+@Serializable
+enum class Environment {
+    @SerialName("development")
+    Development,
+
+    @SerialName("production")
+    Production
+}
