@@ -21,3 +21,15 @@
  */
 
 package sh.nino.discord.core.command
+
+class CommandBuilder {
+    /**
+     * The localization key for the command's description.
+     */
+    var description: String = ""
+
+    /**
+     * Returns the name of this [Command].
+     */
+    var name: String = ""
+}
