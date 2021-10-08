@@ -22,13 +22,20 @@
 
 package sh.nino.discord
 
+import com.charleskorn.kaml.Yaml
+import dev.kord.core.Kord
+import dev.kord.gateway.Intent
+import dev.kord.gateway.Intents
+import dev.kord.gateway.PrivilegedIntent
+import kotlinx.coroutines.runBlocking
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
-import sh.nino.discord.data.configModule
+import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.utils.showBanner
+import java.io.File
 
 object Bootstrap {
     private lateinit var bot: NinoBot
@@ -38,18 +45,40 @@ object Bootstrap {
         bot.addShutdownHook()
     }
 
+    @OptIn(PrivilegedIntent::class)
     @JvmStatic
     fun main(args: Array<String>) {
         showBanner()
         logger.info("* Initializing Koin...")
 
+        val file = File("./config.yml")
+        val config = Yaml.default.decodeFromString(Config.serializer(), file.readText())
+        val kord = runBlocking {
+            Kord(config.token) {
+                intents = Intents {
+                    +Intent.GuildMessages
+                    +Intent.Guilds
+                    +Intent.GuildMembers
+                    +Intent.GuildVoiceStates
+                    +Intent.GuildBans
+                }
+            }
+        }
+
         startKoin {
             modules(
                 globalModule,
-                configModule,
                 module {
                     single {
                         NinoBot()
+                    }
+
+                    single {
+                        config
+                    }
+
+                    single {
+                        kord
                     }
                 }
             )

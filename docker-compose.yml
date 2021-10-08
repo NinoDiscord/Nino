@@ -1,0 +1,73 @@
+version: '3.8'
+services:
+  nino:
+    build: .
+    container_name: nino
+    restart: always
+    depends_on:
+      - database
+      - prometheus
+      - timeouts
+      - cluster_operator
+      - redis
+    networks:
+      - nino
+    volumes:
+      - /run/media/noel/Storage/Projects/Nino/Nino/config.yml:/app/Nino/config.yml:ro
+  redis:
+    container_name: redis
+    restart: always
+    image: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - nino
+    volumes:
+      - redis:/data
+  database:
+    container_name: database
+    restart: always
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    networks:
+      - nino
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: nino
+  prometheus:
+    container_name: prometheus
+    build: ./docker/prometheus
+    restart: always
+    networks:
+      - default
+
+  cluster-operator:
+    container_name: cluster-operator
+    image: noelware/cluster-operator:81dd82c23ed00592de4293f6b222fcbad4948eee
+    ports:
+      - "3010:3010"
+    networks:
+      - nino
+    volumes:
+      - /run/media/noel/Storage/Projects/Nino/Nino/docker/cluster-operator/config.json:/app/config.json:ro
+
+  timeouts:
+    container_name: timeouts
+    restart: always
+    image: docker.pkg.github.com/ninodiscord/timeouts/timeouts:latest
+    ports:
+      - "4025:4025"
+    networks:
+      - nino
+    environment:
+      AUTH: ${TIMEOUTS_AUTH}
+volumes:
+  redis:
+  postgres:
+networks:
+  nino:
+    internal: true
