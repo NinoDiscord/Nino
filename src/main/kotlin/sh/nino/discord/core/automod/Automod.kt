@@ -47,6 +47,10 @@ class Automod(
     private val onMemberJoinCall: AutomodCallable<MemberJoinEvent>?,
     private val onMemberNickUpdateCall: AutomodCallable<MemberUpdateEvent>?
 ) {
+    init {
+        require(name != "") { "Name cannot be empty." }
+    }
+
     // Why is `event` dynamic?
     // So you can pass in any event-driven class from Kord,
     // and the `execute` function will cast the [event]
