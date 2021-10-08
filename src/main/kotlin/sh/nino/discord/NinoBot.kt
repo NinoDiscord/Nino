@@ -22,9 +22,16 @@
 
 package sh.nino.discord
 
+import dev.kord.core.Kord
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.runBlocking
+import org.koin.core.context.GlobalContext
+import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.NinoThreadFactory
+import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
 import java.util.concurrent.Executors
+import kotlin.concurrent.thread
 
 class NinoBot {
     companion object {
@@ -45,5 +52,19 @@ class NinoBot {
         // Launch database, migrator, redis, etc etc
     }
 
-    fun addShutdownHook() {}
+    fun addShutdownHook() {
+        val kord = GlobalContext.inject<Kord>()
+        val shutdownThread = thread(name = "Nino-ShutdownThread", start = false) {
+            logger.warn("Shutting down Nino...")
+            runBlocking {
+                kord.gateway.detachAll()
+                NinoScope.cancel()
+            }
+
+            logger.warn("Nino has shut down, goodbye senpai.")
+        }
+
+        logger.info("Enabled shutdown hook thread.")
+        Runtime.getRuntime().addShutdownHook(shutdownThread)
+    }
 }

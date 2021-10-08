@@ -21,3 +21,17 @@
  */
 
 package sh.nino.discord.automod
+
+import sh.nino.discord.core.automod.automod
+
+val dehoistingAutomod = automod {
+    name = "blacklists"
+
+    onMemberNickUpdate {
+        false
+    }
+
+    onUserUpdate {
+        false
+    }
+}

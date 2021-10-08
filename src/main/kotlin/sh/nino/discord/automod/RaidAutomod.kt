@@ -21,3 +21,14 @@
  */
 
 package sh.nino.discord.automod
+
+import sh.nino.discord.core.automod.automod
+
+val raidAutomod = automod {
+    name = "blacklists"
+
+    onMemberJoin {
+        false
+    }
+}
+

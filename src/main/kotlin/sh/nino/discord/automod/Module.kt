@@ -21,3 +21,17 @@
  */
 
 package sh.nino.discord.automod
+
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import sh.nino.discord.core.automod.Automod
+
+val automodModule = module {
+    single { blacklistAutomod } bind Automod::class
+    single { dehoistingAutomod } bind Automod::class
+    single { messageLinkAutomod } bind Automod::class
+    single { phishingAutomod } bind Automod::class
+    single { raidAutomod } bind Automod::class
+    single { shortlinksAutomod } bind Automod::class
+    single { spamAutomod } bind Automod::class
+}

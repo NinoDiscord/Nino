@@ -21,3 +21,13 @@
  */
 
 package sh.nino.discord.automod
+
+import sh.nino.discord.core.automod.automod
+
+val blacklistAutomod = automod {
+    name = "blacklists"
+
+    onMessage {
+        false
+    }
+}

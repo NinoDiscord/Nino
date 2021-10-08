@@ -31,6 +31,7 @@ import kotlinx.coroutines.runBlocking
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
+import sh.nino.discord.automod.automodModule
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
@@ -68,6 +69,7 @@ object Bootstrap {
         startKoin {
             modules(
                 globalModule,
+                automodModule,
                 module {
                     single {
                         NinoBot()
@@ -86,5 +88,10 @@ object Bootstrap {
 
         logger.info("* Initialized Koin, now starting Nino...")
         bot = GlobalContext.inject()
+        bot.addShutdownHook()
+
+        runBlocking {
+            bot.launch()
+        }
     }
 }
