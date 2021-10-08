@@ -31,4 +31,3 @@ val shortlinksAutomod = automod {
         false
     }
 }
-

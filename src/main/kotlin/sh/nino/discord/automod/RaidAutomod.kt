@@ -31,4 +31,3 @@ val raidAutomod = automod {
         false
     }
 }
-

@@ -31,4 +31,3 @@ val messageLinkAutomod = automod {
         false
     }
 }
-

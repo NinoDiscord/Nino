@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
 import sh.nino.discord.NinoBot
 import sh.nino.discord.NinoInfo
 import sh.nino.discord.core.NinoScope
