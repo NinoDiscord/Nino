@@ -55,7 +55,8 @@ class ApplicationCommandOptionBuilder {
 
     fun toJsonObject(): JsonObject = JsonObject(
         mapOf(
-            "name" to name.asJson()
+            "name" to name.asJson(),
+            "description" to description.asJson()
         )
     )
 }
