@@ -67,11 +67,11 @@ dependencies {
 
     // Ktor (http client)
     implementation("io.ktor:ktor-client-serialization:1.6.3")
-    implementation("io.ktor:ktor-client-websockets:1.6.3")
+    implementation("io.ktor:ktor-client-websockets:1.6.4")
     implementation("io.ktor:ktor-client-okhttp:1.6.3")
 
     // Kord
-    implementation("dev.kord:kord-core:0.8.0-M5")
+    implementation("dev.kord:kord-core:0.8.0-M6")
 
     // YAML (configuration)
     implementation("com.charleskorn.kaml:kaml:0.36.0")

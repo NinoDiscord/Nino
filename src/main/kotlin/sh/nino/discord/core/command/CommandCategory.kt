@@ -21,3 +21,13 @@
  */
 
 package sh.nino.discord.core.command
+
+enum class CommandCategory(val category: String, val emoji: String? = null) {
+    ADMIN("Administration", "⚒️"),
+    CORE("Core", "ℹ"),
+    EASTER_EGG("Easter Egg"),
+    MODERATION("Moderation", "\uD83D\uDD28"),
+    SYSTEM("System Administration"),
+    THREADS("Thread Moderation", "\uD83E\uDDF5"),
+    VOICE("Voice Moderation", "\uD83D\uDD08");
+}
