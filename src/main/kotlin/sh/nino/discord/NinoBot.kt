@@ -22,7 +22,14 @@
 
 package sh.nino.discord
 
+import dev.kord.common.entity.ActivityType
+import dev.kord.common.entity.DiscordBotActivity
+import dev.kord.common.entity.PresenceStatus
 import dev.kord.core.Kord
+import dev.kord.gateway.DiscordPresence
+import dev.kord.gateway.Intent
+import dev.kord.gateway.Intents
+import dev.kord.gateway.PrivilegedIntent
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.GlobalContext
@@ -30,26 +37,57 @@ import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.NinoThreadFactory
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
+import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.concurrent.thread
 
 class NinoBot {
     companion object {
-        val executorPool = Executors.newCachedThreadPool(NinoThreadFactory())
+        val executorPool: ExecutorService = Executors.newCachedThreadPool(NinoThreadFactory())
     }
 
     private val logger by logging<NinoBot>()
     val startTime = System.currentTimeMillis()
 
+    @OptIn(PrivilegedIntent::class)
     suspend fun launch() {
         val runtime = Runtime.getRuntime()
+        val dediNode = try {
+            System.getenv()["DEDI"]
+        } catch (e: Exception) {
+            null
+        }
+
         logger.info("================================")
         logger.info("Displaying runtime info:")
         logger.info("* Free / Total Memory - ${runtime.freeMemory() / 1024L / 1024L}/${runtime.totalMemory() / 1024L / 1024L}MB")
         logger.info("* Max Memory - ${runtime.maxMemory() / 1024L / 1024L}MB")
-        logger.info("* JVM Vendor: ${System.getProperty("java.vendor", "<NA>")}")
+        logger.info("* JVM: ${System.getProperty("java.version")} (${System.getProperty("java.vendor", "<NA>")})")
+        logger.info("* Kotlin: ${KotlinVersion.CURRENT}")
 
-        // Launch database, migrator, redis, etc etc
+        if (dediNode != null) logger.info("* Dedi Node: $dediNode")
+
+        val kord = GlobalContext.inject<Kord>()
+        kord.login {
+            presence = DiscordPresence(
+                status = PresenceStatus.Idle,
+                game = DiscordBotActivity(
+                    name = "server fans go whirr...",
+                    type = ActivityType.Listening
+                ),
+
+                afk = true,
+                since = System.currentTimeMillis()
+            )
+
+            intents = Intents {
+                +Intent.Guilds
+                +Intent.GuildMessages
+                +Intent.GuildBans
+                +Intent.GuildVoiceStates
+                +Intent.GuildMembers
+            }
+        }
     }
 
     fun addShutdownHook() {

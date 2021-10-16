@@ -54,6 +54,7 @@ dependencies {
     // kotlinx libraries
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.2.1")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
 
     // Koin (Dependency Injection)
@@ -66,9 +67,9 @@ dependencies {
     api("org.slf4j:slf4j-api:1.7.32")
 
     // Ktor (http client)
-    implementation("io.ktor:ktor-client-serialization:1.6.3")
+    implementation("io.ktor:ktor-client-serialization:1.6.4")
     implementation("io.ktor:ktor-client-websockets:1.6.4")
-    implementation("io.ktor:ktor-client-okhttp:1.6.3")
+    implementation("io.ktor:ktor-client-okhttp:1.6.4")
 
     // Kord
     implementation("dev.kord:kord-core:0.8.0-M6")
@@ -76,10 +77,12 @@ dependencies {
     // YAML (configuration)
     implementation("com.charleskorn.kaml:kaml:0.36.0")
 
-    // Database (KtORM, HikariCP, PostgreSQL)
-    implementation("org.ktorm:ktorm-support-postgresql:3.4.1")
+    // Database (Exposed, HikariCP, PostgreSQL)
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.35.2")
+    implementation("org.jetbrains.exposed:exposed-core:0.35.2")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.35.2")
+    implementation("org.jetbrains.exposed:exposed-dao:0.35.2")
     implementation("org.postgresql:postgresql:42.2.24")
-    implementation("org.ktorm:ktorm-core:3.4.1")
     implementation("com.zaxxer:HikariCP:5.0.0")
 
     // Redis

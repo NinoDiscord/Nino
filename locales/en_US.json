@@ -1,0 +1,16 @@
+{
+  "meta": {
+    "contributors": ["239790360728043520"],
+    "translator": "280158289667555328",
+    "name": "English (United States)",
+    "flag": ":flag_us:",
+    "code": "en_US"
+  },
+
+  "strings": {
+    "descriptions": {},
+    "errors": {},
+    "generic": {},
+    "commands": {}
+  }
+}

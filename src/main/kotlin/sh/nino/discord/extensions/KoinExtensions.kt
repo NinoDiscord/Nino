@@ -22,9 +22,13 @@
 
 package sh.nino.discord.extensions
 
+import org.koin.core.KoinApplication
 import org.koin.core.context.GlobalContext
+import sh.nino.discord.core.koin.NinoKoinLogger
 
 inline fun <reified T: Any> GlobalContext.inject(): T {
     val ctx = this.get()
     return ctx.get()
 }
+
+fun KoinApplication.useNinoLogger() = logger(NinoKoinLogger)

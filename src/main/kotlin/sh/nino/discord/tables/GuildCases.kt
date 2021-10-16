@@ -22,12 +22,49 @@
 
 package sh.nino.discord.tables
 
-import org.ktorm.entity.Entity
-import org.ktorm.schema.Table
+import org.jetbrains.exposed.sql.Table
 
-interface GuildCase: Entity<GuildCase> {
-    val guildId: String
-    val index: Int
+enum class CaseType {}
+
+object GuildCases: Table("guild_cases") {
+
 }
 
-class GuildCasesTable: Table<GuildCase>(tableName = "guild_cases")
+/*
+object Cities : Table() {
+    val id = integer("id").autoIncrement() // Column<Int>
+    val name = varchar("name", 50) // Column<String>
+
+    override val primaryKey = PrimaryKey(id, name = "PK_Cities_ID")
+}
+ */
+
+//
+//import org.ktorm.entity.Entity
+//import org.ktorm.schema.Table
+//
+//interface GuildCase: Entity<GuildCase> {
+//    val attachments: List<String>
+//    val moderatorId: String
+//    val messageId: String?
+//    val victimId: String
+//    val guildId: String
+//    val reason: String?
+//    val index: Int
+//}
+//
+//class GuildCasesTable: Table<GuildCase>(tableName = "guild_cases")
+//
+///*
+//  @Column({
+//    type: 'enum',
+//    enum: PunishmentType,
+//  })
+//  public type!: PunishmentType;
+//
+//  @Column({ default: false })
+//  public soft!: boolean;
+//
+//  @Column({ nullable: true, default: undefined, type: 'bigint' })
+//  public time?: string;
+// */
