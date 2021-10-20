@@ -30,7 +30,8 @@ import dev.kord.core.entity.User
  *
  * ## Example
  * ```kotlin
- * val users = getMultipleUsersFromArgs(["<@!280158289667555328>", "Polarboi"])
+ * val users = getMultipleUsersFromArgs(listOf("<@!280158289667555328>", "Polarboi"))
+ * // => List<User>
  * ```
  */
 fun getMultipleUsersFromArgs(args: List<String>): List<User> {

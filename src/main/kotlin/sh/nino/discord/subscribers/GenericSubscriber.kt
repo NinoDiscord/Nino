@@ -21,3 +21,38 @@
  */
 
 package sh.nino.discord.subscribers
+
+import dev.kord.common.entity.PresenceStatus
+import dev.kord.core.Kord
+import dev.kord.core.event.gateway.DisconnectEvent
+import dev.kord.core.event.gateway.ReadyEvent
+import dev.kord.core.on
+import kotlinx.coroutines.flow.count
+import org.koin.core.context.GlobalContext
+import org.slf4j.LoggerFactory
+import sh.nino.discord.NinoBot
+import sh.nino.discord.data.Config
+
+fun Kord.applyGenericEvents() {
+    val logger = LoggerFactory.getLogger("sh.nino.discord.subscribers.GenericSubscriber")
+    val koin = GlobalContext.get()
+
+    on<ReadyEvent> {
+        val nino = koin.get<NinoBot>()
+
+        logger.info("Logged in as ${this.self.tag} (${this.self.id.asString})")
+        logger.info("Launched in ~${System.currentTimeMillis() - nino.startTime}ms | Guilds: ${kord.guilds.count()}")
+
+        val config = koin.get<Config>()
+        val prefix = config.prefixes.first()
+
+        kord.editPresence {
+            status = PresenceStatus.Online
+            playing("with ${kord.guilds.count()} guilds | ${prefix}help | https://nino.sh")
+        }
+    }
+
+    on<DisconnectEvent> {
+        logger.warn("Shard #${this.shard} has disconnected from the world. :<")
+    }
+}

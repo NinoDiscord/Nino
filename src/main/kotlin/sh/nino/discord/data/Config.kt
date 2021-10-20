@@ -31,6 +31,7 @@ data class Config(
     val environment: Environment = Environment.Development,
     val defaultLocale: String = "en_US",
     val sentryDsn: String? = null,
+    val prefixes: List<String> = listOf("x!"),
     val owners: List<String> = listOf(),
     val token: String,
     val ravy: String? = null,
@@ -43,7 +44,8 @@ data class Config(
         status = "{guilds} guilds saying {prefix}helo | [#{shard_id}] | https://nino.sh"
     ),
 
-    val database: DatabaseConfig
+    val database: DatabaseConfig = DatabaseConfig(),
+    val timeouts: TimeoutsConfig
 )
 
 @Serializable

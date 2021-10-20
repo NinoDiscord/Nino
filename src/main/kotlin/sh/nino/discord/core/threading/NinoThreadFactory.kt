@@ -31,7 +31,7 @@ class NinoThreadFactory: ThreadFactory {
 
     init {
         val security = System.getSecurityManager()
-        group = if (security.threadGroup != null) security.threadGroup else Thread.currentThread().threadGroup
+        group = if (security != null && security.threadGroup != null) security.threadGroup else Thread.currentThread().threadGroup
     }
 
     override fun newThread(r: Runnable): Thread {

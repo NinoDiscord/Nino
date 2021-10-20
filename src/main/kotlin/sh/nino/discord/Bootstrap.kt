@@ -29,27 +29,21 @@ import kotlinx.coroutines.runBlocking
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
-import sh.nino.discord.automod.automodModule
 import sh.nino.discord.clustering.clusteringModule
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.extensions.useNinoLogger
 import sh.nino.discord.kotlin.logging
-import sh.nino.discord.utils.showBanner
 import java.io.File
 
 object Bootstrap {
     private lateinit var bot: NinoBot
     private val logger by logging<Bootstrap>()
 
-    init {
-        bot.addShutdownHook()
-    }
-
     @OptIn(PrivilegedIntent::class)
     @JvmStatic
     fun main(args: Array<String>) {
-        showBanner()
+        Thread.currentThread().name = "Nino-MainThread"
         logger.info("* Initializing Koin...")
 
         val file = File("./config.yml")
@@ -64,7 +58,6 @@ object Bootstrap {
         startKoin {
             modules(
                 globalModule,
-                automodModule,
                 clusteringModule,
                 module {
                     single {

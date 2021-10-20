@@ -113,7 +113,7 @@ spotless {
 }
 
 application {
-    mainClass.set("sh.nino.discord.Bootstrapp")
+    mainClass.set("sh.nino.discord.Bootstrap")
     java {
         sourceCompatibility = JavaVersion.VERSION_16
         targetCompatibility = JavaVersion.VERSION_16

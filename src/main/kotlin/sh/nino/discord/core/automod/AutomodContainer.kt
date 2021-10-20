@@ -20,23 +20,33 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.utils
+package sh.nino.discord.core.automod
 
-import sh.nino.discord.NinoInfo
-import java.io.File
+import sh.nino.discord.automod.*
 
-fun showBanner() {
-    val banner = File("./assets/banner.txt").readText().split("\n")
-    for (line in banner) {
-        val l = line
-            .replace("m", "")
-            .replace("r", "[0m")
-            .replace("{{JVM}}", System.getProperty("java.version"))
-            .replace("{{KOTLIN}}", KotlinVersion.CURRENT.toString())
-            .replace("{{BUILD_DATE}}", NinoInfo.BUILD_DATE)
-            .replace("{{VERSION}}", NinoInfo.VERSION)
-            .replace("{{COMMIT_HASH}}", NinoInfo.COMMIT_HASH)
+object AutomodContainer {
+    private val automod: Map<String, Automod> = mapOf(
+        "blacklist" to blacklistAutomod,
+        "dehoisting" to dehoistingAutomod,
+        "messageLinks" to messageLinkAutomod,
+        "phishing" to phishingAutomod,
+        "raid" to raidAutomod,
+        "shortlinks" to shortlinksAutomod,
+        "spam" to spamAutomod
+    )
 
-        println(l)
+    suspend fun execute(event: Any): Boolean {
+        var ret = false
+        for (a in automod.values) {
+            if (ret) return true
+
+            try {
+                ret = a.execute(event)
+            } catch (e: Exception) {
+                // skip
+            }
+        }
+
+        return ret
     }
 }

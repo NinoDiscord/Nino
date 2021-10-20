@@ -33,13 +33,12 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import sh.nino.discord.clustering.types.*
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.threading.NamedThreadFactory
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.asJson
 import sh.nino.discord.kotlin.logging
-import sh.nino.discord.modules.clustering.types.DataPacket
-import sh.nino.discord.modules.clustering.types.OperationType
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
@@ -90,12 +89,12 @@ class ClusterOperator(
         data: DataPacket
     ) {
         logger.debug("Raw data:", raw)
-        when (data.op) {
-            OperationType.Ready -> {
+        when (data.type) {
+            OPType.Ready -> {
                 logger.info("Received `READY` packet from server.")
             }
 
-            OperationType.HeartbeatAck -> {
+            OPType.HeartbeatAck -> {
                 lastReceivedAt = Clock.System.now()
                 logger.debug("Received heartbeat from server, ping: ~${lastReceivedAt!!.toEpochMilliseconds() - lastAckedAt!!.toEpochMilliseconds()}ms")
             }
