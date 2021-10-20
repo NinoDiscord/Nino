@@ -20,13 +20,29 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.data
+package sh.nino.discord.core.database.transactions
 
-import kotlinx.serialization.Serializable
+import org.jetbrains.exposed.sql.Transaction
+import org.jetbrains.exposed.sql.transactions.transaction
+import sh.nino.discord.NinoBot
+import java.util.concurrent.CompletableFuture
 
-@Serializable
-data class ClusterOperatorConfig(
-    val host: String? = null,
-    val auth: String,
-    val port: Int = 3010
-)
+fun <T> asyncTransaction(block: Transaction.() -> T): AsyncTransaction<T> = AsyncTransaction(block)
+
+/**
+ * Asynchronously create an SQL transaction.
+ */
+class AsyncTransaction<T>(private val block: Transaction.() -> T) {
+    fun execute(): T {
+        val ret = CompletableFuture<T>()
+        NinoBot.executorPool.execute {
+            try {
+                ret.complete(transaction { block() })
+            } catch (e: Throwable) {
+                ret.completeExceptionally(e)
+            }
+        }
+
+        return ret.join()
+    }
+}

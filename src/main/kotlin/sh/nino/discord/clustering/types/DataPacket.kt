@@ -20,4 +20,13 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.tables
+package sh.nino.discord.clustering.types
+
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonObject
+
+@Serializable
+data class DataPacket(
+    val type: OPType,
+    val body: JsonObject? = null
+)

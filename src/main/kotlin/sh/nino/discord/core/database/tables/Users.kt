@@ -20,13 +20,4 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.data
-
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class ClusterOperatorConfig(
-    val host: String? = null,
-    val auth: String,
-    val port: Int = 3010
-)
+package sh.nino.discord.core.database.tables

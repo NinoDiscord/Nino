@@ -28,6 +28,7 @@ import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
+import io.ktor.client.features.websocket.*
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import org.slf4j.LoggerFactory
@@ -53,6 +54,8 @@ val globalModule = module {
                     followRedirects(true)
                 }
             }
+
+            install(WebSockets)
 
             install(JsonFeature) {
                 serializer = KotlinxSerializer(get())

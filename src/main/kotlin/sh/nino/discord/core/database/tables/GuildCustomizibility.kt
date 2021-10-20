@@ -20,4 +20,4 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.tables
+package sh.nino.discord.core.database.tables

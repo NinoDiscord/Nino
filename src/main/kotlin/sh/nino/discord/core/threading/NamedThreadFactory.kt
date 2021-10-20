@@ -20,4 +20,22 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.tables
+package sh.nino.discord.core.threading
+
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.atomic.AtomicInteger
+
+class NamedThreadFactory(private val name: String): ThreadFactory {
+    private val id = AtomicInteger(0)
+    private val threadGroup: ThreadGroup
+
+    init {
+        val security = System.getSecurityManager()
+        threadGroup = if (security != null && security.threadGroup != null)
+            security.threadGroup
+        else
+            Thread.currentThread().threadGroup
+    }
+
+    override fun newThread(r: Runnable): Thread = Thread(threadGroup, r, "$name-Thread[${id.incrementAndGet()}")
+}

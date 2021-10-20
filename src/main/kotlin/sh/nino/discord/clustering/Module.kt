@@ -20,13 +20,10 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.data
+package sh.nino.discord.clustering
 
-import kotlinx.serialization.Serializable
+import org.koin.dsl.module
 
-@Serializable
-data class ClusterOperatorConfig(
-    val host: String? = null,
-    val auth: String,
-    val port: Int = 3010
-)
+val clusteringModule = module {
+    single { ClusterOperator(get(), get(), get()) }
+}

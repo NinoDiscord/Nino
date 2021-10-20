@@ -22,6 +22,7 @@
 
 package sh.nino.discord
 
+import dev.kord.common.annotation.*
 import dev.kord.common.entity.ActivityType
 import dev.kord.common.entity.DiscordBotActivity
 import dev.kord.common.entity.PresenceStatus
@@ -30,13 +31,15 @@ import dev.kord.gateway.DiscordPresence
 import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
+import dev.kord.rest.route.Route
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.core.NinoScope
-import sh.nino.discord.core.NinoThreadFactory
+import sh.nino.discord.core.threading.NinoThreadFactory
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
+import java.lang.management.ManagementFactory
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.concurrent.thread
@@ -49,25 +52,36 @@ class NinoBot {
     private val logger by logging<NinoBot>()
     val startTime = System.currentTimeMillis()
 
-    @OptIn(PrivilegedIntent::class)
+    @OptIn(PrivilegedIntent::class, KordUnsafe::class, KordExperimental::class)
     suspend fun launch() {
         val runtime = Runtime.getRuntime()
         val dediNode = try {
-            System.getenv()["DEDI"]
+            System.getenv()["DEDI_NODE"]
         } catch (e: Exception) {
             null
         }
 
+        val os = ManagementFactory.getOperatingSystemMXBean()
         logger.info("================================")
         logger.info("Displaying runtime info:")
         logger.info("* Free / Total Memory - ${runtime.freeMemory() / 1024L / 1024L}/${runtime.totalMemory() / 1024L / 1024L}MB")
         logger.info("* Max Memory - ${runtime.maxMemory() / 1024L / 1024L}MB")
         logger.info("* JVM: ${System.getProperty("java.version")} (${System.getProperty("java.vendor", "<NA>")})")
         logger.info("* Kotlin: ${KotlinVersion.CURRENT}")
+        logger.info("* Operating System: ${os.name} (${os.arch}; ${os.version})")
 
         if (dediNode != null) logger.info("* Dedi Node: $dediNode")
 
         val kord = GlobalContext.inject<Kord>()
+        val gateway = kord.rest.unsafe(Route.GatewayBotGet) {}
+
+        logger.info("================================")
+        logger.info("Displaying gateway info:")
+        logger.info("* Shards to launch: ${gateway.shards}")
+        logger.info(
+            "* Session Limit: ${gateway.sessionStartLimit.remaining}/${gateway.sessionStartLimit.total}"
+        )
+
         kord.login {
             presence = DiscordPresence(
                 status = PresenceStatus.Idle,

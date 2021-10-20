@@ -24,15 +24,13 @@ package sh.nino.discord
 
 import com.charleskorn.kaml.Yaml
 import dev.kord.core.Kord
-import dev.kord.gateway.Intent
-import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
-import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
 import sh.nino.discord.automod.automodModule
+import sh.nino.discord.clustering.clusteringModule
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.extensions.useNinoLogger
@@ -67,6 +65,7 @@ object Bootstrap {
             modules(
                 globalModule,
                 automodModule,
+                clusteringModule,
                 module {
                     single {
                         NinoBot()
