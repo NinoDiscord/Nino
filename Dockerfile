@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:17-alpine
 
 LABEL MAINTAINER="Nino <cutie@floofy.dev>"
 RUN apk update && apk add git ca-certificates
