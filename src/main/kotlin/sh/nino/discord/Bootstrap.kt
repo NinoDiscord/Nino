@@ -34,6 +34,7 @@ import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.extensions.useNinoLogger
 import sh.nino.discord.kotlin.logging
+import sh.nino.discord.modules.ninoModule
 import java.io.File
 
 object Bootstrap {
@@ -59,6 +60,7 @@ object Bootstrap {
             modules(
                 globalModule,
                 clusteringModule,
+                ninoModule,
                 module {
                     single {
                         NinoBot()

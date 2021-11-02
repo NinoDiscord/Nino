@@ -20,4 +20,27 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.arguments.serializers
+package sh.nino.discord.core.command.arguments
+
+import kotlin.reflect.KClass
+import kotlin.reflect.KParameter
+
+class Argument private constructor(
+    val name: String,
+    val type: KClass<*>,
+    val optional: Boolean = false,
+    val multi: Boolean = false,
+    val infinite: Boolean = false,
+    private val kParam: KParameter
+) {
+    private val reader: ArgumentReader<*>? = null
+
+    constructor(param: KParameter, info: Arg): this(
+        info.name,
+        info.type,
+        info.optional,
+        info.multi,
+        info.infinite,
+        param
+    )
+}

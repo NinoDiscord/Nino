@@ -21,3 +21,41 @@
  */
 
 package sh.nino.discord.subscribers
+
+import dev.kord.core.Kord
+import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.core.on
+import sh.nino.discord.NinoInfo
+import sh.nino.discord.utils.getMultipleUsersFromArgs
+
+private fun <T> List<T>.pairUp(): Pair<T, List<T>> = Pair(first(), drop(1))
+
+fun Kord.applyMessageEvents() {
+    on<MessageCreateEvent> {
+        if (message.author?.id?.value == 280158289667555328L.toULong()) {
+            val content = message.content.substring("nino ".length).trim()
+            val (name, args) = content.split("\\s+".toRegex()).pairUp()
+
+            when (name) {
+                "test" -> {
+                    if (args.isEmpty()) {
+                        message.channel.createMessage("missing users to return.")
+                        return@on
+                    }
+
+                    val users = getMultipleUsersFromArgs(args)
+                    if (users.isEmpty()) {
+                        message.channel.createMessage("well shit, it didn't work!")
+                        return@on
+                    }
+
+                    message.channel.createMessage(users.joinToString(", ") { "${it.tag} (${it.id.asString})" })
+                }
+
+                "build" -> {
+                    message.channel.createMessage("Build Info: v${NinoInfo.VERSION} (**${NinoInfo.COMMIT_HASH}**) - Build Date: ${NinoInfo.BUILD_DATE}")
+                }
+            }
+        }
+    }
+}

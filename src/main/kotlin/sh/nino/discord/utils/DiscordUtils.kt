@@ -22,7 +22,11 @@
 
 package sh.nino.discord.utils
 
+import dev.kord.common.annotation.*
+import dev.kord.core.Kord
 import dev.kord.core.entity.User
+import org.koin.core.context.GlobalContext
+import sh.nino.discord.extensions.asSnowflake
 
 /**
  * Returns an [List] of [User] objects based from the [args]
@@ -30,10 +34,53 @@ import dev.kord.core.entity.User
  *
  * ## Example
  * ```kotlin
- * val users = getMultipleUsersFromArgs(listOf("<@!280158289667555328>", "Polarboi"))
+ * val users = getMultipleUsersFromArgs(listOf("<@!280158289667555328>", "Polarboi#2535"))
  * // => List<User>
  * ```
  */
-fun getMultipleUsersFromArgs(args: List<String>): List<User> {
-    return listOf()
+@OptIn(KordUnsafe::class, KordExperimental::class)
+suspend fun getMultipleUsersFromArgs(args: List<String>): List<User> {
+    val koin = GlobalContext.get()
+    val kord = koin.get<Kord>()
+
+    val users = mutableListOf<User>()
+    val usersByMention = args.filter {
+        it.matches(Constants.USER_MENTION_REGEX.toRegex())
+    }
+
+    for (userMention in usersByMention) {
+        val matcher = Constants.USER_MENTION_REGEX.matcher(userMention)
+
+        // java is on some god who knows what crack
+        // you have to explicitly call `Matcher#matches`
+        // to retrieve groups without it erroring?????
+        //
+        // https://cute.floofy.dev/images/d52dddc2.png
+        //
+        // so if it doesn't match, skip
+        // (shouldn't get here since the users list is filtered
+        //  from the regex match but whatever.)
+        if (!matcher.matches()) continue
+
+        val id = matcher.group(1)
+        val user = kord.getUser(id.asSnowflake())
+
+        // if the user is found and is not in the
+        // users list.
+        if (user != null) users.add(user)
+    }
+
+    val usersById = args.filter {
+        it.matches(Constants.ID_REGEX.toRegex())
+    }
+
+    for (userId in usersById) {
+        val user = kord.getUser(userId.asSnowflake())
+        if (user != null) users.add(user)
+    }
+
+    return users
+        .distinct() // make the list unique, so no duplicates
+        .toList() // make it immutable
+        .ifEmpty { listOf() } // if the list is empty, return an empty list >:3
 }

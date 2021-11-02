@@ -20,4 +20,24 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.arguments.serializers
+package sh.nino.discord.core.command.arguments
+
+import kotlin.reflect.KClass
+
+/**
+ * Represents an argument to use.
+ * @param name The argument's name
+ * @param type The [class][KClass] to use that represents this argument.
+ * @param optional If the argument is optional, this can be casted to `<type>?`.
+ * @param multi If this argument can have multiple values, if so, cast it to `List<Type>`.
+ * @param infinite If this argument is infinite, which will return `List<Type>`. This must
+ * be at the end of the argument tree.
+ */
+@Target(AnnotationTarget.VALUE_PARAMETER)
+annotation class Arg(
+    val name: String,
+    val type: KClass<*>,
+    val optional: Boolean = false,
+    val multi: Boolean = false,
+    val infinite: Boolean = false
+)

@@ -22,14 +22,17 @@
 
 package sh.nino.discord.core.command
 
+import dev.kord.common.DiscordBitSet
 import dev.kord.common.entity.Permissions
 import kotlinx.coroutines.launch
 import sh.nino.discord.core.NinoScope
+import java.lang.reflect.Method
+import kotlin.coroutines.suspendCoroutine
 import kotlin.reflect.KCallable
 import kotlin.reflect.full.callSuspend
 import sh.nino.discord.core.annotations.Command as CommandAnnotation
 
-class Command(
+class Command private constructor(
     val name: String,
     val description: String,
     val category: CommandCategory = CommandCategory.CORE,
@@ -38,47 +41,29 @@ class Command(
     val aliases: List<String> = listOf(),
     val examples: List<String> = listOf(),
     val cooldown: Int = 5,
-    val userPermissions: List<Permissions> = listOf(),
-    val botPermissions: List<Permissions> = listOf(),
-    private val thisCtx: Any,
-    private val kMethod: KCallable<Unit>
+    val userPermissions: Permissions = Permissions(),
+    val botPermissions: Permissions = Permissions(),
+    private val thisCtx: AbstractCommand
 ) {
-    constructor(
-        info: CommandAnnotation,
-        cmdKlass: Any,
-        method: KCallable<Unit>
-    ): this(
-        info.name,
-        info.description,
-        info.category,
-        info.usage,
-        info.ownerOnly,
-        info.aliases.toList(),
-        info.examples.toList(),
-        info.cooldown,
-        info.userPermissions.map { p -> Permissions { +p } }.toList(),
-        info.botPermissions.map { p -> Permissions { +p } }.toList(),
-        cmdKlass,
-        method
+    constructor(klazz: AbstractCommand): this(
+        klazz.info.name,
+        klazz.info.description,
+        klazz.info.category,
+        klazz.info.usage,
+        klazz.info.ownerOnly,
+        klazz.info.aliases.toList(),
+        klazz.info.examples.toList(),
+        klazz.info.cooldown,
+        Permissions(DiscordBitSet(klazz.info.userPermissions)),
+        Permissions(DiscordBitSet(klazz.info.botPermissions)),
+        klazz
     )
 
-    suspend fun execute(callback: (Boolean, Exception?) -> Unit) {
-        if (kMethod.isSuspend) {
-            NinoScope.launch {
-                try {
-                    kMethod.callSuspend(thisCtx)
-                    callback(true, null)
-                } catch (e: Exception) {
-                    callback(false, e)
-                }
-            }
-        } else {
-            try {
-                kMethod.call(thisCtx)
-                callback(true, null)
-            } catch (e: Exception) {
-                callback(false, e)
-            }
+    suspend fun execute(msg: CommandMessage, callback: (Exception?, Boolean) -> Unit, vararg args: Any): Any
+        = try {
+            thisCtx.run(msg, *args)
+            callback(null, true)
+        } catch(e: Exception) {
+            callback(e, false)
         }
-    }
 }

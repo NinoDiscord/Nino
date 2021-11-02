@@ -20,4 +20,22 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.arguments.serializers
+package sh.nino.discord.core.command.arguments
+
+import kotlin.reflect.KClass
+import kotlin.reflect.KParameter
+
+/**
+ * Represents an instance of a consumer, to consume the user's arguments
+ * to attach it to a [Argument] class.
+ */
+class ArgumentConsumer(private val args: List<String>) {
+    companion object {
+        val parsers: Map<KClass<*>, ArgumentReader<*>> = mapOf()
+    }
+
+    fun consume(): Map<KParameter, Any> {
+        val map = mutableMapOf<KParameter, Any>()
+        return map.toMap()
+    }
+}

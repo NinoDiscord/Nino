@@ -30,3 +30,14 @@ data class DataPacket(
     val type: OPType,
     val body: JsonObject? = null
 )
+
+@Serializable
+data class ShardDataPacket(
+    val id: Int
+)
+
+@Serializable
+data class ShardDataBlockPacket(
+    val shards: List<Int>,
+    val total: Int
+)

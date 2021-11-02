@@ -20,4 +20,19 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.migrations
+package sh.nino.discord.extensions
+
+/**
+ * Format this [Long] into a readable byte format.
+ */
+fun Long.formatSize(): String {
+    val kilo = this / 1024L
+    val mega = kilo / 1024L
+    val giga = mega / 1024L
+
+    return when {
+        kilo < 1024 -> "${kilo}KB"
+        mega < 1024 -> "${mega}MB"
+        else -> "${giga}GB"
+    }
+}

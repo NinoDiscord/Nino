@@ -33,6 +33,7 @@ data class Config(
     val sentryDsn: String? = null,
     val prefixes: List<String> = listOf("x!"),
     val owners: List<String> = listOf(),
+    val metrics: Boolean = false,
     val token: String,
     val ravy: String? = null,
 
@@ -41,7 +42,7 @@ data class Config(
     val redis: RedisConfig,
     val status: StatusConfig = StatusConfig(
         type = ActivityType.Listening,
-        status = "{guilds} guilds saying {prefix}helo | [#{shard_id}] | https://nino.sh"
+        status = "{guilds} guilds saying {prefix}help | [#{shard_id}] | https://nino.sh"
     ),
 
     val database: DatabaseConfig = DatabaseConfig(),

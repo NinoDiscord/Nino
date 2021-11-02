@@ -23,5 +23,8 @@
 package sh.nino.discord.modules
 
 import org.koin.dsl.module
+import sh.nino.discord.modules.prometheus.PrometheusModule
 
-val ninoModule = module {}
+val ninoModule = module {
+    single { PrometheusModule(get()) }
+}

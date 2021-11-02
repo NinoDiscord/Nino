@@ -20,12 +20,22 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.annotations
+package sh.nino.discord.utils
 
-/**
- * Represents an annotation to mark a class as an Automod object.
- */
-@Target(AnnotationTarget.CLASS)
-annotation class Automod(
-    val name: String
-)
+import sh.nino.discord.extensions.asKordColor
+import java.awt.Color
+import java.util.regex.Pattern
+
+object Constants {
+    /**
+     * Returns a [Color][dev.kord.common.Color] object for embeds
+     */
+    val COLOR: dev.kord.common.Color = Color.decode("#D26DB1").asKordColor()
+
+    val USERNAME_DISCRIM_REGEX = Pattern.compile("^(\\w.+)#(\\d{4})\$")
+    val DISCORD_INVITE_REGEX = Pattern.compile("(http(s)?://(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg)/\\w+")
+    val USER_MENTION_REGEX = Pattern.compile("^<@!?([0-9]+)>$")
+    val CHANNEL_REGEX = Pattern.compile("<#([0-9]+)>$")
+    val QUOTES_REGEX = Pattern.compile("['\"]")
+    val ID_REGEX = Pattern.compile("^\\d+\$")
+}

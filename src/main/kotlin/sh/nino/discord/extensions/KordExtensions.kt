@@ -28,4 +28,4 @@ import dev.kord.common.Color as KordColor
 /**
  * Converts a [java.awt.Color] into a [KordColor] object.
  */
-fun Color.toKordColor(): KordColor = KordColor(red, green, blue)
+fun Color.asKordColor(): KordColor = KordColor(red, green, blue)

@@ -33,6 +33,6 @@ annotation class Command(
     val aliases: Array<String> = [],
     val examples: Array<String> = [],
     val cooldown: Int = 5,
-    val userPermissions: IntArray = [],
-    val botPermissions: IntArray = []
+    val userPermissions: LongArray = [],
+    val botPermissions: LongArray = []
 )

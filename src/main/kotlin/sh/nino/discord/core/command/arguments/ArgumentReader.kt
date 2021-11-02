@@ -20,4 +20,16 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.arguments.serializers
+package sh.nino.discord.core.command.arguments
+
+import java.util.*
+
+/**
+ * Represents an abstract class to read the value cast as [T].
+ */
+abstract class ArgumentReader<T: Any> {
+    /**
+     * Parses the value and returns a [Optional] block.
+     */
+    abstract fun parse(value: T): Optional<T>
+}

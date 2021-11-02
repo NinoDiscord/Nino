@@ -90,6 +90,13 @@ dependencies {
 
     // Haru (scheduling)
     implementation("dev.floofy.haru:Haru:1.2.0")
+
+    // Cache (in-memory)
+    implementation("com.github.ben-manes.caffeine:caffeine:3.0.4")
+
+    // Prometheus (metrics)
+    implementation("io.prometheus:simpleclient_hotspot:0.12.0")
+    implementation("io.prometheus:simpleclient:0.12.0")
 }
 
 spotless {
@@ -100,8 +107,8 @@ spotless {
 
         // We can't use the .editorconfig file, so we'll have to specify it here
         // issue: https://github.com/diffplug/spotless/issues/142
-
-        // ktlint 0.35.0 (default for Spotless) doesn't support trailing commas
+        // ktlint 0.35.0 (default for Spotless) doesn't support trailing commas,
+        // so, 0.40.0 will work. :>
         ktlint("0.40.0")
             .userData(mapOf(
                 "no-consecutive-blank-lines" to "true",

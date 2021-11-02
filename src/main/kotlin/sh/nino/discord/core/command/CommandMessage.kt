@@ -21,3 +21,56 @@
  */
 
 package sh.nino.discord.core.command
+
+import dev.kord.core.behavior.channel.createMessage
+import dev.kord.core.entity.Message
+import dev.kord.core.entity.User
+import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.rest.builder.message.EmbedBuilder
+import org.koin.core.Koin
+import org.koin.core.context.GlobalContext
+import sh.nino.discord.utils.Constants
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
+class CommandMessage(event: MessageCreateEvent) {
+    private val koin: Koin = GlobalContext.get()
+
+    val message: Message = event.message
+    val author: User = message.author ?: error("this should never happen")
+
+    suspend fun reply(_content: String, reply: Boolean): Message =
+        message.channel.createMessage {
+            content = _content
+
+            if (reply) {
+                messageReference = message.id
+            }
+        }
+
+    suspend fun reply(content: String): Message = reply(content, true)
+
+    @OptIn(ExperimentalContracts::class)
+    suspend fun reply(_content: String, reply: Boolean, block: EmbedBuilder.() -> Unit): Message {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+
+        val embed = EmbedBuilder().apply(block)
+        embed.color = Constants.COLOR
+
+        return message.channel.createMessage {
+            content = _content
+            embeds += embed
+
+            if (reply) {
+                messageReference = message.id
+            }
+        }
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    suspend fun reply(content: String, block: EmbedBuilder.() -> Unit): Message {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+        return reply(content, true, block)
+    }
+}

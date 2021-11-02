@@ -22,8 +22,11 @@
 
 package sh.nino.discord.modules.localization
 
+import sh.nino.discord.data.Config
 import sh.nino.discord.kotlin.logging
 
-class LocalizationModule {
+class LocalizationModule(private val config: Config) {
+    lateinit var defaultLocale: Locale
     private val logger by logging<LocalizationModule>()
+    val locales: MutableMap<String, Locale> = mutableMapOf()
 }

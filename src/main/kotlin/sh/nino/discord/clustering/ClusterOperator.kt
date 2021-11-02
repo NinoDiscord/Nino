@@ -27,8 +27,7 @@ import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.cio.websocket.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
@@ -130,6 +129,12 @@ class ClusterOperator(
             }
         ) {
             logger.info("Connected to WebSocket using URI - 'ws://${config.clustering?.host ?: "localhost"}:${config.clustering?.port ?: 3010}/ws'")
+            defaultWsSession.send("{\"type\":0}")
+
+            logger.info("If this was successful, you should see the gateway connecting...")
+            val message = incoming.receive().readBytes().decodeToString()
+            val shardData = json.decodeFromString(ShardDataPacket.serializer(), message)
+
             messageQueueJob = NinoScope.launch(errorHandler) {
                 receiveWebSocketMessageLoop()
             }

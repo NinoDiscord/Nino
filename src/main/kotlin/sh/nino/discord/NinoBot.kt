@@ -40,6 +40,7 @@ import sh.nino.discord.core.threading.NinoThreadFactory
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.subscribers.applyGenericEvents
+import sh.nino.discord.subscribers.applyMessageEvents
 import java.lang.management.ManagementFactory
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -68,7 +69,7 @@ class NinoBot {
         logger.info("* Free / Total Memory - ${runtime.freeMemory() / 1024L / 1024L}/${runtime.totalMemory() / 1024L / 1024L}MB")
         logger.info("* Max Memory - ${runtime.maxMemory() / 1024L / 1024L}MB")
         logger.info("* JVM: v${System.getProperty("java.version")} (${System.getProperty("java.vendor", "<NA>")})")
-        logger.info("* Kotlin:v ${KotlinVersion.CURRENT}")
+        logger.info("* Kotlin: v${KotlinVersion.CURRENT}")
         logger.info("* Operating System: ${os.name} (${os.arch}; ${os.version})")
 
         if (dediNode != null) logger.info("* Dedi Node: $dediNode")
@@ -84,6 +85,7 @@ class NinoBot {
         )
 
         kord.applyGenericEvents()
+        kord.applyMessageEvents()
         kord.login {
             presence = DiscordPresence(
                 status = PresenceStatus.Idle,
