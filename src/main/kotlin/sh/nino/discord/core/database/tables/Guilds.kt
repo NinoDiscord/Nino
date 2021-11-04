@@ -21,3 +21,28 @@
  */
 
 package sh.nino.discord.core.database.tables
+
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.VarCharColumnType
+import sh.nino.discord.core.database.columns.array
+import sh.nino.discord.core.database.tables.dao.SnowflakeTable
+
+object Guilds: SnowflakeTable("guilds") {
+    val noThreadsRoleId = long("no_threads_role_id").nullable()
+    val modlogChannelId = long("modlog_channel_id").nullable()
+    val mutedRoleId = long("muted_role_id").nullable()
+    val prefixes = array<String>("prefixes", VarCharColumnType(25))
+    val language = text("language").default("en_US")
+}
+
+class GuildEntity(id: EntityID<Long>): LongEntity(id) {
+    companion object: LongEntityClass<GuildEntity>(Guilds)
+
+    var noThreadsRoleId by Guilds.noThreadsRoleId
+    var modlogChannelId by Guilds.modlogChannelId
+    var mutedRoleId by Guilds.mutedRoleId
+    var prefixes by Guilds.prefixes
+    var language by Guilds.language
+}

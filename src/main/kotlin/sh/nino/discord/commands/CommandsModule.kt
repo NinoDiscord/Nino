@@ -21,3 +21,11 @@
  */
 
 package sh.nino.discord.commands
+
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import sh.nino.discord.core.command.AbstractCommand
+
+val commandsModule = module {
+    single { TestCommand() } bind AbstractCommand::class
+}

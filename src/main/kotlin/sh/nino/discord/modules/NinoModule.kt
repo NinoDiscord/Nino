@@ -23,8 +23,10 @@
 package sh.nino.discord.modules
 
 import org.koin.dsl.module
+import sh.nino.discord.core.command.CommandHandler
 import sh.nino.discord.modules.prometheus.PrometheusModule
 
 val ninoModule = module {
     single { PrometheusModule(get()) }
+    single { CommandHandler(get(), get(), get()) }
 }

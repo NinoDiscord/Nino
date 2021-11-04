@@ -22,6 +22,8 @@
 
 package sh.nino.discord
 
+import com.zaxxer.hikari.HikariConfig
+import com.zaxxer.hikari.HikariDataSource
 import dev.floofy.haru.Scheduler
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -32,6 +34,7 @@ import io.ktor.client.features.websocket.*
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import org.slf4j.LoggerFactory
+import sh.nino.discord.data.Config
 
 val globalModule = module {
     single {
@@ -65,5 +68,16 @@ val globalModule = module {
                 agent = "Nino/DiscordBot (+https://github.com/NinoDiscord/Nino; v${NinoInfo.VERSION})"
             }
         }
+    }
+
+    single {
+        val config: Config = get()
+        HikariDataSource(HikariConfig().apply {
+            jdbcUrl = "jdbc:postgresql://${config.database.host}:${config.database.port}/${config.database.name}"
+            username = config.database.username
+            password = config.database.password
+            schema = config.database.schema
+            driverClassName = "org.postgresql.Driver"
+        })
     }
 }

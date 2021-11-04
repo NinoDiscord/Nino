@@ -25,12 +25,12 @@ package sh.nino.discord.core.database.tables
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.TextColumnType
 import org.jetbrains.exposed.sql.VarCharColumnType
 import sh.nino.discord.core.database.columns.array
+import sh.nino.discord.core.database.tables.dao.SnowflakeTable
 
-object AutomodTable: LongIdTable("automod") {
+object AutomodTable: SnowflakeTable("automod") {
     val mentionsThreshold = integer("mentions_threshold").default(4)
     val blacklistedWords = array<String>("blacklisted_words", TextColumnType()).default(arrayOf())
     val omittedChannels = array<String>("omitted_channels", TextColumnType()).default(arrayOf())

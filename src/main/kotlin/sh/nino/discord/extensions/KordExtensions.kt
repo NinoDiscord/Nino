@@ -22,6 +22,7 @@
 
 package sh.nino.discord.extensions
 
+import dev.kord.common.entity.Snowflake
 import java.awt.Color
 import dev.kord.common.Color as KordColor
 
@@ -29,3 +30,4 @@ import dev.kord.common.Color as KordColor
  * Converts a [java.awt.Color] into a [KordColor] object.
  */
 fun Color.asKordColor(): KordColor = KordColor(red, green, blue)
+fun Long.asSnowflake(): Snowflake = Snowflake(this)

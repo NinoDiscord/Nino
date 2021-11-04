@@ -38,12 +38,10 @@ object AutomodContainer {
     suspend fun execute(event: Any): Boolean {
         var ret = false
         for (a in automod.values) {
-            if (ret) return true
-
             try {
                 ret = a.execute(event)
             } catch (e: Exception) {
-                // skip
+                continue
             }
         }
 

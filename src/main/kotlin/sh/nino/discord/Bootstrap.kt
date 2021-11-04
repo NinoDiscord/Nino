@@ -30,6 +30,8 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
 import sh.nino.discord.clustering.clusteringModule
+import sh.nino.discord.commands.commandsModule
+import sh.nino.discord.core.command.CommandHandler
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.extensions.useNinoLogger
@@ -61,6 +63,7 @@ object Bootstrap {
                 globalModule,
                 clusteringModule,
                 ninoModule,
+                commandsModule,
                 module {
                     single {
                         NinoBot()

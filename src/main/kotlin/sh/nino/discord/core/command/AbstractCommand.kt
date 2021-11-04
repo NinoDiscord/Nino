@@ -42,5 +42,5 @@ abstract class AbstractCommand {
             )
         }
 
-    abstract suspend fun run(msg: CommandMessage, vararg args: Any)
+    suspend fun run(msg: CommandMessage, vararg args: Any) {}
 }

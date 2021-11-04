@@ -35,3 +35,5 @@ inline fun <S, T> Iterable<T>.reduce(operation: (S, T) -> S, initialValue: S): S
     @Suppress("UNCHECKED_CAST")
     return acc as S
 }
+
+fun List<String>.filterNonEmptyStrings(): List<String> = filter { it.isBlank() || it.isEmpty() }

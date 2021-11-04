@@ -22,40 +22,55 @@
 
 package sh.nino.discord.core.database.tables
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.TextColumnType
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import sh.nino.discord.core.database.columns.array
 
-enum class PunishmentType {
-    THREAD_MESSAGES_REMOVED,
-    THREAD_MESSAGES_ADDED,
-    WARNING_REMOVED,
-    VOICE_UNDEAFEN,
-    WARNING_ADDED,
-    VOICE_UNMUTED,
-    VOICE_DEAFEN,
-    VOICE_UNMUTE,
-    VOICE_MUTE,
-    UNBAN,
-    MUTE,
-    KICK,
-    BAN
+enum class PunishmentType(val key: String) {
+    THREAD_MESSAGES_REMOVED("thread message removed"),
+    THREAD_MESSAGES_ADDED("thread message added"),
+    WARNING_REMOVED("warning removed"),
+    VOICE_UNDEAFEN("voice undeafen"),
+    WARNING_ADDED("warning added"),
+    VOICE_UNMUTED("voice unmuted"),
+    VOICE_DEAFEN("voice deafened"),
+    VOICE_UNMUTE("voice unmute"),
+    VOICE_MUTE("voice mute"),
+    UNBAN("unban"),
+    MUTE("mute"),
+    KICK("kick"),
+    BAN("ban");
+
+    companion object {
+        fun get(key: String): PunishmentType = values().find { it.key == key } ?: error("Unable to find key '$key' in PunishmentType.")
+    }
 }
 
 object GuildCases: LongIdTable("guild_cases") {
     val attachments = array<String>("attachments", TextColumnType()).default(arrayOf())
-    val moderatorId = varchar("moderator_id", 18)
-    val messageId = varchar("message_id", 18).nullable()
-    val victimId = varchar("victim_id", 18)
+    val moderatorId = long("moderator_id")
+    val messageId = long("message_id").nullable()
+    val createdAt = datetime("created_at").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+    val updatedAt = datetime("updated_at").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+    val victimId = long("victim_id")
     val guildId = long("guild_id")
     val reason = text("reason").nullable()
     val index = integer("index")
-    val type = enumeration("type", PunishmentType::class)
     val soft = bool("soft").default(false)
     val time = long("time").nullable().default(null)
+    val type = customEnumeration(
+        "type",
+        "PunishmentTypeEnum",
+        { value -> PunishmentType.get(value as String) },
+        { toDb -> toDb.key }
+    )
 
     override val primaryKey: PrimaryKey = PrimaryKey(guildId, index, name = "PK_GuildCases_ID")
 }
@@ -66,6 +81,8 @@ class GuildCasesEntity(id: EntityID<Long>): LongEntity(id) {
     var attachments by GuildCases.attachments
     var moderatorId by GuildCases.moderatorId
     var messageId by GuildCases.messageId
+    var createdAt by GuildCases.createdAt
+    var updatedAt by GuildCases.updatedAt
     var victimId by GuildCases.victimId
     var guildId by GuildCases.guildId
     var reason by GuildCases.reason

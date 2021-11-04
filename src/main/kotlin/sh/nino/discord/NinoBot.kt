@@ -22,6 +22,7 @@
 
 package sh.nino.discord
 
+import com.zaxxer.hikari.HikariDataSource
 import dev.kord.common.annotation.*
 import dev.kord.common.entity.ActivityType
 import dev.kord.common.entity.DiscordBotActivity
@@ -34,9 +35,17 @@ import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.route.Route
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.core.NinoScope
+import sh.nino.discord.core.database.tables.*
+import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.core.threading.NinoThreadFactory
+import sh.nino.discord.data.Config
+import sh.nino.discord.data.Environment
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.subscribers.applyGenericEvents
@@ -56,6 +65,7 @@ class NinoBot {
 
     @OptIn(PrivilegedIntent::class, KordUnsafe::class, KordExperimental::class)
     suspend fun launch() {
+        val koin = GlobalContext.get()
         val runtime = Runtime.getRuntime()
         val dediNode = try {
             System.getenv()["DEDI_NODE"]
@@ -83,6 +93,52 @@ class NinoBot {
         logger.info(
             "* Session Limit: ${gateway.sessionStartLimit.remaining}/${gateway.sessionStartLimit.total}"
         )
+
+        logger.info("* Connecting to PostgreSQL...")
+
+        val dataSource = koin.get<HikariDataSource>()
+        val config = koin.get<Config>()
+
+        Database.connect(dataSource)
+        if (config.environment == Environment.Development) {
+            logger.debug("Enabling Exposed SQL logger...")
+            asyncTransaction {
+                addLogger(StdOutSqlLogger)
+            }.execute()
+        }
+
+        asyncTransaction {
+            // drop if it exists
+            execInBatch(
+                listOf(
+                    "DROP TYPE IF EXISTS PunishmentTypeEnum",
+                    "DROP TYPE IF EXISTS GlobalBanTypeEnum",
+                    "DROP TYPE IF EXISTS LogEventEnum"
+                )
+            )
+
+            // create new types
+            val banKeyNames = BanType.values().joinToString(", ") { "'${it.key}'" }
+            val punishmentKeyNames = PunishmentType.values().joinToString(", ") { "'${it.key}'" }
+            val logEventKeyNames = LogEvent.values().joinToString(", ") { "'${it.key}'" }
+
+            execInBatch(
+                listOf(
+                    "CREATE TYPE GlobalBanTypeEnum AS ENUM ($banKeyNames)",
+                    "CREATE TYPE PunishmentTypeEnum AS ENUM ($punishmentKeyNames)",
+                    "CREATE TYPE LogEventEnum AS ENUM ($logEventKeyNames)"
+                )
+            )
+
+            SchemaUtils.createMissingTablesAndColumns(
+                AutomodTable,
+                GlobalBansTable,
+                GuildCases,
+                Guilds,
+                Logging,
+                Users
+            )
+        }.execute()
 
         kord.applyGenericEvents()
         kord.applyMessageEvents()

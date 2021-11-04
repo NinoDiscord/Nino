@@ -53,6 +53,7 @@ dependencies {
 
     // kotlinx libraries
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.2.1")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")

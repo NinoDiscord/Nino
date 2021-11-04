@@ -31,5 +31,5 @@ abstract class ArgumentReader<T: Any> {
     /**
      * Parses the value and returns a [Optional] block.
      */
-    abstract fun parse(value: T): Optional<T>
+    abstract fun parse(value: String): Optional<T>
 }

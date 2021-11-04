@@ -22,9 +22,13 @@
 
 package sh.nino.discord.core.database.transactions
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.future.future
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
 import sh.nino.discord.NinoBot
+import sh.nino.discord.core.NinoScope
 import java.util.concurrent.CompletableFuture
 
 fun <T> asyncTransaction(block: Transaction.() -> T): AsyncTransaction<T> = AsyncTransaction(block)
@@ -33,16 +37,7 @@ fun <T> asyncTransaction(block: Transaction.() -> T): AsyncTransaction<T> = Asyn
  * Asynchronously create an SQL transaction.
  */
 class AsyncTransaction<T>(private val block: Transaction.() -> T) {
-    fun execute(): T {
-        val ret = CompletableFuture<T>()
-        NinoBot.executorPool.execute {
-            try {
-                ret.complete(transaction { block() })
-            } catch (e: Throwable) {
-                ret.completeExceptionally(e)
-            }
-        }
-
-        return ret.join()
-    }
+    suspend fun execute(): T = CoroutineScope(NinoScope.coroutineContext).future {
+        transaction { block() }
+    }.await()
 }

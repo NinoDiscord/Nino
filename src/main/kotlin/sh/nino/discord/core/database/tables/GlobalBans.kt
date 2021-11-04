@@ -21,3 +21,48 @@
  */
 
 package sh.nino.discord.core.database.tables
+
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.dao.id.LongIdTable
+import org.jetbrains.exposed.sql.kotlin.datetime.datetime
+import sh.nino.discord.core.database.tables.dao.SnowflakeTable
+
+enum class BanType(val key: String) {
+    GUILD("guild"),
+    USER("user");
+
+    companion object {
+        fun find(key: String): BanType =
+            values().find { it.key == key } ?: error("Unable to find '$key' -> BanType")
+    }
+}
+
+object GlobalBansTable: SnowflakeTable("global_bans") {
+    val createdAt = datetime("created_at").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
+    val expireAt = long("expire_at").nullable()
+    val reason = varchar("reason", 256).nullable()
+    val issuer = long("issuer")
+    val type = customEnumeration(
+        "type",
+        "GlobalBanTypeEnum",
+        { value -> BanType.find(value as String) },
+        { toDb -> toDb.key }
+    )
+}
+
+// enumeration("type", BanType::class)
+
+class GlobalBans(id: EntityID<Long>): LongEntity(id) {
+    companion object: LongEntityClass<GlobalBans>(GlobalBansTable)
+
+    var createdAt by GlobalBansTable.createdAt
+    var expireAt by GlobalBansTable.expireAt
+    var reason by GlobalBansTable.reason
+    var issuer by GlobalBansTable.issuer
+    var type by GlobalBansTable.type
+}

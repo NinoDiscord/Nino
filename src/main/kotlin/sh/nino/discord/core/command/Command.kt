@@ -43,7 +43,7 @@ class Command private constructor(
     val cooldown: Int = 5,
     val userPermissions: Permissions = Permissions(),
     val botPermissions: Permissions = Permissions(),
-    private val thisCtx: AbstractCommand
+    val thisCtx: AbstractCommand
 ) {
     constructor(klazz: AbstractCommand): this(
         klazz.info.name,
@@ -59,7 +59,7 @@ class Command private constructor(
         klazz
     )
 
-    suspend fun execute(msg: CommandMessage, callback: (Exception?, Boolean) -> Unit, vararg args: Any): Any
+    suspend fun execute(msg: CommandMessage, vararg args: Any, callback: suspend (Exception?, Boolean) -> Unit): Any
         = try {
             thisCtx.run(msg, *args)
             callback(null, true)
