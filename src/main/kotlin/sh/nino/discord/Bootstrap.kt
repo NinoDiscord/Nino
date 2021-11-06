@@ -31,13 +31,13 @@ import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
 import sh.nino.discord.clustering.clusteringModule
 import sh.nino.discord.commands.commandsModule
-import sh.nino.discord.core.command.CommandHandler
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.extensions.useNinoLogger
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.ninoModule
 import java.io.File
+import kotlin.system.exitProcess
 
 object Bootstrap {
     private lateinit var bot: NinoBot
@@ -87,7 +87,12 @@ object Bootstrap {
         bot.addShutdownHook()
 
         runBlocking {
-            bot.launch()
+            try {
+                bot.launch()
+            } catch (e: Exception) {
+                logger.error("A runtime exception has occurred while bootstrapping Nino:", e)
+                exitProcess(1)
+            }
         }
     }
 }

@@ -23,11 +23,11 @@
 package sh.nino.discord.core.command
 
 import sh.nino.discord.core.annotations.Command
-import sh.nino.discord.core.annotations.Subcommand as SubcommandAnnotation
 import kotlin.reflect.KCallable
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.jvm.jvmName
+import sh.nino.discord.core.annotations.Subcommand as SubcommandAnnotation
 
 abstract class AbstractCommand {
     val info: Command
@@ -42,5 +42,5 @@ abstract class AbstractCommand {
             )
         }
 
-    suspend fun run(msg: CommandMessage, vararg args: Any) {}
+    abstract suspend fun run(msg: CommandMessage)
 }

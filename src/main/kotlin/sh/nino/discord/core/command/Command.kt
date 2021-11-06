@@ -24,13 +24,6 @@ package sh.nino.discord.core.command
 
 import dev.kord.common.DiscordBitSet
 import dev.kord.common.entity.Permissions
-import kotlinx.coroutines.launch
-import sh.nino.discord.core.NinoScope
-import java.lang.reflect.Method
-import kotlin.coroutines.suspendCoroutine
-import kotlin.reflect.KCallable
-import kotlin.reflect.full.callSuspend
-import sh.nino.discord.core.annotations.Command as CommandAnnotation
 
 class Command private constructor(
     val name: String,
@@ -59,11 +52,14 @@ class Command private constructor(
         klazz
     )
 
-    suspend fun execute(msg: CommandMessage, vararg args: Any, callback: suspend (Exception?, Boolean) -> Unit): Any
-        = try {
-            thisCtx.run(msg, *args)
+    suspend fun execute(
+        msg: CommandMessage,
+        callback: suspend (Exception?, Boolean) -> Unit
+    ): Any =
+        try {
+            thisCtx.run(msg)
             callback(null, true)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             callback(e, false)
         }
 }

@@ -35,7 +35,7 @@ class NinoThreadFactory: ThreadFactory {
     }
 
     override fun newThread(r: Runnable): Thread {
-        val threadName = "NinoThread[${id.incrementAndGet()}]"
+        val threadName = "Nino-ExecutorThread[${id.incrementAndGet()}]"
         val thread = Thread(group, r, threadName)
 
         if (thread.priority != Thread.NORM_PRIORITY)

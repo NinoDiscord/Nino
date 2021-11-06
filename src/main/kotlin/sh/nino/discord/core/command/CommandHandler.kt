@@ -30,11 +30,6 @@ import kotlinx.coroutines.flow.firstOrNull
 import org.jetbrains.exposed.sql.or
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.core.automod.AutomodContainer
-import sh.nino.discord.core.command.arguments.Arg
-import sh.nino.discord.core.command.arguments.Argument
-import sh.nino.discord.core.command.arguments.ArgumentReader
-import sh.nino.discord.core.command.arguments.readers.IntArgumentReader
-import sh.nino.discord.core.command.arguments.readers.StringArgumentReader
 import sh.nino.discord.core.database.tables.*
 import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.data.Config
@@ -44,9 +39,6 @@ import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.prometheus.PrometheusModule
 import sh.nino.discord.utils.Constants
 import java.util.regex.Pattern
-import kotlin.reflect.KClass
-import kotlin.reflect.KParameter
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.jvmName
 
 private fun <T, U> List<Pair<T, U>>.toMappedPair(): Map<T, U> {
@@ -65,11 +57,6 @@ class CommandHandler(
     private val prometheus: PrometheusModule,
     private val kord: Kord
 ) {
-    private val parsers: Map<KClass<*>, ArgumentReader<*>> = mapOf(
-        String::class to StringArgumentReader(),
-        Int::class to IntArgumentReader()
-    )
-
     private val commands: Map<String, Command>
         get() = GlobalContext
             .get()
@@ -96,13 +83,13 @@ class CommandHandler(
         val author = event.message.author!!
 
         // Get guild and user settings
-        val guildEntity = asyncTransaction {
+        var guildEntity = asyncTransaction {
             GuildEntity.find {
                 Guilds.id eq guild.id.value.toLong()
             }.firstOrNull()
         }.execute()
 
-        val userEntity = asyncTransaction {
+        var userEntity = asyncTransaction {
             UserEntity.find {
                 Users.id eq author.id.value.toLong()
             }.firstOrNull()
@@ -119,6 +106,12 @@ class CommandHandler(
                     prefixes = arrayOf()
                 }
             }.execute()
+
+            guildEntity = asyncTransaction {
+                GuildEntity.find {
+                    Guilds.id eq guild.id.value.toLong()
+                }.first()
+            }.execute()
         }
 
         // If we cannot find the user, let's create a new entry.
@@ -129,6 +122,12 @@ class CommandHandler(
                     prefixes = arrayOf()
                 }
             }.execute()
+
+            userEntity = asyncTransaction {
+                UserEntity.find {
+                    Users.id eq author.id.value.toLong()
+                }.first()
+            }.execute()
         }
 
         // now we find which prefix was invoked
@@ -136,11 +135,10 @@ class CommandHandler(
         val mentionRegex = Pattern.compile("^<@!?${kord.selfId.asString}> ").toRegex()
         val wasMentioned = event.message.content.matches(mentionRegex)
 
-        val prefixes = (config.prefixes + listOf(
-            guildEntity!!.prefixes.toList(),
-            userEntity!!.prefixes.toList(),
+        println(mentionRegex.toString())
+        val prefixes = config.prefixes.toList() + guildEntity.prefixes.toList() + userEntity.prefixes.toList() + listOf(
             if (wasMentioned) mentionRegex.toString() else ""
-        ) as List<String>).filterNonEmptyStrings()
+        ).filterNonEmptyStrings()
 
         // recursively find the prefix, if we can't find it
         val prefix = prefixes.firstOrNull { event.message.content.startsWith(it) } ?: return
@@ -180,7 +178,7 @@ class CommandHandler(
         val content = event.message.content.substring(prefix.length).trim()
         val (name, args) = content.split("\\s+".toRegex()).separateFirst()
         val cmdName = name.lowercase()
-        val message = CommandMessage(event)
+        val message = CommandMessage(event, args)
         val command = commands[cmdName]
             ?: commands.values.firstOrNull { it.aliases.contains(name) }
             ?: return
@@ -219,41 +217,7 @@ class CommandHandler(
             }
         }
 
-        // now we do argument parsing, which is a bit h in the chat im ngl
-        val runMethod = command.thisCtx::class.members.find { it.isSuspend && it.name == "run" } ?: return
-        val runArgs = runMethod.parameters.drop(1)
-        val finalArgs: MutableMap<KParameter, Any> = mutableMapOf()
-        var failed = false
-
-        for ((i, arg) in runArgs.withIndex()) {
-            val info = arg.findAnnotation<Arg>()
-            if (info == null) {
-                logger.warn("Skipping argument ${arg.name} (param #${arg.index}) since it doesn't have an `@Arg` annotation.")
-                continue
-            }
-
-            val argument = Argument(arg, info)
-            val parser = parsers[argument.type] ?: run {
-                message.reply("An unknown exception has occurred, please try again later. If you are the owner, please refer to the logs.")
-                logger.error("Argument ${argument.name} (param #${arg.index})'s type ${argument.type.jvmName} is missing a parser.")
-
-                null
-            } ?: continue
-
-            val result = parser.parse(args[i])
-            if (result.isEmpty && !argument.optional) {
-                failed = true
-                message.reply("Argument **${arg.name}** was not provided when it was required.")
-
-                break
-            } else {
-                finalArgs[arg] = result.get()
-            }
-        }
-
-        if (failed) return
-
-        command.execute(message, *finalArgs.values.toTypedArray()) { ex, success ->
+        command.execute(message) { ex, success ->
             if (!success) {
                 message.reply("Unable to run command **$name**.")
 

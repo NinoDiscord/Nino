@@ -27,6 +27,7 @@ import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.EmbedBuilder
+import dev.kord.rest.builder.message.create.allowedMentions
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.utils.Constants
@@ -34,7 +35,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-class CommandMessage(event: MessageCreateEvent) {
+class CommandMessage(event: MessageCreateEvent, val args: List<String>) {
     private val koin: Koin = GlobalContext.get()
 
     val message: Message = event.message
@@ -46,6 +47,9 @@ class CommandMessage(event: MessageCreateEvent) {
 
             if (reply) {
                 messageReference = message.id
+                allowedMentions {
+                    repliedUser = false
+                }
             }
         }
 
@@ -64,6 +68,9 @@ class CommandMessage(event: MessageCreateEvent) {
 
             if (reply) {
                 messageReference = message.id
+                allowedMentions {
+                    repliedUser = false
+                }
             }
         }
     }

@@ -23,6 +23,7 @@
 package sh.nino.discord
 
 import com.zaxxer.hikari.HikariDataSource
+import com.zaxxer.hikari.util.IsolationLevel
 import dev.kord.common.annotation.*
 import dev.kord.common.entity.ActivityType
 import dev.kord.common.entity.DiscordBotActivity
@@ -35,10 +36,8 @@ import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.route.Route
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.SchemaUtils
-import org.jetbrains.exposed.sql.StdOutSqlLogger
-import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.database.tables.*
@@ -99,7 +98,15 @@ class NinoBot {
         val dataSource = koin.get<HikariDataSource>()
         val config = koin.get<Config>()
 
-        Database.connect(dataSource)
+        Database
+            .connect(
+                dataSource,
+                databaseConfig = DatabaseConfig.invoke {
+                    defaultRepetitionAttempts = 5
+                    defaultIsolationLevel = IsolationLevel.TRANSACTION_REPEATABLE_READ.levelId
+                }
+            )
+
         if (config.environment == Environment.Development) {
             logger.debug("Enabling Exposed SQL logger...")
             asyncTransaction {
@@ -107,28 +114,21 @@ class NinoBot {
             }.execute()
         }
 
+        createPgEnumsIfNotExists()
+
         asyncTransaction {
-            // drop if it exists
-            execInBatch(
-                listOf(
-                    "DROP TYPE IF EXISTS PunishmentTypeEnum",
-                    "DROP TYPE IF EXISTS GlobalBanTypeEnum",
-                    "DROP TYPE IF EXISTS LogEventEnum"
-                )
-            )
-
             // create new types
-            val banKeyNames = BanType.values().joinToString(", ") { "'${it.key}'" }
-            val punishmentKeyNames = PunishmentType.values().joinToString(", ") { "'${it.key}'" }
-            val logEventKeyNames = LogEvent.values().joinToString(", ") { "'${it.key}'" }
-
-            execInBatch(
-                listOf(
-                    "CREATE TYPE GlobalBanTypeEnum AS ENUM ($banKeyNames)",
-                    "CREATE TYPE PunishmentTypeEnum AS ENUM ($punishmentKeyNames)",
-                    "CREATE TYPE LogEventEnum AS ENUM ($logEventKeyNames)"
-                )
-            )
+//            val banKeyNames = BanType.values().joinToString(", ") { "'${it.key}'" }
+//            val punishmentKeyNames = PunishmentType.values().joinToString(", ") { "'${it.key}'" }
+//            val logEventKeyNames = LogEvent.values().joinToString(", ") { "'${it.key}'" }
+//
+//            execInBatch(
+//                listOf(
+//                    "CREATE TYPE IF NOT EXISTS GlobalBanTypeEnum AS ENUM ($banKeyNames)",
+//                    "CREATE TYPE IF NOT EXISTS PunishmentTypeEnum AS ENUM ($punishmentKeyNames)",
+//                    "CREATE TYPE IF NOT EXISTS LogEventEnum AS ENUM ($logEventKeyNames)"
+//                )
+//            )
 
             SchemaUtils.createMissingTablesAndColumns(
                 AutomodTable,
@@ -139,6 +139,10 @@ class NinoBot {
                 Users
             )
         }.execute()
+
+        // Connect to Redis!
+
+        // Enable all cron jobs
 
         kord.applyGenericEvents()
         kord.applyMessageEvents()
@@ -178,5 +182,49 @@ class NinoBot {
 
         logger.info("Enabled shutdown hook thread.")
         Runtime.getRuntime().addShutdownHook(shutdownThread)
+    }
+
+    private fun createPgEnumsIfNotExists() {
+        logger.info("* PostgreSQL: Checking if db enums exists?")
+
+        // create enums since exposed doesn't provide enum column types / support.
+        val globalBanTypeEnumExists = transaction {
+            exec("SELECT * FROM pg_type WHERE typname='${"BanTypeEnum".lowercase()}';") {
+                it.next()
+            }
+        }
+
+        val punishmentTypeEnumExists = transaction {
+            exec("SELECT * FROM pg_type WHERE typname='${"PunishmentTypeEnum".lowercase()}';") {
+                it.next()
+            }
+        }
+
+        val logEventEnumExists = transaction {
+            exec("SELECT * FROM pg_type WHERE typname='${"LogEventEnum".lowercase()}'") {
+                it.next()
+            }
+        }
+
+        if (globalBanTypeEnumExists != null && !globalBanTypeEnumExists) {
+            transaction {
+                val enumKeys = BanType.values().joinToString(", ") { "'${it.key}'" }
+                exec("CREATE TYPE BanTypeEnum AS ENUM($enumKeys);")
+            }
+        }
+
+        if (punishmentTypeEnumExists != null && !punishmentTypeEnumExists) {
+            transaction {
+                val typeKeys = PunishmentType.values().joinToString(", ") { "'${it.key}'" }
+                exec("CREATE TYPE PunishmentTypeEnum AS ENUM($typeKeys);")
+            }
+        }
+
+        if (logEventEnumExists != null && !logEventEnumExists) {
+            transaction {
+                val keys = LogEvent.values().joinToString(", ") { "'${it.key}'" }
+                exec("CREATE TYPE LogEventEnum AS ENUM($keys);")
+            }
+        }
     }
 }

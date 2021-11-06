@@ -48,7 +48,7 @@ data class Locale(
             val koin = GlobalContext.get()
             val json = koin.get<Json>()
 
-            return json.decodeFromString(Locale.serializer(), file.readText())
+            return json.decodeFromString(serializer(), file.readText())
         }
     }
 

@@ -27,9 +27,7 @@ import kotlinx.coroutines.future.await
 import kotlinx.coroutines.future.future
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
-import sh.nino.discord.NinoBot
 import sh.nino.discord.core.NinoScope
-import java.util.concurrent.CompletableFuture
 
 fun <T> asyncTransaction(block: Transaction.() -> T): AsyncTransaction<T> = AsyncTransaction(block)
 

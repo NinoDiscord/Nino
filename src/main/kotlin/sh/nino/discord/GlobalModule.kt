@@ -24,6 +24,7 @@ package sh.nino.discord
 
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
+import com.zaxxer.hikari.util.IsolationLevel
 import dev.floofy.haru.Scheduler
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
@@ -72,12 +73,18 @@ val globalModule = module {
 
     single {
         val config: Config = get()
-        HikariDataSource(HikariConfig().apply {
-            jdbcUrl = "jdbc:postgresql://${config.database.host}:${config.database.port}/${config.database.name}"
-            username = config.database.username
-            password = config.database.password
-            schema = config.database.schema
-            driverClassName = "org.postgresql.Driver"
-        })
+        HikariDataSource(
+            HikariConfig().apply {
+                jdbcUrl = "jdbc:postgresql://${config.database.host}:${config.database.port}/${config.database.name}"
+                username = config.database.username
+                password = config.database.password
+                schema = config.database.schema
+                driverClassName = "org.postgresql.Driver"
+                isAutoCommit = false
+                transactionIsolation = IsolationLevel.TRANSACTION_REPEATABLE_READ.name
+                leakDetectionThreshold = 30L * 1000
+                poolName = "Nino-HikariPool"
+            }
+        )
     }
 }

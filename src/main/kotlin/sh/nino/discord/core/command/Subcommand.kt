@@ -53,8 +53,8 @@ class Subcommand private constructor(
         thisCtx
     )
 
-    suspend fun execute(msg: CommandMessage, callback: (Exception?, Boolean) -> Unit, vararg args: Any): Any
-        = if (method.isSuspend) {
+    suspend fun execute(msg: CommandMessage, callback: (Exception?, Boolean) -> Unit, vararg args: Any): Any =
+        if (method.isSuspend) {
             NinoScope.launch {
                 try {
                     method.callSuspend(thisCtx, msg, *args)
