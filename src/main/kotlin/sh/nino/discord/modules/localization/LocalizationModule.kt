@@ -24,9 +24,57 @@ package sh.nino.discord.modules.localization
 
 import sh.nino.discord.data.Config
 import sh.nino.discord.kotlin.logging
+import java.io.File
 
-class LocalizationModule(private val config: Config) {
-    lateinit var defaultLocale: Locale
+class LocalizationModule(config: Config) {
+    private val localeDirectory: File = File("./locales")
+    private lateinit var defaultLocale: Locale
     private val logger by logging<LocalizationModule>()
-    val locales: MutableMap<String, Locale> = mutableMapOf()
+    private val locales: MutableMap<String, Locale> = mutableMapOf()
+
+    init {
+        logger.info("Now locating locales in ${localeDirectory.path}")
+        if (!localeDirectory.exists())
+            throw IllegalStateException("Locale path must be available under ${localeDirectory.path}.")
+
+        val files = localeDirectory.listFiles { _, s ->
+            s.endsWith(".json")
+        } ?: arrayOf()
+
+        for (file in files) {
+            val locale = Locale.fromFile(file)
+
+            logger.info("Found locale ${locale.meta.code} by ${locale.meta.translator}!")
+            locales[locale.meta.code] = locale
+
+            if (locale.meta.code == config.defaultLocale) {
+                logger.info("Found default locale ${config.defaultLocale}!")
+                defaultLocale = locale
+            }
+        }
+
+        if (!this::defaultLocale.isInitialized) {
+            logger.warn("No default locale was found, setting to English (US)!")
+            defaultLocale = locales["en_US"]!!
+        }
+    }
+
+    fun get(guild: String, user: String): Locale {
+        // This should never happen, but it could happen.
+        if (!locales.containsKey(guild) || !locales.containsKey(user)) return defaultLocale
+
+        // If both parties use the default locale, return it.
+        if (guild == defaultLocale.meta.code && user == defaultLocale.meta.code) return defaultLocale
+
+        // Users have more priority than guilds, so let's check if the guild locale
+        // is the default and the user's locale is completely different
+        if (user != defaultLocale.meta.code && guild == defaultLocale.meta.code) return locales[user]!!
+
+        // If the user's locale is not the guild's locale, return it
+        // so it can be translated properly.
+        if (guild !== defaultLocale.meta.code && user == defaultLocale.meta.code) return locales[guild]!!
+
+        // We should never be here, but here we are.
+        error("Illegal unknown value (locale: guild->$guild;user->$user)")
+    }
 }

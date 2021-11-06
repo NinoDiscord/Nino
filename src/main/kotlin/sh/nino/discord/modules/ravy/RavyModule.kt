@@ -21,3 +21,39 @@
  */
 
 package sh.nino.discord.modules.ravy
+
+import io.ktor.client.*
+import io.ktor.client.request.*
+import kotlinx.serialization.Serializable
+import sh.nino.discord.data.Config
+
+@Serializable
+data class User(
+    val pronouns: String,
+    val bans: List<Ban>,
+    val trust: Int,
+    val rep: List<RepProvider>
+)
+
+@Serializable
+sealed class Ban(
+    val provider: String,
+    val reason: String,
+    val moderator: String
+)
+
+@Serializable
+sealed class RepProvider(
+    val type: String,
+    val score: Int
+)
+
+class RavyModule(private val config: Config, private val httpClient: HttpClient) {
+    suspend fun getBansById(id: String): List<Ban> {
+        if (config.ravy == null) return emptyList()
+
+        return httpClient.get("https://ravy.org/api/v1/users/$id/bans") {
+            header("Authorization", config.ravy)
+        }
+    }
+}

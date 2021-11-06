@@ -22,21 +22,23 @@
 
 package sh.nino.discord.modules.localization
 
-import dev.kord.common.entity.Snowflake
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.context.GlobalContext
 import java.io.File
+import java.util.regex.Pattern
 
 @Serializable
 data class LocalizationMeta(
-    val contributors: List<Snowflake>,
-    val translator: Snowflake,
+    val contributors: List<String>,
+    val translator: String,
     val aliases: List<String> = listOf(),
     val code: String,
     val flag: String,
     val name: String
 )
+
+private val KEY_REGEX = Pattern.compile("[\$]\\{([\\w\\.]+)\\}").toRegex()
 
 @Serializable
 data class Locale(
@@ -52,5 +54,10 @@ data class Locale(
         }
     }
 
-    fun translate(key: String, args: Map<String, Any>): String = TODO()
+    fun translate(key: String, args: Map<String, Any> = mapOf()): String {
+        val format = strings[key] ?: error("Key \"$key\" was not found.")
+        return KEY_REGEX.replace(format, transform = {
+            args[it.groups[1]!!.value].toString()
+        })
+    }
 }

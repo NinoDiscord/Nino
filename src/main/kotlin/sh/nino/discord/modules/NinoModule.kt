@@ -24,9 +24,13 @@ package sh.nino.discord.modules
 
 import org.koin.dsl.module
 import sh.nino.discord.core.command.CommandHandler
+import sh.nino.discord.modules.localization.LocalizationModule
 import sh.nino.discord.modules.prometheus.PrometheusModule
+import sh.nino.discord.modules.ravy.RavyModule
 
 val ninoModule = module {
     single { PrometheusModule(get()) }
     single { CommandHandler(get(), get(), get()) }
+    single { LocalizationModule(get()) }
+    single { RavyModule(get(), get()) }
 }

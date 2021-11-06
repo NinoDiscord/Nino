@@ -1,11 +1,13 @@
-FROM noelware/openjdk:latest
+FROM noelware/openjdk:latest AS builder
 
-WORKDIR /app/Nino
+WORKDIR /
 COPY . .
 RUN chmod +x gradlew
 RUN ./gradlew build
-RUN rm -rf *.gradle.kts .idea .gradle gradle src gradle.properties gradlew gradlew.bat
-RUN cp ./build/libs/Nino.jar Nino.jar
-RUN rm -rf build
+
+FROM noelware/openjdk:latest
+
+WORKDIR /app/Nino
+COPY --from=builder /build/libs/Nino.jar /app/Nino/Nino.jar
 
 CMD ["java", "-jar", "Nino.jar"]
