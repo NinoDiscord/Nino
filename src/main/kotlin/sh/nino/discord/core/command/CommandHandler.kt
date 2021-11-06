@@ -34,11 +34,9 @@ import sh.nino.discord.core.database.tables.*
 import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.asSnowflake
-import sh.nino.discord.extensions.filterNonEmptyStrings
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.prometheus.PrometheusModule
 import sh.nino.discord.utils.Constants
-import java.util.regex.Pattern
 import kotlin.reflect.jvm.jvmName
 
 private fun <T, U> List<Pair<T, U>>.toMappedPair(): Map<T, U> {
@@ -132,17 +130,36 @@ class CommandHandler(
 
         // now we find which prefix was invoked
         val self = guild.members.firstOrNull { it.id.asString == kord.selfId.asString } ?: return
-        val mentionRegex = Pattern.compile("^<@!?${kord.selfId.asString}> ").toRegex()
-        val wasMentioned = event.message.content.matches(mentionRegex)
+        val prefixes = (
+            listOf(
+                "<@${kord.selfId.asString}>",
+                "<@!${kord.selfId.asString}>"
+            ) + config.prefixes.toList() + guildEntity.prefixes.toList() + userEntity.prefixes.toList()
+            ).distinct() // distinct will remove any duplicates
 
-        println(mentionRegex.toString())
-        val prefixes = config.prefixes.toList() + guildEntity.prefixes.toList() + userEntity.prefixes.toList() + listOf(
-            if (wasMentioned) mentionRegex.toString() else ""
-        ).filterNonEmptyStrings()
+        if (event.message.content.matches("^<@!?${kord.selfId.asString}>$".toRegex())) {
+            val prefix = prefixes.drop(2).random()
+            event.message.channel.createMessage {
+                content = ":wave: Hello, **${author.username}#${author.discriminator}**"
+                embeds += EmbedBuilder().apply {
+                    color = Constants.COLOR
+                    description = buildString {
+                        appendLine("I am **${self.tag}**, I operate as a moderation bot in this guild! (**${guild.name}**)")
+                        appendLine("> You can see a list of commands from our [website](https://nino.sh/commands) or invoking the **${prefix}help** command!")
+                        appendLine()
+                        appendLine("If you wish to invite ${self.username}, please click [here](https://nino.sh/invite) to do so.")
+                        appendLine("Nino is also open source! If you wish, you can star the [repository](https://github.com/NinoDiscord/Nino)! :hearts:")
+                        appendLine()
+                        appendLine("I will get out of your hair senpai, have a good day/evening~")
+                    }
+                }
+            }
+
+            return
+        }
 
         // recursively find the prefix, if we can't find it
         val prefix = prefixes.firstOrNull { event.message.content.startsWith(it) } ?: return
-        if (wasMentioned && !event.message.content.contains(" ")) return
 
         // check for global bans for user/guild
         val globalBan = asyncTransaction {
