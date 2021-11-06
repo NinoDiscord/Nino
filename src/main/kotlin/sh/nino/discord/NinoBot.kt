@@ -115,21 +115,7 @@ class NinoBot {
         }
 
         createPgEnumsIfNotExists()
-
         asyncTransaction {
-            // create new types
-//            val banKeyNames = BanType.values().joinToString(", ") { "'${it.key}'" }
-//            val punishmentKeyNames = PunishmentType.values().joinToString(", ") { "'${it.key}'" }
-//            val logEventKeyNames = LogEvent.values().joinToString(", ") { "'${it.key}'" }
-//
-//            execInBatch(
-//                listOf(
-//                    "CREATE TYPE IF NOT EXISTS GlobalBanTypeEnum AS ENUM ($banKeyNames)",
-//                    "CREATE TYPE IF NOT EXISTS PunishmentTypeEnum AS ENUM ($punishmentKeyNames)",
-//                    "CREATE TYPE IF NOT EXISTS LogEventEnum AS ENUM ($logEventKeyNames)"
-//                )
-//            )
-
             SchemaUtils.createMissingTablesAndColumns(
                 AutomodTable,
                 GlobalBansTable,
