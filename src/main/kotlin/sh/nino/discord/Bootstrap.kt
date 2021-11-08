@@ -29,7 +29,6 @@ import kotlinx.coroutines.runBlocking
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
-import sh.nino.discord.clustering.clusteringModule
 import sh.nino.discord.commands.commandsModule
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
@@ -61,7 +60,6 @@ object Bootstrap {
         startKoin {
             modules(
                 globalModule,
-                clusteringModule,
                 ninoModule,
                 commandsModule,
                 module {

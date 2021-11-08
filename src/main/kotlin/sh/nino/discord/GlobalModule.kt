@@ -34,6 +34,7 @@ import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
+import org.redisson.Redisson
 import org.slf4j.LoggerFactory
 import sh.nino.discord.data.Config
 
@@ -86,5 +87,40 @@ val globalModule = module {
                 poolName = "Nino-HikariPool"
             }
         )
+    }
+
+    single {
+        val config = get<Config>()
+        val cfg = org.redisson.config.Config()
+
+        if (config.redis.sentinels.isNotEmpty()) {
+            logger.info("Using Redis Sentinel configuration")
+
+            if (config.redis.master == null)
+                throw IllegalArgumentException("`config.redis.master` cannot be null if using Redis Sentinel configuration.")
+
+            cfg.useSentinelServers().apply {
+                masterName = config.redis.master
+                database = config.redis.index
+
+                if (config.redis.password != null) {
+                    password = config.redis.password
+                }
+
+                addSentinelAddress(*config.redis.sentinels.map { "${it.host}:${it.port}" }.toTypedArray())
+            }
+        } else {
+            logger.info("Using Redis Standalone configuration")
+            cfg.useSingleServer().apply {
+                address = "${config.redis.host}:${config.redis.port}"
+                database = config.redis.index
+
+                if (config.redis.password != null) {
+                    password = config.redis.password
+                }
+            }
+        }
+
+        Redisson.create(cfg).reactive()
     }
 }

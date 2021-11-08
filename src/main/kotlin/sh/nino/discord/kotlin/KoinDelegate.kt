@@ -20,22 +20,13 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.data
+package sh.nino.discord.kotlin
 
-import kotlinx.serialization.Serializable
+import org.koin.core.context.GlobalContext
+import kotlin.properties.ReadOnlyProperty
 
-@Serializable
-data class RedisConfig(
-    val sentinels: List<RedisSentinelConnectionUri> = listOf(),
-    val master: String? = null,
-    val password: String? = null,
-    val index: Int = 5,
-    val host: String = "localhost",
-    val port: Int = 6379
-)
-
-@Serializable
-data class RedisSentinelConnectionUri(
-    val host: String,
-    val port: Int
-)
+inline fun <reified T: Any> inject(): ReadOnlyProperty<Any, T> =
+    ReadOnlyProperty { _, _ ->
+        val koin = GlobalContext.get()
+        koin.get()
+    }

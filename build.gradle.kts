@@ -87,7 +87,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.0")
 
     // Redis
-    implementation("io.lettuce:lettuce-core:6.1.5.RELEASE")
+    implementation("org.redisson:redisson:3.16.4")
 
     // Haru (scheduling)
     implementation("dev.floofy.haru:Haru:1.2.0")

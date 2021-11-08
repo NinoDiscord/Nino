@@ -36,6 +36,7 @@ abstract class AbstractCommand {
     val subcommands: List<Subcommand>
         get() = this::class.members.filter { it.hasAnnotation<SubcommandAnnotation>() }.map {
             Subcommand(
+                @Suppress("UNCHECKED_CAST")
                 it as KCallable<Unit>,
                 it.findAnnotation()!!,
                 this@AbstractCommand

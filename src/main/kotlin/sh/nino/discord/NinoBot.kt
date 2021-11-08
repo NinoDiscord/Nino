@@ -66,17 +66,13 @@ class NinoBot {
     suspend fun launch() {
         val koin = GlobalContext.get()
         val runtime = Runtime.getRuntime()
-        val dediNode = try {
-            System.getenv()["DEDI_NODE"]
-        } catch (e: Exception) {
-            null
-        }
+        val dediNode = System.getProperty("winterfox.dedi", null)
 
         val os = ManagementFactory.getOperatingSystemMXBean()
         logger.info("================================")
         logger.info("Displaying runtime info:")
-        logger.info("* Free / Total Memory - ${runtime.freeMemory() / 1024L / 1024L}/${runtime.totalMemory() / 1024L / 1024L}MB")
-        logger.info("* Max Memory - ${runtime.maxMemory() / 1024L / 1024L}MB")
+        logger.info("* Free / Total Memory: ${runtime.freeMemory() / 1024L / 1024L}/${runtime.totalMemory() / 1024L / 1024L}MB")
+        logger.info("* Max Memory: ${runtime.maxMemory() / 1024L / 1024L}MB")
         logger.info("* JVM: v${System.getProperty("java.version")} (${System.getProperty("java.vendor", "<NA>")})")
         logger.info("* Kotlin: v${KotlinVersion.CURRENT}")
         logger.info("* Operating System: ${os.name} (${os.arch}; ${os.version})")
@@ -90,7 +86,7 @@ class NinoBot {
         logger.info("Displaying gateway info:")
         logger.info("* Shards to launch: ${gateway.shards}")
         logger.info(
-            "* Session Limit: ${gateway.sessionStartLimit.remaining}/${gateway.sessionStartLimit.total}"
+            "* Gateway Session Limit: ${gateway.sessionStartLimit.remaining}/${gateway.sessionStartLimit.total}"
         )
 
         logger.info("* Connecting to PostgreSQL...")
@@ -126,10 +122,7 @@ class NinoBot {
             )
         }.execute()
 
-        // Connect to Redis!
-
         // Enable all cron jobs
-
         kord.applyGenericEvents()
         kord.applyMessageEvents()
         kord.login {
