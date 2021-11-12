@@ -21,3 +21,35 @@
  */
 
 package sh.nino.discord.core.database.tables
+
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import sh.nino.discord.core.database.tables.dao.SnowflakeTable
+
+object Punishments: SnowflakeTable("punishments") {
+    var warnings = integer("warnings").default(1)
+    var index = integer("index").autoIncrement()
+    var soft = bool("soft").default(false)
+    var time = long("time").nullable()
+    var days = integer("days").nullable()
+    val type = GuildCases.customEnumeration(
+        "type",
+        "PunishmentTypeEnum",
+        { value -> PunishmentType.get(value as String) },
+        { toDb -> toDb.key }
+    )
+
+    override val primaryKey: PrimaryKey = PrimaryKey(id, index, name = "PK_GuildPunishments_ID")
+}
+
+class PunishmentsEntity(id: EntityID<Long>): LongEntity(id) {
+    companion object: LongEntityClass<PunishmentsEntity>(Punishments)
+
+    var warnings by Punishments.warnings
+    var index by Punishments.index
+    var soft by Punishments.soft
+    var time by Punishments.time
+    var days by Punishments.days
+    var type by Punishments.type
+}

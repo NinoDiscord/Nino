@@ -20,13 +20,20 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.commands.core
+package sh.nino.discord.modules.punishments
 
-import org.koin.dsl.bind
-import org.koin.dsl.module
-import sh.nino.discord.core.command.AbstractCommand
+fun <A, B> unionOf(first: A, second: B): Union<A, B> = Union.from(first, second)
+fun <A, B> nullUnionOf(first: A, second: B?): Union<A, B?> = Union.fromNull(first, second)
 
-val coreCommandsModule = module {
-    single { TestPaginationEmbedCommand() } bind AbstractCommand::class
-    single { AboutCommand(get()) } bind AbstractCommand::class
+class Union<out A, out B>(private val first: UnionA<A>, private val second: UnionB<B>) {
+    class UnionA<out A>(val value: A)
+    class UnionB<out B>(val value: B)
+
+    companion object {
+        fun <A, B> fromNull(first: A, second: B?) = Union(UnionA(first), UnionB(second))
+        fun <A, B> from(first: A, second: B) = Union(UnionA(first), UnionB(second))
+    }
+
+    operator fun component1(): A = first.value
+    operator fun component2(): B = second.value
 }

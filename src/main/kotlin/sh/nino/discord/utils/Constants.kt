@@ -36,6 +36,11 @@ object Constants {
     val DISCORD_INVITE_REGEX = Pattern.compile("(http(s)?://(www.)?)?(discord.gg|discord.io|discord.me|discord.link|invite.gg)/\\w+")
     val USER_MENTION_REGEX = Pattern.compile("^<@!?([0-9]+)>$")
     val CHANNEL_REGEX = Pattern.compile("<#([0-9]+)>$")
+    val FLAG_REGEX = Pattern.compile(
+        "(?:--?|—)([\\w]+)(=?(\\w+|['\"].*['\"]))?",
+        Pattern.CASE_INSENSITIVE
+    )
+
     val QUOTES_REGEX = Pattern.compile("['\"]")
     val ID_REGEX = Pattern.compile("^\\d+\$")
 }

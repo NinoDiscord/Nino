@@ -62,6 +62,8 @@ class CommandHandler(
             .map { it.info.name to Command(it) }
             .toMappedPair()
 
+    // we'll be removing/adding stuff here, so no need for caffeine (yet)
+    private val cooldownCache = mapOf<String, Int>()
     private val logger by logging<CommandHandler>()
 
     suspend fun onCommand(event: MessageCreateEvent) {
@@ -200,7 +202,7 @@ class CommandHandler(
             ?: commands.values.firstOrNull { it.aliases.contains(name) }
             ?: return
 
-        if (command.ownerOnly && config.owners.contains(author.id.asString)) {
+        if (command.ownerOnly && !config.owners.contains(author.id.asString)) {
             message.reply("You do not have permission to execute the **$name** command.")
             return
         }

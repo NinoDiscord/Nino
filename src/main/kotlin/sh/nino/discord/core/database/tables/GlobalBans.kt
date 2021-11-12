@@ -48,7 +48,7 @@ object GlobalBansTable: SnowflakeTable("global_bans") {
     val issuer = long("issuer")
     val type = customEnumeration(
         "type",
-        "GlobalBanTypeEnum",
+        "BanTypeEnum",
         { value -> BanType.find(value as String) },
         { toDb -> toDb.key }
     )

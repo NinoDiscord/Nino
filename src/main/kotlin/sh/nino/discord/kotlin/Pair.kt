@@ -20,13 +20,6 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.commands.core
+package sh.nino.discord.kotlin
 
-import org.koin.dsl.bind
-import org.koin.dsl.module
-import sh.nino.discord.core.command.AbstractCommand
-
-val coreCommandsModule = module {
-    single { TestPaginationEmbedCommand() } bind AbstractCommand::class
-    single { AboutCommand(get()) } bind AbstractCommand::class
-}
+fun <A, B> pairOf(first: A, second: B): Pair<A, B> = Pair(first, second)

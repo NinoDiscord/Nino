@@ -25,11 +25,13 @@ package sh.nino.discord.core.command
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
+import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.allowedMentions
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
+import sh.nino.discord.core.messaging.PaginationEmbed
 import sh.nino.discord.utils.Constants
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -40,6 +42,11 @@ class CommandMessage(event: MessageCreateEvent, val args: List<String>) {
 
     val message: Message = event.message
     val author: User = message.author ?: error("this should never happen")
+
+    suspend fun createPaginationEmbed(embeds: List<EmbedBuilder>): PaginationEmbed {
+        val channel = message.channel.asChannel() as TextChannel
+        return PaginationEmbed(channel, author, embeds)
+    }
 
     suspend fun reply(_content: String, reply: Boolean): Message =
         message.channel.createMessage {
@@ -79,5 +86,20 @@ class CommandMessage(event: MessageCreateEvent, val args: List<String>) {
     suspend fun reply(content: String, block: EmbedBuilder.() -> Unit): Message {
         contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
         return reply(content, true, block)
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    suspend fun replyEmbed(reply: Boolean = true, block: EmbedBuilder.() -> Unit): Message {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+        return message.channel.createMessage {
+            this.embeds += EmbedBuilder().apply(block)
+
+            if (reply) {
+                messageReference = message.id
+                allowedMentions {
+                    repliedUser = false
+                }
+            }
+        }
     }
 }

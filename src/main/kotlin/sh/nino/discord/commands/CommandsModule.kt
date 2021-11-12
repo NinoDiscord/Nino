@@ -22,7 +22,6 @@
 
 package sh.nino.discord.commands
 
-import org.koin.dsl.module
+import sh.nino.discord.commands.core.coreCommandsModule
 
-val commandsModule = module {
-}
+val commandsModule = coreCommandsModule

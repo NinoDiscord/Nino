@@ -20,13 +20,14 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.commands.core
+package sh.nino.discord.core
 
-import org.koin.dsl.bind
-import org.koin.dsl.module
-import sh.nino.discord.core.command.AbstractCommand
-
-val coreCommandsModule = module {
-    single { TestPaginationEmbedCommand() } bind AbstractCommand::class
-    single { AboutCommand(get()) } bind AbstractCommand::class
+/**
+ * Simple interface representing an [AutoCloseable] but using suspend.
+ */
+interface SuspendClosable {
+    /**
+     * Closes this resource, and possibly any connections.
+     */
+    suspend fun close()
 }

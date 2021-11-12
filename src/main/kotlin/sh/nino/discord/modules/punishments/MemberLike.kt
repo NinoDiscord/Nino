@@ -20,13 +20,17 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.commands.core
+package sh.nino.discord.modules.punishments
 
-import org.koin.dsl.bind
-import org.koin.dsl.module
-import sh.nino.discord.core.command.AbstractCommand
+import dev.kord.common.entity.Snowflake
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.Member
 
-val coreCommandsModule = module {
-    single { TestPaginationEmbedCommand() } bind AbstractCommand::class
-    single { AboutCommand(get()) } bind AbstractCommand::class
+data class MemberLike(
+    val guild: Guild,
+    val id: Snowflake,
+    val member: Member? = null
+) {
+    val isPartial: Boolean
+        get() = member == null
 }

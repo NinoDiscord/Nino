@@ -39,10 +39,10 @@ enum class PunishmentType(val key: String) {
     WARNING_REMOVED("warning removed"),
     VOICE_UNDEAFEN("voice undeafen"),
     WARNING_ADDED("warning added"),
-    VOICE_UNMUTED("voice unmuted"),
     VOICE_DEAFEN("voice deafened"),
     VOICE_UNMUTE("voice unmute"),
     VOICE_MUTE("voice mute"),
+    UNMUTE("unmute"),
     UNBAN("unban"),
     MUTE("mute"),
     KICK("kick"),
@@ -60,9 +60,8 @@ object GuildCases: LongIdTable("guild_cases") {
     val createdAt = datetime("created_at").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
     val updatedAt = datetime("updated_at").default(Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()))
     val victimId = long("victim_id")
-    val guildId = long("guild_id")
     val reason = text("reason").nullable()
-    val index = integer("index")
+    val index = integer("index").autoIncrement()
     val soft = bool("soft").default(false)
     val time = long("time").nullable().default(null)
     val type = customEnumeration(
@@ -72,7 +71,7 @@ object GuildCases: LongIdTable("guild_cases") {
         { toDb -> toDb.key }
     )
 
-    override val primaryKey: PrimaryKey = PrimaryKey(guildId, index, name = "PK_GuildCases_ID")
+    override val primaryKey: PrimaryKey = PrimaryKey(id, index, name = "PK_GuildCases_ID")
 }
 
 class GuildCasesEntity(id: EntityID<Long>): LongEntity(id) {
@@ -84,7 +83,6 @@ class GuildCasesEntity(id: EntityID<Long>): LongEntity(id) {
     var createdAt by GuildCases.createdAt
     var updatedAt by GuildCases.updatedAt
     var victimId by GuildCases.victimId
-    var guildId by GuildCases.guildId
     var reason by GuildCases.reason
     var index by GuildCases.index
     var type by GuildCases.type

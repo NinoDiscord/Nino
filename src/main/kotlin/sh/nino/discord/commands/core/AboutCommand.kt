@@ -21,3 +21,30 @@
  */
 
 package sh.nino.discord.commands.core
+
+import dev.kord.core.Kord
+import sh.nino.discord.core.annotations.Command
+import sh.nino.discord.core.command.AbstractCommand
+import sh.nino.discord.core.command.CommandMessage
+
+@Command(
+    name = "about",
+    description = "descriptions.core.about"
+)
+class AboutCommand(private val kord: Kord): AbstractCommand() {
+    override suspend fun run(msg: CommandMessage) {
+        val self = kord.getSelf()
+        val guild = msg.message.getGuild()
+
+        msg.replyEmbed {
+            title = "[ About ${self.tag} (${self.id.asString}) ]"
+            description = buildString {
+                appendLine("Hello, **${msg.author.tag}**! I am ${self.username}, a discord moderation bot here in **${guild.name}**!")
+                appendLine("I mainly automate workloads for moderators here so they can have somewhat of a break!")
+                appendLine()
+                appendLine("I am open source for education purposes: **<https://github.com/NinoDiscord/Nino>**!")
+                appendLine("Here is some ~~useless~~ statistics:")
+            }
+        }
+    }
+}

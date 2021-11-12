@@ -21,3 +21,24 @@
  */
 
 package sh.nino.discord.core.database.tables
+
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import sh.nino.discord.core.database.tables.dao.SnowflakeTable
+
+object Warnings: SnowflakeTable("warnings") {
+    var guildId = long("guild_id")
+    var reason = text("reason").nullable()
+    var amount = integer("amount").default(0)
+
+    override val primaryKey: PrimaryKey = PrimaryKey(guildId, id, name = "PK_Warnings_ID")
+}
+
+class WarningEntity(id: EntityID<Long>): LongEntity(id) {
+    companion object: LongEntityClass<WarningEntity>(Warnings)
+
+    var guildId by Warnings.guildId
+    var reason by Warnings.reason
+    var amount by Warnings.amount
+}

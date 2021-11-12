@@ -22,11 +22,36 @@
 
 package sh.nino.discord.commands.core
 
-import org.koin.dsl.bind
-import org.koin.dsl.module
+import dev.kord.rest.builder.message.EmbedBuilder
+import sh.nino.discord.core.annotations.Command
 import sh.nino.discord.core.command.AbstractCommand
+import sh.nino.discord.core.command.CommandMessage
+import sh.nino.discord.utils.Constants
 
-val coreCommandsModule = module {
-    single { TestPaginationEmbedCommand() } bind AbstractCommand::class
-    single { AboutCommand(get()) } bind AbstractCommand::class
+@Command(
+    name = "test",
+    description = "Tests the pagination embed.",
+    ownerOnly = true
+)
+class TestPaginationEmbedCommand: AbstractCommand() {
+    override suspend fun run(msg: CommandMessage) {
+        msg.createPaginationEmbed(
+            listOf(
+                EmbedBuilder().apply {
+                    color = Constants.COLOR
+                    description = "boys ${"<:lovePlead:855278284089851945> ".repeat(20)}"
+                },
+
+                EmbedBuilder().apply {
+                    color = Constants.COLOR
+                    description = "ice is adorable indeed!"
+                },
+
+                EmbedBuilder().apply {
+                    color = Constants.COLOR
+                    description = "noel is not adorable. why speak such lies?"
+                }
+            )
+        ).create()
+    }
 }
