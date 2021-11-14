@@ -42,10 +42,14 @@ import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.data.Config
 import sh.nino.discord.data.Environment
 import sh.nino.discord.extensions.asSnowflake
+import sh.nino.discord.extensions.elipsis
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.localization.LocalizationModule
 import sh.nino.discord.modules.prometheus.PrometheusModule
 import sh.nino.discord.utils.Constants
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
+import java.nio.charset.StandardCharsets
 import kotlin.reflect.jvm.jvmName
 
 private fun <T, U> List<Pair<T, U>>.toMappedPair(): Map<T, U> {
@@ -274,25 +278,31 @@ class CommandHandler(
                 }
 
                 if (config.environment == Environment.Development) {
+                    val baos = ByteArrayOutputStream()
+                    val stream = PrintStream(baos, true, StandardCharsets.UTF_8.name())
+
+                    stream.use {
+                        ex!!.printStackTrace(stream)
+                    }
+
+                    val stack = baos.toString(StandardCharsets.UTF_8.name())
                     message.reply(
-                        """
-                        | I was unable to execute the **$name** command.
-                        | If this is a re-occurring problem, please report this to:
-                        | ${owners.mapIndexed { index, s -> if (index == owners.size) "and **$s**" else "**$s**" }.joinToString(", ")}
-                        |
-                        | Below is a stacktrace since the bot is not running in production:
-                        | ```kotlin
-                        | $ex
-                        | ```
-                    """.trimMargin().trim()
+                        buildString {
+                            appendLine(":pensive: I was unable to execute the **$name** command, if this is a reoccorring problem,")
+                            appendLine("report it to: ${owners.mapIndexed { index, s -> if (index == owners.size - 1) "and **$s**" else "**$s**" }.joinToString(", ")}")
+                            appendLine()
+                            appendLine("```kotlin")
+                            appendLine(ex.toString())
+                            appendLine(stack.elipsis(1650))
+                            appendLine("```")
+                        }
                     )
                 } else {
                     message.reply(
-                        """
-                        | I was unable to execute the command **$name**.
-                        | If this is a re-occurring problem, please report this to:
-                        | ${owners.mapIndexed { index, s -> if (index == owners.size) " and **$s**" else "**$s**" }.joinToString(", ")}
-                    """.trimMargin().trim()
+                        buildString {
+                            appendLine(":pensive: I was unable to execute the **$name** command, if this is a reoccorring problem,")
+                            appendLine("report it to: ${owners.mapIndexed { index, s -> if (index == owners.size - 1) "and **$s**" else "**$s**" }.joinToString(", ")}")
+                        }
                     )
                 }
 

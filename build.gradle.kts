@@ -102,6 +102,9 @@ dependencies {
     // Sentry (error handling as a service :^)
     implementation("io.sentry:sentry-logback:5.4.0")
     implementation("io.sentry:sentry:5.4.0")
+
+    // Apache Utilities
+    implementation("org.apache.commons:commons-lang3:3.12.0")
 }
 
 spotless {

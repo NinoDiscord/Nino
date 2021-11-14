@@ -32,7 +32,6 @@ import kotlinx.coroutines.flow.count
 import kotlinx.serialization.json.JsonObject
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.asJson
-import sh.nino.discord.extensions.isNull
 import sh.nino.discord.kotlin.logging
 
 private data class BotlistResult(
@@ -52,7 +51,7 @@ class BotlistsJob(
     private val logger by logging<BotlistsJob>()
 
     override suspend fun execute() {
-        if (config.botlists.isNull()) return
+        if (config.botlists == null) return
 
         logger.info("Checking if api keys are present...")
 
@@ -63,7 +62,7 @@ class BotlistsJob(
         var errored = 0
         val listing = mutableListOf<BotlistResult>()
 
-        if (config.botlists!!.dservices != null) {
+        if (config.botlists.dservices != null) {
             logger.info("|- Discord Services token is present!")
 
             val dservicesStartAt = System.currentTimeMillis()

@@ -21,3 +21,18 @@
  */
 
 package sh.nino.discord.commands.core
+
+import dev.kord.core.Kord
+import sh.nino.discord.core.annotations.Command
+import sh.nino.discord.core.command.AbstractCommand
+import sh.nino.discord.core.command.CommandMessage
+
+@Command(
+    name = "shardinfo",
+    description = "descriptions.core.shardinfo"
+)
+class ShardInfoCommand(private val kord: Kord): AbstractCommand() {
+    override suspend fun run(msg: CommandMessage) {
+        TODO("Not yet implemented")
+    }
+}

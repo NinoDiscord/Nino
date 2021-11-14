@@ -42,3 +42,4 @@ fun String.shell(): String {
 }
 
 fun String.toTitleCase(): String = replaceFirstChar { it.uppercase() }
+fun String.elipsis(textLen: Int = 1995): String = if (this.length > textLen) "${this.slice(0..textLen)}..." else this

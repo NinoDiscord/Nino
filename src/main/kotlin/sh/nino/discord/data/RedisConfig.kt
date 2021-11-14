@@ -31,7 +31,8 @@ data class RedisConfig(
     val password: String? = null,
     val index: Int = 5,
     val host: String = "localhost",
-    val port: Int = 6379
+    val port: Int = 6379,
+    val ssl: Boolean = false
 )
 
 @Serializable

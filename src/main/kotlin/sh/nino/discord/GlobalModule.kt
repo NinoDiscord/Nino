@@ -92,6 +92,7 @@ val globalModule = module {
     single {
         val config = get<Config>()
         val cfg = org.redisson.config.Config()
+        val protogay = if (config.redis.ssl) "rediss://" else "redis://"
 
         if (config.redis.sentinels.isNotEmpty()) {
             logger.info("Using Redis Sentinel configuration")
@@ -107,12 +108,12 @@ val globalModule = module {
                     password = config.redis.password
                 }
 
-                addSentinelAddress(*config.redis.sentinels.map { "${it.host}:${it.port}" }.toTypedArray())
+                addSentinelAddress(*config.redis.sentinels.map { "$protogay${it.host}:${it.port}" }.toTypedArray())
             }
         } else {
             logger.info("Using Redis Standalone configuration")
             cfg.useSingleServer().apply {
-                address = "${config.redis.host}:${config.redis.port}"
+                address = "$protogay${config.redis.host}:${config.redis.port}"
                 database = config.redis.index
 
                 if (config.redis.password != null) {
@@ -121,6 +122,6 @@ val globalModule = module {
             }
         }
 
-        Redisson.create(cfg).reactive()
+        Redisson.create(cfg)
     }
 }

@@ -42,8 +42,7 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
-import org.redisson.Redisson
-import org.redisson.api.RedissonReactiveClient
+import org.redisson.api.RedissonClient
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.database.tables.*
 import sh.nino.discord.core.database.transactions.asyncTransaction
@@ -183,7 +182,7 @@ class NinoBot {
         val kord = GlobalContext.inject<Kord>()
         val scheduler = GlobalContext.inject<Scheduler>()
         val hikari = GlobalContext.inject<HikariDataSource>()
-        val redis = GlobalContext.inject<RedissonReactiveClient>()
+        val redis = GlobalContext.inject<RedissonClient>()
 
         val shutdownThread = thread(name = "Nino-ShutdownThread", start = false) {
             logger.warn("Shutting down Nino...")
