@@ -30,7 +30,7 @@ import sh.nino.discord.modules.ravy.RavyModule
 
 val ninoModule = module {
     single { PrometheusModule(get()) }
-    single { CommandHandler(get(), get(), get()) }
+    single { CommandHandler(get(), get(), get(), get()) }
     single { LocalizationModule(get()) }
     single { RavyModule(get(), get()) }
 }

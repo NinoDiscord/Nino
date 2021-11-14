@@ -28,10 +28,10 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.TextColumnType
 import org.jetbrains.exposed.sql.kotlin.datetime.datetime
 import sh.nino.discord.core.database.columns.array
+import sh.nino.discord.core.database.tables.dao.SnowflakeTable
 
 enum class PunishmentType(val key: String) {
     THREAD_MESSAGES_REMOVED("thread message removed"),
@@ -53,7 +53,7 @@ enum class PunishmentType(val key: String) {
     }
 }
 
-object GuildCases: LongIdTable("guild_cases") {
+object GuildCases: SnowflakeTable("guild_cases") {
     val attachments = array<String>("attachments", TextColumnType()).default(arrayOf())
     val moderatorId = long("moderator_id")
     val messageId = long("message_id").nullable()

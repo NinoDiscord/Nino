@@ -70,7 +70,7 @@ class LocalizationModule(config: Config) {
         // is the default and the user's locale is completely different
         if (user != defaultLocale.meta.code && guild == defaultLocale.meta.code) return locales[user]!!
 
-        // If the user's locale is not the guild's locale, return it
+        // If the user's locale is not the guild's locale, return it,
         // so it can be translated properly.
         if (guild !== defaultLocale.meta.code && user == defaultLocale.meta.code) return locales[guild]!!
 

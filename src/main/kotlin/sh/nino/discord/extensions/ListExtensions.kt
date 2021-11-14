@@ -36,4 +36,7 @@ inline fun <S, T> Iterable<T>.reduce(operation: (S, T) -> S, initialValue: S): S
     return acc as S
 }
 
-fun List<String>.filterNonEmptyStrings(): List<String> = filter { it.isBlank() || it.isEmpty() }
+fun <T> List<T>.sort(block: (T, T) -> Int): List<T> {
+    val comparator = Comparator<T> { o1, o2 -> block(o1, o2) }
+    return sortedWith(comparator)
+}

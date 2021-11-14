@@ -40,3 +40,5 @@ fun String.shell(): String {
     proc.waitFor(60, TimeUnit.MINUTES)
     return proc.inputStream.bufferedReader().readText()
 }
+
+fun String.toTitleCase(): String = replaceFirstChar { it.uppercase() }

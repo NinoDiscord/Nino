@@ -25,9 +25,11 @@ package sh.nino.discord.core.database.tables
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.LongIdTable
 import org.jetbrains.exposed.sql.LongColumnType
+import org.jetbrains.exposed.sql.StringColumnType
 import sh.nino.discord.core.database.columns.array
+import sh.nino.discord.core.database.tables.dao.SnowflakeTable
+import kotlin.reflect.full.isSubclassOf
 
 enum class LogEvent(val key: String) {
     VoiceMemberDeafen("voice member deafen"),
@@ -46,24 +48,24 @@ enum class LogEvent(val key: String) {
     }
 }
 
-object Logging: LongIdTable("logging") {
+object Logging: SnowflakeTable("logging") {
     val ignoreChannels = array<Long>("ignore_channels", LongColumnType())
     var ignoredUsers = array<Long>("ignore_users", LongColumnType())
     var channelId = long("channel_id").nullable()
     var enabled = bool("enabled").default(false)
-    var guildId = long("guild_id")
-//    var events = array<LogEvent>("events", object: StringColumnType() {
-//        override fun sqlType(): String = "LogEventEnum"
-//        override fun valueFromDB(value: Any): LogEvent =
-//            if (value::class.isSubclassOf(Enum::class))
-//                value as LogEvent
-//            else
-//                LogEvent.get(value as String)
-//
-//        override fun nonNullValueToString(value: Any): String = (value as PunishmentType).key
-//    })
+    var events = array<LogEvent>(
+        "events",
+        object: StringColumnType() {
+            override fun sqlType(): String = "LogEventEnum"
+            override fun valueFromDB(value: Any): LogEvent =
+                if (value::class.isSubclassOf(Enum::class))
+                    value as LogEvent
+                else
+                    LogEvent.get(value as String)
 
-    override val primaryKey = PrimaryKey(guildId, name = "PK_Guild_Logging_id")
+            override fun nonNullValueToString(value: Any): String = (value as PunishmentType).key
+        }
+    )
 }
 
 class LoggingEntity(id: EntityID<Long>): LongEntity(id) {
@@ -73,6 +75,5 @@ class LoggingEntity(id: EntityID<Long>): LongEntity(id) {
     var ignoredUsers by Logging.ignoredUsers
     var channelId by Logging.channelId
     var enabled by Logging.enabled
-    var guildId by Logging.guildId
-//    var events         by Logging.events
+    var events by Logging.events
 }

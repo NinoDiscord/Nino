@@ -37,7 +37,6 @@ class PrometheusModule(config: Config) {
     val commandLatency: Histogram?
     val commandsExecuted: Counter?
     val messagesSeen: Counter?
-    val websocketEvents: Counter?
     val shardLatency: Gauge?
 
     val enabled: Boolean = config.metrics
@@ -74,13 +73,6 @@ class PrometheusModule(config: Config) {
                 .labelNames("shard_id")
                 .help("Returns the average latency of a shard.")
                 .register(registry)
-
-            websocketEvents = Counter
-                .build()
-                .name("nino_websocket_events")
-                .labelNames("event", "shard")
-                .help("How many events are being emitted per shard.")
-                .register(registry)
         } else {
             logger.info("Metrics are not enabled.")
 
@@ -89,7 +81,6 @@ class PrometheusModule(config: Config) {
             commandLatency = null
             commandsExecuted = null
             messagesSeen = null
-            websocketEvents = null
         }
     }
 }

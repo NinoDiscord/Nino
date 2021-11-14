@@ -22,19 +22,28 @@
 
 package sh.nino.discord.core.command
 
+import dev.kord.common.entity.DiscordUser
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
 import dev.kord.core.behavior.channel.createMessage
+import dev.kord.core.cache.data.UserData
+import dev.kord.core.entity.User
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.EmbedBuilder
+import io.sentry.Sentry
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.future.future
 import org.jetbrains.exposed.sql.or
 import org.koin.core.context.GlobalContext
+import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.automod.AutomodContainer
 import sh.nino.discord.core.database.tables.*
 import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.data.Config
+import sh.nino.discord.data.Environment
 import sh.nino.discord.extensions.asSnowflake
 import sh.nino.discord.kotlin.logging
+import sh.nino.discord.modules.localization.LocalizationModule
 import sh.nino.discord.modules.prometheus.PrometheusModule
 import sh.nino.discord.utils.Constants
 import kotlin.reflect.jvm.jvmName
@@ -53,9 +62,10 @@ private fun <T> List<T>.separateFirst(): Pair<T, List<T>> = Pair(first(), drop(1
 class CommandHandler(
     private val config: Config,
     private val prometheus: PrometheusModule,
-    private val kord: Kord
+    private val kord: Kord,
+    private val localization: LocalizationModule
 ) {
-    private val commands: Map<String, Command>
+    val commands: Map<String, Command>
         get() = GlobalContext
             .get()
             .getAll<AbstractCommand>()
@@ -197,7 +207,9 @@ class CommandHandler(
         val content = event.message.content.substring(prefix.length).trim()
         val (name, args) = content.split("\\s+".toRegex()).separateFirst()
         val cmdName = name.lowercase()
-        val message = CommandMessage(event, args)
+
+        val locale = localization.get(guildEntity.language, userEntity.language)
+        val message = CommandMessage(event, args, guildEntity, userEntity, locale)
         val command = commands[cmdName]
             ?: commands.values.firstOrNull { it.aliases.contains(name) }
             ?: return
@@ -236,13 +248,62 @@ class CommandHandler(
             }
         }
 
+        val executedAt = System.currentTimeMillis()
+        val timer = prometheus.commandLatency?.startTimer()
         command.execute(message) { ex, success ->
-            if (!success) {
-                message.reply("Unable to run command **$name**.")
+            prometheus.commandLatency?.observe(timer!!.observeDuration())
 
+            if (!success) {
+                val owners = config.owners.map {
+                    // Return the user if we can retrieve, if not,
+                    // return a stub user for now.
+                    val user = NinoScope.future { kord.getUser(it.asSnowflake()) }.join() ?: User(
+                        UserData.Companion.from(
+                            DiscordUser(
+                                id = Snowflake("0"),
+                                username = "Unknown User",
+                                discriminator = "0000",
+                                null
+                            )
+                        ),
+
+                        kord
+                    )
+
+                    user.tag
+                }
+
+                if (config.environment == Environment.Development) {
+                    message.reply(
+                        """
+                        | I was unable to execute the **$name** command.
+                        | If this is a re-occurring problem, please report this to:
+                        | ${owners.mapIndexed { index, s -> if (index == owners.size) "and **$s**" else "**$s**" }.joinToString(", ")}
+                        |
+                        | Below is a stacktrace since the bot is not running in production:
+                        | ```kotlin
+                        | $ex
+                        | ```
+                    """.trimMargin().trim()
+                    )
+                } else {
+                    message.reply(
+                        """
+                        | I was unable to execute the command **$name**.
+                        | If this is a re-occurring problem, please report this to:
+                        | ${owners.mapIndexed { index, s -> if (index == owners.size) " and **$s**" else "**$s**" }.joinToString(", ")}
+                    """.trimMargin().trim()
+                    )
+                }
+
+                Sentry.captureException(ex as Throwable)
                 logger.error("Unable to execute command $name:", ex)
                 return@execute
+            } else {
+                logger.info("Executed command $name by ${author.tag} (${author.id.asString}) in guild ${guild.name} (${guild.id.asString}) in ${System.currentTimeMillis() - executedAt}ms")
             }
         }
+
+        prometheus.commandsExecuted?.inc()
     }
 }

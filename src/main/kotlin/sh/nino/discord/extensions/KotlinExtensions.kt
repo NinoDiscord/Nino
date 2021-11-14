@@ -20,4 +20,6 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.messaging
+package sh.nino.discord.extensions
+
+fun <T> T?.isNull() = this == null

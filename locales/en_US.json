@@ -6,11 +6,7 @@
     "flag": ":flag_us:",
     "code": "en_US"
   },
-
   "strings": {
-    "descriptions": {},
-    "errors": {},
-    "generic": {},
-    "commands": {}
+    "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use."
   }
 }

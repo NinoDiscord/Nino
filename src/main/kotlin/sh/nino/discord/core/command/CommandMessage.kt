@@ -31,13 +31,22 @@ import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.allowedMentions
 import org.koin.core.Koin
 import org.koin.core.context.GlobalContext
+import sh.nino.discord.core.database.tables.GuildEntity
+import sh.nino.discord.core.database.tables.UserEntity
 import sh.nino.discord.core.messaging.PaginationEmbed
+import sh.nino.discord.modules.localization.Locale
 import sh.nino.discord.utils.Constants
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-class CommandMessage(event: MessageCreateEvent, val args: List<String>) {
+class CommandMessage(
+    event: MessageCreateEvent,
+    val args: List<String>,
+    val settings: GuildEntity,
+    val userSettings: UserEntity,
+    val locale: Locale
+) {
     private val koin: Koin = GlobalContext.get()
 
     val message: Message = event.message
@@ -91,8 +100,12 @@ class CommandMessage(event: MessageCreateEvent, val args: List<String>) {
     @OptIn(ExperimentalContracts::class)
     suspend fun replyEmbed(reply: Boolean = true, block: EmbedBuilder.() -> Unit): Message {
         contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+
+        val embed = EmbedBuilder().apply(block)
+        embed.color = Constants.COLOR
+
         return message.channel.createMessage {
-            this.embeds += EmbedBuilder().apply(block)
+            this.embeds += embed
 
             if (reply) {
                 messageReference = message.id

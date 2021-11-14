@@ -55,11 +55,11 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.2.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.3.1")
     api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
 
     // Koin (Dependency Injection)
-    implementation("io.insert-koin:koin-logger-slf4j:3.1.2")
+    implementation("io.insert-koin:koin-logger-slf4j:3.1.3")
     implementation("io.insert-koin:koin-core-ext:3.0.2")
 
     // Logging (SLF4J + Logback)
@@ -79,18 +79,18 @@ dependencies {
     implementation("com.charleskorn.kaml:kaml:0.36.0")
 
     // Database (Exposed, HikariCP, PostgreSQL)
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.35.2")
-    implementation("org.jetbrains.exposed:exposed-core:0.35.2")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.35.2")
-    implementation("org.jetbrains.exposed:exposed-dao:0.35.2")
-    implementation("org.postgresql:postgresql:42.2.24")
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-core:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
+    implementation("org.postgresql:postgresql:42.3.1")
     implementation("com.zaxxer:HikariCP:5.0.0")
 
     // Redis
     implementation("org.redisson:redisson:3.16.4")
 
     // Haru (scheduling)
-    implementation("dev.floofy.haru:Haru:1.2.0")
+    implementation("dev.floofy.haru:Haru:1.3.0")
 
     // Cache (in-memory)
     implementation("com.github.ben-manes.caffeine:caffeine:3.0.4")
@@ -98,6 +98,10 @@ dependencies {
     // Prometheus (metrics)
     implementation("io.prometheus:simpleclient_hotspot:0.12.0")
     implementation("io.prometheus:simpleclient:0.12.0")
+
+    // Sentry (error handling as a service :^)
+    implementation("io.sentry:sentry-logback:5.4.0")
+    implementation("io.sentry:sentry:5.4.0")
 }
 
 spotless {

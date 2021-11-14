@@ -27,6 +27,6 @@ import org.koin.dsl.module
 import sh.nino.discord.core.command.AbstractCommand
 
 val coreCommandsModule = module {
-    single { TestPaginationEmbedCommand() } bind AbstractCommand::class
-    single { AboutCommand(get()) } bind AbstractCommand::class
+    single { HelpCommand(get(), get(), get()) } bind AbstractCommand::class
+    single { InviteCommand(get()) } bind AbstractCommand::class
 }

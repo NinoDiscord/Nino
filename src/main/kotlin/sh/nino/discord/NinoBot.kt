@@ -24,6 +24,8 @@ package sh.nino.discord
 
 import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.util.IsolationLevel
+import dev.floofy.haru.Scheduler
+import dev.floofy.haru.abstractions.AbstractJob
 import dev.kord.common.annotation.*
 import dev.kord.common.entity.ActivityType
 import dev.kord.common.entity.DiscordBotActivity
@@ -34,11 +36,14 @@ import dev.kord.gateway.Intent
 import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.route.Route
+import io.sentry.Sentry
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
+import org.redisson.Redisson
+import org.redisson.api.RedissonReactiveClient
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.database.tables.*
 import sh.nino.discord.core.database.transactions.asyncTransaction
@@ -47,6 +52,7 @@ import sh.nino.discord.data.Config
 import sh.nino.discord.data.Environment
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
+import sh.nino.discord.modules.localization.LocalizationModule
 import sh.nino.discord.subscribers.applyGenericEvents
 import sh.nino.discord.subscribers.applyMessageEvents
 import java.lang.management.ManagementFactory
@@ -67,8 +73,8 @@ class NinoBot {
         val koin = GlobalContext.get()
         val runtime = Runtime.getRuntime()
         val dediNode = System.getProperty("winterfox.dedi", null)
-
         val os = ManagementFactory.getOperatingSystemMXBean()
+
         logger.info("================================")
         logger.info("Displaying runtime info:")
         logger.info("* Free / Total Memory: ${runtime.freeMemory() / 1024L / 1024L}/${runtime.totalMemory() / 1024L / 1024L}MB")
@@ -122,7 +128,33 @@ class NinoBot {
             )
         }.execute()
 
-        // Enable all cron jobs
+        // Initialize localization
+        koin.get<LocalizationModule>()
+
+        // Schedule all cron jobs
+        val scheduler = koin.get<Scheduler>()
+        val jobs = koin.getAll<AbstractJob>()
+        scheduler.bulkSchedule(*jobs.toTypedArray(), start = true)
+
+        // Setup Sentry
+        if (config.sentryDsn != null) {
+            logger.info("* Installing Sentry...")
+            Sentry.init { opts ->
+                opts.dsn = config.sentryDsn
+            }
+
+            Sentry.configureScope { scope ->
+                scope.tags += mutableMapOf(
+                    "nino.environment" to config.environment.toString(),
+                    "nino.build.date" to NinoInfo.BUILD_DATE,
+                    "nino.version" to NinoInfo.VERSION,
+                    "nino.commit" to NinoInfo.COMMIT_HASH,
+                    "system.user" to System.getProperty("user.name"),
+                    "system.os" to "${os.name} (${os.arch}; ${os.version})"
+                )
+            }
+        }
+
         kord.applyGenericEvents()
         kord.applyMessageEvents()
         kord.login {
@@ -149,6 +181,10 @@ class NinoBot {
 
     fun addShutdownHook() {
         val kord = GlobalContext.inject<Kord>()
+        val scheduler = GlobalContext.inject<Scheduler>()
+        val hikari = GlobalContext.inject<HikariDataSource>()
+        val redis = GlobalContext.inject<RedissonReactiveClient>()
+
         val shutdownThread = thread(name = "Nino-ShutdownThread", start = false) {
             logger.warn("Shutting down Nino...")
             runBlocking {
@@ -156,6 +192,12 @@ class NinoBot {
                 NinoScope.cancel()
             }
 
+            // Close off Redis and PostgreSQL
+            redis.shutdown()
+            hikari.close()
+
+            // Unschedule all jobs
+            scheduler.unschedule()
             logger.warn("Nino has shut down, goodbye senpai.")
         }
 
