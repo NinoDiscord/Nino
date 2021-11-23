@@ -46,7 +46,7 @@
     "fastify": "3.24.0",
     "fastify-cors": "6.0.2",
     "fastify-no-icon": "4.0.0",
-    "ioredis": "4.28.0",
+    "ioredis": "4.28.1",
     "js-yaml": "4.1.0",
     "luxon": "2.1.1",
     "ms": "2.1.3",
