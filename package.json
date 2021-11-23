@@ -57,7 +57,7 @@
     "source-map-support": "0.5.21",
     "tslog": "3.2.2",
     "typeorm": "0.2.31",
-    "ws": "8.2.3"
+    "ws": "8.3.0"
   },
   "devDependencies": {
     "@augu/eslint-config": "2.2.0",
