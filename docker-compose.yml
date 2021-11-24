@@ -45,15 +45,15 @@ services:
     networks:
       - default
 
-  cluster-operator:
-    container_name: cluster-operator
-    image: noelware/cluster-operator:81dd82c23ed00592de4293f6b222fcbad4948eee
-    ports:
-      - "3010:3010"
-    networks:
-      - nino
-    volumes:
-      - /run/media/noel/Storage/Projects/Nino/Nino/docker/cluster-operator/config.json:/app/config.json:ro
+#  cluster-operator:
+#    container_name: cluster-operator
+#    image: noelware/cluster-operator:81dd82c23ed00592de4293f6b222fcbad4948eee
+#    ports:
+#      - "3010:3010"
+#    networks:
+#      - nino
+#    volumes:
+#      - /run/media/noel/Storage/Projects/Nino/Nino/docker/cluster-operator/config.json:/app/config.json:ro
 
   timeouts:
     container_name: timeouts

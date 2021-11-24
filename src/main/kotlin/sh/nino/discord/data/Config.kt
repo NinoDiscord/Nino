@@ -32,8 +32,9 @@ data class Config(
     val defaultLocale: String = "en_US",
     val sentryDsn: String? = null,
     val prefixes: List<String> = listOf("x!"),
-    val owners: List<String> = listOf(),
     val metrics: Boolean = false,
+    val instatus: InstatusConfig? = null,
+    val owners: List<String> = listOf(),
     val token: String,
     val ravy: String? = null,
 

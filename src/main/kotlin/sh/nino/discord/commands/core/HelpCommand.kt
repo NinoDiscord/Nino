@@ -141,7 +141,7 @@ class HelpCommand(
         }
 
         val command = handler.commands.values.firstOrNull {
-            it.name == arg || it.aliases.contains(arg)
+            (it.name == arg || it.aliases.contains(arg)) && (it.category != CommandCategory.EASTER_EGG && it.category != CommandCategory.SYSTEM)
         }
 
         if (command != null) {

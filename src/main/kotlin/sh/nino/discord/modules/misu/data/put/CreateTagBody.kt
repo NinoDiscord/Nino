@@ -20,4 +20,6 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.commands.easter_egg
+package sh.nino.discord.modules.misu.data.put
+
+class CreateTagBody

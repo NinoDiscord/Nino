@@ -27,9 +27,9 @@ import java.util.Date
 
 plugins {
     id("com.github.johnrengelman.shadow") version "7.1.0"
-    kotlin("plugin.serialization") version "1.5.31"
-    id("com.diffplug.spotless") version "5.16.0"
-    kotlin("jvm") version "1.5.31"
+    kotlin("plugin.serialization") version "1.6.0"
+    id("com.diffplug.spotless") version "6.0.0"
+    kotlin("jvm") version "1.6.0"
     application
 }
 
@@ -47,36 +47,37 @@ repositories {
 
 dependencies {
     // Kotlin Libraries
-    implementation(kotlin("reflect", "1.5.31"))
-    implementation(kotlin("stdlib", "1.5.31"))
-    runtimeOnly(kotlin("scripting-jsr223", "1.5.31"))
+    implementation(kotlin("reflect", "1.6.0"))
+    implementation(kotlin("stdlib", "1.6.0"))
+    runtimeOnly(kotlin("scripting-jsr223", "1.6.0"))
 
     // kotlinx libraries
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.3.1")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.0")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.1")
 
     // Koin (Dependency Injection)
     implementation("io.insert-koin:koin-logger-slf4j:3.1.3")
     implementation("io.insert-koin:koin-core-ext:3.0.2")
 
     // Logging (SLF4J + Logback)
-    implementation("ch.qos.logback:logback-classic:1.2.6")
-    implementation("ch.qos.logback:logback-core:1.2.6")
+    implementation("ch.qos.logback:logback-classic:1.2.7")
+    implementation("ch.qos.logback:logback-core:1.2.7")
     api("org.slf4j:slf4j-api:1.7.32")
 
     // Ktor (http client)
     implementation("io.ktor:ktor-client-serialization:1.6.4")
     implementation("io.ktor:ktor-client-websockets:1.6.4")
     implementation("io.ktor:ktor-client-okhttp:1.6.4")
+    implementation("io.ktor:ktor-client-core:1.6.4")
 
     // Kord
-    implementation("dev.kord:kord-core:0.8.0-M6")
+    implementation("dev.kord:kord-core:0.8.0-M7")
 
     // YAML (configuration)
-    implementation("com.charleskorn.kaml:kaml:0.36.0")
+    implementation("com.charleskorn.kaml:kaml:0.37.0")
 
     // Database (Exposed, HikariCP, PostgreSQL)
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.36.1")
@@ -136,7 +137,7 @@ application {
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
+        kotlinOptions.jvmTarget = JavaVersion.VERSION_16.toString()
         kotlinOptions.javaParameters = true
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xopt-in=kotlin.RequiresOptIn"

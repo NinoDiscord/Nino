@@ -25,6 +25,8 @@ package sh.nino.discord.modules.punishments
 import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
 import dev.kord.core.Kord
+import dev.kord.core.cache.data.MemberData
+import dev.kord.core.cache.data.toData
 import dev.kord.core.entity.Attachment
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
@@ -32,22 +34,20 @@ import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.VoiceChannel
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import org.jetbrains.exposed.sql.and
+import org.jetbrains.exposed.sql.deleteWhere
 import sh.nino.discord.core.database.tables.*
 import sh.nino.discord.core.database.transactions.asyncTransaction
+import sh.nino.discord.extensions.contains
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.kotlin.pairOf
-
-data class ApplyPunishmentOptions(
-    val attachments: List<Attachment> = listOf(),
-    val moderator: User,
-    val publish: Boolean = true,
-    val reason: String? = null,
-    val member: MemberLike,
-    val soft: Boolean = false,
-    val time: Int? = null,
-    val days: Int? = null,
-    val type: PunishmentType
-)
+import sh.nino.discord.modules.punishments.builders.ApplyPunishmentBuilder
+import sh.nino.discord.utils.isMemberAbove
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
 
 data class ModLogOptions(
     val warningsRemoved: Union<Int, String?>? = null,
@@ -117,10 +117,37 @@ private fun stringifyDbType(type: PunishmentType): Pair<String, String> = when (
 class PunishmentsModule(private val kord: Kord) {
     private val logger by logging<PunishmentsModule>()
 
-    private suspend fun resolveMember(member: MemberLike): Member {
+    private suspend fun resolveMember(member: MemberLike, rest: Boolean = true): Member {
         if (!member.isPartial) return member.member!!
 
-        return member.guild.members.filter { it.id == member.id }.first()
+        // Yes, the parameter name is a bit misleading but hear me out:
+        // Kord doesn't have a user cache, so I cannot retrieve a user WITHOUT
+        // using rest, so. yes.
+        return if (rest) {
+            val guildMember = kord.rest.guild.getGuildMember(member.guild.id, member.id).toData(member.id, member.guild.id)
+            val user = kord.rest.user.getUser(member.id).toData()
+
+            Member(
+                guildMember,
+                user,
+                kord
+            )
+        } else {
+            val user = kord.rest.user.getUser(member.id).toData()
+
+            // For now, let's mock the member data
+            // with the user values. :3
+            Member(
+                MemberData(
+                    member.id,
+                    member.guild.id,
+                    joinedAt = Clock.System.now().toString(),
+                    roles = listOf()
+                ),
+                user,
+                kord
+            )
+        }
     }
 
     private fun permissionsForType(type: PunishmentType): Permissions = when (type) {
@@ -195,6 +222,7 @@ class PunishmentsModule(private val kord: Kord) {
         asyncTransaction {
             GuildCasesEntity.new(member.guild.id.value.toLong()) {
                 moderatorId = moderator.id.value.toLong()
+                createdAt = LocalDateTime.parse(Clock.System.now().toString())
                 victimId = member.id.value.toLong()
                 soft = false
                 type = PunishmentType.WARNING_ADDED
@@ -214,229 +242,166 @@ class PunishmentsModule(private val kord: Kord) {
      * @param reason The reason why the warnings were removed.
      * @param amount The amount of warnings to add. If [amount] is set to `null`,
      * it'll just clean their database entries for this specific guild, not globally.
+     *
      * @throws IllegalStateException If the member doesn't need any warnings removed.
      */
     suspend fun removeWarnings(member: Member, moderator: Member, reason: String? = null, amount: Int? = null) {
         val warnings = asyncTransaction {
             WarningEntity.find {
-                Warnings.id eq member.id.value.toLong()
+                (Warnings.id eq member.id.value.toLong()) and (Warnings.guildId eq member.guildId.value.toLong())
             }
         }.execute()
 
         if (warnings.toList().isEmpty()) throw IllegalStateException("Member ${member.tag} doesn't have any warnings to be removed.")
         if (amount == null) {
             logger.info("Removing all warnings from ${member.tag} (invoked from mod - ${moderator.tag}; guild: ${member.guild.asGuild().name})")
+
+            // Delete all warnings
             asyncTransaction {
+                Warnings.deleteWhere {
+                    (Warnings.id eq member.id.value.toLong()) and (Warnings.guildId eq member.guildId.value.toLong())
+                }
             }.execute()
+
+            // Create a new case
+            asyncTransaction {
+                GuildCasesEntity.new(member.guildId.value.toLong()) {
+                    moderatorId = moderator.id.value.toLong()
+                    createdAt = LocalDateTime.parse(Clock.System.now().toString())
+                    victimId = member.id.value.toLong()
+                    soft = false
+                    type = PunishmentType.WARNING_REMOVED
+
+                    this.reason = "Moderator cleaned all warnings.${if (reason != null) " ($reason)" else ""}"
+                }
+            }.execute()
+
+            return
+        } else {
+            // Create a new case
+            asyncTransaction {
+                GuildCasesEntity.new(member.guildId.value.toLong()) {
+                    moderatorId = moderator.id.value.toLong()
+                    createdAt = LocalDateTime.parse(Clock.System.now().toString())
+                    victimId = member.id.value.toLong()
+                    soft = false
+                    type = PunishmentType.WARNING_REMOVED
+
+                    this.reason = "Moderator cleaned **$amount** warnings.${if (reason != null) " ($reason)" else ""}"
+                }
+            }.execute()
+
+            asyncTransaction {
+                WarningEntity.new(member.id.value.toLong()) {
+                    this.guildId = member.guild.id.value.toLong()
+                    this.amount = -1
+                    this.reason = reason
+                }
+            }.execute()
+
+            // TODO: post to modlog
         }
+    }
+
+    /**
+     * Applies a new punishment to a user, if needed.
+     * @param member The [member][MemberLike] to execute this action.
+     * @param moderator The moderator who executed this action.
+     * @param type The punishment type that is being executed.
+     * @param builder DSL builder for any extra options.
+     */
+    @OptIn(ExperimentalContracts::class)
+    suspend fun apply(
+        member: MemberLike,
+        moderator: Member,
+        type: PunishmentType,
+        builder: ApplyPunishmentBuilder.() -> Unit = {}
+    ) {
+        contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
+
+        val options = ApplyPunishmentBuilder().apply(builder).build()
+        logger.info("Applying punishment ${type.key} on member ${member.id.asString}${if (options.reason != null) ", with reason: ${options.reason}" else ""}")
+
+        // TODO: port all db executions to a "controller"
+        val settings = asyncTransaction {
+            GuildEntity.findById(member.id.value.toLong())!!
+        }.execute()
+
+        val self = member.guild.members.first { it.id.value == kord.selfId.value }
+        if (
+            (!member.isPartial && isMemberAbove(self, member.member!!)) ||
+            (self.getPermissions().code.value.toLong() and permissionsForType(type).code.value.toLong() == 0L)
+        ) return
+
+        val actual = resolveMember(member, type != PunishmentType.UNBAN)
+        when (type) {
+            PunishmentType.BAN -> {
+                // TODO: PunishmentModule#applyBan
+            }
+
+            PunishmentType.KICK -> {
+                actual.kick(options.reason)
+            }
+
+            PunishmentType.MUTE -> {
+                // TODO: PunishmentModule#applyMute
+            }
+
+            PunishmentType.UNBAN -> {
+                actual.guild.unban(member.id, options.reason)
+            }
+
+            PunishmentType.UNMUTE -> {
+                // TODO: PunishmentModule#applyUnmute
+            }
+
+            PunishmentType.VOICE_MUTE -> {
+                // TODO
+            }
+
+            PunishmentType.VOICE_UNMUTE -> {
+                // TODO
+            }
+
+            PunishmentType.VOICE_UNDEAFEN -> {
+                // TODO
+            }
+
+            PunishmentType.VOICE_DEAFEN -> {
+                // TODO
+            }
+
+            PunishmentType.THREAD_MESSAGES_ADDED -> {
+                // TODO
+            }
+
+            PunishmentType.THREAD_MESSAGES_REMOVED -> {
+                // TODO
+            }
+
+            // Don't run anything.
+            else -> {}
+        }
+
+        val case = asyncTransaction {
+            GuildCasesEntity.new(member.guild.id.value.toLong()) {
+                attachments = options.attachments.toTypedArray()
+                moderatorId = moderator.id.value.toLong()
+                victimId = member.id.value.toLong()
+                soft = options.soft
+                time = options.time?.toLong()
+
+                this.type = type
+                this.reason = options.reason
+            }
+        }.execute()
+
+        if (options.shouldPublish) Unit
     }
 }
 
 /*
 export default class PunishmentService {
-  async removeWarning(member: Member, reason?: string, amount?: number | 'all') {
-    const count = warnings.reduce((acc, curr) => acc + curr.amount, 0);
-    if (amount === 'all') {
-      await this.database.warnings.clean(member.guild.id, member.id);
-      const model = await this.database.cases.create({
-        attachments: [],
-        moderatorID: this.discord.client.user.id,
-        victimID: member.id,
-        guildID: member.guild.id,
-        reason,
-        type: PunishmentType.WarningRemoved,
-      });
-
-      return this.publishToModLog(
-        {
-          warningsRemoved: 'all',
-          moderator: self.user,
-          victim: member.user,
-          reason,
-          guild: member.guild,
-          type: PunishmentEntryType.WarningRemoved,
-        },
-        model
-      );
-    } else {
-      const model = await this.database.cases.create({
-        attachments: [],
-        moderatorID: this.discord.client.user.id,
-        victimID: member.id,
-        guildID: member.guild.id,
-        reason,
-        type: PunishmentType.WarningRemoved,
-      });
-
-      await this.database.warnings.create({
-        guildID: member.guild.id,
-        userID: member.user.id,
-        amount: -1,
-        reason,
-      });
-
-      return this.publishToModLog(
-        {
-          warningsRemoved: count,
-          moderator: self.user,
-          victim: member.user,
-          reason,
-          guild: member.guild,
-          type: PunishmentEntryType.WarningRemoved,
-        },
-        model
-      );
-    }
-  }
-
-  async apply({ attachments, moderator, publish, reason, member, soft, type, days, time }: ApplyPunishmentOptions) {
-    this.logger.info(
-      `Told to apply punishment ${type} on member ${member.id}${reason ? `, with reason: ${reason}` : ''}${
-        publish ? ', publishing to modlog!' : ''
-      }`
-    );
-
-    const settings = await this.database.guilds.get(member.guild.id);
-    const self = member.guild.members.get(this.discord.client.user.id)!;
-
-    if (
-      (member instanceof Member && !Permissions.isMemberAbove(self, member)) ||
-      (BigInt(self.permissions.allow) & this.permissionsFor(type)) === 0n
-    )
-      return;
-
-    let user!: Member;
-    if (type === PunishmentType.Unban || (type === PunishmentType.Ban && member.guild.members.has(member.id))) {
-      user = await this.resolveMember(member, false);
-    } else {
-      user = await this.resolveMember(member, true);
-    }
-
-    const modlogStatement: PublishModLogOptions = {
-      attachments: attachments?.map((s) => s.url) ?? [],
-      moderator,
-      reason,
-      victim: user.user,
-      guild: member.guild,
-      type: stringifyDBType(type)!,
-      time,
-    };
-
-    switch (type) {
-      case PunishmentType.Ban:
-        await this.applyBan({
-          moderator,
-          member: user,
-          reason,
-          guild: member.guild,
-          self,
-          days: days ?? 7,
-          soft: soft === true,
-          time,
-        });
-        break;
-
-      case PunishmentType.Kick:
-        await user.kick(reason ? encodeURIComponent(reason) : 'No reason was specified.');
-        break;
-
-      case PunishmentType.Mute:
-        await this.applyMute({
-          moderator,
-          settings,
-          member: user,
-          reason,
-          guild: member.guild,
-          self,
-          time,
-        });
-
-        break;
-
-      case PunishmentType.Unban:
-        await member.guild.unbanMember(member.id, reason ? encodeURIComponent(reason) : 'No reason was specified.');
-        break;
-
-      case PunishmentType.Unmute:
-        await this.applyUnmute({
-          moderator,
-          settings,
-          member: user,
-          reason,
-          guild: member.guild,
-          self,
-          time,
-        });
-
-        break;
-
-      case PunishmentType.VoiceMute:
-        await this.applyVoiceMute({
-          moderator,
-          statement: modlogStatement,
-          member: user,
-          reason,
-          guild: member.guild,
-          self,
-          time,
-        });
-
-        break;
-
-      case PunishmentType.VoiceDeafen:
-        await this.applyVoiceDeafen({
-          moderator,
-          statement: modlogStatement,
-          member: user,
-          reason,
-          guild: member.guild,
-          self,
-          time,
-        });
-
-        break;
-
-      case PunishmentType.VoiceUnmute:
-        await this.applyVoiceUnmute({
-          moderator,
-          statement: modlogStatement,
-          member: user,
-          reason,
-          guild: member.guild,
-          self,
-        });
-
-        break;
-
-      case PunishmentType.VoiceUndeafen:
-        await this.applyVoiceUndeafen({
-          moderator,
-          statement: modlogStatement,
-          member: user,
-          reason,
-          guild: member.guild,
-          self,
-        });
-
-        break;
-    }
-
-    const model = await this.database.cases.create({
-      attachments: attachments?.slice(0, 5).map((v) => v.url) ?? [],
-      moderatorID: moderator.id,
-      victimID: member.id,
-      guildID: member.guild.id,
-      reason,
-      soft: soft === true,
-      time,
-      type,
-    });
-
-    if (publish) {
-      await this.publishToModLog(modlogStatement, model);
-    }
-  }
-
   private async applyBan({ moderator, reason, member, guild, days, soft, time }: ApplyBanActionOptions) {
     await guild.banMember(member.id, days, reason);
     if (soft) await guild.unbanMember(member.id, reason);

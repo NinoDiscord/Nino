@@ -63,8 +63,8 @@ class PingCommand(
             """
             📡 Running under node **$node**
 
-            > **PostgreSQL (Database):** ${pg}ms
-            > **Message**: ${stopwatch.getTime(TimeUnit.MILLISECONDS)}ms
+            > **Message Delete**: ${stopwatch.getTime(TimeUnit.MILLISECONDS)}ms
+            > **PostgreSQL:** ${pg}ms
             > **Gateway**: ${if (gwPing == Duration.ZERO) "???" else "${gwPing.inWholeMilliseconds}ms"}
             > **Redis** ${redis}ms
             """.trimIndent()

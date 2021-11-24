@@ -21,3 +21,12 @@
  */
 
 package sh.nino.discord.jobs
+
+import dev.floofy.haru.abstractions.AbstractJob
+import org.koin.dsl.bind
+import org.koin.dsl.module
+
+var jobsModule = module {
+    single { BotlistsJob(get(), get(), get()) } bind AbstractJob::class
+    single { GatewayPingJob(get(), get(), get(), get()) } bind AbstractJob::class
+}

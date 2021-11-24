@@ -27,5 +27,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class TimeoutsConfig(
     val auth: String,
-    val port: Int = 4025
+    val uri: String
 )

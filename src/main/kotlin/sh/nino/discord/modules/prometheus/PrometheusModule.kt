@@ -35,14 +35,13 @@ class PrometheusModule(config: Config) {
     private val registry: CollectorRegistry?
 
     val commandLatency: Histogram?
+    var gatewayPing: Histogram?
     val commandsExecuted: Counter?
     val messagesSeen: Counter?
     val shardLatency: Gauge?
 
-    val enabled: Boolean = config.metrics
-
     init {
-        if (enabled) {
+        if (config.metrics) {
             logger.info("Metrics are enabled! Enabling registry...")
 
             registry = CollectorRegistry(true)
@@ -53,6 +52,12 @@ class PrometheusModule(config: Config) {
                 .name("nino_command_latency")
                 .labelNames("command")
                 .help("Returns the average latency of a command's execution.")
+                .register(registry)
+
+            gatewayPing = Histogram
+                .build()
+                .name("nino_gateway")
+                .help("Returns the average latency of all gateway shards.")
                 .register(registry)
 
             commandsExecuted = Counter
@@ -80,6 +85,7 @@ class PrometheusModule(config: Config) {
             shardLatency = null
             commandLatency = null
             commandsExecuted = null
+            gatewayPing = null
             messagesSeen = null
         }
     }

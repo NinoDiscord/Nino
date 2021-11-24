@@ -42,7 +42,6 @@ import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.data.Config
 import sh.nino.discord.data.Environment
 import sh.nino.discord.extensions.asSnowflake
-import sh.nino.discord.extensions.elipsis
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.localization.LocalizationModule
 import sh.nino.discord.modules.prometheus.PrometheusModule
@@ -214,6 +213,7 @@ class CommandHandler(
 
         val locale = localization.get(guildEntity.language, userEntity.language)
         val message = CommandMessage(event, args, guildEntity, userEntity, locale)
+
         val command = commands[cmdName]
             ?: commands.values.firstOrNull { it.aliases.contains(name) }
             ?: return
@@ -252,40 +252,100 @@ class CommandHandler(
             }
         }
 
-        val executedAt = System.currentTimeMillis()
-        val timer = prometheus.commandLatency?.startTimer()
-        command.execute(message) { ex, success ->
-            prometheus.commandLatency?.observe(timer!!.observeDuration())
-
-            if (!success) {
-                val owners = config.owners.map {
-                    // Return the user if we can retrieve, if not,
-                    // return a stub user for now.
-                    val user = NinoScope.future { kord.getUser(it.asSnowflake()) }.join() ?: User(
-                        UserData.Companion.from(
-                            DiscordUser(
-                                id = Snowflake("0"),
-                                username = "Unknown User",
-                                discriminator = "0000",
-                                null
-                            )
-                        ),
-
-                        kord
-                    )
-
-                    user.tag
+        // Figure out the subcommand, if any.
+        var subcommand: Subcommand? = null
+        for (arg in args) {
+            if (command.thisCtx.subcommands.isNotEmpty()) {
+                if (command.thisCtx.subcommands.find { it.name == arg || it.aliases.contains(arg) } != null) {
+                    subcommand = command.thisCtx.subcommands.first { it.name == arg || it.aliases.contains(arg) }
+                    break
                 }
+            }
+        }
 
+        val executedAt = System.currentTimeMillis()
+        val timer = prometheus.commandLatency?.labels(command.name)?.startTimer()
+
+        if (subcommand != null) {
+            val newCtx = CommandMessage(
+                event,
+                args.drop(1),
+                guildEntity,
+                userEntity,
+                locale
+            )
+
+            subcommand.execute(newCtx) { ex, success ->
+                prometheus.commandsExecuted?.inc()
+                prometheus.commandLatency?.observe(timer!!.observeDuration())
+
+                onCommandResult(newCtx, subcommand.name, ex, success, true)
+            }
+        } else {
+            command.execute(message) { ex, success ->
+                prometheus.commandsExecuted?.inc()
+                prometheus.commandLatency?.observe(timer!!.observeDuration())
+
+                onCommandResult(message, name, ex, success)
+            }
+        }
+    }
+
+    private suspend fun onCommandResult(
+        message: CommandMessage,
+        name: String,
+        ex: Exception?,
+        success: Boolean,
+        isSub: Boolean = false
+    ) {
+        // Don't do anything if it was successful.
+        if (success) return
+
+        // Report to Sentry, if we can
+        if (config.sentryDsn != null) {
+            Sentry.captureException(ex as Throwable)
+        }
+
+        // Fetch the owners
+        val owners = config.owners.map {
+            val user = NinoScope.future { kord.getUser(it.asSnowflake()) }.join() ?: User(
+                UserData.Companion.from(
+                    DiscordUser(
+                        id = Snowflake("0"),
+                        username = "Unknown User",
+                        discriminator = "0000",
+                        null
+                    )
+                ),
+
+                kord
+            )
+
+            user.tag
+        }
+
+        if (config.environment == Environment.Development) {
+            val baos = ByteArrayOutputStream()
+            val stream = PrintStream(baos, true, StandardCharsets.UTF_8.name())
+            stream.use { ex!!.printStackTrace(stream) }
+
+            val stacktrace = baos.toString(StandardCharsets.UTF_8.name())
+            message.reply(
+                buildString {
+                    appendLine("I was unable to execute the **$name** ${if (isSub) "sub" else ""}command. If this a re-occurrence, please report it to:")
+                    appendLine(owners.joinToString(", ") { "**$it**" })
+                    appendLine()
+                    appendLine("Since you're in development mode, I will send the stacktrace here and in the console.")
+                }
+            )
+        }
+    }
+}
+
+/*
+        command.execute(message) { ex, success ->
+            if (!success) {
                 if (config.environment == Environment.Development) {
-                    val baos = ByteArrayOutputStream()
-                    val stream = PrintStream(baos, true, StandardCharsets.UTF_8.name())
-
-                    stream.use {
-                        ex!!.printStackTrace(stream)
-                    }
-
-                    val stack = baos.toString(StandardCharsets.UTF_8.name())
                     message.reply(
                         buildString {
                             appendLine(":pensive: I was unable to execute the **$name** command, if this is a reoccorring problem,")
@@ -315,5 +375,4 @@ class CommandHandler(
         }
 
         prometheus.commandsExecuted?.inc()
-    }
-}
+ */

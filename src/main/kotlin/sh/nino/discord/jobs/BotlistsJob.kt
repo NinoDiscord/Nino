@@ -46,7 +46,7 @@ class BotlistsJob(
     private val kord: Kord
 ): AbstractJob(
     name = "nino:botlists",
-    expression = ""
+    expression = "*/15 * * * *"
 ) {
     private val logger by logging<BotlistsJob>()
 
@@ -62,6 +62,7 @@ class BotlistsJob(
         var errored = 0
         val listing = mutableListOf<BotlistResult>()
 
+        // builderman botlist
         if (config.botlists.dservices != null) {
             logger.info("|- Discord Services token is present!")
 
@@ -89,6 +90,7 @@ class BotlistsJob(
             )
         }
 
+        // bleh
         if (config.botlists.dboats != null) {
             logger.info("|- Discord Boats token is present!")
 
@@ -116,6 +118,7 @@ class BotlistsJob(
             )
         }
 
+        // good botlist
         if (config.botlists.dbots != null) {
             logger.info("|- Discord Bots token is present!")
 
@@ -144,6 +147,7 @@ class BotlistsJob(
             )
         }
 
+        // bleh
         if (config.botlists.topgg != null) {
             logger.info("|- top.gg token is present!")
 
@@ -172,76 +176,67 @@ class BotlistsJob(
             )
         }
 
-        // cutie boyfriend, carrot, and bolb botlist :fifiHappy:
+        // cutie boyfriend, carrot, and blob botlist :fifiHappy:
         if (config.botlists.delly != null) {
+            logger.info("|- Found Delly token, now posting...")
+
+            val dellyStartAt = System.currentTimeMillis()
+            val res = httpClient.post<HttpResponse>("https://api.discordextremelist.xyz/v2/bot/$botId/stats") {
+                header("Authorization", config.botlists.delly)
+                body = JsonObject(
+                    mapOf(
+                        "guildCount" to guildCount.asJson(),
+                        "shardCount" to shards.asJson()
+                    )
+                )
+            }
+
+            if (res.status == HttpStatusCode.OK)
+                success += 1
+            else
+                errored += 1
+
+            listing.add(
+                BotlistResult(
+                    "Delly",
+                    res.status == HttpStatusCode.OK,
+                    System.currentTimeMillis() - dellyStartAt
+                )
+            )
+        }
+
+        if (config.botlists.discords != null) {
+            logger.info("|- discords.com token was found, now posting...")
+
+            val discordsStartAt = System.currentTimeMillis()
+            val res = httpClient.post<HttpResponse>("https://discords.com/bots/api/v1/$botId") {
+                header("Authorization", config.botlists.discords)
+                body = JsonObject(
+                    mapOf(
+                        "server_count" to guildCount.asJson()
+                    )
+                )
+            }
+
+            if (res.status == HttpStatusCode.OK)
+                success += 1
+            else
+                errored += 1
+
+            listing.add(
+                BotlistResult(
+                    "discords.com",
+                    res.status == HttpStatusCode.OK,
+                    System.currentTimeMillis() - discordsStartAt
+                )
+            )
+        }
+
+        val successRate = (success.toDouble() / listing.size.toDouble()) * 100
+        logger.info("$success/$errored ($successRate% rate) to ${listing.size} lists.")
+
+        for (list in listing) {
+            logger.info("   * ${if (list.success) "✔" else "❌"} ${list.list} (~${list.time}ms)")
         }
     }
 }
-
-/*
-    // Ice is a cute boyfriend btw <3
-    if (botlists.delly !== undefined) {
-      this.logger.info('Found Discord Extreme List token, now posting...');
-
-      await this.http
-        .request({
-          url: `https://api.discordextremelist.xyz/v2/bot/${this.discord.client.user.id}/stats`,
-          method: 'POST',
-          data: {
-            guildCount: this.discord.client.guilds.size,
-            shardCount: this.discord.client.shards.size,
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': botlists.delly,
-          },
-        })
-        .then((res) => {
-          res.statusCode === 200 ? success++ : errored++;
-          list.push({
-            name: 'Delly',
-            success: res.statusCode === 200,
-            data: res.json(),
-          });
-        })
-        .catch((ex) => this.logger.warn('Unable to parse JSON [Delly]:', ex));
-    }
-
-    if (botlists.bfd !== undefined) {
-      this.logger.info('Found Bots for Discord token, now posting...');
-
-      const res = await this.http
-        .request({
-          method: 'POST',
-          url: `https://botsfordiscord.com/api/bot/${this.discord.client.user.id}`,
-          data: {
-            server_count: this.discord.client.guilds.size,
-          },
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': botlists.bfd,
-          },
-        })
-        .then((res) => {
-          res.statusCode === 200 ? success++ : errored++;
-          list.push({
-            name: 'Bots for Discord',
-            success: res.statusCode === 200,
-            data: res.json(),
-          });
-        })
-        .catch((ex) => this.logger.warn('Unable to parse JSON [Bots for Discord]:', ex));
-    }
-
-    const successRate = ((success / list.length) * 100).toFixed(2);
-    this.logger.info(
-      [
-        `ℹ️ listly posted to ${list.length} botlists with a success rate of ${successRate}%`,
-        'Serialized output will be displayed:',
-      ].join('\n')
-    );
-
-    for (const botlist of list) {
-      this.logger.info(`${botlist.success ? '✔' : '❌'} ${botlist.name}`, botlist.data);
-    }
- */

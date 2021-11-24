@@ -20,28 +20,30 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.database.tables
+package sh.nino.discord.extensions
 
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.kotlin.datetime.date
-import sh.nino.discord.core.database.tables.dao.SnowflakeTable
+import kotlinx.coroutines.flow.*
 
-object Warnings: SnowflakeTable("warnings") {
-    var receivedAt = date("received_at")
-    var guildId = long("guild_id")
-    var reason = text("reason").nullable()
-    var amount = integer("amount").default(0)
-
-    override val primaryKey: PrimaryKey = PrimaryKey(guildId, id, name = "PK_Warnings_ID")
+/**
+ * Sorts the [flow] from the [comparator] callback. This will emit entities to
+ * returned as a flow.
+ */
+fun <T> Flow<T>.sortWith(comparator: (T, T) -> Int): Flow<T> = flow {
+    for (entity in toList().sort(comparator)) emit(entity)
 }
 
-class WarningEntity(id: EntityID<Long>): LongEntity(id) {
-    companion object: LongEntityClass<WarningEntity>(Warnings)
+/**
+ * Returns if the original Flow contains an entity
+ */
+suspend fun <T> Flow<T>.contains(value: T): Boolean = filter { it == value }.firstOrNull() != null
 
-    var receivedAt by Warnings.receivedAt
-    var guildId by Warnings.guildId
-    var reason by Warnings.reason
-    var amount by Warnings.amount
+suspend fun <T, U> Flow<T>.reduce(initialValue: U, operation: suspend (U, T) -> U): U {
+    var value: Any? = initialValue
+    collect {
+        @Suppress("UNCHECKED_CAST")
+        value = operation(value as U, it)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return value as U
 }

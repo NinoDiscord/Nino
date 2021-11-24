@@ -21,3 +21,12 @@
  */
 
 package sh.nino.discord.commands.easter_egg
+
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import sh.nino.discord.core.command.AbstractCommand
+
+val easterEggCommandsModule = module {
+    single { WahCommand(get()) } bind AbstractCommand::class
+    single { TestCommand() } bind AbstractCommand::class
+}

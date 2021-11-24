@@ -30,4 +30,7 @@ val coreCommandsModule = module {
     single { HelpCommand(get(), get(), get()) } bind AbstractCommand::class
     single { InviteCommand(get()) } bind AbstractCommand::class
     single { PingCommand(get(), get(), get()) } bind AbstractCommand::class
+    single { ShardInfoCommand(get()) } bind AbstractCommand::class
+    single { StatsCommand(get(), get(), get()) } bind AbstractCommand::class
+    single { UptimeCommand() } bind AbstractCommand::class
 }

@@ -21,3 +21,35 @@
  */
 
 package sh.nino.discord.commands.easter_egg
+
+import io.ktor.client.*
+import io.ktor.client.request.*
+import kotlinx.serialization.Serializable
+import sh.nino.discord.core.annotations.Command
+import sh.nino.discord.core.command.AbstractCommand
+import sh.nino.discord.core.command.CommandCategory
+import sh.nino.discord.core.command.CommandMessage
+
+@Serializable
+data class WahResponse(
+    val link: String
+)
+
+@Command(
+    name = "wah",
+    description = "beautiful wah :D",
+    category = CommandCategory.EASTER_EGG,
+    aliases = ["wah", "weh", "pamda", "PANDUH", "panduh", "panda"]
+)
+class WahCommand(private val httpClient: HttpClient): AbstractCommand() {
+    override suspend fun run(msg: CommandMessage) {
+        val res: WahResponse = httpClient.get("https://some-random-api.ml/img/red_panda")
+        msg.replyEmbed {
+            title = "wah!"
+            image = res.link
+            footer {
+                text = "good job on finding a easter egg command!"
+            }
+        }
+    }
+}

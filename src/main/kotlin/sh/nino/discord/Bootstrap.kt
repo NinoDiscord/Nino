@@ -23,6 +23,8 @@
 package sh.nino.discord
 
 import com.charleskorn.kaml.Yaml
+import dev.kord.cache.map.MapLikeCollection
+import dev.kord.cache.map.internal.MapEntryCache
 import dev.kord.core.Kord
 import dev.kord.gateway.PrivilegedIntent
 import kotlinx.coroutines.runBlocking
@@ -32,7 +34,6 @@ import org.koin.dsl.module
 import sh.nino.discord.commands.commandsModule
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
-import sh.nino.discord.extensions.useNinoLogger
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.ninoModule
 import java.io.File
@@ -54,6 +55,17 @@ object Bootstrap {
         val kord = runBlocking {
             Kord(config.token) {
                 enableShutdownHook = false
+                cache {
+                    // cache members
+                    members { cache, description ->
+                        MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+                    }
+
+                    // cache users
+                    users { cache, description ->
+                        MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+                    }
+                }
             }
         }
 
@@ -61,7 +73,7 @@ object Bootstrap {
             modules(
                 globalModule,
                 ninoModule,
-                commandsModule,
+                *commandsModule.toTypedArray(),
                 module {
                     single {
                         NinoBot()
@@ -76,8 +88,6 @@ object Bootstrap {
                     }
                 }
             )
-
-            useNinoLogger()
         }
 
         logger.info("* Initialized Koin, now starting Nino...")

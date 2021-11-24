@@ -20,4 +20,20 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.gateway
+package sh.nino.discord.commands.easter_egg
+
+import sh.nino.discord.core.annotations.Command
+import sh.nino.discord.core.command.AbstractCommand
+import sh.nino.discord.core.command.CommandCategory
+import sh.nino.discord.core.command.CommandMessage
+
+@Command(
+    name = "test",
+    description = "A secret test command. :eyes:",
+    category = CommandCategory.EASTER_EGG
+)
+class TestCommand: AbstractCommand() {
+    override suspend fun run(msg: CommandMessage) {
+        msg.reply("blep!")
+    }
+}

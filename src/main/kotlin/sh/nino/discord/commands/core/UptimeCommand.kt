@@ -21,3 +21,20 @@
  */
 
 package sh.nino.discord.commands.core
+
+import sh.nino.discord.core.annotations.Command
+import sh.nino.discord.core.command.AbstractCommand
+import sh.nino.discord.core.command.CommandMessage
+import sh.nino.discord.extensions.humanize
+import java.lang.management.ManagementFactory
+
+@Command(
+    name = "uptime",
+    description = "descriptions.core.uptime",
+    aliases = ["up", "upfor", "amialive"]
+)
+class UptimeCommand: AbstractCommand() {
+    override suspend fun run(msg: CommandMessage) {
+        msg.reply(":gear: **${ManagementFactory.getRuntimeMXBean().uptime.humanize()}**")
+    }
+}

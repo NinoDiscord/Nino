@@ -22,17 +22,61 @@
 
 package sh.nino.discord.commands.core
 
+import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import sh.nino.discord.core.annotations.Command
 import sh.nino.discord.core.command.AbstractCommand
 import sh.nino.discord.core.command.CommandMessage
+import kotlin.time.Duration
+
+private data class ShardInfo(
+    val guilds: MutableList<Long>,
+    var users: Int,
+    val ping: Duration
+)
 
 @Command(
     name = "shardinfo",
-    description = "descriptions.core.shardinfo"
+    description = "descriptions.core.shardinfo",
+    aliases = ["shards", "si"]
 )
 class ShardInfoCommand(private val kord: Kord): AbstractCommand() {
     override suspend fun run(msg: CommandMessage) {
-        TODO("Not yet implemented")
+        val guildShardMap = kord.guilds.map {
+            ((it.id.value.toLong() shr 22) % kord.gateway.gateways.size) to it.id.value.toLong()
+        }.toList()
+
+        // TODO: this doesn't probably scale well, but oh well.
+        val shards = mutableMapOf<Long, ShardInfo>()
+        for ((id, guildId) in guildShardMap) {
+            if (!shards.containsKey(id)) {
+                shards[id] = ShardInfo(
+                    mutableListOf(),
+                    0,
+                    kord.gateway.gateways[id.toInt()]!!.ping.value ?: Duration.ZERO
+                )
+            }
+
+            val info = shards[id]!!
+            info.guilds.add(guildId)
+            info.users += kord.getGuild(Snowflake(guildId))!!.memberCount ?: 0
+
+            shards[id] = info
+        }
+
+        val self = kord.getSelf()
+        msg.replyEmbed {
+            title = "[ ${self.tag} | Shard Information ]"
+            description = buildString {
+                appendLine("```apache")
+                for ((id, info) in shards) {
+                    appendLine("* Shard #$id: G: ${info.guilds.size} | U: ${info.users} | L: ${if (info.ping == Duration.ZERO) "?" else "${info.ping.inWholeMilliseconds}ms"}")
+                }
+
+                appendLine("```")
+            }
+        }
     }
 }
