@@ -46,6 +46,7 @@ import org.redisson.api.RedissonClient
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.database.tables.*
 import sh.nino.discord.core.database.transactions.asyncTransaction
+import sh.nino.discord.core.ktor.NinoKtorServer
 import sh.nino.discord.core.threading.NinoThreadFactory
 import sh.nino.discord.data.Config
 import sh.nino.discord.data.Environment
@@ -183,6 +184,7 @@ class NinoBot {
         val scheduler = GlobalContext.inject<Scheduler>()
         val hikari = GlobalContext.inject<HikariDataSource>()
         val redis = GlobalContext.inject<RedissonClient>()
+        val ktor = GlobalContext.inject<NinoKtorServer>()
 
         val shutdownThread = thread(name = "Nino-ShutdownThread", start = false) {
             logger.warn("Shutting down Nino...")
@@ -197,6 +199,10 @@ class NinoBot {
 
             // Unschedule all jobs
             scheduler.unschedule()
+
+            // Close off server, if we had any :3
+            ktor.close()
+
             logger.warn("Nino has shut down, goodbye senpai.")
         }
 

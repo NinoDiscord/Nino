@@ -32,6 +32,7 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.context.GlobalContext.startKoin
 import org.koin.dsl.module
 import sh.nino.discord.commands.commandsModule
+import sh.nino.discord.core.ktor.ktorModule
 import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
@@ -74,6 +75,7 @@ object Bootstrap {
                 globalModule,
                 ninoModule,
                 *commandsModule.toTypedArray(),
+                ktorModule,
                 module {
                     single {
                         NinoBot()

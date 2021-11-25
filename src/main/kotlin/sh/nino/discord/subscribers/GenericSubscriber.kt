@@ -28,9 +28,12 @@ import dev.kord.core.event.gateway.DisconnectEvent
 import dev.kord.core.event.gateway.ReadyEvent
 import dev.kord.core.on
 import kotlinx.coroutines.flow.count
+import kotlinx.coroutines.launch
 import org.koin.core.context.GlobalContext
 import org.slf4j.LoggerFactory
 import sh.nino.discord.NinoBot
+import sh.nino.discord.core.NinoScope
+import sh.nino.discord.core.ktor.NinoKtorServer
 import sh.nino.discord.data.Config
 
 fun Kord.applyGenericEvents() {
@@ -45,6 +48,11 @@ fun Kord.applyGenericEvents() {
 
         val config = koin.get<Config>()
         val prefix = config.prefixes.first()
+        val ktor = koin.get<NinoKtorServer>()
+
+        NinoScope.launch {
+            ktor.launch()
+        }
 
         kord.editPresence {
             status = PresenceStatus.Online

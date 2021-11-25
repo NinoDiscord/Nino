@@ -32,8 +32,8 @@ import sh.nino.discord.kotlin.logging
 
 class PrometheusModule(config: Config) {
     private val logger by logging<PrometheusModule>()
-    private val registry: CollectorRegistry?
 
+    val registry: CollectorRegistry?
     val commandLatency: Histogram?
     var gatewayPing: Histogram?
     val commandsExecuted: Counter?

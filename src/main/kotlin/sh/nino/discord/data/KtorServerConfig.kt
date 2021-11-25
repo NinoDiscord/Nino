@@ -22,40 +22,22 @@
 
 package sh.nino.discord.data
 
-import dev.kord.common.entity.ActivityType
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+/**
+ * Returns the KTOR server configuration for Prometheus.
+ */
 @Serializable
-data class Config(
-    val environment: Environment = Environment.Development,
-    val defaultLocale: String = "en_US",
-    val sentryDsn: String? = null,
-    val prefixes: List<String> = listOf("x!"),
-    val metrics: Boolean = false,
-    val instatus: InstatusConfig? = null,
-    val owners: List<String> = listOf(),
-    val server: KtorServerConfig? = null,
-    val token: String,
-    val ravy: String? = null,
+data class KtorServerConfig(
+    /**
+     * Returns the host to connect to. Returns `0.0.0.0` by default,
+     * which is scoped globally whilst `127.0.0.1` is scoped only to
+     * the network.
+     */
+    val host: String = "0.0.0.0",
 
-    val botlists: BotlistsConfig? = null,
-    val clustering: ClusterOperatorConfig? = null,
-    val redis: RedisConfig,
-    val status: StatusConfig = StatusConfig(
-        type = ActivityType.Listening,
-        status = "{guilds} guilds saying {prefix}help | [#{shard_id}] | https://nino.sh"
-    ),
-
-    val database: DatabaseConfig = DatabaseConfig(),
-    val timeouts: TimeoutsConfig
+    /**
+     * Returns the port to listen on.
+     */
+    val port: Int = 8787
 )
-
-@Serializable
-enum class Environment {
-    @SerialName("development")
-    Development,
-
-    @SerialName("production")
-    Production
-}

@@ -24,5 +24,6 @@ package sh.nino.discord.commands
 
 import sh.nino.discord.commands.core.coreCommandsModule
 import sh.nino.discord.commands.easter_egg.easterEggCommandsModule
+import sh.nino.discord.commands.system.systemCommandsModule
 
-val commandsModule = coreCommandsModule + easterEggCommandsModule
+val commandsModule = coreCommandsModule + easterEggCommandsModule + systemCommandsModule

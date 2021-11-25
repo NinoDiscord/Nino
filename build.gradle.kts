@@ -67,6 +67,9 @@ dependencies {
     implementation("ch.qos.logback:logback-core:1.2.7")
     api("org.slf4j:slf4j-api:1.7.32")
 
+    // Ktor Server (server for prometheus)
+    implementation("io.ktor:ktor-server-netty:1.6.4")
+
     // Ktor (http client)
     implementation("io.ktor:ktor-client-serialization:1.6.4")
     implementation("io.ktor:ktor-client-websockets:1.6.4")
@@ -98,6 +101,7 @@ dependencies {
 
     // Prometheus (metrics)
     implementation("io.prometheus:simpleclient_hotspot:0.12.0")
+    implementation("io.prometheus:simpleclient_common:0.12.0")
     implementation("io.prometheus:simpleclient:0.12.0")
 
     // Sentry (error handling as a service :^)

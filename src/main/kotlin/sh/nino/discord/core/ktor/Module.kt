@@ -20,42 +20,10 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.data
+package sh.nino.discord.core.ktor
 
-import dev.kord.common.entity.ActivityType
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import org.koin.dsl.module
 
-@Serializable
-data class Config(
-    val environment: Environment = Environment.Development,
-    val defaultLocale: String = "en_US",
-    val sentryDsn: String? = null,
-    val prefixes: List<String> = listOf("x!"),
-    val metrics: Boolean = false,
-    val instatus: InstatusConfig? = null,
-    val owners: List<String> = listOf(),
-    val server: KtorServerConfig? = null,
-    val token: String,
-    val ravy: String? = null,
-
-    val botlists: BotlistsConfig? = null,
-    val clustering: ClusterOperatorConfig? = null,
-    val redis: RedisConfig,
-    val status: StatusConfig = StatusConfig(
-        type = ActivityType.Listening,
-        status = "{guilds} guilds saying {prefix}help | [#{shard_id}] | https://nino.sh"
-    ),
-
-    val database: DatabaseConfig = DatabaseConfig(),
-    val timeouts: TimeoutsConfig
-)
-
-@Serializable
-enum class Environment {
-    @SerialName("development")
-    Development,
-
-    @SerialName("production")
-    Production
+val ktorModule = module {
+    single { NinoKtorServer(get(), get()) }
 }

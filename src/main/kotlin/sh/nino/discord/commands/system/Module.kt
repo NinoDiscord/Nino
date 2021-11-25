@@ -21,3 +21,13 @@
  */
 
 package sh.nino.discord.commands.system
+
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import sh.nino.discord.core.command.AbstractCommand
+
+val systemCommandsModule = module {
+    single { ShellCommand(get(), get()) } bind AbstractCommand::class
+    single { EvalCommand(get(), get()) } bind AbstractCommand::class
+    single { GlobalBansCommand(get()) } bind AbstractCommand::class
+}

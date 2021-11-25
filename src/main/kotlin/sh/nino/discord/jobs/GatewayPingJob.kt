@@ -46,7 +46,7 @@ class GatewayPingJob(
     private val config: Config,
     private val httpClient: HttpClient,
     private val kord: Kord
-): AbstractJob(name = "update:gateway:ping", expression = "1 * * * *") {
+): AbstractJob(name = "update:gateway:ping", expression = "*/1 * * * *") {
     private val logger by logging<GatewayPingJob>()
 
     @OptIn(ExperimentalTime::class)

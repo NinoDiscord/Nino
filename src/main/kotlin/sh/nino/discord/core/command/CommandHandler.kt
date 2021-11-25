@@ -33,6 +33,7 @@ import dev.kord.rest.builder.message.EmbedBuilder
 import io.sentry.Sentry
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.future.future
+import org.apache.commons.lang3.time.StopWatch
 import org.jetbrains.exposed.sql.or
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.core.NinoScope
@@ -42,6 +43,7 @@ import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.data.Config
 import sh.nino.discord.data.Environment
 import sh.nino.discord.extensions.asSnowflake
+import sh.nino.discord.extensions.elipsis
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.localization.LocalizationModule
 import sh.nino.discord.modules.prometheus.PrometheusModule
@@ -263,9 +265,10 @@ class CommandHandler(
             }
         }
 
-        val executedAt = System.currentTimeMillis()
+        val watch = StopWatch()
         val timer = prometheus.commandLatency?.labels(command.name)?.startTimer()
 
+        watch.start()
         if (subcommand != null) {
             val newCtx = CommandMessage(
                 event,
@@ -279,6 +282,9 @@ class CommandHandler(
                 prometheus.commandsExecuted?.inc()
                 prometheus.commandLatency?.observe(timer!!.observeDuration())
 
+                watch.stop()
+
+                logger.info("Subcommand \"$prefix${command.name} ${subcommand.name}\" was executed by ${event.message.author!!.tag} in guild ${guild.name} (${guild.id.asString})")
                 onCommandResult(newCtx, subcommand.name, ex, success, true)
             }
         } else {
@@ -286,6 +292,9 @@ class CommandHandler(
                 prometheus.commandsExecuted?.inc()
                 prometheus.commandLatency?.observe(timer!!.observeDuration())
 
+                watch.stop()
+
+                logger.info("Command \"$prefix${command.name}\" was executed by ${event.message.author!!.tag} in guild ${guild.name} (${guild.id.asString})")
                 onCommandResult(message, name, ex, success)
             }
         }
@@ -332,47 +341,27 @@ class CommandHandler(
             val stacktrace = baos.toString(StandardCharsets.UTF_8.name())
             message.reply(
                 buildString {
-                    appendLine("I was unable to execute the **$name** ${if (isSub) "sub" else ""}command. If this a re-occurrence, please report it to:")
+                    appendLine("I was unable to execute the **$name** ${if (isSub) "sub" else ""}command. If this is a re-occurrence, please report it to:")
                     appendLine(owners.joinToString(", ") { "**$it**" })
                     appendLine()
                     appendLine("Since you're in development mode, I will send the stacktrace here and in the console.")
+                    appendLine()
+                    appendLine("```kotlin")
+                    appendLine(stacktrace.elipsis(1500))
+                    appendLine("```")
+                }
+            )
+        } else {
+            message.reply(
+                buildString {
+                    appendLine("I was unable to execute the **$name** ${if (isSub) "sub" else ""}command. If this a re-occurrence, please report it to:")
+                    appendLine(owners.joinToString(", ") { "**$it**" })
+                    appendLine("and report it to the Noelware server under <#824071651486335036>: https://discord.gg/ATmjFH9kMH")
                 }
             )
         }
+
+        Sentry.captureException(ex as Throwable)
+        logger.error("Unable to execute command $name:", ex)
     }
 }
-
-/*
-        command.execute(message) { ex, success ->
-            if (!success) {
-                if (config.environment == Environment.Development) {
-                    message.reply(
-                        buildString {
-                            appendLine(":pensive: I was unable to execute the **$name** command, if this is a reoccorring problem,")
-                            appendLine("report it to: ${owners.mapIndexed { index, s -> if (index == owners.size - 1) "and **$s**" else "**$s**" }.joinToString(", ")}")
-                            appendLine()
-                            appendLine("```kotlin")
-                            appendLine(ex.toString())
-                            appendLine(stack.elipsis(1650))
-                            appendLine("```")
-                        }
-                    )
-                } else {
-                    message.reply(
-                        buildString {
-                            appendLine(":pensive: I was unable to execute the **$name** command, if this is a reoccorring problem,")
-                            appendLine("report it to: ${owners.mapIndexed { index, s -> if (index == owners.size - 1) "and **$s**" else "**$s**" }.joinToString(", ")}")
-                        }
-                    )
-                }
-
-                Sentry.captureException(ex as Throwable)
-                logger.error("Unable to execute command $name:", ex)
-                return@execute
-            } else {
-                logger.info("Executed command $name by ${author.tag} (${author.id.asString}) in guild ${guild.name} (${guild.id.asString}) in ${System.currentTimeMillis() - executedAt}ms")
-            }
-        }
-
-        prometheus.commandsExecuted?.inc()
- */
