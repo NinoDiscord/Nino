@@ -20,11 +20,27 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.commands
+package sh.nino.discord.core.slash
 
-import sh.nino.discord.commands.admin.adminCommandsModule
-import sh.nino.discord.commands.core.coreCommandsModule
-import sh.nino.discord.commands.easter_egg.easterEggCommandsModule
-import sh.nino.discord.commands.system.systemCommandsModule
+import dev.kord.common.entity.Permissions
+import sh.nino.discord.core.command.CommandCategory
+import sh.nino.discord.core.slash.builders.ApplicationCommandOption
 
-val commandsModule = coreCommandsModule + easterEggCommandsModule + systemCommandsModule + adminCommandsModule
+class SlashCommand(
+    val name: String,
+    val description: String,
+    val category: CommandCategory = CommandCategory.CORE,
+    val cooldown: Int = 5,
+    val options: List<ApplicationCommandOption>,
+    val onlyIn: List<Long> = listOf(),
+    val userPermissions: Permissions,
+    val botPermissions: Permissions,
+    private val runner: suspend (SlashCommandMessage) -> Unit
+) {
+    suspend fun execute(msg: SlashCommandMessage, callback: suspend (Exception?, Boolean) -> Unit): Any = try {
+        runner.invoke(msg)
+        callback(null, true)
+    } catch (e: Exception) {
+        callback(e, false)
+    }
+}

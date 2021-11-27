@@ -20,4 +20,8 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.pagination
+package sh.nino.discord.extensions
+
+fun <T> T?.ifNotNull(block: T.() -> Unit) {
+    if (this != null) block() else Unit
+}

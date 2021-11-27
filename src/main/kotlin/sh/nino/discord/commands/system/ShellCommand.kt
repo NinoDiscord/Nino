@@ -37,7 +37,8 @@ import java.util.concurrent.TimeUnit
     name = "shell",
     description = "Executes arbitary shell commands.",
     aliases = ["sh", "exec", "$"],
-    category = CommandCategory.SYSTEM
+    category = CommandCategory.SYSTEM,
+    ownerOnly = true
 )
 class ShellCommand(private val kord: Kord, private val httpClient: HttpClient): AbstractCommand() {
     override suspend fun run(msg: CommandMessage) {

@@ -32,6 +32,7 @@ import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.builder.message.EmbedBuilder
 import io.sentry.Sentry
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.future.await
 import kotlinx.coroutines.future.future
 import org.apache.commons.lang3.time.StopWatch
 import org.jetbrains.exposed.sql.or
@@ -53,7 +54,7 @@ import java.io.PrintStream
 import java.nio.charset.StandardCharsets
 import kotlin.reflect.jvm.jvmName
 
-private fun <T, U> List<Pair<T, U>>.toMappedPair(): Map<T, U> {
+fun <T, U> List<Pair<T, U>>.toMappedPair(): Map<T, U> {
     val map = mutableMapOf<T, U>()
     for (item in this) {
         map[item.first] = item.second
@@ -62,7 +63,7 @@ private fun <T, U> List<Pair<T, U>>.toMappedPair(): Map<T, U> {
     return map.toMap()
 }
 
-private fun <T> List<T>.separateFirst(): Pair<T, List<T>> = Pair(first(), drop(1))
+fun <T> List<T>.separateFirst(): Pair<T, List<T>> = Pair(first(), drop(1))
 
 class CommandHandler(
     private val config: Config,
@@ -226,14 +227,15 @@ class CommandHandler(
         }
 
         // if there is permissions for the user, let's check.
-        if (command.userPermissions.values.isNotEmpty()) {
+        // If it is the guild owner, bypass checks
+        if (command.userPermissions.values.isNotEmpty() && !guild.isOwner) {
             val member = author.asMember(guild.id)
             val missing = command.userPermissions.values.filter {
-                member.getPermissions().contains(it)
+                !member.getPermissions().contains(it)
             }
 
             if (missing.isNotEmpty()) {
-                val perms = missing.map { perm -> perm::class.jvmName }
+                val perms = missing.map { perm -> perm::class.jvmName.split("$").last() }
                 message.reply("You are missing the following permissions: ${perms.joinToString(", ")}")
 
                 return
@@ -243,7 +245,7 @@ class CommandHandler(
         // check the permissions for Nino
         if (command.botPermissions.values.isNotEmpty()) {
             val missing = command.botPermissions.values.filter {
-                self.getPermissions().contains(it)
+                !self.getPermissions().contains(it)
             }
 
             if (missing.isNotEmpty()) {
@@ -280,7 +282,7 @@ class CommandHandler(
 
             subcommand.execute(newCtx) { ex, success ->
                 prometheus.commandsExecuted?.inc()
-                prometheus.commandLatency?.observe(timer!!.observeDuration())
+                prometheus.commandLatency?.labels(command.name)?.observe(timer!!.observeDuration())
 
                 watch.stop()
 
@@ -290,7 +292,7 @@ class CommandHandler(
         } else {
             command.execute(message) { ex, success ->
                 prometheus.commandsExecuted?.inc()
-                prometheus.commandLatency?.observe(timer!!.observeDuration())
+                prometheus.commandLatency?.labels(command.name)?.observe(timer!!.observeDuration())
 
                 watch.stop()
 
@@ -317,7 +319,7 @@ class CommandHandler(
 
         // Fetch the owners
         val owners = config.owners.map {
-            val user = NinoScope.future { kord.getUser(it.asSnowflake()) }.join() ?: User(
+            val user = NinoScope.future { kord.getUser(it.asSnowflake()) }.await() ?: User(
                 UserData.Companion.from(
                     DiscordUser(
                         id = Snowflake("0"),

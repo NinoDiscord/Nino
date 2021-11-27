@@ -20,11 +20,22 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.commands
+package sh.nino.discord.utils
 
-import sh.nino.discord.commands.admin.adminCommandsModule
-import sh.nino.discord.commands.core.coreCommandsModule
-import sh.nino.discord.commands.easter_egg.easterEggCommandsModule
-import sh.nino.discord.commands.system.systemCommandsModule
+import java.security.SecureRandom
 
-val commandsModule = coreCommandsModule + easterEggCommandsModule + systemCommandsModule + adminCommandsModule
+object RandomId {
+    private const val ALPHA_CHARS = "abcdefghijklmnopqrstuvxyz0123456789"
+    private val random by lazy { SecureRandom() }
+
+    fun generate(len: Int = 8): String {
+        val builder = StringBuilder()
+        for (i in 0 until len) {
+            val index = random.nextInt(ALPHA_CHARS.length)
+            val char = ALPHA_CHARS[index]
+            builder.append(char)
+        }
+
+        return builder.toString()
+    }
+}

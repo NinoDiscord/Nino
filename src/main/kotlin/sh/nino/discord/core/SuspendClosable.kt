@@ -27,7 +27,7 @@ package sh.nino.discord.core
  */
 interface SuspendClosable {
     /**
-     * Closes this resource, and possibly any connections.
+     * Closes this resource.
      */
     suspend fun close()
 }

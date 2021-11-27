@@ -20,4 +20,22 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.pagination
+package sh.nino.discord.core.slash
+
+import dev.kord.core.Kord
+import dev.kord.core.entity.Guild
+import dev.kord.core.entity.User
+import dev.kord.core.event.interaction.InteractionCreateEvent
+import sh.nino.discord.core.database.tables.GuildEntity
+import sh.nino.discord.core.database.tables.UserEntity
+import sh.nino.discord.modules.localization.Locale
+
+class SlashCommandMessage(
+    private val event: InteractionCreateEvent,
+    private val kord: Kord,
+    val userSettings: UserEntity,
+    val settings: GuildEntity,
+    val locale: Locale,
+    val author: User,
+    val guild: Guild
+)

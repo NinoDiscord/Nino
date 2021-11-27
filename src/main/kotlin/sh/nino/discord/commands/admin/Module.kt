@@ -21,3 +21,12 @@
  */
 
 package sh.nino.discord.commands.admin
+
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import sh.nino.discord.commands.admin.import.ExportCommand
+import sh.nino.discord.core.command.AbstractCommand
+
+val adminCommandsModule = module {
+    single { ExportCommand(get(), get()) } bind AbstractCommand::class
+}

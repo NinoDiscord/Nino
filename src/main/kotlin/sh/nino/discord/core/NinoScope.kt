@@ -28,6 +28,9 @@ import kotlinx.coroutines.asCoroutineDispatcher
 import sh.nino.discord.NinoBot
 import kotlin.coroutines.CoroutineContext
 
+/**
+ * Returns a custom [CoroutineScope] but using the executor pool from the [NinoBot] class.
+ */
 object NinoScope: CoroutineScope {
     private val job: Job = Job()
     override val coroutineContext: CoroutineContext = job + NinoBot.executorPool.asCoroutineDispatcher()

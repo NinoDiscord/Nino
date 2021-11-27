@@ -23,10 +23,12 @@
 package sh.nino.discord.core.command
 
 import dev.kord.core.behavior.channel.createMessage
+import dev.kord.core.entity.Attachment
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.allowedMentions
 import org.koin.core.Koin
@@ -49,6 +51,7 @@ class CommandMessage(
 ) {
     private val koin: Koin = GlobalContext.get()
 
+    val attachments: List<Attachment> = event.message.attachments.toList()
     val message: Message = event.message
     val author: User = message.author ?: error("this should never happen")
 
@@ -56,6 +59,18 @@ class CommandMessage(
         val channel = message.channel.asChannel() as TextChannel
         return PaginationEmbed(channel, author, embeds)
     }
+
+    suspend fun reply(content: String, files: List<NamedFile>): Message =
+        message.channel.createMessage {
+            this.content = content
+
+            messageReference = message.id
+            allowedMentions {
+                repliedUser = false
+            }
+
+            this.files += files
+        }
 
     suspend fun reply(_content: String, reply: Boolean): Message =
         message.channel.createMessage {

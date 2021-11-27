@@ -32,6 +32,7 @@ import dev.kord.common.Color as KordColor
  */
 fun Color.asKordColor(): KordColor = KordColor(red, green, blue)
 fun Long.asSnowflake(): Snowflake = Snowflake(this)
+fun ULong.asSnowflake(): Snowflake = this.toLong().asSnowflake()
 
 fun Permission.asString(): String = when (this) {
     is Permission.CreateInstantInvite -> "Create Instant Invite"
