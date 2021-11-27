@@ -21,3 +21,10 @@
  */
 
 package sh.nino.discord.core.slash
+
+class SlashSubcommandGroup(
+    val name: String,
+    val description: String,
+    val required: Boolean = false,
+    val subcommands: List<SlashSubcommand> = listOf()
+)

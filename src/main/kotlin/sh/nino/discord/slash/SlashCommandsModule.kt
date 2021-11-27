@@ -23,8 +23,8 @@
 package sh.nino.discord.slash
 
 import org.koin.dsl.module
-import sh.nino.discord.slash.core.testCommand
+import sh.nino.discord.slash.core.testSubCommand
 
 val slashCommandsModule = module {
-    single { testCommand }
+    single { testSubCommand }
 }

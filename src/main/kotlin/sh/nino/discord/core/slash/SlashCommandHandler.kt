@@ -75,6 +75,10 @@ class SlashCommandHandler(
     init {
         logger.info("Registering slash commands...")
         NinoScope.launch {
+            // Discard old commands that we need to get rid of since
+            // they have been removed from the codebase.
+            discardOldCommands()
+
             for (command in commands) {
                 if (command.onlyIn.isEmpty()) {
                     registerSlashCommand(command)
@@ -83,6 +87,21 @@ class SlashCommandHandler(
                 }
             }
         }
+    }
+
+    private suspend fun discardOldCommands() {
+        logger.info("Discarding old slash commands (that don't exist anymore)...")
+
+        val globalCommands = kord.rest.interaction.getGlobalApplicationCommands(kord.selfId)
+        val commandsThatDontExist = globalCommands.filter { commands.find { i -> i.name == it.name } == null }
+        if (commandsThatDontExist.isNotEmpty()) {
+            logger.info("|- Found ${commandsThatDontExist.size} commands that should be discarded.")
+            for (cmd in commandsThatDontExist) {
+                kord.rest.interaction.deleteGlobalApplicationCommand(kord.selfId, cmd.id)
+            }
+        }
+
+        logger.info("Hopefully, discarded old commands.")
     }
 
     private fun SubCommandBuilder.fillInInnerOptions(option: ApplicationCommandOption) {
@@ -213,12 +232,12 @@ class SlashCommandHandler(
             }
 
             ApplicationCommandOptionType.SubCommand -> {
-                if (option.options == null) throw IllegalStateException("Missing `options` object. Did you add the `option {}` DSL object?")
-
                 subCommand(option.name, option.description) {
                     this.required = option.required
-                    for (inner in option.options) {
-                        fillInInnerOptions(option)
+                    if (option.options != null) {
+                        for (inner in option.options) {
+                            fillInInnerOptions(option)
+                        }
                     }
                 }
             }
@@ -397,13 +416,70 @@ class SlashCommandHandler(
             }
         }
 
+        var subcommand: SlashSubcommand? = null
+        var group: SlashSubcommandGroup? = null
+        val option = options.values.first()
+        val secondKey = try {
+            options.values.toList()[1]
+        } catch (e: Exception) {
+            null
+        }
+
+        var indexToSkip = 0
+
+        if (option != null) {
+            // Check if it is a subcommand
+            for (s in command.subcommands) {
+                if (option.name == s.name) {
+                    subcommand = s
+                    indexToSkip = 1
+
+                    break
+                }
+            }
+
+            // Maybe it is a group?
+            for (g in command.groups) {
+                if (option.name == g.name) {
+                    group = g
+                    indexToSkip = 2
+                    break
+                }
+            }
+        }
+
+        // If the subcommand is still NULL and we have a group,
+        // find the subcommand there.
+        if (subcommand == null && group != null) {
+            // Let's not do anything.
+            if (secondKey == null) return
+
+            for (s in group.subcommands) {
+                if (s.name == secondKey.name) {
+                    subcommand = s
+                    break
+                }
+            }
+        }
+
+        val finalizedOptions = if (subcommand != null && group == null) {
+            options.remove(option!!.name)
+            options
+        } else if (subcommand != null && group != null) {
+            options.remove(option!!.name)
+            options.remove(secondKey!!.name)
+            options
+        } else {
+            options
+        }
+
         val message = SlashCommandMessage(
             event,
             kord,
             userEntity,
             guildEntity,
             channel as TextChannel,
-            options,
+            finalizedOptions,
             localization.get(guildEntity.language, userEntity.language),
             author,
             guild.asGuild()
@@ -411,38 +487,50 @@ class SlashCommandHandler(
 
         // Now, we execute the command! ^w^
         NinoScope.launch {
-            command.execute(message) { exception, success ->
-                if (!success) {
-                    // Report to Sentry, if we can
-                    if (config.sentryDsn != null) {
-                        Sentry.captureException(exception as Throwable)
-                    }
+            if (subcommand != null) {
+                subcommand.execute(message) { exception, success -> onCommandResult(message, success, true, exception, subcommand.name) }
+            } else {
+                command.execute(message) { exception, success -> onCommandResult(message, success, false, exception, command.name) }
+            }
+        }
+    }
 
-                    // Fetch the owners
-                    val owners = config.owners.map {
-                        val user = NinoScope.future { kord.getUser(it.asSnowflake()) }.await() ?: User(
-                            UserData.from(
-                                DiscordUser(
-                                    id = Snowflake("0"),
-                                    username = "Unknown User",
-                                    discriminator = "0000",
-                                    null
-                                )
-                            ),
+    private suspend fun onCommandResult(message: SlashCommandMessage, success: Boolean, isSub: Boolean, exception: Exception?, command: String) {
+        if (success) {
+            logger.info("Executed slash ${if (isSub) "sub" else ""}command: /$command - Author: ${message.author.tag} | Guild: ${message.guild.name} (${message.guild.id.asString}) | Channel: #${message.channel.name}")
+            return
+        }
 
-                            kord
-                        )
+        // Report to Sentry, if we can
+        if (config.sentryDsn != null) {
+            Sentry.captureException(exception as Throwable)
+        }
 
-                        user.tag
-                    }
+        // Fetch the owners
+        val owners = config.owners.map {
+            val user = NinoScope.future { kord.getUser(it.asSnowflake()) }.await() ?: User(
+                UserData.from(
+                    DiscordUser(
+                        id = Snowflake("0"),
+                        username = "Unknown User",
+                        discriminator = "0000",
+                        null
+                    )
+                ),
 
-                    if (config.environment == Environment.Development) {
-                        val baos = ByteArrayOutputStream()
-                        val stream = PrintStream(baos, true, StandardCharsets.UTF_8.name())
-                        stream.use { exception!!.printStackTrace(stream) }
+                kord
+            )
 
-                        val stacktrace = baos.toString(StandardCharsets.UTF_8.name())
-//                        message.reply(
+            user.tag
+        }
+
+        if (config.environment == Environment.Development) {
+            val baos = ByteArrayOutputStream()
+            val stream = PrintStream(baos, true, StandardCharsets.UTF_8.name())
+            stream.use { exception!!.printStackTrace(stream) }
+
+            val stacktrace = baos.toString(StandardCharsets.UTF_8.name())
+            //                        message.reply(
 //                            buildString {
 //                                appendLine("I was unable to execute the **$name** ${if (isSub) "sub" else ""}command. If this is a re-occurrence, please report it to:")
 //                                appendLine(owners.joinToString(", ") { "**$it**" })
@@ -454,7 +542,7 @@ class SlashCommandHandler(
 //                                appendLine("```")
 //                            }
 //                        )
-                    } else {
+        } else {
 //                        message.reply(
 //                            buildString {
 //                                appendLine("I was unable to execute the **$name** ${if (isSub) "sub" else ""}command. If this a re-occurrence, please report it to:")
@@ -462,9 +550,6 @@ class SlashCommandHandler(
 //                                appendLine("and report it to the Noelware server under <#824071651486335036>: https://discord.gg/ATmjFH9kMH")
 //                            }
 //                        )
-                    }
-                }
-            }
         }
     }
 }

@@ -22,4 +22,19 @@
 
 package sh.nino.discord.core.slash
 
-class SlashSubcommand
+import sh.nino.discord.core.slash.builders.ApplicationCommandOption
+
+class SlashSubcommand(
+    val name: String,
+    val description: String,
+    val options: List<ApplicationCommandOption> = listOf(),
+    val required: Boolean = false,
+    private val runner: suspend (SlashCommandMessage) -> Unit
+) {
+    suspend fun execute(msg: SlashCommandMessage, callback: suspend (Exception?, Boolean) -> Unit): Any = try {
+        runner.invoke(msg)
+        callback(null, true)
+    } catch (e: Exception) {
+        callback(e, false)
+    }
+}

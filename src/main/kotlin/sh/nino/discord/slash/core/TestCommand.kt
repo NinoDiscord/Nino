@@ -25,7 +25,7 @@ package sh.nino.discord.slash.core
 import dev.kord.common.entity.ApplicationCommandOptionType
 import sh.nino.discord.core.slash.builders.slashCommand
 
-val testCommand = slashCommand {
+val testSubCommand = slashCommand {
     description = "blep fluff"
     name = "blep"
 
@@ -34,6 +34,20 @@ val testCommand = slashCommand {
         required = true
         name = "is_blep"
         type = ApplicationCommandOptionType.Boolean
+    }
+
+    subcommand("repeat", "bleps x amount of times") {
+        option {
+            description = "How many times we need to blep!"
+            required = false
+            name = "amount"
+            type = ApplicationCommandOptionType.Integer
+        }
+
+        run { msg ->
+            val times = msg.options["amount"]!!.value as Long
+            msg.reply("".repeat(times.toInt()))
+        }
     }
 
     onlyIn(743698927039283201L)

@@ -35,6 +35,8 @@ class SlashCommand(
     val onlyIn: List<Long> = listOf(),
     val userPermissions: Permissions,
     val botPermissions: Permissions,
+    val subcommands: List<SlashSubcommand>,
+    val groups: List<SlashSubcommandGroup>,
     private val runner: suspend (SlashCommandMessage) -> Unit
 ) {
     suspend fun execute(msg: SlashCommandMessage, callback: suspend (Exception?, Boolean) -> Unit): Any = try {

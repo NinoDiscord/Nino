@@ -27,6 +27,8 @@ import dev.kord.common.entity.Permissions
 import sh.nino.discord.core.command.CommandCategory
 import sh.nino.discord.core.slash.SlashCommand
 import sh.nino.discord.core.slash.SlashCommandMessage
+import sh.nino.discord.core.slash.SlashSubcommand
+import sh.nino.discord.core.slash.SlashSubcommandGroup
 import java.lang.IllegalStateException
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
@@ -45,6 +47,8 @@ class SlashCommandBuilder {
     private val userPermissions: MutableList<Permission> = mutableListOf()
     private val botPermissions: MutableList<Permission> = mutableListOf()
     private val commandOptions: MutableList<ApplicationCommandOption> = mutableListOf()
+    private val subcommands: MutableList<SlashSubcommand> = mutableListOf()
+    private val subcommandGroups: MutableList<SlashSubcommandGroup> = mutableListOf()
     private val onlyInGuilds: MutableList<Long> = mutableListOf()
     private var executor: (suspend (SlashCommandMessage) -> Unit)? = null
 
@@ -53,6 +57,11 @@ class SlashCommandBuilder {
 
     var category: CommandCategory = CommandCategory.CORE
     var cooldown = 5
+
+    fun bulkAddOptions(options: List<ApplicationCommandOption>): SlashCommandBuilder {
+        commandOptions += options
+        return this
+    }
 
     @OptIn(ExperimentalContracts::class)
     fun option(block: ApplicationCommandOptionBuilder.() -> Unit): SlashCommandBuilder {
@@ -89,6 +98,25 @@ class SlashCommandBuilder {
         return this
     }
 
+    @OptIn(ExperimentalContracts::class)
+    fun subcommand(name: String, description: String, block: SlashSubcommandBuilder.() -> Unit): SlashCommandBuilder {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+
+        val subcommand = SlashSubcommandBuilder(name, description).apply(block).build(this)
+        subcommands.add(subcommand)
+        return this
+    }
+
+    @OptIn(ExperimentalContracts::class)
+    fun subcommandGroup(name: String, description: String, block: SlashSubcommandGroupBuilder.() -> Unit): SlashCommandBuilder {
+        contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+
+        val group = SlashSubcommandGroupBuilder(name, description, this).apply(block).build()
+        subcommandGroups.add(group)
+
+        return this
+    }
+
     fun build(): SlashCommand {
         require(this::description.isInitialized) { "`description` must be defined." }
         require(this::name.isInitialized) { "`name` must be defined." }
@@ -114,6 +142,8 @@ class SlashCommandBuilder {
                 }
             },
 
+            subcommands,
+            subcommandGroups,
             executor!!
         )
     }
