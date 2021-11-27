@@ -37,6 +37,7 @@ import sh.nino.discord.data.Config
 import sh.nino.discord.extensions.inject
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.ninoModule
+import sh.nino.discord.slash.slashCommandsModule
 import java.io.File
 import kotlin.system.exitProcess
 
@@ -76,6 +77,7 @@ object Bootstrap {
                 ninoModule,
                 *commandsModule.toTypedArray(),
                 ktorModule,
+                slashCommandsModule,
                 module {
                     single {
                         NinoBot()

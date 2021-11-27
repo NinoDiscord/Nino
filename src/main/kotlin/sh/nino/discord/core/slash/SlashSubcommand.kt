@@ -20,21 +20,6 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.modules
+package sh.nino.discord.core.slash
 
-import org.koin.dsl.module
-import sh.nino.discord.core.command.CommandHandler
-import sh.nino.discord.core.slash.SlashCommandHandler
-import sh.nino.discord.modules.localization.LocalizationModule
-import sh.nino.discord.modules.prometheus.PrometheusModule
-import sh.nino.discord.modules.ravy.RavyModule
-import sh.nino.discord.modules.timeouts.TimeoutsModule
-
-val ninoModule = module {
-    single { PrometheusModule(get()) }
-    single { CommandHandler(get(), get(), get(), get()) }
-    single { LocalizationModule(get()) }
-    single { RavyModule(get(), get()) }
-    single { TimeoutsModule(get(), get()) }
-    single { SlashCommandHandler(get(), get(), get()) }
-}
+class SlashSubcommand

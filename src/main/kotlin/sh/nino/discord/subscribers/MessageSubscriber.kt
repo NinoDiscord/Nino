@@ -23,10 +23,12 @@
 package sh.nino.discord.subscribers
 
 import dev.kord.core.Kord
+import dev.kord.core.event.interaction.InteractionCreateEvent
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.core.command.CommandHandler
+import sh.nino.discord.core.slash.SlashCommandHandler
 
 fun Kord.applyMessageEvents() {
     val koin = GlobalContext.get()
@@ -34,5 +36,10 @@ fun Kord.applyMessageEvents() {
     on<MessageCreateEvent> {
         val handler = koin.get<CommandHandler>()
         handler.onCommand(this)
+    }
+
+    on<InteractionCreateEvent> {
+        val handler = koin.get<SlashCommandHandler>()
+        handler.onInteraction(this)
     }
 }

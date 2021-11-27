@@ -20,21 +20,26 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.modules
+package sh.nino.discord.slash.core
 
-import org.koin.dsl.module
-import sh.nino.discord.core.command.CommandHandler
-import sh.nino.discord.core.slash.SlashCommandHandler
-import sh.nino.discord.modules.localization.LocalizationModule
-import sh.nino.discord.modules.prometheus.PrometheusModule
-import sh.nino.discord.modules.ravy.RavyModule
-import sh.nino.discord.modules.timeouts.TimeoutsModule
+import dev.kord.common.entity.ApplicationCommandOptionType
+import sh.nino.discord.core.slash.builders.slashCommand
 
-val ninoModule = module {
-    single { PrometheusModule(get()) }
-    single { CommandHandler(get(), get(), get(), get()) }
-    single { LocalizationModule(get()) }
-    single { RavyModule(get(), get()) }
-    single { TimeoutsModule(get(), get()) }
-    single { SlashCommandHandler(get(), get(), get()) }
+val testCommand = slashCommand {
+    description = "blep fluff"
+    name = "blep"
+
+    option {
+        description = "are u a blepper?"
+        required = true
+        name = "is_blep"
+        type = ApplicationCommandOptionType.Boolean
+    }
+
+    onlyIn(743698927039283201L)
+
+    run { msg ->
+        val blepper = msg.options["is_blep"]!!.value as Boolean
+        msg.reply("blepper: **${if (blepper) "yes" else "no"}**", true)
+    }
 }

@@ -228,7 +228,7 @@ class CommandHandler(
 
         // if there is permissions for the user, let's check.
         // If it is the guild owner, bypass checks
-        if (command.userPermissions.values.isNotEmpty() && !guild.isOwner) {
+        if (command.userPermissions.values.isNotEmpty() && guild.ownerId != author.id) {
             val member = author.asMember(guild.id)
             val missing = command.userPermissions.values.filter {
                 !member.getPermissions().contains(it)
@@ -363,7 +363,6 @@ class CommandHandler(
             )
         }
 
-        Sentry.captureException(ex as Throwable)
         logger.error("Unable to execute command $name:", ex)
     }
 }

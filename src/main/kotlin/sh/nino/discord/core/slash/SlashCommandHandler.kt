@@ -22,19 +22,27 @@
 
 package sh.nino.discord.core.slash
 
-import dev.kord.common.entity.ApplicationCommandOptionType
-import dev.kord.common.entity.InteractionResponseType
-import dev.kord.common.entity.InteractionType
-import dev.kord.common.entity.Snowflake
+import dev.kord.common.annotation.KordExperimental
+import dev.kord.common.annotation.KordUnsafe
+import dev.kord.common.entity.*
+import dev.kord.common.entity.optional.Optional
 import dev.kord.common.entity.optional.optional
 import dev.kord.core.Kord
+import dev.kord.core.cache.data.UserData
+import dev.kord.core.entity.User
+import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.entity.interaction.ApplicationCommandInteraction
 import dev.kord.core.event.interaction.InteractionCreateEvent
 import dev.kord.rest.builder.interaction.*
+import dev.kord.rest.json.request.FollowupMessageCreateRequest
 import dev.kord.rest.json.request.InteractionApplicationCommandCallbackData
 import dev.kord.rest.json.request.InteractionResponseCreateRequest
+import dev.kord.rest.json.request.MultipartFollowupMessageCreateRequest
+import io.sentry.Sentry
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.future.await
+import kotlinx.coroutines.future.future
 import kotlinx.coroutines.launch
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.database.tables.GuildEntity
@@ -43,16 +51,21 @@ import sh.nino.discord.core.database.tables.UserEntity
 import sh.nino.discord.core.database.tables.Users
 import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.core.slash.builders.ApplicationCommandOption
+import sh.nino.discord.data.Config
+import sh.nino.discord.data.Environment
 import sh.nino.discord.extensions.asSnowflake
 import sh.nino.discord.kotlin.logging
 import sh.nino.discord.modules.localization.LocalizationModule
-import sh.nino.discord.modules.prometheus.PrometheusModule
+import java.io.ByteArrayOutputStream
+import java.io.PrintStream
 import java.lang.IllegalStateException
+import java.nio.charset.StandardCharsets
+import kotlin.reflect.jvm.jvmName
 
 class SlashCommandHandler(
-    private val prometheus: PrometheusModule,
     private val kord: Kord,
-    private val localization: LocalizationModule
+    private val localization: LocalizationModule,
+    private val config: Config
 ) {
     private val logger by logging<SlashCommandHandler>()
     val commands: List<SlashCommand> = GlobalContext
@@ -63,7 +76,7 @@ class SlashCommandHandler(
         logger.info("Registering slash commands...")
         NinoScope.launch {
             for (command in commands) {
-                if (command.onlyIn.isNotEmpty()) {
+                if (command.onlyIn.isEmpty()) {
                     registerSlashCommand(command)
                 } else {
                     registerGuildSlashCommand(command)
@@ -220,6 +233,8 @@ class SlashCommandHandler(
                     }
                 }
             }
+
+            else -> error("Unknown option: ${option.type}")
         }
     }
 
@@ -245,6 +260,7 @@ class SlashCommandHandler(
         }
     }
 
+    @OptIn(KordUnsafe::class, KordExperimental::class)
     suspend fun onInteraction(event: InteractionCreateEvent) {
         // If it is not an application command, skip it.
         if (event.interaction.type != InteractionType.ApplicationCommand) return
@@ -260,8 +276,8 @@ class SlashCommandHandler(
         // Bots and webhooks cannot invoke slash commands, so it's
         // pretty redundant to.
         val author = event.interaction.user.asUser()
-        val guild = kord.rest.guild.getGuild(event.interaction.data.guildId.value!!)
-        val channel = kord.rest.channel.getChannel(event.interaction.data.channelId.value.asSnowflake())
+        val guild = kord.unsafe.guild(event.interaction.data.guildId.value!!)
+        val channel = kord.unsafe.channel(event.interaction.data.channelId.value.asSnowflake()).asChannel()
 
         // Now we get guild and user settings
         var guildEntity = asyncTransaction {
@@ -326,5 +342,129 @@ class SlashCommandHandler(
                 InteractionApplicationCommandCallbackData().optional()
             )
         )
+
+        // Collect all options
+        val options = mutableMapOf<String, CommandArgument<*>?>()
+        if (event.interaction.data.data.options.value != null) {
+            for (option in event.interaction.data.data.options.value!!) {
+                options[option.name] = option.value.value
+            }
+        }
+
+        // Check if the executor has permission to execute this slash command.
+        // This inherits for all subcommands/subcommand groups
+        if (command.userPermissions.values.isNotEmpty() && guild.asGuild().ownerId != author.id) {
+            val member = author.asMember(guild.id)
+            val missing = command.userPermissions.values.filter {
+                !member.getPermissions().contains(it)
+            }
+
+            if (missing.isNotEmpty()) {
+                val perms = missing.map { perm -> perm::class.jvmName.split("$").last() }
+                kord.rest.interaction.createFollowupMessage(
+                    kord.selfId,
+                    event.interaction.token,
+                    MultipartFollowupMessageCreateRequest(
+                        FollowupMessageCreateRequest(
+                            content = Optional.invoke("You are missing the following permissions: $perms.")
+                        )
+                    )
+                )
+
+                return
+            }
+        }
+
+        if (command.botPermissions.values.isNotEmpty()) {
+            val self = guild.members.firstOrNull { it.id.asString == kord.selfId.asString } ?: return
+            val missing = command.botPermissions.values.filter {
+                !self.getPermissions().contains(it)
+            }
+
+            if (missing.isNotEmpty()) {
+                val perms = missing.map { perm -> perm::class.jvmName.split("$").last() }
+                kord.rest.interaction.createFollowupMessage(
+                    kord.selfId,
+                    event.interaction.token,
+                    MultipartFollowupMessageCreateRequest(
+                        FollowupMessageCreateRequest(
+                            content = Optional.invoke("I am missing the following permissions: $perms.")
+                        )
+                    )
+                )
+
+                return
+            }
+        }
+
+        val message = SlashCommandMessage(
+            event,
+            kord,
+            userEntity,
+            guildEntity,
+            channel as TextChannel,
+            options,
+            localization.get(guildEntity.language, userEntity.language),
+            author,
+            guild.asGuild()
+        )
+
+        // Now, we execute the command! ^w^
+        NinoScope.launch {
+            command.execute(message) { exception, success ->
+                if (!success) {
+                    // Report to Sentry, if we can
+                    if (config.sentryDsn != null) {
+                        Sentry.captureException(exception as Throwable)
+                    }
+
+                    // Fetch the owners
+                    val owners = config.owners.map {
+                        val user = NinoScope.future { kord.getUser(it.asSnowflake()) }.await() ?: User(
+                            UserData.from(
+                                DiscordUser(
+                                    id = Snowflake("0"),
+                                    username = "Unknown User",
+                                    discriminator = "0000",
+                                    null
+                                )
+                            ),
+
+                            kord
+                        )
+
+                        user.tag
+                    }
+
+                    if (config.environment == Environment.Development) {
+                        val baos = ByteArrayOutputStream()
+                        val stream = PrintStream(baos, true, StandardCharsets.UTF_8.name())
+                        stream.use { exception!!.printStackTrace(stream) }
+
+                        val stacktrace = baos.toString(StandardCharsets.UTF_8.name())
+//                        message.reply(
+//                            buildString {
+//                                appendLine("I was unable to execute the **$name** ${if (isSub) "sub" else ""}command. If this is a re-occurrence, please report it to:")
+//                                appendLine(owners.joinToString(", ") { "**$it**" })
+//                                appendLine()
+//                                appendLine("Since you're in development mode, I will send the stacktrace here and in the console.")
+//                                appendLine()
+//                                appendLine("```kotlin")
+//                                appendLine(stacktrace.elipsis(1500))
+//                                appendLine("```")
+//                            }
+//                        )
+                    } else {
+//                        message.reply(
+//                            buildString {
+//                                appendLine("I was unable to execute the **$name** ${if (isSub) "sub" else ""}command. If this a re-occurrence, please report it to:")
+//                                appendLine(owners.joinToString(", ") { "**$it**" })
+//                                appendLine("and report it to the Noelware server under <#824071651486335036>: https://discord.gg/ATmjFH9kMH")
+//                            }
+//                        )
+                    }
+                }
+            }
+        }
     }
 }

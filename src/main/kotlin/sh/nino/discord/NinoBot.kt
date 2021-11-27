@@ -47,6 +47,7 @@ import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.database.tables.*
 import sh.nino.discord.core.database.transactions.asyncTransaction
 import sh.nino.discord.core.ktor.NinoKtorServer
+import sh.nino.discord.core.slash.SlashCommandHandler
 import sh.nino.discord.core.threading.NinoThreadFactory
 import sh.nino.discord.data.Config
 import sh.nino.discord.data.Environment
@@ -155,6 +156,10 @@ class NinoBot {
             }
         }
 
+        // Setup slash commands
+        koin.get<SlashCommandHandler>()
+
+        // Login to Discord!
         kord.applyGenericEvents()
         kord.applyMessageEvents()
         kord.login {

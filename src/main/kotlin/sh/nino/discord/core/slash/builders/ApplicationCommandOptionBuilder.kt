@@ -34,11 +34,7 @@ data class ApplicationCommandOption(
     val required: Boolean = false,
     val choices: List<NameValuePair>? = null,
     val options: List<ApplicationCommandOption>? = null
-) {
-    fun toRest() {
-        // TODO: this
-    }
-}
+)
 
 data class NameValuePair(
     val name: String,
