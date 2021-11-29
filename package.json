@@ -68,7 +68,7 @@
     "@types/luxon": "2.0.7",
     "@types/ms": "0.7.31",
     "@types/node": "16.11.10",
-    "@types/ws": "8.2.0",
+    "@types/ws": "8.2.1",
     "@typescript-eslint/eslint-plugin": "5.4.0",
     "@typescript-eslint/parser": "5.4.0",
     "discord-api-types": "0.25.0",
