@@ -48,7 +48,7 @@
     "fastify-no-icon": "4.0.0",
     "ioredis": "4.28.2",
     "js-yaml": "4.1.0",
-    "luxon": "2.1.1",
+    "luxon": "2.2.0",
     "ms": "2.1.3",
     "pg": "8.7.1",
     "prom-client": "14.0.1",
