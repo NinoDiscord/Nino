@@ -40,12 +40,9 @@ object AutomodTable: SnowflakeTable("automod") {
     val shortlinks = bool("shortlinks").default(false)
     val blacklist = bool("blacklist").default(false)
     val mentions = bool("mentions").default(false)
-    val guildId = long("guild_id")
     val invites = bool("invites").default(false)
     val spam = bool("spam").default(false)
     val raid = bool("raid").default(false)
-
-    override val primaryKey = PrimaryKey(guildId, name = "PK_Automod_ID")
 }
 
 class AutomodEntity(id: EntityID<Long>): LongEntity(id) {
@@ -60,7 +57,6 @@ class AutomodEntity(id: EntityID<Long>): LongEntity(id) {
     var shortlinks by AutomodTable.shortlinks
     var blacklist by AutomodTable.blacklist
     var mentions by AutomodTable.mentions
-    var guildId by AutomodTable.guildId
     var invites by AutomodTable.invites
     var spam by AutomodTable.spam
     var raid by AutomodTable.raid

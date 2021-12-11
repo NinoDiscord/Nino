@@ -59,7 +59,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.1")
 
     // Koin (Dependency Injection)
-    implementation("io.insert-koin:koin-logger-slf4j:3.1.3")
+    implementation("io.insert-koin:koin-logger-slf4j:3.1.4")
     implementation("io.insert-koin:koin-core-ext:3.0.2")
 
     // Logging (SLF4J + Logback)
@@ -68,13 +68,13 @@ dependencies {
     api("org.slf4j:slf4j-api:1.7.32")
 
     // Ktor Server (server for prometheus)
-    implementation("io.ktor:ktor-server-netty:1.6.4")
+    implementation("io.ktor:ktor-server-netty:1.6.6")
 
     // Ktor (http client)
-    implementation("io.ktor:ktor-client-serialization:1.6.4")
-    implementation("io.ktor:ktor-client-websockets:1.6.4")
-    implementation("io.ktor:ktor-client-okhttp:1.6.4")
-    implementation("io.ktor:ktor-client-core:1.6.4")
+    implementation("io.ktor:ktor-client-serialization:1.6.6")
+    implementation("io.ktor:ktor-client-websockets:1.6.6")
+    implementation("io.ktor:ktor-client-okhttp:1.6.6")
+    implementation("io.ktor:ktor-client-core:1.6.6")
 
     // Kord
     implementation("dev.kord:kord-core:0.8.0-M7")
@@ -105,7 +105,7 @@ dependencies {
     implementation("io.prometheus:simpleclient:0.12.0")
 
     // Sentry (error handling as a service :^)
-    implementation("io.sentry:sentry-logback:5.4.0")
+    implementation("io.sentry:sentry-logback:5.4.3")
     implementation("io.sentry:sentry:5.4.0")
 
     // Apache Utilities
