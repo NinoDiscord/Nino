@@ -61,6 +61,36 @@ fun Kord.applyGenericEvents() {
     }
 
     on<DisconnectEvent> {
-        logger.warn("Shard #${this.shard} has disconnected from the world. :<")
+        val reason = buildString {
+            append("Reason: ")
+
+            if (this@on is DisconnectEvent.DetachEvent)
+                append("Shard #${this@on.shard} has been detached.")
+
+            if (this@on is DisconnectEvent.UserCloseEvent)
+                append("Closed by you.")
+
+            if (this@on is DisconnectEvent.TimeoutEvent)
+                append("Possible internet connection loss; something was timed out. :<")
+
+            if (this@on is DisconnectEvent.DiscordCloseEvent) {
+                val event = this@on
+                append("Discord closed off our connection (${event.closeCode.name} ~ ${event.closeCode.code}; recoverable=${if (event.recoverable) "yes" else "no"})")
+            }
+
+            if (this@on is DisconnectEvent.RetryLimitReachedEvent)
+                append("Failed to established connection too many times, please restart the bot.")
+
+            if (this@on is DisconnectEvent.ReconnectingEvent)
+                append("Requested reconnect from Discord.")
+
+            if (this@on is DisconnectEvent.SessionReset)
+                append("Gateway was closed; attempting to start new session.")
+
+            if (this@on is DisconnectEvent.ZombieConnectionEvent)
+                append("Discord is no longer responding to gateway commands.")
+        }
+
+        logger.warn("Shard #${this.shard} has disconnected from the world: $reason")
     }
 }

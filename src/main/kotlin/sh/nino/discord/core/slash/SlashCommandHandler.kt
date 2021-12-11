@@ -61,6 +61,7 @@ import java.io.PrintStream
 import java.lang.IllegalStateException
 import java.nio.charset.StandardCharsets
 import kotlin.reflect.jvm.jvmName
+import kotlin.system.exitProcess
 
 class SlashCommandHandler(
     private val kord: Kord,
@@ -97,6 +98,7 @@ class SlashCommandHandler(
         if (commandsThatDontExist.isNotEmpty()) {
             logger.info("|- Found ${commandsThatDontExist.size} commands that should be discarded.")
             for (cmd in commandsThatDontExist) {
+                logger.info("--~|- /${cmd.name} ~ ${cmd.description}")
                 kord.rest.interaction.deleteGlobalApplicationCommand(kord.selfId, cmd.id)
             }
         }
@@ -153,6 +155,12 @@ class SlashCommandHandler(
 
             ApplicationCommandOptionType.Channel -> {
                 channel(option.name, option.description) {
+                    this.required = option.required
+                }
+            }
+
+            ApplicationCommandOptionType.Mentionable -> {
+                mentionable(option.name, option.description) {
                     this.required = option.required
                 }
             }
@@ -273,10 +281,16 @@ class SlashCommandHandler(
                 defaultPermission = true
 
                 for (option in command.options) {
+                    println(option)
                     fillInOptions(option)
                 }
             }
         }
+
+        // here for testing 😳
+        // i feel like im going to forget this and check why
+        // prod is crashing - foreshadowing ✨
+        exitProcess(0)
     }
 
     @OptIn(KordUnsafe::class, KordExperimental::class)

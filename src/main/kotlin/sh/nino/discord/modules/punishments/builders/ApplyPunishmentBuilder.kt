@@ -23,9 +23,11 @@
 package sh.nino.discord.modules.punishments.builders
 
 import dev.kord.core.entity.Attachment
+import dev.kord.core.entity.channel.VoiceChannel
 
 data class ApplyPunishmentOptions(
     val attachments: List<String> = listOf(),
+    val voiceChannel: VoiceChannel? = null,
     val shouldPublish: Boolean = true,
     val reason: String? = null,
     val soft: Boolean = false,
@@ -39,6 +41,13 @@ data class ApplyPunishmentOptions(
  */
 class ApplyPunishmentBuilder {
     private var attachments: MutableList<String> = mutableListOf()
+
+    /**
+     * WARN: This is only used in voice moderation.
+     *
+     * Returns the voice channel it was in.
+     */
+    var voiceChannel: VoiceChannel? = null
 
     /**
      * Returns if we should publish this punishment to the mod-log, if any.
@@ -86,6 +95,7 @@ class ApplyPunishmentBuilder {
      */
     fun build(): ApplyPunishmentOptions = ApplyPunishmentOptions(
         attachments = attachments.toList(),
+        voiceChannel,
         publish,
         reason,
         soft,

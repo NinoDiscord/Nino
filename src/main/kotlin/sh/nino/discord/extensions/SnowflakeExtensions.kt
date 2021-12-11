@@ -20,32 +20,14 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.slash.core
+package sh.nino.discord.extensions
 
-import dev.kord.common.entity.ApplicationCommandOptionType
-import sh.nino.discord.core.slash.builders.slashCommand
+import dev.kord.common.entity.Snowflake
+import java.time.Instant
+import kotlin.math.floor
 
-val testSubCommand = slashCommand {
-    description = "blep fluff"
-    name = "blep"
-
-    subcommand("repeat", "bleps x amount of times") {
-        required = false
-        option {
-            description = "How many times we need to blep!"
-            required = false
-            name = "amount"
-            type = ApplicationCommandOptionType.Integer
-        }
-
-        run { msg ->
-            val times = msg.options["amount"]!!.value as Long
-            msg.reply("blep".repeat(times.toInt()))
-        }
-    }
-
-    onlyIn(743698927039283201L)
-    run { msg ->
-        msg.reply("owo")
-    }
-}
+/**
+ * Returns a [Instant] on when this [Snowflake] was created at.
+ */
+val Snowflake.createdAt: Instant
+    get() = Instant.ofEpochMilli(floor((this.value.toLong() / 4194304).toDouble()).toLong() + 1420070400000L)

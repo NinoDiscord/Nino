@@ -20,32 +20,16 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.slash.core
+package sh.nino.discord.extensions
 
-import dev.kord.common.entity.ApplicationCommandOptionType
-import sh.nino.discord.core.slash.builders.slashCommand
-
-val testSubCommand = slashCommand {
-    description = "blep fluff"
-    name = "blep"
-
-    subcommand("repeat", "bleps x amount of times") {
-        required = false
-        option {
-            description = "How many times we need to blep!"
-            required = false
-            name = "amount"
-            type = ApplicationCommandOptionType.Integer
-        }
-
-        run { msg ->
-            val times = msg.options["amount"]!!.value as Long
-            msg.reply("blep".repeat(times.toInt()))
-        }
-    }
-
-    onlyIn(743698927039283201L)
-    run { msg ->
-        msg.reply("owo")
-    }
+/**
+ * Runs the specified [callback] and checks if an [Exception] occurs,
+ * if it does, it will return `null`.
+ *
+ * @param T The type that this function is being called from
+ */
+fun <T> T.nullOnError(): T? = try {
+    this
+} catch (e: Exception) {
+    null
 }
