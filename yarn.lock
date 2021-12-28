@@ -1228,21 +1228,21 @@ fastify-warning@^0.2.0:
   resolved "https://registry.yarnpkg.com/fastify-warning/-/fastify-warning-0.2.0.tgz#e717776026a4493dc9a2befa44db6d17f618008f"
   integrity sha512-s1EQguBw/9qtc1p/WTY4eq9WMRIACkj+HTcOIK1in4MV5aFaQC9ZCIt0dJ7pr5bIf4lPpHvAtP2ywpTNgs7hqw==
 
-fastify@3.25.2:
-  version "3.25.2"
-  resolved "https://registry.yarnpkg.com/fastify/-/fastify-3.25.2.tgz#09c10a66b89bef4a4b74d0f35d9ee6e2d71585e3"
-  integrity sha512-uH0RN/l2GrpvOpun5V4mLvreUjbTlgsEqodExGrmCDsBPfvUQ07Q0ZEY0HIB0TgJTr/ey6dAxlGzAZelV6CNXg==
+fastify@3.25.3:
+  version "3.25.3"
+  resolved "https://registry.yarnpkg.com/fastify/-/fastify-3.25.3.tgz#7a2578edbdb59729cbf48ec44b5ae2b0f8db1f4a"
+  integrity sha512-20SbobjjMfjGNCU4PlcZis3d5XLDtQxIbcAf6ogi/8zPxRxOOkKwfjmj7yW9Q1VnxDpBwcllwPtbZ/LyvQzXbQ==
   dependencies:
     "@fastify/ajv-compiler" "^1.0.0"
     abstract-logging "^2.0.0"
     avvio "^7.1.2"
     fast-json-stringify "^2.5.2"
     fastify-error "^0.3.0"
-    fastify-warning "^0.2.0"
     find-my-way "^4.5.0"
     flatstr "^1.0.12"
     light-my-request "^4.2.0"
     pino "^6.13.0"
+    process-warning "^1.0.0"
     proxy-addr "^2.0.7"
     rfdc "^1.1.4"
     secure-json-parse "^2.0.0"
@@ -2097,6 +2097,11 @@ prisma@3.7.0:
   integrity sha512-pzgc95msPLcCHqOli7Hnabu/GRfSGSUWl5s2P6N13T/rgMB+NNeKbxCmzQiZT2yLOeLEPivV6YrW1oeQIwJxcg==
   dependencies:
     "@prisma/engines" "3.7.0-31.8746e055198f517658c08a0c426c7eec87f5a85f"
+
+process-warning@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/process-warning/-/process-warning-1.0.0.tgz#980a0b25dc38cd6034181be4b7726d89066b4616"
+  integrity sha512-du4wfLyj4yCZq1VupnVSZmRsPJsNuxoDQFdCFHLaYiEbFBD7QE0a+I4D7hOxrVnh78QE/YipFAj9lXHiXocV+Q==
 
 progress@^2.0.0:
   version "2.0.3"
