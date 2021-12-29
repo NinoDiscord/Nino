@@ -1,0 +1,5 @@
+{
+  "version": "${version}",
+  "commit_sha": "${commitSha}",
+  "build_date": "${buildDate}"
+}

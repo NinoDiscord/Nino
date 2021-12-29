@@ -1,13 +1,15 @@
-FROM noelware/openjdk:latest AS builder
+FROM eclipse-temurin:17-alpine AS builder
 
 WORKDIR /
 COPY . .
 RUN chmod +x gradlew
 RUN ./gradlew build
 
-FROM noelware/openjdk:latest
+FROM gcr.io/distroless/java17-debian11:latest
 
-WORKDIR /app/Nino
-COPY --from=builder /build/libs/Nino.jar /app/Nino/Nino.jar
+WORKDIR /app/noelware/nino
+COPY --from=builder /build/libs/Nino.jar /app/noelware/nino/Nino.jar
+COPY --from=builder /docker/docker-entrypoint.sh /app/noelware/nino/docker-entrypoint.sh
+RUN chmod +x /app/noelware/nino/docker-entrypoint.sh
 
-CMD ["java", "-jar", "Nino.jar"]
+CMD [ "/app/noelware/nino/docker-entrypoint.sh" ]

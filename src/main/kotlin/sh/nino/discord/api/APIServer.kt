@@ -21,3 +21,18 @@
  */
 
 package sh.nino.discord.api
+
+import io.ktor.server.netty.*
+import sh.nino.discord.data.Config
+import sh.nino.discord.kotlin.inject
+import sh.nino.discord.kotlin.logging
+
+class APIServer {
+    private lateinit var server: NettyApplicationEngine
+    private val logger by logging<APIServer>()
+    private val config: Config by inject()
+
+    suspend fun launch() {
+        logger.info("Launching API server...")
+    }
+}

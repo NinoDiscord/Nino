@@ -23,6 +23,8 @@
 package sh.nino.discord.core.caching
 
 import com.github.benmanes.caffeine.cache.Caffeine
+import com.github.benmanes.caffeine.cache.RemovalCause
+import dev.kord.common.entity.Snowflake
 import kotlinx.coroutines.future.await
 import kotlinx.serialization.InternalSerializationApi
 import kotlinx.serialization.json.Json
@@ -59,9 +61,13 @@ class SimpleCache<out V: Any>(private val name: String, private val kClass: KCla
         .removalListener<Long, V?> { key, value, cause ->
             logger.debug("Key $key was removed because of ${cause.name} (evicted=${if (cause.wasEvicted()) "yes" else "no"})")
 
-            val encoded = json.encodeToString(kClass.serializer(), value!!)
-            val cache = redis.getMap<Long, String>("nino:cache")
-            cache[key!!] = encoded
+            if (cause == RemovalCause.EXPIRED) {
+                logger.debug("Caching $key due to being it expired")
+
+                val encoded = json.encodeToString(kClass.serializer(), value!!)
+                val cache = redis.getMap<Long, String>("nino:cache")
+                cache[key!!] = encoded
+            }
         }
         .expireAfterAccess(1L, TimeUnit.HOURS)
         .suspendingAsyncCache { key ->
@@ -84,7 +90,32 @@ class SimpleCache<out V: Any>(private val name: String, private val kClass: KCla
             error("unable to find info from key: $key")
         }
 
-    suspend fun get(key: Long): V? = inMemory[key]?.await()
+    /**
+     * Returns a given value from [key]. The value will return
+     * null if it was expired, but a [loader] function will
+     * add it if it doesn't exist.
+     *
+     * @param key The snowflake as a [Long] to store as
+     * @param loader A loader function if we cannot find it.
+     * @return The [value][V] given.
+     */
+    suspend fun get(key: Long, loader: suspend () -> @UnsafeVariance V): V {
+        val map = inMemory.asMap()
+        if (!map.containsKey(key)) {
+            val value = loader()
+            put(key, value)
+
+            return value
+        }
+
+        return inMemory[key]!!.await()
+    }
+
+    /**
+     * Adds a value to the in memory cache pool.
+     * @param key The snowflake as a [Long] to add
+     * @param value The value to store.
+     */
     fun put(key: Long, value: @UnsafeVariance V) {
         inMemory.put(key, CompletableFuture.completedFuture(value))
     }
