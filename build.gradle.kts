@@ -38,6 +38,7 @@ buildscript {
         classpath("com.diffplug.spotless:spotless-plugin-gradle:6.0.5")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
         classpath("org.jetbrains.kotlin:kotlin-serialization:1.6.10")
+        classpath("io.kotest:kotest-gradle-plugin:0.3.9")
         classpath("gay.floof.utils:gradle-utils:1.1.0")
     }
 }
@@ -47,6 +48,7 @@ plugins {
     kotlin("plugin.serialization") version "1.6.10"
     id("com.diffplug.spotless") version "6.0.0"
     kotlin("jvm") version "1.6.10"
+    id("io.kotest") version "0.3.9"
     application
 }
 
@@ -102,6 +104,11 @@ subprojects {
 
         // Noel Utilities
         floof("commons", "commons-slf4j", "1.1.0")
+
+        // Testing utilities
+        testImplementation("io.kotest:kotest-runner-junit5-jvm:5.0.3")
+        testImplementation("io.kotest:kotest-assertions-core-jvm:5.0.3")
+        testImplementation("io.kotest:kotest-property-jvm:5.0.3")
     }
 
     // Setup Spotless in all subprojects

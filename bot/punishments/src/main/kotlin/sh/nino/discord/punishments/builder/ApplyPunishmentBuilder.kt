@@ -27,8 +27,8 @@ import dev.kord.core.entity.Attachment
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.channel.VoiceChannel
+import sh.nino.discord.database.tables.PunishmentType
 import sh.nino.discord.punishments.MemberLike
-import sh.nino.discord.punishments.PunishmentType
 
 /**
  * The data when you fun the [ApplyPunishmentBuilder.build] method.

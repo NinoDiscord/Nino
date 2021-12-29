@@ -44,6 +44,19 @@ on:
 jobs:
   ktlint:
     runs-on: ubuntu-latest
+    services:
+      redis:
+        image: bitnami/redis:latest
+        ports:
+          - 6379:6379
+      timeouts:
+        image: ghcr.io/ninodiscord/timeouts/timeouts:latest
+        env:
+          AUTH: owodauwu
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
+        ports:
+          - 4025:4025
     steps:
       - name: Checks out the repository
         uses: actions/checkout@v2

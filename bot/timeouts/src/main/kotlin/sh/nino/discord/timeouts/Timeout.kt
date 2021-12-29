@@ -20,30 +20,30 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.database.tables
+package sh.nino.discord.timeouts
 
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
-import sh.nino.discord.database.SnowflakeTable
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-object Warnings: SnowflakeTable("warnings") {
-    var receivedAt = datetime("received_at")
-    var expiresIn = datetime("expires_in").nullable()
-    var reason = text("reason").nullable()
-    var guildId = long("guild_id")
-    var amount = integer("amount").default(0)
+/**
+ * Represents the timeout as a serializable object. ([source](https://github.com/NinoDiscord/timeouts/blob/master/pkg/types.go#L18-L26))
+ */
+@Serializable
+data class Timeout(
+    @SerialName("guild_id")
+    val guildId: String,
 
-    override val primaryKey: PrimaryKey = PrimaryKey(id, guildId, name = "PK_UserWarnings")
-}
+    @SerialName("user_id")
+    val userId: String,
 
-class WarningsEntity(id: EntityID<Long>): LongEntity(id) {
-    companion object: LongEntityClass<WarningsEntity>(Warnings)
+    @SerialName("issued_at")
+    val issuedAt: Long,
 
-    var receivedAt by Warnings.receivedAt
-    var expiresIn by Warnings.expiresIn
-    var reason by Warnings.reason
-    var guildId by Warnings.guildId
-    var amount by Warnings.amount
-}
+    @SerialName("expires_at")
+    val expiresIn: Long,
+
+    @SerialName("moderator_id")
+    val moderatorId: String,
+    val reason: String? = null,
+    val type: String
+)

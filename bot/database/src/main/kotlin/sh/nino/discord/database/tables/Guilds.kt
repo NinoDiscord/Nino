@@ -21,3 +21,32 @@
  */
 
 package sh.nino.discord.database.tables
+
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.VarCharColumnType
+import sh.nino.discord.database.SnowflakeTable
+import sh.nino.discord.database.columns.array
+
+object GuildSettings: SnowflakeTable("guilds") {
+    val usePlainModlogMessage = bool("use_plain_modlog_message").default(false)
+    val modlogWebhookUri = text("modlog_webhook_uri").nullable().default(null)
+    val noThreadsRoleId = long("no_threads_role_id").nullable().default(null)
+    val modlogChannelId = long("modlog_channel_id").nullable().default(null)
+    val mutedRoleId = long("muted_role_id").nullable().default(null)
+    val language = text("language").default("en_US")
+    val prefixes = array<String>("prefixes", VarCharColumnType(18)).default(arrayOf())
+}
+
+class GuildSettingsEntity(id: EntityID<Long>): LongEntity(id) {
+    companion object: LongEntityClass<GuildSettingsEntity>(GuildSettings)
+
+    var usePlainModlogMessage by GuildSettings.usePlainModlogMessage
+    var modlogWebhookUri by GuildSettings.modlogWebhookUri
+    var noThreadsRoleId by GuildSettings.noThreadsRoleId
+    var modlogChannelId by GuildSettings.modlogChannelId
+    var mutedRoleId by GuildSettings.mutedRoleId
+    var language by GuildSettings.language
+    var prefixes by GuildSettings.prefixes
+}

@@ -24,6 +24,9 @@ package sh.nino.discord.punishments
 
 import dev.kord.core.entity.Member
 import dev.kord.core.entity.Message
+import kotlinx.datetime.LocalDateTime
+import sh.nino.discord.database.tables.GuildCasesEntity
+import sh.nino.discord.database.tables.PunishmentType
 import sh.nino.discord.punishments.builder.ApplyPunishmentBuilder
 import sh.nino.discord.punishments.builder.PublishModLogBuilder
 
@@ -46,7 +49,8 @@ interface PunishmentModule {
         member: Member,
         moderator: Member,
         reason: String? = null,
-        amount: Int = 1
+        amount: Int = 1,
+        expiresIn: LocalDateTime? = null
     )
 
     /**
@@ -89,7 +93,7 @@ interface PunishmentModule {
      * @param builder The builder DSL to use
      */
     suspend fun publishModlog(
-        case: Any,
+        case: GuildCasesEntity,
         builder: PublishModLogBuilder.() -> Unit = {}
     )
 
@@ -99,7 +103,7 @@ interface PunishmentModule {
      * @param message The message itself.
      */
     suspend fun editModlogMessage(
-        case: Any,
+        case: GuildCasesEntity,
         message: Message
     )
 }

@@ -43,6 +43,8 @@ enum class PunishmentType(val key: String) {
     VOICE_DEAFEN("voice deafened"),
     VOICE_UNMUTE("voice unmute"),
     VOICE_MUTE("voice mute"),
+    ROLE_REMOVE("role remove"),
+    ROLE_ADD("role add"),
     UNMUTE("unmute"),
     UNBAN("unban"),
     MUTE("mute"),
@@ -67,6 +69,8 @@ val PunishmentType.asEmoji: String
         PunishmentType.VOICE_UNDEAFEN -> "\uD83D\uDCE2"
         PunishmentType.THREAD_MESSAGES_ADDED -> "\uD83E\uDDF5"
         PunishmentType.THREAD_MESSAGES_REMOVED -> "\uD83E\uDDF5"
+        PunishmentType.ROLE_ADD -> ""
+        PunishmentType.ROLE_REMOVE -> ""
         else -> error("Unknown punishment type: $this")
     }
 

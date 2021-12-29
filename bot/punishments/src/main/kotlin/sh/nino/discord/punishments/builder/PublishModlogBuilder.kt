@@ -26,7 +26,7 @@ import dev.kord.core.entity.Attachment
 import dev.kord.core.entity.Guild
 import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.VoiceChannel
-import sh.nino.discord.punishments.PunishmentType
+import sh.nino.discord.database.tables.PunishmentType
 
 data class PublishModLogData(
     val warningsRemoved: Int? = null,

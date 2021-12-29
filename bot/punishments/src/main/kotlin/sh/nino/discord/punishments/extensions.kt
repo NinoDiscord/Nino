@@ -20,30 +20,13 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.database.tables
+@file:JvmName("PunishmentExtensionsKt")
+package sh.nino.discord.punishments
 
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
-import sh.nino.discord.database.SnowflakeTable
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
 
-object Warnings: SnowflakeTable("warnings") {
-    var receivedAt = datetime("received_at")
-    var expiresIn = datetime("expires_in").nullable()
-    var reason = text("reason").nullable()
-    var guildId = long("guild_id")
-    var amount = integer("amount").default(0)
-
-    override val primaryKey: PrimaryKey = PrimaryKey(id, guildId, name = "PK_UserWarnings")
-}
-
-class WarningsEntity(id: EntityID<Long>): LongEntity(id) {
-    companion object: LongEntityClass<WarningsEntity>(Warnings)
-
-    var receivedAt by Warnings.receivedAt
-    var expiresIn by Warnings.expiresIn
-    var reason by Warnings.reason
-    var guildId by Warnings.guildId
-    var amount by Warnings.amount
+fun <T> Flow<T>.sortWith(comparator: (T, T) -> Int): Flow<T> = flow {
+    for (entity in toList().sortedWith(Comparator(comparator))) emit(entity)
 }

@@ -20,30 +20,25 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.database.tables
+package sh.nino.discord.timeouts
 
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
-import sh.nino.discord.database.SnowflakeTable
-
-object Warnings: SnowflakeTable("warnings") {
-    var receivedAt = datetime("received_at")
-    var expiresIn = datetime("expires_in").nullable()
-    var reason = text("reason").nullable()
-    var guildId = long("guild_id")
-    var amount = integer("amount").default(0)
-
-    override val primaryKey: PrimaryKey = PrimaryKey(id, guildId, name = "PK_UserWarnings")
+/**
+ * Represents a base event which includes the [client].
+ */
+interface Event {
+    /**
+     * The client that this event was emitted from.
+     */
+    val client: Client
 }
 
-class WarningsEntity(id: EntityID<Long>): LongEntity(id) {
-    companion object: LongEntityClass<WarningsEntity>(Warnings)
+/**
+ * This indicates that the connection was successful.
+ */
+class ReadyEvent(override val client: Client): Event
 
-    var receivedAt by Warnings.receivedAt
-    var expiresIn by Warnings.expiresIn
-    var reason by Warnings.reason
-    var guildId by Warnings.guildId
-    var amount by Warnings.amount
-}
+/**
+ * This indicates that a timeout packet has fulfilled its lifetime, and we need to do a
+ * reverse operation.
+ */
+class ApplyEvent(override val client: Client, val timeout: Timeout): Event

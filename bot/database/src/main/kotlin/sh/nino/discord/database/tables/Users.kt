@@ -21,3 +21,22 @@
  */
 
 package sh.nino.discord.database.tables
+
+import org.jetbrains.exposed.dao.LongEntity
+import org.jetbrains.exposed.dao.LongEntityClass
+import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.VarCharColumnType
+import sh.nino.discord.database.SnowflakeTable
+import sh.nino.discord.database.columns.array
+
+object Users: SnowflakeTable("users") {
+    val prefixes = array<String>("prefixes", VarCharColumnType(25)).default(arrayOf())
+    val language = text("language").default("en_US")
+}
+
+class UserEntity(id: EntityID<Long>): LongEntity(id) {
+    companion object: LongEntityClass<UserEntity>(Users)
+
+    var prefixes by Users.prefixes
+    var language by Users.language
+}

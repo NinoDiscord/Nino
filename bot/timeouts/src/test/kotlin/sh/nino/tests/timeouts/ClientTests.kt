@@ -20,30 +20,36 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.database.tables
+package sh.nino.tests.timeouts
 
-import org.jetbrains.exposed.dao.LongEntity
-import org.jetbrains.exposed.dao.LongEntityClass
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.kotlin.datetime.datetime
-import sh.nino.discord.database.SnowflakeTable
+import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.should
+import io.kotest.matchers.string.startWith
+import sh.nino.discord.timeouts.ClientBuilder
 
-object Warnings: SnowflakeTable("warnings") {
-    var receivedAt = datetime("received_at")
-    var expiresIn = datetime("expires_in").nullable()
-    var reason = text("reason").nullable()
-    var guildId = long("guild_id")
-    var amount = integer("amount").default(0)
+class ClientTests: DescribeSpec({
+    it("should throw an illegal state exception on ClientBuilder#build without a URI.") {
+        val builder = ClientBuilder().apply {
+            auth = "jsssosjsbnsaskjdssdkds"
+        }
 
-    override val primaryKey: PrimaryKey = PrimaryKey(id, guildId, name = "PK_UserWarnings")
-}
+        val ex = shouldThrow<IllegalStateException> {
+            builder.build()
+        }
 
-class WarningsEntity(id: EntityID<Long>): LongEntity(id) {
-    companion object: LongEntityClass<WarningsEntity>(Warnings)
+        ex.message should startWith("URI to the timeouts service")
+    }
 
-    var receivedAt by Warnings.receivedAt
-    var expiresIn by Warnings.expiresIn
-    var reason by Warnings.reason
-    var guildId by Warnings.guildId
-    var amount by Warnings.amount
-}
+    it("should not throw an illegal exception on Client#build with a URI") {
+        val builder = ClientBuilder().apply {
+            uri = "localhost:4025"
+            auth = "owo"
+        }
+
+        shouldNotThrow<IllegalStateException> {
+            builder.build()
+        }
+    }
+})
