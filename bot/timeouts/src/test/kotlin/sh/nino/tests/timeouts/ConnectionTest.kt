@@ -51,8 +51,9 @@ class ConnectionTest: DescribeSpec({
     }
 
     it("should connect with valid auth") {
+        val isCI = System.getenv("GITHUB_ACTIONS") != null
         val client = Client {
-            uri = "localhost:4025"
+            uri = if (isCI) "timeouts:4025" else "localhost:4025"
             auth = "owodauwu"
             shutdownAfterSuccess = true
         }
