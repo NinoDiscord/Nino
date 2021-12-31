@@ -29,6 +29,7 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
+import io.ktor.network.sockets.*
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -44,6 +45,9 @@ fun Client(builder: ClientBuilder.() -> Unit): Client {
 class Client(val resources: ClientResources): AutoCloseable {
     private lateinit var connection: Connection
     private val logger by logging<Client>()
+
+    val closed: Boolean
+        get() = if (::connection.isInitialized) connection.closed else true
 
     override fun close() {
         if (!::connection.isInitialized) return
@@ -86,5 +90,10 @@ class Client(val resources: ClientResources): AutoCloseable {
         )
 
         return connection.connect()
+    }
+
+    suspend fun send(command: Command) {
+        if (!::connection.isInitialized) return
+        return connection.send(command)
     }
 }

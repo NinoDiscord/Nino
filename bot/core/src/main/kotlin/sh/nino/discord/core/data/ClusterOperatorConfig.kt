@@ -21,3 +21,11 @@
  */
 
 package sh.nino.discord.core.data
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ClusterOperatorConfig(
+    val auth: String? = null,
+    val uri: String
+)

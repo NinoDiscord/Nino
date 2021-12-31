@@ -80,13 +80,27 @@ internal class Connection(
         val actualOp = try { OPCode[op] } catch (e: Exception) { null }
         if (actualOp == null) {
             logger.warn("Unknown op code: $op")
+            return
         }
 
         when (actualOp) {
             is OPCode.Apply -> {
-                // TODO: this
+                val timeout = Timeout.fromJsonObject(data["d"]!!.jsonObject)
+                eventFlow.emit(
+                    ApplyEvent(
+                        client,
+                        timeout
+                    )
+                )
             }
         }
+    }
+
+    suspend fun send(command: Command) {
+        val data = json.encodeToString(Command.Companion, command)
+        logger.trace("Sending command >> ", data)
+
+        session.send(Frame.Text(data))
     }
 
     private suspend fun connectionCreate(sess: DefaultClientWebSocketSession) {

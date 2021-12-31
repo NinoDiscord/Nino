@@ -26,13 +26,18 @@ import dev.kord.common.entity.Permission
 import dev.kord.common.entity.Permissions
 import dev.kord.common.entity.Snowflake
 import dev.kord.core.Kord
+import dev.kord.core.behavior.ban
+import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.behavior.channel.editRolePermission
+import dev.kord.core.behavior.edit
+import dev.kord.core.behavior.getChannelOf
+import dev.kord.core.cache.data.AttachmentData
 import dev.kord.core.cache.data.MemberData
 import dev.kord.core.cache.data.toData
-import dev.kord.core.entity.Guild
-import dev.kord.core.entity.Member
-import dev.kord.core.entity.Message
+import dev.kord.core.entity.*
+import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.firstOrNull
+import dev.kord.rest.builder.message.EmbedBuilder
 import gay.floof.utils.slf4j.logging
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
@@ -44,20 +49,26 @@ import kotlinx.datetime.toLocalDateTime
 import org.jetbrains.exposed.sql.and
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.update
-import org.koin.core.context.GlobalContext
+import sh.nino.discord.common.COLOR
+import sh.nino.discord.common.extensions.asSnowflake
+import sh.nino.discord.common.extensions.inject
+import sh.nino.discord.common.ms
 import sh.nino.discord.database.asyncTransaction
 import sh.nino.discord.database.tables.*
 import sh.nino.discord.punishments.MemberLike
 import sh.nino.discord.punishments.PunishmentModule
 import sh.nino.discord.punishments.builder.ApplyPunishmentBuilder
 import sh.nino.discord.punishments.builder.PublishModLogBuilder
+import sh.nino.discord.punishments.builder.PublishModLogData
 import sh.nino.discord.punishments.sortWith
+import sh.nino.discord.timeouts.Client
+import sh.nino.discord.timeouts.RequestCommand
+import sh.nino.discord.timeouts.Timeout
 
 class PunishmentModuleImpl: PunishmentModule {
     private val logger by logging<PunishmentModuleImpl>()
-    private val kord: Kord by lazy {
-        GlobalContext.get().get()
-    }
+    private val timeouts: Client by inject()
+    private val kord: Kord by inject()
 
     /**
      * Resolves the current [member] to get the actual member object IF the current
@@ -153,9 +164,15 @@ class PunishmentModuleImpl: PunishmentModule {
         }
 
         return if (guildPunishments.toList().isEmpty()) {
-            // still do nothing LUL
+            publishModlog(case) {
+                this.moderator = moderator
+                this.guild = guild
+
+                warningsAdded = amount
+                victim = member
+            }
         } else {
-            // do nothing LUL
+            // something here
         }
     }
 
@@ -260,21 +277,143 @@ class PunishmentModuleImpl: PunishmentModule {
     /**
      * Publishes the [case] towards the mod-log channel if specified
      * in guild settings.
-     *
-     * @param case The case
      */
     override suspend fun publishModlog(case: GuildCasesEntity, builder: PublishModLogBuilder.() -> Unit) {
-        TODO("Not yet implemented")
+        val data = PublishModLogBuilder().apply(builder).build()
+        val settings = asyncTransaction {
+            GuildSettingsEntity[data.guild.id.value.toLong()]
+        }
+
+        val modlogChannel = try {
+            data.guild.getChannelOf<TextChannel>(Snowflake(settings.modlogChannelId!!))
+        } catch (e: Exception) {
+            null
+        } ?: return
+
+        val permissions = modlogChannel.getEffectivePermissions(kord.selfId)
+        if (!permissions.contains(Permission.SendMessages) || !permissions.contains(Permission.EmbedLinks))
+            return
+
+        val message = if (settings.usePlainModlogMessage) {
+            modlogChannel.createMessage {
+                content = getModlogPlainText(case.id.value.toInt(), data)
+            }
+        } else {
+            modlogChannel.createMessage {
+                embeds += getModlogMessage(case.id.value.toInt(), data)
+            }
+        }
+
+        asyncTransaction {
+            GuildCases.update({
+                (GuildCases.index eq case.index) and (GuildCases.id eq data.guild.id.value.toLong())
+            }) {
+                it[messageId] = message.id.value.toLong()
+            }
+        }
     }
 
     override suspend fun editModlogMessage(case: GuildCasesEntity, message: Message) {
-        TODO("Not yet implemented")
+        // Check if it was with plan text
+        val settings = asyncTransaction {
+            GuildSettingsEntity[case.id.value]
+        }
+
+        val guild = message.getGuild()
+        val data = PublishModLogBuilder().apply {
+            moderator = guild.members.first { it.id == case.moderatorId.asSnowflake() }
+            reason = case.reason
+            victim = guild.members.first { it.id == case.victimId.asSnowflake() }
+            type = case.type
+
+            this.guild = guild
+            if (case.attachments.isNotEmpty()) {
+                addAttachments(
+                    case.attachments.map {
+                        Attachment(
+                            // we don't store the id, size, proxyUrl, or filename,
+                            // so it's fine to make it mocked.
+                            AttachmentData(
+                                id = Snowflake(0L),
+                                size = 0,
+                                url = it,
+                                proxyUrl = it,
+                                filename = "unknown.png"
+                            ),
+
+                            kord
+                        )
+                    }
+                )
+            }
+        }
+
+        if (settings.usePlainModlogMessage) {
+            // this looks fucking horrendous but it works LOL
+            val warningsRegex = "> \\*\\*Warnings (Added|Removed)\\*\\*: ([A-Za-z]|\\d+)".toRegex()
+            val matcher = warningsRegex.toPattern().matcher(message.content)
+
+            // if we find any matches, let's grab em all
+            if (matcher.matches()) {
+                val addOrRemove = matcher.group(1)
+                val allOrInt = matcher.group(2)
+
+                when (addOrRemove) {
+                    "Added" -> {
+                        val intValue = try {
+                            Integer.parseInt(allOrInt)
+                        } catch (e: Exception) {
+                            null
+                        } ?: throw IllegalStateException("Unable to cast \"$allOrInt\" into a number.")
+
+                        data.warningsAdded = intValue
+                    }
+
+                    "Removed" -> {
+                        if (allOrInt == "All") {
+                            data.warningsRemoved = -1
+                        } else {
+                            val intValue = try {
+                                Integer.parseInt(allOrInt)
+                            } catch (e: Exception) {
+                                null
+                            } ?: throw IllegalStateException("Unable to cast \"$allOrInt\" into a number.")
+
+                            data.warningsRemoved = intValue
+                        }
+                    }
+                }
+            }
+
+            message.edit {
+                content = getModlogPlainText(case.id.value.toInt(), data.build())
+            }
+        } else {
+            val embed = message.embeds.first()
+            val warningsRemovedField = embed.fields.firstOrNull {
+                it.name.lowercase().contains("warnings removed")
+            }
+
+            val warningsAddedField = embed.fields.firstOrNull {
+                it.name.lowercase().contains("warnings added")
+            }
+
+            if (warningsRemovedField != null)
+                data.warningsRemoved = Integer.parseInt(warningsRemovedField.value)
+
+            if (warningsAddedField != null)
+                data.warningsAdded = Integer.parseInt(warningsAddedField.value)
+
+            message.edit {
+                embeds?.plusAssign(getModlogMessage(case.id.value.toInt(), data.build()))
+            }
+        }
     }
 
     private suspend fun getOrCreateMutedRole(settings: GuildSettingsEntity, guild: Guild): Snowflake {
         if (settings.mutedRoleId != null) return Snowflake(settings.mutedRoleId!!)
 
-        var muteRole = 0L
+        val muteRole: Long
         val role = guild.roles.firstOrNull {
             it.name.lowercase() == "muted"
         }
@@ -391,78 +530,83 @@ class PunishmentModuleImpl: PunishmentModule {
         soft: Boolean = false,
         time: Int? = null
     ) {
-        // TODO: this
-    }
-}
-
-/*
-    private suspend fun applyBan(
-        moderator: User,
-        reason: String?,
-        member: Member,
-        guild: Guild,
-        days: Int = 7,
-        soft: Boolean = false,
-        time: Int? = null
-    ) {
-        logger.info("Banning ${member.tag} for ${reason ?: "no reason"} :3")
+        logger.info("Banning ${member.tag} for ${reason ?: "no reason"} by ${moderator.tag} in guild ${guild.name} (${guild.id})")
         guild.ban(member.id) {
-            this.reason = reason
             this.deleteMessagesDays = days
+            this.reason = reason
         }
 
         if (soft) {
-            logger.info("Unbanning ${member.tag} (was softban) for ${reason ?: "no reason"}")
+            logger.info("Unbanning ${member.tag} (executed softban cmd).")
             guild.unban(member.id, reason)
         }
 
         if (!soft && time != null) {
-            // TODO: this
+            if (timeouts.closed) {
+                logger.warn("Timeouts microservice has not been established (or not connected)")
+                return
+            }
+
+            timeouts.send(
+                RequestCommand(
+                    Timeout(
+                        guildId = guild.id.toString(),
+                        userId = member.id.toString(),
+                        issuedAt = System.currentTimeMillis(),
+                        expiresIn = time.toLong(),
+                        moderatorId = moderator.id.toString(),
+                        reason = reason,
+                        type = PunishmentType.UNBAN.key
+                    )
+                )
+            )
         }
     }
 
-    private suspend fun applyUnmute(
-        settings: GuildEntity,
-        member: Member,
-        reason: String?,
-        guild: Guild
-    ) {
+    private suspend fun applyUnmute(settings: GuildSettingsEntity, member: Member, reason: String?, guild: Guild) {
         val muteRoleId = getOrCreateMutedRole(settings, guild)
-        val mutedRole = guild.roles.firstOrNull {
-            it.id == muteRoleId
-        } ?: return
-
-        if (member.roles.contains(mutedRole))
-            member.removeRole(mutedRole.id, reason)
+        member.removeRole(muteRoleId, reason)
     }
 
     private suspend fun applyMute(
-        settings: GuildEntity,
-        moderator: User,
-        reason: String?,
+        settings: GuildSettingsEntity,
         member: Member,
+        moderator: Member,
+        reason: String?,
         guild: Guild,
-        time: Int? = null
+        time: Int?
     ) {
         val roleId = getOrCreateMutedRole(settings, guild)
-        val mutedRole = guild.roles.first {
-            it.id == roleId
-        }
-
-        if (!member.roles.contains(mutedRole))
-            member.addRole(roleId, reason)
+        member.addRole(roleId, reason)
 
         if (time != null) {
-            // TODO: timeouts service
+            if (timeouts.closed) {
+                logger.warn("Timeouts microservice has not been established (or not connected)")
+                return
+            }
+
+            timeouts.send(
+                RequestCommand(
+                    Timeout(
+                        guildId = guild.id.toString(),
+                        userId = member.id.toString(),
+                        issuedAt = System.currentTimeMillis(),
+                        expiresIn = time.toLong(),
+                        moderatorId = moderator.id.toString(),
+                        reason = reason,
+                        type = PunishmentType.UNMUTE.key
+                    )
+                )
+            )
         }
     }
 
     private suspend fun applyVoiceMute(
-        moderator: User,
-        reason: String?,
         member: Member,
+        reason: String?,
         guild: Guild,
-        time: Int? = null
+        moderator: Member,
+        time: Int?
     ) {
         val voiceState = member.getVoiceState()
         if (voiceState.channelId != null && !voiceState.isMuted) {
@@ -473,7 +617,24 @@ class PunishmentModuleImpl: PunishmentModule {
         }
 
         if (time != null) {
-            // TODO: this
+            if (timeouts.closed) {
+                logger.warn("Timeouts microservice has not been established (or not connected)")
+                return
+            }
+
+            timeouts.send(
+                RequestCommand(
+                    Timeout(
+                        guildId = guild.id.toString(),
+                        userId = member.id.toString(),
+                        issuedAt = System.currentTimeMillis(),
+                        expiresIn = time.toLong(),
+                        moderatorId = moderator.id.toString(),
+                        reason = reason,
+                        type = PunishmentType.VOICE_UNMUTE.key
+                    )
+                )
+            )
         }
     }
 
@@ -493,7 +654,24 @@ class PunishmentModuleImpl: PunishmentModule {
         }
 
         if (time != null) {
-            // TODO: this
+            if (timeouts.closed) {
+                logger.warn("Timeouts microservice has not been established (or not connected)")
+                return
+            }
+
+            timeouts.send(
+                RequestCommand(
+                    Timeout(
+                        guildId = guild.id.toString(),
+                        userId = member.id.toString(),
+                        issuedAt = System.currentTimeMillis(),
+                        expiresIn = time.toLong(),
+                        moderatorId = moderator.id.toString(),
+                        reason = reason,
+                        type = PunishmentType.VOICE_UNMUTE.key
+                    )
+                )
+            )
         }
     }
 
@@ -523,204 +701,85 @@ class PunishmentModuleImpl: PunishmentModule {
         }
     }
 
-    @OptIn(ExperimentalContracts::class)
-    suspend fun publishToModlog(case: GuildCasesEntity, builder: PublishModLogBuilder.() -> Unit) {
-        contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
-
-        val data = PublishModLogBuilder().apply(builder).build()
-        val settings = transaction { GuildEntity[data.guild.id.value.toLong()] }
-        if (settings.modlogChannelId == null) return
-
-        val modlogChannel = try {
-            data.guild.getChannelOf<TextChannel>(settings.modlogChannelId!!.asSnowflake())
-        } catch (e: Exception) {
-            null
-        } ?: return
-
-        val permissions = modlogChannel.getEffectivePermissions(kord.selfId)
-        if (!permissions.contains(Permission.SendMessages) || !permissions.contains(Permission.EmbedLinks))
-            return
-
-        val (type, emoji) = stringifyDbType(data.type)
-        val message = modlogChannel.createMessage {
-            content = "#${case.index} **|** $emoji $type"
-            embeds += getModLogEmbed(case.index, data)
+    private fun getModlogMessage(caseId: Int, data: PublishModLogData): EmbedBuilder = EmbedBuilder().apply {
+        color = COLOR
+        author {
+            name = "[ Case #$caseId | ${data.type.asEmoji} ${data.type.key} ]"
+            icon = data.victim.avatar?.url
         }
 
-        asyncTransaction {
-            GuildCases.update({ (GuildCases.index eq case.index) and (GuildCases.id eq data.guild.id.value.toLong()) }) {
-                it[messageId] = message.id.value.toLong()
-            }
-        }.execute()
-    }
-
-    suspend fun editModLog(case: GuildCasesEntity, message: Message) {
-        val embed = message.embeds.first()
-
-        val warningsRemovedField = embed.fields.firstOrNull {
-            it.name.lowercase().contains("warnings removed")
-        }
-
-        val warningsAddedField = embed.fields.firstOrNull {
-            it.name.lowercase().contains("warnings added")
-        }
-
-        val guild = message.getGuild()
-        val cachedUser = kord.defaultSupplier.getUserOrNull(case.victimId.asSnowflake())
-
-        if (case.type == PunishmentType.UNBAN || cachedUser == null) {
-            val victimField = embed.fields.firstOrNull {
-                it.value.contains(case.victimId.toString())
-            } ?: error("Unable to deserialize ID from embed")
-
-            val matcher = Pattern.compile("\\d{15,21}").matcher(victimField.value)
-            if (!matcher.matches()) error("Unable to deserialize ID from embed")
-
-            val user = kord.rest.user.getUser(matcher.group(1).asSnowflake()).nullOnError() ?: error("Unknown User")
-            val data = PublishModLogBuilder().apply {
-                moderator = guild.members.first { it.id == case.moderatorId.asSnowflake() }
-                reason = case.reason
-                victim = User(user.toData(), kord)
-                type = case.type
-
-                if (case.attachments.isNotEmpty()) {
-                    addAttachments(
-                        case.attachments.map {
-                            Attachment(
-                                // we don't store the id, size, proxyUrl, or filename,
-                                // so it's fine to make it mocked.
-                                AttachmentData(
-                                    id = Snowflake(0L),
-                                    size = 0,
-                                    url = it,
-                                    proxyUrl = it,
-                                    filename = "unknown.png"
-                                ),
-
-                                kord
-                            )
-                        }
-                    )
-                }
-
-                if (warningsAddedField != null) {
-                    warningsAdded = Integer.parseInt(warningsAddedField.value)
-                }
-
-                if (warningsRemovedField != null) {
-                    warningsRemoved = Integer.parseInt(warningsRemovedField.value)
-                }
-
-                this.guild = guild
-            }
-
-            val (type, emoji) = stringifyDbType(data.type)
-            message.edit {
-                content = "#${case.index} **|** $emoji $type"
-                embeds?.plusAssign(getModLogEmbed(case.index, data.build()))
-            }
-        } else {
-            val data = PublishModLogBuilder().apply {
-                moderator = guild.members.first { it.id == case.moderatorId.asSnowflake() }
-                reason = case.reason
-                victim = guild.members.first { it.id == case.victimId.asSnowflake() }
-                type = case.type
-
-                if (case.attachments.isNotEmpty()) {
-                    addAttachments(
-                        case.attachments.map {
-                            Attachment(
-                                // we don't store the id, size, proxyUrl, or filename,
-                                // so it's fine to make it mocked.
-                                AttachmentData(
-                                    id = Snowflake(0L),
-                                    size = 0,
-                                    url = it,
-                                    proxyUrl = it,
-                                    filename = "unknown.png"
-                                ),
-
-                                kord
-                            )
-                        }
-                    )
-                }
-
-                if (warningsAddedField != null) {
-                    warningsAdded = Integer.parseInt(warningsAddedField.value)
-                }
-
-                if (warningsRemovedField != null) {
-                    warningsRemoved = Integer.parseInt(warningsRemovedField.value)
-                }
-
-                this.guild = guild
-            }
-
-            val (type, emoji) = stringifyDbType(data.type)
-            message.edit {
-                content = "#${case.index} **|** $emoji $type"
-                embeds?.plusAssign(getModLogEmbed(case.index, data.build()))
-            }
-        }
-    }
-
-    private fun getModLogEmbed(caseId: Int, data: PublishModLogData): EmbedBuilder {
-        val embed = EmbedBuilder().apply {
-            color = Constants.COLOR
-            author {
-                name = "${data.victim.tag} (${data.victim.id.asString})"
-                icon = data.victim.avatar?.url
-            }
-
-            field {
-                name = "• Moderator"
-                value = "${data.moderator.tag} (**${data.moderator.id.asString}**)"
-            }
-        }
-
-        val description = buildString {
+        description = buildString {
             if (data.reason != null) {
                 appendLine("• ${data.reason}")
             } else {
-                appendLine("• **No reason was specified, edit it using `reason $caseId <reason>` to update it.")
+                appendLine("• No reason was specified, edit it using `reason $caseId <reason>`")
             }
 
             if (data.attachments.isNotEmpty()) {
                 appendLine()
-
                 for ((i, attachment) in data.attachments.withIndex()) {
                     appendLine("• [**#$i**](${attachment.url})")
                 }
             }
         }
 
-        embed.description = description
-        if (data.warningsRemoved != null) {
-            embed.field {
-                name = "• Warnings Removed"
-                value = if (data.warningsRemoved == -1) "All" else data.warningsRemoved.toString()
-                inline = true
-            }
+        field {
+            name = "• Victim"
+            value = "${data.victim.tag} (**${data.victim.id}**)"
         }
 
-        if (data.warningsAdded != null) {
-            embed.field {
-                name = "• Warnings Added"
-                value = data.warningsAdded.toString()
-                inline = true
-            }
+        field {
+            name = "• Moderator"
+            value = "${data.moderator.tag} (**${data.moderator.id}**)"
         }
 
         if (data.time != null) {
-            val verboseTime = fromLong(data.time.toLong(), true)
-            embed.field {
-                name = "• :watch: Time"
+            val verboseTime = ms.fromLong(data.time.toLong(), true)
+            field {
+                name = "• Time"
                 value = verboseTime
                 inline = true
             }
         }
 
-        return embed
+        if (data.warningsRemoved != null) {
+            field {
+                name = "• Warnings Removed"
+                inline = true
+                value = if (data.warningsRemoved == 1)
+                    "All"
+                else
+                    "${data.warningsRemoved}"
+            }
+        }
+
+        if (data.warningsAdded != null) {
+            field {
+                name = "• Warnings Added"
+                inline = true
+                value = "${data.warningsAdded}"
+            }
+        }
     }
- */
+
+    private fun getModlogPlainText(caseId: Int, data: PublishModLogData): String = buildString {
+        appendLine("**[** Case #**$caseId** | ${data.type.asEmoji} **${data.type.key}** **]**")
+        appendLine()
+        appendLine("> **Victim**: ${data.victim.tag} (**${data.victim.id}**)")
+        appendLine("> **Moderator**: ${data.moderator.tag} (**${data.moderator.id}**)")
+        appendLine("> **Reason**: ${data.reason ?: "No reason was specified, edit it using `reason $caseId <reason>`"}")
+
+        if (data.time != null) {
+            val verboseTime = ms.fromLong(data.time.toLong())
+            appendLine("> :watch: **Time**: $verboseTime")
+        }
+
+        if (data.warningsAdded != null) {
+            appendLine("> **Warnings Added**: ${data.warningsAdded}")
+        }
+
+        if (data.warningsRemoved != null) {
+            appendLine("> **Warnings Removed**: ${if (data.warningsRemoved == -1) "All" else data.warningsAdded}")
+        }
+    }
+}

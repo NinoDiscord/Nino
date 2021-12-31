@@ -109,6 +109,11 @@ subprojects {
         testImplementation("io.kotest:kotest-runner-junit5-jvm:5.0.3")
         testImplementation("io.kotest:kotest-assertions-core-jvm:5.0.3")
         testImplementation("io.kotest:kotest-property-jvm:5.0.3")
+
+        // do not link :bot:commons to the project itself
+        if (this@subprojects.name != "commons") {
+            implementation(project(":bot:commons"))
+        }
     }
 
     // Setup Spotless in all subprojects

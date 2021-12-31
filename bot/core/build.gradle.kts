@@ -21,13 +21,6 @@
  */
 
 dependencies {
-    // kotlinx libraries
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.3.1")
-    api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.1")
-
     // Koin (Dependency Injection)
     implementation("io.insert-koin:koin-logger-slf4j:3.1.4")
     implementation("io.insert-koin:koin-core-ext:3.0.2")
@@ -46,10 +39,10 @@ dependencies {
     implementation("io.ktor:ktor-client-core:1.6.7")
 
     // Kord
-    implementation("dev.kord:kord-core:0.8.0-M7")
+    implementation("dev.kord:kord-core:0.8.0-M8")
 
     // YAML (configuration)
-    implementation("com.charleskorn.kaml:kaml:0.37.0")
+    implementation("com.charleskorn.kaml:kaml:0.38.0")
 
     // Database (Exposed, HikariCP, PostgreSQL)
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.36.1")
@@ -64,4 +57,7 @@ dependencies {
 
     // Lettuce (Redis client)
     implementation("io.lettuce:lettuce-core:6.1.5.RELEASE")
+
+    // Timeouts client
+    implementation(project(":bot:timeouts"))
 }

@@ -21,3 +21,11 @@
  */
 
 package sh.nino.discord.core.data
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class ApiConfig(
+    val host: String = "0.0.0.0",
+    val port: Int = 8989
+)

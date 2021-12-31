@@ -23,7 +23,11 @@
 package sh.nino.discord
 
 import gay.floof.utils.slf4j.logging
+import org.koin.core.context.startKoin
 import sh.nino.discord.core.NinoInfo
+import sh.nino.discord.core.globalModule
+import sh.nino.discord.core.modules.ninoModule
+import sh.nino.discord.punishments.punishmentsModule
 import java.io.File
 
 object Bootstrap {
@@ -44,5 +48,12 @@ object Bootstrap {
         }
 
         logger.info("* Initializing Koin...")
+        val koin = startKoin {
+            modules(
+                punishmentsModule,
+                globalModule,
+                ninoModule
+            )
+        }
     }
 }

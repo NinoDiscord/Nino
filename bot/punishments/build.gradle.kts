@@ -29,6 +29,8 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.0")
 
     implementation(project(":bot:database"))
+    implementation(project(":bot:commons"))
+    api(project(":bot:timeouts"))
 
     api("org.slf4j:slf4j-api:1.7.32")
     api("dev.kord:kord-core:0.8.0-M8")

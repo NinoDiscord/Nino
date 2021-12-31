@@ -19,8 +19,8 @@ include(":bot:timeouts")
 // Markup language for custom messages
 include(":bot:markup")
 
-// Cluster operator client + relay client
-include(":bot:cluster")
+// Common utilities + extensions
+include(":bot:commons")
 
 // Core components that ties everything in
 include(":bot:core")
