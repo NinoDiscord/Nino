@@ -24,12 +24,7 @@ import {
   Constants,
   Message,
   OldMessage,
-  TextChannel,
-  PingInteraction,
-  CommandInteraction,
-  ComponentInteraction,
-  UnknownInteraction,
-  Interaction,
+  TextChannel
 } from 'eris';
 
 import { Inject, Subscribe } from '@augu/lilith';
@@ -58,21 +53,21 @@ export default class MessageListener {
 
   @Subscribe('interactionCreate', { emitter: 'discord' })
   async onInteractionCreate(interaction: Interaction) {
-    // We don't care about interaction pings D:
-    if (interaction.type === 1) return;
+    // // We don't care about interaction pings D:
+    // if (interaction.type === 1) return;
 
-    // We care about command interactions!
-    if (interaction.type === 2) {
-      // If we haven't been ready, let's not initialize
-      // slash commands.
-      if (!this.discord.slashCreator)
-        return (interaction as CommandInteraction).createMessage({
-          content: 'Client is not ready to receive slash commands, use the normal commands!',
-          flags: 64,
-        });
-    }
+    // // We care about command interactions!
+    // if (interaction.type === 2) {
+    //   // If we haven't been ready, let's not initialize
+    //   // slash commands.
+    //   if (!this.discord.slashCreator)
+    //     return (interaction as CommandInteraction).createMessage({
+    //       content: 'Client is not ready to receive slash commands, use the normal commands!',
+    //       flags: 64,
+    //     });
+    // }
 
-    // slash-create will handle the rest.
+    // // slash-create will handle the rest.
   }
 
   @Subscribe('messageCreate', { emitter: 'discord' })

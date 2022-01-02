@@ -34,6 +34,7 @@ const hearts: { [P in ShardStatus]: string } = {
   connecting: ':yellow_heart:',
   resuming: ':blue_heart:',
   ready: ':green_heart:',
+  identifying: ':question:',
 };
 
 interface ShardInfo {
