@@ -51,8 +51,8 @@ export default class MessageListener {
   @Inject
   private readonly discord!: Discord;
 
-  @Subscribe('interactionCreate', { emitter: 'discord' })
-  async onInteractionCreate(interaction: Interaction) {
+  // @Subscribe('interactionCreate', { emitter: 'discord' })
+  // async onInteractionCreate(interaction: Interaction) {
     // // We don't care about interaction pings D:
     // if (interaction.type === 1) return;
 
@@ -68,7 +68,7 @@ export default class MessageListener {
     // }
 
     // // slash-create will handle the rest.
-  }
+  // }
 
   @Subscribe('messageCreate', { emitter: 'discord' })
   onMessageCreate(msg: Message<TextChannel>) {
