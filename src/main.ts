@@ -51,8 +51,6 @@ import ts from 'typescript';
   if (process.env.REGION !== undefined) logger.info(`->     Region: ${process.env.REGION}`);
 
   try {
-    // @ts-ignore i fucked up typings :D
-    await app.importSingleton<any>(() => import('./singletons/Prisma'));
     await app.load();
     await import('./util/patches/ErisPatch');
     await app.addComponent(Api);
