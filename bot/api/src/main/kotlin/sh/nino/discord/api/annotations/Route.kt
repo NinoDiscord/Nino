@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,26 +20,9 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core
+package sh.nino.discord.api.annotations
 
-import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.decodeFromStream
-import kotlinx.serialization.json.jsonPrimitive
-
-@OptIn(ExperimentalSerializationApi::class)
-object NinoInfo {
-    val VERSION: String
-    val COMMIT_SHA: String
-    val BUILD_DATE: String
-
-    init {
-        val reader = this::class.java.getResourceAsStream("/build-info.json")!!
-        val data = Json.decodeFromStream(JsonObject.serializer(), reader)
-
-        VERSION = data["version"]!!.jsonPrimitive.content
-        COMMIT_SHA = data["commit_sha"]!!.jsonPrimitive.content
-        BUILD_DATE = data["build_date"]!!.jsonPrimitive.content
-    }
-}
+annotation class Route(
+    val path: String,
+    val method: String
+)

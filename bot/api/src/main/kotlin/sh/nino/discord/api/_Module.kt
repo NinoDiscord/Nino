@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,3 +21,18 @@
  */
 
 package sh.nino.discord.api
+
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
+import org.koin.dsl.module
+import sh.nino.discord.api.routes.endpointModule
+
+val apiModule = endpointModule + module {
+    single {
+        ApiServer()
+    }
+
+    single {
+        PrometheusMeterRegistry(PrometheusConfig.DEFAULT)
+    }
+}

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,3 +21,16 @@
  */
 
 package sh.nino.discord.api.routes
+
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
+import sh.nino.discord.api.Endpoint
+import sh.nino.discord.api.annotations.Route
+
+class MainRoute: Endpoint("/") {
+    @Route("/", method = "GET")
+    suspend fun owo(call: ApplicationCall) {
+        call.respondText("hewo world", status = HttpStatusCode.OK)
+    }
+}

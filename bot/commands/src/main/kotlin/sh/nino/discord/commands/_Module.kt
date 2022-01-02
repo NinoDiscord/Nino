@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,3 +21,18 @@
  */
 
 package sh.nino.discord.commands
+
+import org.koin.dsl.module
+import sh.nino.discord.commands.admin.adminCommandsModule
+import sh.nino.discord.commands.core.coreCommandsModule
+import sh.nino.discord.commands.easter_egg.easterEggCommandModule
+import sh.nino.discord.commands.moderation.moderationCommandsModule
+import sh.nino.discord.commands.system.systemCommandsModule
+import sh.nino.discord.commands.threads.threadsCommandsModule
+import sh.nino.discord.commands.util.utilCommandsModule
+import sh.nino.discord.commands.voice.voiceCommandsModule
+
+val commandsModule = adminCommandsModule + coreCommandsModule +
+    easterEggCommandModule + moderationCommandsModule + systemCommandsModule +
+    threadsCommandsModule + utilCommandsModule + voiceCommandsModule + module {
+}

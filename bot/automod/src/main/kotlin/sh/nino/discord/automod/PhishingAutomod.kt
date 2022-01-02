@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,13 +20,13 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.data
+package sh.nino.discord.automod
 
-import dev.kord.common.entity.ActivityType
-import kotlinx.serialization.Serializable
+import sh.nino.discord.automod.core.automod
 
-@Serializable
-data class StatusConfig(
-    val status: String,
-    val type: ActivityType
-)
+val phishingAutomod = automod {
+    name = "mentions"
+    onMessage { event ->
+        true
+    }
+}

@@ -47,12 +47,15 @@ dependencies {
     implementation(project(":bot:database"))
 
     // Logging (slf4j + logback)
-    implementation("ch.qos.logback:logback-classic:1.2.9")
-    implementation("ch.qos.logback:logback-core:1.2.9")
+    implementation("ch.qos.logback:logback-classic:1.2.10")
+    implementation("ch.qos.logback:logback-core:1.2.10")
     api("org.slf4j:slf4j-api:1.7.32")
 
     // Koin
-    implementation("io.insert-koin:koin-core-ext:3.0.2")
+    implementation("io.insert-koin:koin-core:3.1.4")
+
+    // YAML (configuration)
+    implementation("com.charleskorn.kaml:kaml:0.38.0")
 }
 
 tasks {

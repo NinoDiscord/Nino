@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 package sh.nino.discord.core.localization
 
 import gay.floof.utils.slf4j.logging
-import sh.nino.discord.core.data.Config
+import sh.nino.discord.common.data.Config
 import java.io.File
 
 class LocalizationManager(config: Config) {

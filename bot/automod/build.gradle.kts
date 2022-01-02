@@ -19,3 +19,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+dependencies {
+    implementation("dev.kord:kord-core:0.8.0-M8")
+    api("org.slf4j:slf4j-api:1.7.32")
+}

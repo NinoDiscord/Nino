@@ -22,8 +22,7 @@
 
 dependencies {
     // Koin (Dependency Injection)
-    implementation("io.insert-koin:koin-logger-slf4j:3.1.4")
-    implementation("io.insert-koin:koin-core-ext:3.0.2")
+    implementation("io.insert-koin:koin-core:3.1.4")
 
     // Logging (SLF4J + Logback)
     api("org.slf4j:slf4j-api:1.7.32")
@@ -41,9 +40,6 @@ dependencies {
     // Kord
     implementation("dev.kord:kord-core:0.8.0-M8")
 
-    // YAML (configuration)
-    implementation("com.charleskorn.kaml:kaml:0.38.0")
-
     // Database (Exposed, HikariCP, PostgreSQL)
     implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.36.1")
     implementation("org.jetbrains.exposed:exposed-core:0.36.1")
@@ -60,4 +56,6 @@ dependencies {
 
     // Timeouts client
     implementation(project(":bot:timeouts"))
+    implementation(project(":bot:database"))
+    implementation(project(":bot:api"))
 }

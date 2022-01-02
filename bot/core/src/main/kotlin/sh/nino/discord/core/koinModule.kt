@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,7 +22,6 @@
 
 package sh.nino.discord.core
 
-import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.util.IsolationLevel
@@ -34,19 +33,14 @@ import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
-import sh.nino.discord.core.data.Config
+import sh.nino.discord.common.NinoInfo
+import sh.nino.discord.common.data.Config
 import sh.nino.discord.core.localization.LocalizationManager
 import sh.nino.discord.timeouts.Client
-import java.io.File
 
 val globalModule = module {
     single {
         NinoBot()
-    }
-
-    single {
-        val configFile = File("./config.yml")
-        Yaml.default.decodeFromString(Config.serializer(), configFile.readText())
     }
 
     single {
@@ -105,7 +99,7 @@ val globalModule = module {
             uri = config.timeouts.uri
 
             if (config.timeouts.auth != null) {
-                auth = config.timeouts.auth
+                auth = config.timeouts.auth as String
             }
         }
     }

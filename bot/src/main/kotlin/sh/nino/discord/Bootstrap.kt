@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,23 @@
 
 package sh.nino.discord
 
+import com.charleskorn.kaml.Yaml
+import dev.kord.cache.map.MapLikeCollection
+import dev.kord.cache.map.internal.MapEntryCache
+import dev.kord.core.Kord
 import gay.floof.utils.slf4j.logging
+import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
-import sh.nino.discord.core.NinoInfo
+import org.koin.dsl.module
+import sh.nino.discord.api.apiModule
+import sh.nino.discord.commands.commandsModule
+import sh.nino.discord.common.NinoInfo
+import sh.nino.discord.common.data.Config
+import sh.nino.discord.core.NinoBot
 import sh.nino.discord.core.globalModule
-import sh.nino.discord.core.modules.ninoModule
 import sh.nino.discord.punishments.punishmentsModule
 import java.io.File
+import kotlin.system.exitProcess
 
 object Bootstrap {
     private val logger by logging<Bootstrap>()
@@ -47,13 +57,54 @@ object Bootstrap {
             println(l)
         }
 
+        val configFile = File("./config.yml")
+        val config = Yaml.default.decodeFromString(Config.serializer(), configFile.readText())
+        val kord = runBlocking {
+            Kord(config.token) {
+                enableShutdownHook = false
+
+                cache {
+                    // cache members
+                    members { cache, description ->
+                        MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+                    }
+
+                    // cache users
+                    users { cache, description ->
+                        MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+                    }
+                }
+            }
+        }
+
         logger.info("* Initializing Koin...")
         val koin = startKoin {
             modules(
-                punishmentsModule,
                 globalModule,
-                ninoModule
+                *apiModule.toTypedArray(),
+                *commandsModule.toTypedArray(),
+                module {
+                    single {
+                        config
+                    }
+
+                    single {
+                        kord
+                    }
+                },
+
+                punishmentsModule
             )
+        }
+
+        val bot = koin.koin.get<NinoBot>()
+        runBlocking {
+            try {
+                bot.start()
+            } catch (e: Exception) {
+                logger.error("Unable to initialize Nino:", e)
+                exitProcess(1)
+            }
         }
     }
 }

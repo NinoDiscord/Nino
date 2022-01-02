@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,13 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.data
+package sh.nino.discord.automod
 
-import kotlinx.serialization.Serializable
+import sh.nino.discord.automod.core.automod
 
-@Serializable
-data class PostgresConfig(
-    val username: String = "postgres",
-    val password: String = "postgres",
-    val schema: String = "public",
-    val host: String = "localhost",
-    val port: Int = 5432,
-    val name: String = "nino"
-)
+val blacklistAutomod = automod {
+    name = "blacklist"
+    onMessage { event ->
+        true
+    }
+}

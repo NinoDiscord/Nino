@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,39 +20,12 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.data
+package sh.nino.discord.common.data
 
-import dev.kord.common.entity.ActivityType
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-enum class Environment {
-    @SerialName("development")
-    Development,
-
-    @SerialName("production")
-    Production
-}
-
-@Serializable
-data class Config(
-    val defaultLocale: String = "en_US",
-    val environment: Environment = Environment.Development,
-    val clustering: ClusterOperatorConfig,
-    val sentryDsn: String? = null,
-    val prefixes: List<String> = listOf("x!"),
-    val database: PostgresConfig = PostgresConfig(),
-    val instatus: InstatusConfig? = null,
-    val timeouts: TimeoutsConfig,
-    val metrics: Boolean = false,
-    val owners: List<String> = listOf(),
-    val status: StatusConfig = StatusConfig(
-        type = ActivityType.Game,
-        status = "with {guilds} guilds [#{shard_id}] https://nino.sh"
-    ),
-    val redis: RedisConfig,
-    val token: String,
-    val ravy: String? = null,
-    val api: ApiConfig? = null
+data class ApiConfig(
+    val host: String = "0.0.0.0",
+    val port: Int = 8989
 )

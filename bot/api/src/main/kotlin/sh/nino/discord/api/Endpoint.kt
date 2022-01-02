@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,3 +21,33 @@
  */
 
 package sh.nino.discord.api
+
+import io.ktor.application.*
+import io.ktor.http.*
+import kotlin.reflect.KCallable
+import kotlin.reflect.full.callSuspend
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
+import sh.nino.discord.api.annotations.Route as RouteMeta
+
+class Route(val path: String, val method: HttpMethod, private val callable: KCallable<*>, private val thiz: Any) {
+    suspend fun execute(call: ApplicationCall): Any? {
+        return callable.callSuspend(thiz, call)
+    }
+}
+
+open class Endpoint(val prefix: String) {
+    companion object {
+        fun merge(prefix: String, other: String): String {
+            if (other == "/") return prefix
+
+            return "${if (prefix == "/") "" else prefix}$other"
+        }
+    }
+
+    val routes: List<Route>
+        get() = this::class.members.filter { it.hasAnnotation<RouteMeta>() }.map {
+            val meta = it.findAnnotation<RouteMeta>()!!
+            Route(merge(this.prefix, meta.path), HttpMethod.parse(meta.method), it, this)
+        }
+}

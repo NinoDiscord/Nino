@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,12 +22,10 @@
 
 package sh.nino.discord.database
 
-import org.jetbrains.exposed.sql.Database
-
-suspend fun Database.Companion.createPgEnums(mapped: Map<String, List<String>>) {
+suspend fun createPgEnums(mapped: Map<String, List<String>>) {
     for ((typeName, meta) in mapped) {
         val exists = asyncTransaction {
-            exec("SELECT * FROM pg_type WHERE typname='$typeName';") {
+            exec("SELECT * FROM pg_type WHERE typname='${typeName.lowercase()}';") {
                 it.next()
             }
         }

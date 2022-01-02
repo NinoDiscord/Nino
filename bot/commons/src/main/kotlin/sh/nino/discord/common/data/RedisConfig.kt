@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,17 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.core.data
+package sh.nino.discord.common.data
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class ApiConfig(
-    val host: String = "0.0.0.0",
-    val port: Int = 8989
+data class RedisConfig(
+    val sentinels: List<String> = listOf(),
+    val master: String? = null,
+    val password: String? = null,
+    val index: Int = 5,
+    val host: String = "localhost",
+    val port: Int = 6379,
+    val ssl: Boolean = false
 )

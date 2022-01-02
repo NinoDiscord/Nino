@@ -21,6 +21,6 @@
  */
 
 dependencies {
-    implementation("io.insert-koin:koin-core-ext:3.0.2")
+    implementation("io.insert-koin:koin-core:3.1.4")
     implementation("dev.kord:kord-core:0.8.0-M8")
 }

@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2019-2021 Nino
+/*
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,3 +21,7 @@
  */
 
 package sh.nino.discord.commands.core
+
+import org.koin.dsl.module
+
+val coreCommandsModule = module {}
