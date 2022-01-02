@@ -45,9 +45,9 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.api.ApiServer
 import sh.nino.discord.common.NinoInfo
-import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
+import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.core.listeners.applyGenericEvents
 import sh.nino.discord.core.localization.LocalizationManager
 import sh.nino.discord.database.asyncTransaction

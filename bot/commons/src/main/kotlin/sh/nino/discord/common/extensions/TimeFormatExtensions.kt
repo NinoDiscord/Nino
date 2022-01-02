@@ -41,7 +41,7 @@ fun Long.formatSize(): String {
  * Returns the humanized time for a [java.lang.Long] instance
  * @credit // Credit: https://github.com/DV8FromTheWorld/Yui/blob/master/src/main/java/net/dv8tion/discord/commands/UptimeCommand.java#L34
  */
-fun Long.humanize(): String {
+fun Long.humanize(long: Boolean = false): String {
     val months = this / 2592000000L % 12
     val weeks = this / 604800000L % 7
     val days = this / 86400000L % 30
@@ -50,12 +50,12 @@ fun Long.humanize(): String {
     val seconds = this / 1000L % 60
 
     val str = StringBuilder()
-    if (months > 0) str.append("${months}mo")
-    if (weeks > 0) str.append("${weeks}w")
-    if (days > 0) str.append("${days}d")
-    if (hours > 0) str.append("${hours}h")
-    if (minutes > 0) str.append("${minutes}m")
-    if (seconds > 0) str.append("${seconds}s")
+    if (months > 0) str.append(if (long) "$months month${if (months == 1L) "" else "s"}" else "${months}mo")
+    if (weeks > 0) str.append(if (long) "$weeks week${if (weeks == 1L) "" else "s"}" else "${weeks}w")
+    if (days > 0) str.append(if (long) "$days day${if (months == 1L) "" else "s"}" else "${days}d")
+    if (hours > 0) str.append(if (long) "$hours hour${if (months == 1L) "" else "s"}" else "${hours}h")
+    if (minutes > 0) str.append(if (long) "$minutes minute${if (months == 1L) "" else "s"}" else "${minutes}m")
+    if (seconds > 0) str.append(if (long) "$seconds second${if (months == 1L) "" else "s"}" else "${seconds}s")
 
     return str.toString()
 }

@@ -44,9 +44,9 @@ import org.koin.core.context.GlobalContext
 import org.slf4j.LoggerFactory
 import org.slf4j.event.Level
 import sh.nino.discord.common.NinoInfo
-import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
+import sh.nino.discord.common.extensions.retrieve
 import java.util.concurrent.TimeUnit
 
 class ApiServer {

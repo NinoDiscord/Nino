@@ -20,6 +20,7 @@
  * SOFTWARE.
  */
 
+@file:Suppress("UNUSED")
 package sh.nino.discord.api.routes
 
 import io.ktor.application.*
