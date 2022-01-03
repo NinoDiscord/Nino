@@ -1,11 +1,12 @@
 FROM eclipse-temurin:17-alpine AS builder
 
+RUN apk update && apk add git ca-certificates
 WORKDIR /
 COPY . .
 RUN chmod +x gradlew
-RUN ./gradlew :bot:build
+RUN ./gradlew :bot:build --stacktrace
 
-FROM gcr.io/distroless/java17-debian11:latest
+FROM eclipse-temurin:17-alpine
 
 WORKDIR /app/noelware/nino
 COPY --from=builder /bot/build/libs/Nino.jar /app/noelware/nino/Nino.jar

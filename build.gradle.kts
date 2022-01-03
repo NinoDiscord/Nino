@@ -64,13 +64,7 @@ repositories {
 }
 
 subprojects {
-    val displayId = this
-        .displayName
-        .replace("project '", "")
-        .replace("'", "")
-
-    val groupId = if (displayId.startsWith(":bot")) "bot" else "gateway"
-    group = "sh.nino.$groupId"
+    group = "sh.nino.bot"
     version = if (project.version != "unspecified") project.version else "$current"
 
     // apply plugins
