@@ -27,7 +27,6 @@ import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.TextColumnType
-import org.jetbrains.exposed.sql.VarCharColumnType
 import sh.nino.discord.database.SnowflakeTable
 import sh.nino.discord.database.columns.array
 

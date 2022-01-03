@@ -30,10 +30,10 @@ import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.NewsChannel
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.rest.builder.message.EmbedBuilder
+import kotlinx.datetime.Instant
 import sh.nino.discord.automod.core.automod
 import sh.nino.discord.common.COLOR
 import sh.nino.discord.common.extensions.asSnowflake
-import kotlinx.datetime.Instant
 
 private val NORMAL_DISCORD_MESSAGE_LINK = "https:\\/\\/discord.com\\/channels\\/(\\d{15,21})\\/(\\d{15,21})\\/(\\d{15,21})$".toRegex()
 private val CANARY_OR_PTB_MESSAGE_LINK = "https:\\/\\/(canary|ptb).discord.com\\/channels\\/(\\d{15,21})\\/(\\d{15,21})\\/(\\d{15,21})$".toRegex()
@@ -66,11 +66,11 @@ val messageLinks = automod {
             // if we can grab the messages.
             val message: Message? = when (channel.type) {
                 is ChannelType.GuildText -> {
-                   try {
-                       (channel as TextChannel).getMessage(messageId)
-                   } catch (e: Exception) {
-                       null
-                   }
+                    try {
+                        (channel as TextChannel).getMessage(messageId)
+                    } catch (e: Exception) {
+                        null
+                    }
                 }
 
                 is ChannelType.GuildNews -> {

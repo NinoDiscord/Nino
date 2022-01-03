@@ -39,7 +39,6 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.or
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.automod.core.Container
-import sh.nino.discord.commands.admin.AutomodCommand
 import sh.nino.discord.common.COLOR
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment

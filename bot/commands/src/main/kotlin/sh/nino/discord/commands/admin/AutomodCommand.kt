@@ -75,7 +75,8 @@ class AutomodCommand: AbstractCommand() {
     @Subcommand(
         "messageLinks",
         "descriptions.automod.messageLinks",
-        aliases = ["links", "msglinks", "mlinks", "ml"])
+        aliases = ["links", "msglinks", "mlinks", "ml"]
+    )
     suspend fun messageLinks(msg: CommandMessage) {
         val guild = msg.message.getGuild()
         val settings = asyncTransaction {
@@ -89,17 +90,21 @@ class AutomodCommand: AbstractCommand() {
             }
         }
 
-        msg.replyTranslate("commands.automod.toggle", mapOf(
-            "emoji" to enabled(prop),
-            "toggle" to msg.locale.translate("generic.${if (prop) "enabled" else "disabled"}"),
-            "name" to "Message Links"
-        ))
+        msg.replyTranslate(
+            "commands.automod.toggle",
+            mapOf(
+                "emoji" to enabled(prop),
+                "toggle" to msg.locale.translate("generic.${if (prop) "enabled" else "disabled"}"),
+                "name" to "Message Links"
+            )
+        )
     }
 
     @Subcommand(
         "accountAge",
         "descriptions.automod.accountAge",
-        aliases = ["age", "accAge"])
+        aliases = ["age", "accAge"]
+    )
     suspend fun accountAge(msg: CommandMessage) {
         val guild = msg.message.getGuild()
         val settings = asyncTransaction {
@@ -113,10 +118,13 @@ class AutomodCommand: AbstractCommand() {
             }
         }
 
-        msg.replyTranslate("commands.automod.toggle", mapOf(
-            "emoji" to enabled(prop),
-            "toggle" to msg.locale.translate("generic.${if (prop) "enabled" else "disabled"}"),
-            "name" to "Account Age"
-        ))
+        msg.replyTranslate(
+            "commands.automod.toggle",
+            mapOf(
+                "emoji" to enabled(prop),
+                "toggle" to msg.locale.translate("generic.${if (prop) "enabled" else "disabled"}"),
+                "name" to "Account Age"
+            )
+        )
     }
 }
