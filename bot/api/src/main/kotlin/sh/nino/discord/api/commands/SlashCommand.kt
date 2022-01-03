@@ -46,7 +46,7 @@ class SlashCommand(
         try {
             runner.invoke(msg)
             callback(null, true)
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             callback(e, false)
         }
     }

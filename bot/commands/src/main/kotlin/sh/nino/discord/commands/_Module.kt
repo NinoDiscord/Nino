@@ -35,7 +35,7 @@ import sh.nino.discord.commands.voice.voiceCommandsModule
 val commandsModule = adminCommandsModule + coreCommandsModule +
     easterEggCommandModule + moderationCommandsModule + systemCommandsModule +
     threadsCommandsModule + utilCommandsModule + voiceCommandsModule + module {
-        single {
-            CommandHandler(get(), get(), get(), get())
-        }
+    single {
+        CommandHandler(get(), get(), get(), get())
+    }
 }

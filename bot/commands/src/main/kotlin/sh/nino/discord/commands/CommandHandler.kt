@@ -115,10 +115,11 @@ class CommandHandler(
 
         val selfUser = guild.members.firstOrNull { it.id == kord.selfId } ?: return
         val prefixes = (
-                listOf("<@${kord.selfId}>", "<@!${kord.selfId}>")
-                        + config.prefixes.toList()
-                        + guildSettings.prefixes.toList()
-                        + userSettings.prefixes.toList()).distinct()
+            listOf("<@${kord.selfId}>", "<@!${kord.selfId}>") +
+                config.prefixes.toList() +
+                guildSettings.prefixes.toList() +
+                userSettings.prefixes.toList()
+            ).distinct()
 
         if (event.message.content.matches("^<@!?${kord.selfId}>$".toRegex())) {
             val prefix = prefixes.drop(2).random()
@@ -193,9 +194,14 @@ class CommandHandler(
 
             if (missing.isNotEmpty()) {
                 val permList = missing.map { perm -> perm::class.jvmName.split("$").last() }
-                message.reply(locale.translate("errors.missingPermsUser", mapOf(
-                    "perms" to permList
-                )))
+                message.reply(
+                    locale.translate(
+                        "errors.missingPermsUser",
+                        mapOf(
+                            "perms" to permList
+                        )
+                    )
+                )
 
                 return
             }
@@ -208,9 +214,14 @@ class CommandHandler(
 
             if (missing.isNotEmpty()) {
                 val permList = missing.map { perm -> perm::class.jvmName.split("$").last() }
-                message.reply(locale.translate("errors.missingPermsBot", mapOf(
-                    "perms" to permList
-                )))
+                message.reply(
+                    locale.translate(
+                        "errors.missingPermsBot",
+                        mapOf(
+                            "perms" to permList
+                        )
+                    )
+                )
 
                 return
             }
@@ -231,20 +242,28 @@ class CommandHandler(
             val time = timestamps[event.message.author!!.id.toString()]!! + amount
             if (now < time.toLong()) {
                 val left = (time - now) / 1000
-                message.reply(locale.translate("errors.cooldown", mapOf(
-                    "command" to command.name,
-                    "time" to round(left.toDouble())
-                )))
+                message.reply(
+                    locale.translate(
+                        "errors.cooldown",
+                        mapOf(
+                            "command" to command.name,
+                            "time" to round(left.toDouble())
+                        )
+                    )
+                )
 
                 return
             }
 
             timestamps[event.message.author!!.id.toString()] = now.toInt()
-            timer.schedule(object: TimerTask() {
-                override fun run() {
-                    timestamps.remove(event.message.author!!.id.toString())
-                }
-            }, amount.toLong())
+            timer.schedule(
+                object: TimerTask() {
+                    override fun run() {
+                        timestamps.remove(event.message.author!!.id.toString())
+                    }
+                },
+                amount.toLong()
+            )
         }
 
         // Is there a subcommand? maybe!
@@ -324,44 +343,68 @@ class CommandHandler(
                 baos.toString(StandardCharsets.UTF_8.name())
             }
 
-            message.reply(buildString {
-                appendLine(message.locale.translate("errors.unknown.0", mapOf(
-                    "command" to name,
-                    "suffix" to if (isSub) {
-                        "subcommand"
-                    } else {
-                        "command"
-                    }
-                )))
+            message.reply(
+                buildString {
+                    appendLine(
+                        message.locale.translate(
+                            "errors.unknown.0",
+                            mapOf(
+                                "command" to name,
+                                "suffix" to if (isSub) {
+                                    "subcommand"
+                                } else {
+                                    "command"
+                                }
+                            )
+                        )
+                    )
 
-                appendLine(message.locale.translate("errors.unknown.1", mapOf(
-                    "owners" to owners.joinToString(", ") { "**$it**" }
-                )))
+                    appendLine(
+                        message.locale.translate(
+                            "errors.unknown.1",
+                            mapOf(
+                                "owners" to owners.joinToString(", ") { "**$it**" }
+                            )
+                        )
+                    )
 
-                appendLine()
-                appendLine(message.locale.translate("errors.unknown.2"))
-                appendLine()
-                appendLine("```kotlin")
-                appendLine(stacktrace.elipsis(1500))
-                appendLine("```")
-            })
+                    appendLine()
+                    appendLine(message.locale.translate("errors.unknown.2"))
+                    appendLine()
+                    appendLine("```kotlin")
+                    appendLine(stacktrace.elipsis(1500))
+                    appendLine("```")
+                }
+            )
         } else {
-            message.reply(buildString {
-                appendLine(message.locale.translate("errors.unknown.0", mapOf(
-                    "command" to name,
-                    "suffix" to if (isSub) {
-                        "subcommand"
-                    } else {
-                        "command"
-                    }
-                )))
+            message.reply(
+                buildString {
+                    appendLine(
+                        message.locale.translate(
+                            "errors.unknown.0",
+                            mapOf(
+                                "command" to name,
+                                "suffix" to if (isSub) {
+                                    "subcommand"
+                                } else {
+                                    "command"
+                                }
+                            )
+                        )
+                    )
 
-                appendLine(message.locale.translate("errors.unknown.1", mapOf(
-                    "owners" to owners.joinToString(", ") { "**$it**" }
-                )))
+                    appendLine(
+                        message.locale.translate(
+                            "errors.unknown.1",
+                            mapOf(
+                                "owners" to owners.joinToString(", ") { "**$it**" }
+                            )
+                        )
+                    )
 
-                appendLine(message.locale.translate("errors.unknown.3"))
-            })
+                    appendLine(message.locale.translate("errors.unknown.3"))
+                }
+            )
         }
 
         logger.error("Unable to execute command $name:", exception)

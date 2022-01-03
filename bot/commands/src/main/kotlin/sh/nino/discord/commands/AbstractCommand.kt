@@ -23,10 +23,10 @@
 package sh.nino.discord.commands
 
 import sh.nino.discord.commands.annotations.Command
-import sh.nino.discord.commands.annotations.Subcommand as SubcommandAnnotation
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.jvm.jvmName
+import sh.nino.discord.commands.annotations.Subcommand as SubcommandAnnotation
 
 abstract class AbstractCommand {
     val info: Command

@@ -26,9 +26,9 @@ import dev.kord.common.DiscordBitSet
 import dev.kord.common.entity.Permissions
 import kotlinx.coroutines.launch
 import sh.nino.discord.core.NinoScope
-import sh.nino.discord.commands.annotations.Subcommand as Annotation
 import kotlin.reflect.KCallable
 import kotlin.reflect.full.callSuspend
+import sh.nino.discord.commands.annotations.Subcommand as Annotation
 
 class Subcommand private constructor(
     val name: String,
