@@ -66,7 +66,7 @@ object GuildLogging: SnowflakeTable("logging") {
 
             override fun nonNullValueToString(value: Any): String = (value as LogEvent).key
         }
-    )
+    ).default(arrayOf())
 }
 
 class LoggingEntity(id: EntityID<Long>): LongEntity(id) {

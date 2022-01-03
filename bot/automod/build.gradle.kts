@@ -21,6 +21,9 @@
  */
 
 dependencies {
+    implementation("org.jetbrains.exposed:exposed-core:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
     implementation("dev.kord:kord-core:0.8.0-M8")
+    implementation(project(":bot:database"))
     api("org.slf4j:slf4j-api:1.7.32")
 }

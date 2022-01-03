@@ -39,6 +39,7 @@ import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.or
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.automod.core.Container
+import sh.nino.discord.commands.admin.AutomodCommand
 import sh.nino.discord.common.COLOR
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
@@ -102,6 +103,12 @@ class CommandHandler(
         // Can't find the guild or user settings?
         // Let's create it and override the variable!
         if (guildSettings == null) {
+            // create the other guild settings
+            asyncTransaction {
+                AutomodEntity.new(guild.id.value.toLong()) {}
+                LoggingEntity.new(guild.id.value.toLong()) {}
+            }
+
             guildSettings = asyncTransaction {
                 GuildSettingsEntity.new(guild.id.value.toLong()) {}
             }

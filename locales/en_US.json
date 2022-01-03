@@ -7,6 +7,9 @@
     "code": "en_US"
   },
   "strings": {
+    "generic.enabled": "Enabled",
+    "generic.disabled": "Disabled",
+
     "errors.ownerOnly": "You are not allowed to invoke the **${name}** command.",
     "errors.missingPermsBot": "I am currently missing the following permissions: **${perms}**",
     "errors.missingPermsUser": "You are currently missing the following permissions: **${perms}**",
@@ -16,6 +19,9 @@
     "errors.unknown.2": "Since you are in development mode, the stacktrace can be seen below and in the console:",
     "errors.unknown.3": "Report it to Noelware under the **<#824071651486335036>** channel: https://discord.gg/ATmjFH9kMH",
 
-    "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use."
+    "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use.",
+
+    "commands.automod.list.footer": "Need more information? Run \"automod describe\" to get more information. :D",
+    "commands.automod.toggle": "${emoji} ${toggle} the **${name}** automod!"
   }
 }

@@ -22,6 +22,10 @@
 
 package sh.nino.discord.commands.admin
 
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import sh.nino.discord.commands.AbstractCommand
 
-val adminCommandsModule = module {}
+val adminCommandsModule = module {
+    single { AutomodCommand() } bind AbstractCommand::class
+}

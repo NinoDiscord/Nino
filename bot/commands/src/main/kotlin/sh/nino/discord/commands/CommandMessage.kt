@@ -95,4 +95,6 @@ class CommandMessage(
             }
         }
     }
+
+    suspend fun replyTranslate(key: String, args: Map<String, Any> = mapOf()): Message = reply(locale.translate(key, args))
 }

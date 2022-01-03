@@ -22,11 +22,163 @@
 
 package sh.nino.discord.automod
 
+import dev.kord.common.Color
+import dev.kord.common.entity.ChannelType
+import dev.kord.common.entity.optional.value
+import dev.kord.core.behavior.channel.createMessage
+import dev.kord.core.entity.Message
+import dev.kord.core.entity.channel.NewsChannel
+import dev.kord.core.entity.channel.TextChannel
+import dev.kord.rest.builder.message.EmbedBuilder
 import sh.nino.discord.automod.core.automod
+import sh.nino.discord.common.COLOR
+import sh.nino.discord.common.extensions.asSnowflake
+import kotlinx.datetime.Instant
+
+private val NORMAL_DISCORD_MESSAGE_LINK = "https:\\/\\/discord.com\\/channels\\/(\\d{15,21})\\/(\\d{15,21})\\/(\\d{15,21})$".toRegex()
+private val CANARY_OR_PTB_MESSAGE_LINK = "https:\\/\\/(canary|ptb).discord.com\\/channels\\/(\\d{15,21})\\/(\\d{15,21})\\/(\\d{15,21})$".toRegex()
 
 val messageLinks = automod {
     name = "mentions"
     onMessage { event ->
-        true
+        if (event.message.content.matches(NORMAL_DISCORD_MESSAGE_LINK) || event.message.content.matches(CANARY_OR_PTB_MESSAGE_LINK)) {
+            var matcher = NORMAL_DISCORD_MESSAGE_LINK.toPattern().matcher(event.message.content)
+            val usingCanary: Boolean
+
+            if (!matcher.matches()) {
+                matcher = CANARY_OR_PTB_MESSAGE_LINK.toPattern().matcher(event.message.content)
+                if (!matcher.matches()) {
+                    return@onMessage false
+                } else {
+                    usingCanary = true
+                }
+            } else {
+                usingCanary = false
+            }
+
+            val channelId = matcher.group(if (usingCanary) 3 else 2).asSnowflake()
+            val messageId = matcher.group(if (usingCanary) 4 else 3).asSnowflake()
+
+            // can we find the channel?
+            val channel = event.kord.getChannel(channelId) ?: return@onMessage false
+
+            // Try to surf through the channel types and see
+            // if we can grab the messages.
+            val message: Message? = when (channel.type) {
+                is ChannelType.GuildText -> {
+                   try {
+                       (channel as TextChannel).getMessage(messageId)
+                   } catch (e: Exception) {
+                       null
+                   }
+                }
+
+                is ChannelType.GuildNews -> {
+                    try {
+                        (channel as NewsChannel).getMessage(messageId)
+                    } catch (e: Exception) {
+                        null
+                    }
+                }
+
+                else -> null
+            } ?: return@onMessage false
+
+            if (message!!.embeds.isNotEmpty()) {
+                val first = message.embeds.first()
+                val member = message.getAuthorAsMember()
+
+                event.message.channel.createMessage {
+                    embeds += EmbedBuilder().apply {
+                        if (first.data.title.value != null) {
+                            title = first.data.title.value
+                        }
+
+                        if (first.data.description.value != null) {
+                            description = first.data.description.value
+                        }
+
+                        if (first.data.url.value != null) {
+                            url = first.data.url.value
+                        }
+
+                        color = if (first.data.color.asNullable != null) {
+                            Color(first.data.color.asOptional.value!!)
+                        } else {
+                            COLOR
+                        }
+
+                        if (first.data.timestamp.value != null) {
+                            timestamp = Instant.parse(first.data.timestamp.value!!)
+                        }
+
+                        if (first.data.footer.value != null) {
+                            footer {
+                                text = first.data.footer.value!!.text
+                                icon = first.data.footer.value!!.iconUrl.value ?: first.data.footer.value!!.proxyIconUrl.value ?: ""
+                            }
+                        }
+
+                        if (first.data.thumbnail.value != null) {
+                            thumbnail {
+                                url = first.data.thumbnail.value!!.url.value ?: first.data.thumbnail.value!!.proxyUrl.value ?: ""
+                            }
+                        }
+
+                        if (first.data.author.value != null) {
+                            author {
+                                name = first.data.author.value!!.name.value ?: ""
+                                icon = first.data.author.value!!.iconUrl.value ?: first.data.author.value!!.proxyIconUrl.value ?: ""
+                                url = first.data.author.value!!.url.value ?: ""
+                            }
+                        } else {
+                            author {
+                                name = if (message.author == null) {
+                                    "Webhook"
+                                } else {
+                                    "${message.author!!.tag} (${message.author!!.id})"
+                                }
+
+                                icon = member?.avatar?.url ?: message.author!!.avatar?.url ?: message.author!!.defaultAvatar.url
+                            }
+                        }
+
+                        if (first.data.fields.value != null) {
+                            for (f in first.data.fields.value!!) {
+                                field {
+                                    name = f.name
+                                    value = f.value
+                                    inline = f.inline.value ?: true
+                                }
+                            }
+                        }
+                    }
+                }
+
+                return@onMessage true
+            } else {
+                val member = message.getAuthorAsMember()
+                event.message.channel.createMessage {
+                    embeds += EmbedBuilder().apply {
+                        description = message.content
+                        color = COLOR
+
+                        author {
+                            name = if (message.author == null) {
+                                "Webhook"
+                            } else {
+                                "${message.author!!.tag} (${message.author!!.id})"
+                            }
+
+                            icon = member?.avatar?.url ?: message.author!!.avatar?.url ?: message.author!!.defaultAvatar.url
+                        }
+                    }
+                }
+
+                return@onMessage true
+            }
+        }
+
+        false
     }
 }

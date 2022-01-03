@@ -25,6 +25,7 @@ package sh.nino.discord.database.tables
 import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
+import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.TextColumnType
 import org.jetbrains.exposed.sql.VarCharColumnType
 import sh.nino.discord.database.SnowflakeTable
@@ -33,12 +34,14 @@ import sh.nino.discord.database.columns.array
 object AutomodTable: SnowflakeTable("automod") {
     val mentionsThreshold = integer("mention_threshold").default(4)
     val blacklistedWords = array<String>("blacklisted_words", TextColumnType()).default(arrayOf())
-    val omittedChannels = array<String>("omitted_channels", TextColumnType()).default(arrayOf())
-    val omittedUsers = array<String>("omitted_users", VarCharColumnType(18))
+    val omittedChannels = array<Long>("omitted_channels", LongColumnType()).default(arrayOf())
+    val omittedUsers = array<Long>("omitted_users", LongColumnType()).default(arrayOf())
     val messageLinks = bool("message_links").default(false)
+    val accountAge = bool("account_age").default(false)
     val dehoisting = bool("dehoisting").default(false)
     val shortlinks = bool("shortlinks").default(false)
     val blacklist = bool("blacklist").default(false)
+    val phishing = bool("phishing").default(false)
     val mentions = bool("mentions").default(false)
     val invites = bool("invites").default(false)
     val spam = bool("spam").default(false)
@@ -53,9 +56,11 @@ class AutomodEntity(id: EntityID<Long>): LongEntity(id) {
     var omittedChannels by AutomodTable.omittedChannels
     var omittedUsers by AutomodTable.omittedUsers
     var messageLinks by AutomodTable.messageLinks
+    val accountAge by AutomodTable.accountAge
     var dehoisting by AutomodTable.dehoisting
     var shortlinks by AutomodTable.shortlinks
     var blacklist by AutomodTable.blacklist
+    var phishing by AutomodTable.phishing
     var mentions by AutomodTable.mentions
     var invites by AutomodTable.invites
     var spam by AutomodTable.spam
