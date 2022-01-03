@@ -159,5 +159,3 @@ gradle-app.setting
 
 # other stuff
 config.yml
-src/main/resources/build-info.properties
-docker/cluster-operator/config.json
