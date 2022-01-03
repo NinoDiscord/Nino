@@ -21,3 +21,7 @@
  */
 
 package sh.nino.discord.api.commands
+
+import org.koin.dsl.module
+
+val slashCommandsModule = module {}

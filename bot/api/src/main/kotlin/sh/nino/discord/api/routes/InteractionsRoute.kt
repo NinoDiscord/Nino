@@ -23,22 +23,27 @@
 @file:Suppress("UNUSED")
 package sh.nino.discord.api.routes
 
+import gay.floof.utils.slf4j.logging
 import io.ktor.application.*
 import io.ktor.response.*
 import sh.nino.discord.api.Endpoint
 import sh.nino.discord.api.annotations.Route
+import sh.nino.discord.common.data.Config
 
 private data class Response(
     val message: String
 )
 
-class InteractionsRoute: Endpoint("/interactions") {
+class InteractionsRoute(private val config: Config): Endpoint("/interactions") {
+    private val logger by logging<InteractionsRoute>()
+
     @Route(path = "/", method = "GET")
     suspend fun get(call: ApplicationCall) {
         call.respond(Response(message = "hello world"))
     }
 
-    @Route("/", method = "POST")
+    @Route("/receive", method = "POST")
     suspend fun interactions(call: ApplicationCall) {
+        logger.info("Received interaction request!")
     }
 }

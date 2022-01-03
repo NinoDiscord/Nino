@@ -29,5 +29,8 @@ dependencies {
     implementation("io.ktor:ktor-serialization:1.6.7")
     implementation("io.ktor:ktor-server-netty:1.6.7")
     implementation("dev.kord:kord-core:0.8.0-M8")
+    implementation("commons-codec:commons-codec:1.15")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.69")
+    implementation("org.bouncycastle:bcpkix-jdk15on:1.69")
     api("org.slf4j:slf4j-api:1.7.32")
 }

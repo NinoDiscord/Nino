@@ -7,6 +7,15 @@
     "code": "en_US"
   },
   "strings": {
+    "errors.ownerOnly": "You are not allowed to invoke the **${name}** command.",
+    "errors.missingPermsBot": "I am currently missing the following permissions: **${perms}**",
+    "errors.missingPermsUser": "You are currently missing the following permissions: **${perms}**",
+    "errors.cooldown": "You are currently on cooldown for command **${command}** for **${time}**.",
+    "errors.unknown.0": "Sorry! We were not able to execute the **${command}** ${suffix}!",
+    "errors.unknown.1": "If this is a more than one occurrence, please report it to:\n${owners}",
+    "errors.unknown.2": "Since you are in development mode, the stacktrace can be seen below and in the console:",
+    "errors.unknown.3": "Report it to Noelware under the **<#824071651486335036>** channel: https://discord.gg/ATmjFH9kMH",
+
     "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use."
   }
 }

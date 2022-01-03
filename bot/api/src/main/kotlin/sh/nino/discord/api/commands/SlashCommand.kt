@@ -21,3 +21,33 @@
  */
 
 package sh.nino.discord.api.commands
+
+import dev.kord.common.entity.ApplicationCommandOption
+import dev.kord.common.entity.Permissions
+
+private val SLASH_COMMAND_NAME_REGEX = "^[\\w-]{1,32}\$".toRegex()
+
+class SlashCommand(
+    val name: String,
+    val description: String,
+    val options: List<ApplicationCommandOption>,
+    val onlyIn: List<Long> = listOf(),
+    val userPermissions: Permissions,
+    val botPermissions: Permissions,
+    val subcommands: List<SlashSubcommand>,
+    val groups: List<SlashSubcommandGroup>,
+    private val runner: suspend (SlashCommandMessage) -> Unit
+) {
+    init {
+        check(name.matches(SLASH_COMMAND_NAME_REGEX)) { "owo da uwu" }
+    }
+
+    suspend fun execute(msg: SlashCommandMessage, callback: suspend (Exception?, Boolean) -> Unit) {
+        try {
+            runner.invoke(msg)
+            callback(null, true)
+        } catch(e: Exception) {
+            callback(e, false)
+        }
+    }
+}

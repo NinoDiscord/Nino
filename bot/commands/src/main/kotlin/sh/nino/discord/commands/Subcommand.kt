@@ -21,3 +21,54 @@
  */
 
 package sh.nino.discord.commands
+
+import dev.kord.common.DiscordBitSet
+import dev.kord.common.entity.Permissions
+import kotlinx.coroutines.launch
+import sh.nino.discord.core.NinoScope
+import sh.nino.discord.commands.annotations.Subcommand as Annotation
+import kotlin.reflect.KCallable
+import kotlin.reflect.full.callSuspend
+
+class Subcommand private constructor(
+    val name: String,
+    val description: String,
+    val usage: String = "",
+    val aliases: List<String> = listOf(),
+    val permissions: Permissions = Permissions(),
+    private val method: KCallable<*>,
+    private val thisCtx: Any
+) {
+    constructor(
+        method: KCallable<*>,
+        info: Annotation,
+        thisCtx: Any
+    ): this(
+        info.name,
+        info.description,
+        info.usage,
+        info.aliases.toList(),
+        Permissions(DiscordBitSet(info.permissions)),
+        method,
+        thisCtx
+    )
+
+    suspend fun execute(msg: CommandMessage, callback: suspend (Exception?, Boolean) -> Unit): Any =
+        if (method.isSuspend) {
+            NinoScope.launch {
+                try {
+                    method.callSuspend(thisCtx, msg)
+                    callback(null, true)
+                } catch (e: Exception) {
+                    callback(e, false)
+                }
+            }
+        } else {
+            try {
+                method.call(thisCtx, msg)
+                callback(null, true)
+            } catch (e: Exception) {
+                callback(e, false)
+            }
+        }
+}

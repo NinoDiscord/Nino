@@ -40,6 +40,7 @@ data class Config(
     val defaultLocale: String = "en_US",
     val environment: Environment = Environment.Development,
     val sentryDsn: String? = null,
+    val publicKey: String,
     val prefixes: List<String> = listOf("x!"),
     val database: PostgresConfig = PostgresConfig(),
     val instatus: InstatusConfig? = null,

@@ -21,3 +21,19 @@
  */
 
 package sh.nino.discord.commands.easter_egg
+
+import sh.nino.discord.commands.AbstractCommand
+import sh.nino.discord.commands.CommandCategory
+import sh.nino.discord.commands.CommandMessage
+import sh.nino.discord.commands.annotations.Command
+
+@Command(
+    name = "test",
+    description = "A secret test command. :eyes:",
+    category = CommandCategory.EASTER_EGG
+)
+class TestCommand: AbstractCommand() {
+    override suspend fun execute(msg: CommandMessage) {
+        msg.reply("blep!")
+    }
+}

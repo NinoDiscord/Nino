@@ -80,8 +80,8 @@ class NinoBot {
         logger.info("Displaying runtime information:")
         logger.info("* Free / Total (Max) Memory: ${free}MiB/${total}MiB (${maxMem}MiB)")
         logger.info("* Threads: ${threads.threadCount} (${threads.daemonThreadCount} daemon'd)")
-        logger.info("* JVM: ${System.getProperty("java.version")} (${System.getProperty("java.vendor", "<NA>")})")
-        logger.info("* Kotlin: ${KotlinVersion.CURRENT}")
+        logger.info("* JVM: v${System.getProperty("java.version")} (${System.getProperty("java.vendor", "<NA>")})")
+        logger.info("* Kotlin: v${KotlinVersion.CURRENT}")
         logger.info("* Operating System: ${os.name} with ${os.availableProcessors} processors (${os.arch}; ${os.version})")
 
         if (dediNode != null)
@@ -156,12 +156,6 @@ class NinoBot {
             }
         }
 
-        // Setup text-based commands
-        // GlobalContext.retrieve<CommandHandler>()
-
-        // Setup slash commands
-        // GlobalContext.retrieve<SlashCommandHandler>()
-
         // Startup the timeouts client in a different coroutine scope
         // since it will block this thread (and we don't want that.)
         NinoScope.launch {
@@ -197,6 +191,12 @@ class NinoBot {
                 +Intent.GuildVoiceStates
                 +Intent.GuildMembers
             }
+        }
+    }
+
+    fun sentryReport(ex: Exception) {
+        if (Sentry.isEnabled()) {
+            Sentry.captureException(ex)
         }
     }
 

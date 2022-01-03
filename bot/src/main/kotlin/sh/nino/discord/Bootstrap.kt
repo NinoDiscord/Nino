@@ -26,11 +26,14 @@ import com.charleskorn.kaml.Yaml
 import dev.kord.cache.map.MapLikeCollection
 import dev.kord.cache.map.internal.MapEntryCache
 import dev.kord.core.Kord
+import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.core.on
 import gay.floof.utils.slf4j.logging
 import kotlinx.coroutines.runBlocking
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import sh.nino.discord.api.apiModule
+import sh.nino.discord.commands.CommandHandler
 import sh.nino.discord.commands.commandsModule
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
@@ -100,6 +103,16 @@ object Bootstrap {
         val bot = koin.koin.get<NinoBot>()
         runBlocking {
             try {
+                // set up the command handler before the bot starts,
+                // so we don't do circular dependencies.
+                val handler = koin.koin.get<CommandHandler>()
+
+                // setup slash commands also! for the same reason above.
+                // koin.koin.get<SlashCommandHandler>()
+
+                // setup kord events here (read ABOVE >:c)
+                kord.on<MessageCreateEvent> { handler.onCommand(this) }
+
                 bot.start()
             } catch (e: Exception) {
                 logger.error("Unable to initialize Nino:", e)

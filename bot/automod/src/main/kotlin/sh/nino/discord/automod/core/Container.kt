@@ -23,9 +23,19 @@
 package sh.nino.discord.automod.core
 
 import dev.kord.core.event.Event
+import sh.nino.discord.automod.*
 
 object Container {
-    private val automods = mapOf<String, Automod>()
+    private val automods = mapOf(
+        "accountAge" to accountAgeAutomod,
+        "blacklist" to blacklistAutomod,
+        "mentions" to mentionsAutomod,
+        "messageLinks" to messageLinks,
+        "phishing" to phishingAutomod,
+        "raid" to raidAutomod,
+        "shortlinks" to shortlinksAutomod,
+        "spam" to spamAutomod
+    )
 
     suspend fun execute(event: Event): Boolean {
         var ret = false

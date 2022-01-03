@@ -21,3 +21,7 @@
  */
 
 package sh.nino.discord.api.commands
+
+abstract class AbstractSlashCommand {
+    abstract suspend fun execute(msg: SlashCommandMessage)
+}

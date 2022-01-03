@@ -25,9 +25,10 @@ package sh.nino.discord.api
 import io.micrometer.prometheus.PrometheusConfig
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import org.koin.dsl.module
+import sh.nino.discord.api.commands.slashCommandsModule
 import sh.nino.discord.api.routes.endpointModule
 
-val apiModule = endpointModule + module {
+val apiModule = endpointModule + slashCommandsModule + module {
     single {
         ApiServer()
     }

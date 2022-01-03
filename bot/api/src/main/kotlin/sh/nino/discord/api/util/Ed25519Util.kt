@@ -21,3 +21,36 @@
  */
 
 package sh.nino.discord.api.util
+
+import org.apache.commons.codec.binary.Hex
+import org.bouncycastle.asn1.edec.EdECObjectIdentifiers
+import org.bouncycastle.asn1.x509.AlgorithmIdentifier
+import org.bouncycastle.asn1.x509.SubjectPublicKeyInfo
+import org.bouncycastle.jce.provider.BouncyCastleProvider
+import java.security.KeyFactory
+import java.security.Security
+import java.security.Signature
+import java.security.spec.X509EncodedKeySpec
+
+object Ed25519Util {
+    private val provider = BouncyCastleProvider()
+    private val KEY_FACTORY = KeyFactory.getInstance("ed25519", provider)
+
+    init {
+        Security.addProvider(provider)
+    }
+
+    fun verify(publicKey: String, signature: String, ts: String, data: String): Boolean {
+        val keyInBytes = Hex.decodeHex(publicKey)
+        val pki = SubjectPublicKeyInfo(AlgorithmIdentifier(EdECObjectIdentifiers.id_Ed25519), keyInBytes)
+        val pkSpec = X509EncodedKeySpec(pki.encoded)
+        val gPublicKey = KEY_FACTORY.generatePublic(pkSpec)
+        val signedData = Signature.getInstance("ed25519", provider)
+
+        signedData.initVerify(gPublicKey)
+        signedData.update(ts.toByteArray(Charsets.UTF_8))
+        signedData.update(data.toByteArray(Charsets.UTF_8))
+
+        return signedData.verify(Hex.decodeHex(signature))
+    }
+}

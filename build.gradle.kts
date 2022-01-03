@@ -93,6 +93,7 @@ subprojects {
 
     dependencies {
         // common kotlin libraries for all projects
+        implementation(kotlin("reflect", "1.6.10"))
         implementation(kotlin("stdlib", "1.6.10"))
 
         // kotlinx libraries

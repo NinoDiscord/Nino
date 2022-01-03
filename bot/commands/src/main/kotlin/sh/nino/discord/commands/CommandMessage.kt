@@ -21,3 +21,79 @@
  */
 
 package sh.nino.discord.commands
+
+import dev.kord.core.behavior.channel.createMessage
+import dev.kord.core.entity.Embed
+import dev.kord.core.entity.Message
+import dev.kord.core.entity.channel.TextChannel
+import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.rest.builder.message.EmbedBuilder
+import dev.kord.rest.builder.message.create.allowedMentions
+import sh.nino.discord.common.COLOR
+import sh.nino.discord.core.localization.Locale
+import sh.nino.discord.core.messaging.PaginationEmbed
+import sh.nino.discord.database.tables.GuildSettingsEntity
+import sh.nino.discord.database.tables.UserEntity
+
+class CommandMessage(
+    private val event: MessageCreateEvent,
+    val args: List<String>,
+    val settings: GuildSettingsEntity,
+    val userSettings: UserEntity,
+    val locale: Locale
+) {
+    val attachments = event.message.attachments.toList()
+    val message = event.message
+    val author = message.author!!
+
+    suspend fun createPaginationEmbed(embeds: List<EmbedBuilder>): PaginationEmbed {
+        val channel = message.channel.asChannel() as TextChannel
+        return PaginationEmbed(channel, author, embeds)
+    }
+
+    suspend fun reply(content: String, reply: Boolean = true, embedBuilder: EmbedBuilder.() -> Unit): Message {
+        val embed = EmbedBuilder().apply(embedBuilder)
+        embed.color = COLOR
+
+        return message.channel.createMessage {
+            this.content = content
+            this.embeds += embed
+
+            if (reply) {
+                messageReference = message.id
+                allowedMentions {
+                    repliedUser = false
+                }
+            }
+        }
+    }
+
+    suspend fun reply(content: String, reply: Boolean = true): Message {
+        return message.channel.createMessage {
+            this.content = content
+
+            if (reply) {
+                messageReference = message.id
+                allowedMentions {
+                    repliedUser = false
+                }
+            }
+        }
+    }
+
+    suspend fun reply(content: String): Message = reply(content, true)
+    suspend fun reply(reply: Boolean = true, embedBuilder: EmbedBuilder.() -> Unit): Message {
+        val embed = EmbedBuilder().apply(embedBuilder)
+        embed.color = COLOR
+
+        return message.channel.createMessage {
+            this.embeds += embed
+            if (reply) {
+                messageReference = message.id
+                allowedMentions {
+                    repliedUser = false
+                }
+            }
+        }
+    }
+}

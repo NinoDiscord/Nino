@@ -21,3 +21,43 @@
  */
 
 package sh.nino.discord.commands
+
+import dev.kord.common.DiscordBitSet
+import dev.kord.common.entity.Permissions
+
+class Command private constructor(
+    val name: String,
+    val description: String,
+    val category: CommandCategory = CommandCategory.CORE,
+    val usage: String = "",
+    val ownerOnly: Boolean = false,
+    val aliases: List<String> = listOf(),
+    val examples: List<String> = listOf(),
+    val cooldown: Int = 5,
+    val userPermissions: Permissions = Permissions(),
+    val botPermissions: Permissions = Permissions(),
+    val thiz: AbstractCommand
+) {
+    constructor(thiz: AbstractCommand): this(
+        thiz.info.name,
+        thiz.info.description,
+        thiz.info.category,
+        thiz.info.usage,
+        thiz.info.ownerOnly,
+        thiz.info.aliases.toList(),
+        thiz.info.examples.toList(),
+        thiz.info.cooldown,
+        Permissions(DiscordBitSet(thiz.info.userPermissions)),
+        Permissions(DiscordBitSet(thiz.info.botPermissions)),
+        thiz
+    )
+
+    suspend fun run(msg: CommandMessage, callback: suspend (Exception?, Boolean) -> Unit) {
+        try {
+            thiz.execute(msg)
+            callback(null, true)
+        } catch (e: Exception) {
+            callback(e, false)
+        }
+    }
+}

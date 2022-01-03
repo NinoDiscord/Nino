@@ -21,3 +21,25 @@
  */
 
 package sh.nino.discord.commands
+
+import sh.nino.discord.commands.annotations.Command
+import sh.nino.discord.commands.annotations.Subcommand as SubcommandAnnotation
+import kotlin.reflect.full.findAnnotation
+import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.jvm.jvmName
+
+abstract class AbstractCommand {
+    val info: Command
+        get() = this::class.findAnnotation() ?: error("Missing @Command annotation on ${this::class.simpleName ?: this::class.jvmName}")
+
+    val subcommands: List<Subcommand>
+        get() = this::class.members.filter { it.hasAnnotation<SubcommandAnnotation>() }.map {
+            Subcommand(
+                it,
+                it.findAnnotation()!!,
+                this@AbstractCommand
+            )
+        }
+
+    abstract suspend fun execute(msg: CommandMessage)
+}
