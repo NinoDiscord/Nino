@@ -31,6 +31,7 @@ import sh.nino.discord.database.SnowflakeTable
 import sh.nino.discord.database.columns.array
 
 object AutomodTable: SnowflakeTable("automod") {
+    val accountAgeDayThreshold = integer("account_age_days_threshold").default(4)
     val mentionsThreshold = integer("mention_threshold").default(4)
     val blacklistedWords = array<String>("blacklisted_words", TextColumnType()).default(arrayOf())
     val omittedChannels = array<Long>("omitted_channels", LongColumnType()).default(arrayOf())
@@ -50,6 +51,7 @@ object AutomodTable: SnowflakeTable("automod") {
 class AutomodEntity(id: EntityID<Long>): LongEntity(id) {
     companion object: LongEntityClass<AutomodEntity>(AutomodTable)
 
+    var accountAgeDayThreshold by AutomodTable.accountAgeDayThreshold
     var mentionThreshold by AutomodTable.mentionsThreshold
     var blacklistedWords by AutomodTable.blacklistedWords
     var omittedChannels by AutomodTable.omittedChannels

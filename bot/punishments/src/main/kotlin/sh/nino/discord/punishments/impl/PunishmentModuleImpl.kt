@@ -52,6 +52,7 @@ import org.jetbrains.exposed.sql.update
 import sh.nino.discord.common.COLOR
 import sh.nino.discord.common.extensions.asSnowflake
 import sh.nino.discord.common.extensions.inject
+import sh.nino.discord.common.isMemberAbove
 import sh.nino.discord.common.ms
 import sh.nino.discord.database.asyncTransaction
 import sh.nino.discord.database.tables.*
@@ -271,7 +272,126 @@ class PunishmentModuleImpl: PunishmentModule {
         type: PunishmentType,
         builder: ApplyPunishmentBuilder.() -> Unit
     ) {
-        TODO("Not yet implemented")
+        val options = ApplyPunishmentBuilder().apply(builder).build()
+        logger.info("Applying punishment ${type.key} on member ${member.id}${if (options.reason != null) " for ${options.reason}" else ""}")
+
+        val guildSettings = asyncTransaction {
+            GuildSettingsEntity.findById(member.guild.id.value.toLong())!!
+        }
+
+        val self = member.guild.getMember(kord.selfId)
+        if (
+            (!member.partial && isMemberAbove(self, member.member!!)) ||
+            (self.getPermissions().code.value.toLong() and type.permissions.code.value.toLong() == 0L)
+        ) return
+
+        val mem = resolveMember(member, type != PunishmentType.UNBAN)
+        when (type) {
+            PunishmentType.VOICE_UNMUTE -> applyVoiceUnmute(mem, options.reason)
+            PunishmentType.VOICE_UNDEAFEN -> applyVoiceUndeafen(mem, options.reason)
+            PunishmentType.KICK -> mem.kick(options.reason)
+            PunishmentType.UNBAN -> mem.guild.unban(member.id, options.reason)
+            PunishmentType.VOICE_DEAFEN -> applyVoiceDeafen(moderator, options.reason, mem, member.guild, options.time)
+            PunishmentType.THREAD_MESSAGES_ADDED -> applyAddThreadMessagesBack(guildSettings, mem, options.reason, member.guild)
+
+            PunishmentType.ROLE_ADD -> {
+                mem.addRole(options.roleId!!.asSnowflake(), options.reason)
+            }
+
+            PunishmentType.ROLE_REMOVE -> {
+                mem.removeRole(options.roleId!!.asSnowflake(), options.reason)
+            }
+
+            PunishmentType.BAN -> applyBan(
+                mem,
+                options.reason,
+                moderator,
+                member.guild,
+                options.days,
+                options.soft,
+                options.time
+            )
+
+            PunishmentType.MUTE -> applyMute(
+                guildSettings,
+                mem,
+                moderator,
+                options.reason,
+                member.guild,
+                options.time
+            )
+
+            PunishmentType.UNMUTE -> applyUnmute(
+                guildSettings,
+                mem,
+                options.reason,
+                member.guild
+            )
+
+            PunishmentType.VOICE_MUTE -> applyVoiceMute(
+                mem,
+                options.reason,
+                member.guild,
+                moderator,
+                options.time
+            )
+
+            PunishmentType.THREAD_MESSAGES_REMOVED -> applyRemoveThreadMessagePerms(
+                guildSettings,
+                mem,
+                moderator,
+                options.reason,
+                member.guild,
+                options.time
+            )
+
+            else -> {
+                // do nothing owo
+            }
+        }
+
+        val case = asyncTransaction {
+            GuildCasesEntity.new(member.guild.id.value.toLong()) {
+                attachments = options.attachments.toTypedArray().map { it.url }.toTypedArray()
+                moderatorId = moderator.id.value.toLong()
+                victimId = member.id.value.toLong()
+                soft = options.soft
+                time = options.time?.toLong()
+
+                this.type = type
+                this.reason = options.reason
+            }
+        }
+
+        if (options.publish) {
+            publishModlog(case) {
+                this.moderator = moderator
+
+                voiceChannel = options.voiceChannel
+                reason = options.reason
+                victim = mem
+                guild = member.guild
+                time = options.time
+
+                if (options.attachments.isNotEmpty()) addAttachments(
+                    options.attachments.map {
+                        Attachment(
+                            // we don't store the id, size, proxyUrl, or filename,
+                            // so it's fine to make it mocked.
+                            AttachmentData(
+                                id = Snowflake(0L),
+                                size = 0,
+                                url = it.url,
+                                proxyUrl = it.proxyUrl,
+                                filename = "unknown.png"
+                            ),
+
+                            kord
+                        )
+                    }
+                )
+            }
+        }
     }
 
     /**
@@ -568,6 +688,11 @@ class PunishmentModuleImpl: PunishmentModule {
         member.removeRole(muteRoleId, reason)
     }
 
+    private suspend fun applyAddThreadMessagesBack(settings: GuildSettingsEntity, member: Member, reason: String?, guild: Guild) {
+        val threadsRoleId = getOrCreateNoThreadsRole(settings, guild)
+        member.removeRole(threadsRoleId, reason)
+    }
+
     private suspend fun applyMute(
         settings: GuildSettingsEntity,
         member: Member,
@@ -595,6 +720,39 @@ class PunishmentModuleImpl: PunishmentModule {
                         moderatorId = moderator.id.toString(),
                         reason = reason,
                         type = PunishmentType.UNMUTE.key
+                    )
+                )
+            )
+        }
+    }
+
+    private suspend fun applyRemoveThreadMessagePerms(
+        settings: GuildSettingsEntity,
+        member: Member,
+        moderator: Member,
+        reason: String?,
+        guild: Guild,
+        time: Int?
+    ) {
+        val roleId = getOrCreateNoThreadsRole(settings, guild)
+        member.addRole(roleId, reason)
+
+        if (time != null) {
+            if (timeouts.closed) {
+                logger.warn("Timeouts microservice has not been established (or not connected)")
+                return
+            }
+
+            timeouts.send(
+                RequestCommand(
+                    Timeout(
+                        guildId = guild.id.toString(),
+                        userId = member.id.toString(),
+                        issuedAt = System.currentTimeMillis(),
+                        expiresIn = time.toLong(),
+                        moderatorId = moderator.id.toString(),
+                        reason = reason,
+                        type = PunishmentType.THREAD_MESSAGES_ADDED.key
                     )
                 )
             )

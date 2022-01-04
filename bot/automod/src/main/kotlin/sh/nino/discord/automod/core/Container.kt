@@ -30,7 +30,7 @@ object Container {
         "accountAge" to accountAgeAutomod,
         "blacklist" to blacklistAutomod,
         "mentions" to mentionsAutomod,
-        "messageLinks" to messageLinks,
+        "messageLinks" to messageLinksAutomod,
         "phishing" to phishingAutomod,
         "raid" to raidAutomod,
         "shortlinks" to shortlinksAutomod,

@@ -22,11 +22,37 @@
 
 package sh.nino.discord.automod
 
+import org.koin.core.context.GlobalContext
 import sh.nino.discord.automod.core.automod
+import sh.nino.discord.common.extensions.retrieve
+import sh.nino.discord.database.asyncTransaction
+import sh.nino.discord.database.tables.AutomodEntity
+import sh.nino.discord.punishments.PunishmentModule
 
 val blacklistAutomod = automod {
     name = "blacklist"
     onMessage { event ->
-        true
+        val guild = event.message.getGuild()
+        val settings = asyncTransaction {
+            AutomodEntity.findById(guild.id.value.toLong())!!
+        }
+
+        if (!settings.blacklist)
+            return@onMessage false
+
+        val content = event.message.content.split(" ")
+        for (word in settings.blacklistedWords) {
+            if (content.any { it.lowercase() == word.lowercase() }) {
+                event.message.delete()
+                event.message.channel.createMessage("Hey! You are not allowed to say that here! qwq")
+
+                val punishments = GlobalContext.retrieve<PunishmentModule>()
+                punishments.addWarning(event.member!!, guild.getMember(event.kord.selfId), "[Automod] User said a blacklisted word in their message. qwq")
+
+                return@onMessage true
+            }
+        }
+
+        false
     }
 }

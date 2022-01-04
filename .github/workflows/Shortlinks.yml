@@ -9,11 +9,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Use Node.js v16
-        uses: actions/setup-node@v2
+      - name: Update shortlinks
+        uses: NinoDiscord/actions@master
         with:
-          node-version: 16.x
+          command: shortlinks
 
-      - name: Run the shortlinks script
-        working-directory: .actions/build
-        run: node shortlinks.js
+      - name: Setup Git configuration
+        run: |
+          git config --global user.name 'Noel[bot]'
+          git config --global user.email 'ohlookitsaugust@gmail.com'
+          git config --global committer.email 'cutie@floofy.dev'
+          git config --global committer.name 'Noel'
+
+      - name: Check if git status is dirty
+        id: git_status
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+              echo '::set-output name=STATUS_DIRTY::true'
+          else
+            echo '::set-output name=STATUS_DIRTY::false'
+          fi
+      - name: Commit changes (if dirty)
+        if: contains(steps.git_status.outputs.STATUS_DIRTY, 'true')
+        run: |
+          git add .
+          git commit -m "chore(automate): update shortlinks.json file"
+          git push -u origin $(git rev-parse --abbrev-ref HEAD)

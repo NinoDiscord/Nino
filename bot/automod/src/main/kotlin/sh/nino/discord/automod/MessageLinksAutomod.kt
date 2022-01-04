@@ -35,36 +35,24 @@ import sh.nino.discord.automod.core.automod
 import sh.nino.discord.common.COLOR
 import sh.nino.discord.common.extensions.asSnowflake
 
-private val NORMAL_DISCORD_MESSAGE_LINK = "https:\\/\\/discord.com\\/channels\\/(\\d{15,21})\\/(\\d{15,21})\\/(\\d{15,21})$".toRegex()
-private val CANARY_OR_PTB_MESSAGE_LINK = "https:\\/\\/(canary|ptb).discord.com\\/channels\\/(\\d{15,21})\\/(\\d{15,21})\\/(\\d{15,21})$".toRegex()
+private val DISCORD_MESSAGE_LINK_REGEX = "(?:https?:\\/\\/)?(?:canary\\.|ptb\\.)?discord\\.com\\/channels\\/(\\d{15,21}|@me)\\/(\\d{15,21})\\/(\\d{15,21})\n".toRegex()
 
-val messageLinks = automod {
+val messageLinksAutomod = automod {
     name = "mentions"
     onMessage { event ->
-        if (event.message.content.matches(NORMAL_DISCORD_MESSAGE_LINK) || event.message.content.matches(CANARY_OR_PTB_MESSAGE_LINK)) {
-            var matcher = NORMAL_DISCORD_MESSAGE_LINK.toPattern().matcher(event.message.content)
-            val usingCanary: Boolean
+        if (event.message.content.matches(DISCORD_MESSAGE_LINK_REGEX)) {
+            val matcher = DISCORD_MESSAGE_LINK_REGEX.toPattern().matcher(event.message.content)
+            if (!matcher.matches()) return@onMessage false
 
-            if (!matcher.matches()) {
-                matcher = CANARY_OR_PTB_MESSAGE_LINK.toPattern().matcher(event.message.content)
-                if (!matcher.matches()) {
-                    return@onMessage false
-                } else {
-                    usingCanary = true
-                }
-            } else {
-                usingCanary = false
-            }
-
-            val channelId = matcher.group(if (usingCanary) 3 else 2).asSnowflake()
-            val messageId = matcher.group(if (usingCanary) 4 else 3).asSnowflake()
+            val channelId = matcher.group(4).asSnowflake()
+            val messageId = matcher.group(5).asSnowflake()
 
             // can we find the channel?
             val channel = event.kord.getChannel(channelId) ?: return@onMessage false
 
             // Try to surf through the channel types and see
             // if we can grab the messages.
-            val message: Message? = when (channel.type) {
+            val message: Message = when (channel.type) {
                 is ChannelType.GuildText -> {
                     try {
                         (channel as TextChannel).getMessage(messageId)
@@ -84,7 +72,7 @@ val messageLinks = automod {
                 else -> null
             } ?: return@onMessage false
 
-            if (message!!.embeds.isNotEmpty()) {
+            if (message.embeds.isNotEmpty()) {
                 val first = message.embeds.first()
                 val member = message.getAuthorAsMember()
 

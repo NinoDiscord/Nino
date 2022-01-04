@@ -69,7 +69,11 @@ data class ApplyPunishmentData(
     /**
      * How much time in milliseconds this action should revert.
      */
-    val time: Int? = null
+    val time: Int? = null,
+
+    val roleId: Long? = null,
+    val soft: Boolean = false,
+    val days: Int = 7
 )
 
 class ApplyPunishmentBuilder {
@@ -78,7 +82,10 @@ class ApplyPunishmentBuilder {
     var attachments: List<Attachment> = listOf()
     var publish: Boolean = true
     var reason: String? = null
+    var roleId: Long? = null
     var time: Int? = null
+    var soft: Boolean = false
+    var days: Int = 7
 
     fun setMemberData(data: Member?, guild: Guild, id: Snowflake): ApplyPunishmentBuilder {
         val member = MemberLike(data, guild, id)
@@ -96,7 +103,10 @@ class ApplyPunishmentBuilder {
             publish,
             reason,
             member = _member!!,
-            time
+            time,
+            roleId,
+            soft,
+            days
         )
     }
 }

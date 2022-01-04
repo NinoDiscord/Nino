@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2019-2021 Nino
+ * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,9 @@
 dependencies {
     implementation("org.jetbrains.exposed:exposed-core:0.36.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
+    implementation("io.insert-koin:koin-core:3.1.4")
     implementation("dev.kord:kord-core:0.8.0-M8")
+    implementation(project(":bot:punishments"))
     implementation(project(":bot:database"))
     api("org.slf4j:slf4j-api:1.7.32")
 }

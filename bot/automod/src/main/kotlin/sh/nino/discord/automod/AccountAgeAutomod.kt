@@ -22,11 +22,47 @@
 
 package sh.nino.discord.automod
 
+import dev.kord.core.Kord
+import kotlinx.datetime.toJavaInstant
+import org.koin.core.context.GlobalContext
 import sh.nino.discord.automod.core.automod
+import sh.nino.discord.common.extensions.retrieve
+import sh.nino.discord.database.asyncTransaction
+import sh.nino.discord.database.tables.AutomodEntity
+import sh.nino.discord.database.tables.PunishmentType
+import sh.nino.discord.punishments.MemberLike
+import sh.nino.discord.punishments.PunishmentModule
+import java.time.OffsetDateTime
+import java.time.temporal.ChronoUnit
 
 val accountAgeAutomod = automod {
     name = "accountAge"
     onMemberJoin { event ->
-        true
+        val settings = asyncTransaction {
+            AutomodEntity.findById(event.guild.id.value.toLong())!!
+        }
+
+        if (!settings.accountAge)
+            return@onMemberJoin false
+
+        val totalDays = ChronoUnit.DAYS.between(event.member.joinedAt.toJavaInstant(), OffsetDateTime.now().toLocalDate())
+        if (totalDays <= settings.accountAgeDayThreshold) {
+            val punishments = GlobalContext.retrieve<PunishmentModule>()
+            val kord = GlobalContext.retrieve<Kord>()
+            val guild = event.getGuild()
+            val selfMember = guild.getMember(kord.selfId)
+
+            punishments.apply(
+                MemberLike(event.member, event.getGuild(), event.member.id),
+                selfMember,
+                PunishmentType.KICK
+            ) {
+                reason = "[Automod] Account threshold for member was under ${settings.accountAgeDayThreshold} days."
+            }
+
+            return@onMemberJoin true
+        }
+
+        false
     }
 }

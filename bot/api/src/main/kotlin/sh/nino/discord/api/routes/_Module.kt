@@ -28,7 +28,6 @@ import sh.nino.discord.api.Endpoint
 
 val endpointModule = module {
     single { HealthRoute() } bind Endpoint::class
-    single { InteractionsRoute(get()) } bind Endpoint::class
     single { MetricsRoute(get(), get()) } bind Endpoint::class
     single { MainRoute() } bind Endpoint::class
 }

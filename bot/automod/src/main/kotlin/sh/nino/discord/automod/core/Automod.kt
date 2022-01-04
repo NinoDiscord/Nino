@@ -22,10 +22,16 @@
 
 package sh.nino.discord.automod.core
 
+import dev.kord.common.entity.Permission
+import dev.kord.core.Kord
+import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.guild.MemberJoinEvent
 import dev.kord.core.event.guild.MemberUpdateEvent
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.user.UserUpdateEvent
+import org.koin.core.context.GlobalContext
+import sh.nino.discord.common.extensions.retrieve
+import sh.nino.discord.common.isMemberAbove
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -58,7 +64,20 @@ class Automod(
     suspend fun execute(event: Any): Boolean = when {
         onMessageCall != null -> {
             val ev = event as? MessageCreateEvent ?: error("Unable to cast ${event::class} -> MessageCreateEvent")
-            onMessageCall.invoke(ev)
+            val guild = event.getGuild()!!
+            val kord = GlobalContext.retrieve<Kord>()
+            val channel = event.message.getChannel() as? TextChannel
+
+            if (
+                (event.member != null && !isMemberAbove(guild.getMember(kord.selfId), event.member!!)) ||
+                (channel != null && channel.getEffectivePermissions(kord.selfId).contains(Permission.ManageMessages)) ||
+                (event.message.author == null || event.message.author!!.isBot) ||
+                (channel != null && channel.getEffectivePermissions(event.message.author!!.id).contains(Permission.BanMembers))
+            ) {
+                false
+            } else {
+                onMessageCall.invoke(ev)
+            }
         }
 
         onUserUpdateCall != null -> {
