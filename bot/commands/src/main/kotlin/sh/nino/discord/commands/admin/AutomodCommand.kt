@@ -287,11 +287,14 @@ class AutomodCommand: AbstractCommand() {
                     }
                 }
 
-                messageRemoverTimer.schedule(object: TimerTask() {
-                    override fun run() {
-                        NinoScope.launch { original.delete() }
-                    }
-                }, 5000L)
+                messageRemoverTimer.schedule(
+                    object: TimerTask() {
+                        override fun run() {
+                            NinoScope.launch { original.delete() }
+                        }
+                    },
+                    5000L
+                )
             }
 
             "add", "set" -> {

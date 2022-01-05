@@ -97,9 +97,11 @@ class SlashCommandMessage(
             InteractionResponseCreateRequest(
                 InteractionResponseType.ChannelMessageWithSource,
                 InteractionApplicationCommandCallbackData(
-                    flags = Optional.invoke(MessageFlags {
-                        +MessageFlag.Ephemeral
-                    })
+                    flags = Optional.invoke(
+                        MessageFlags {
+                            +MessageFlag.Ephemeral
+                        }
+                    )
                 ).optional()
             )
         )
