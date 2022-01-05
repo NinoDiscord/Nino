@@ -25,8 +25,8 @@ package sh.nino.discord.automod
 import sh.nino.discord.automod.core.automod
 
 val raidAutomod = automod {
-    name = "mentions"
-    onMessage { event ->
+    name = "raid"
+    onMessage {
         true
     }
 }

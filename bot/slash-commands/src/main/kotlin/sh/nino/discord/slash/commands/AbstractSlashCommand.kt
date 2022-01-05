@@ -21,3 +21,5 @@
  */
 
 package sh.nino.discord.slash.commands
+
+abstract class AbstractSlashCommand

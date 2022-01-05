@@ -41,6 +41,7 @@ object AutomodTable: SnowflakeTable("automod") {
     val dehoisting = bool("dehoisting").default(false)
     val shortlinks = bool("shortlinks").default(false)
     val blacklist = bool("blacklist").default(false)
+    val toxicity = bool("toxicity").default(false)
     val phishing = bool("phishing").default(false)
     val mentions = bool("mentions").default(false)
     val invites = bool("invites").default(false)
@@ -61,6 +62,7 @@ class AutomodEntity(id: EntityID<Long>): LongEntity(id) {
     var dehoisting by AutomodTable.dehoisting
     var shortlinks by AutomodTable.shortlinks
     var blacklist by AutomodTable.blacklist
+    var toxicity by AutomodTable.toxicity
     var phishing by AutomodTable.phishing
     var mentions by AutomodTable.mentions
     var invites by AutomodTable.invites

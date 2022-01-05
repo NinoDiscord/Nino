@@ -25,8 +25,8 @@ package sh.nino.discord.automod
 import sh.nino.discord.automod.core.automod
 
 val phishingAutomod = automod {
-    name = "mentions"
-    onMessage { event ->
+    name = "phishing"
+    onMessage {
         true
     }
 }

@@ -25,8 +25,8 @@ package sh.nino.discord.automod
 import sh.nino.discord.automod.core.automod
 
 val spamAutomod = automod {
-    name = "mentions"
-    onMessage { event ->
+    name = "spam"
+    onMessage {
         true
     }
 }

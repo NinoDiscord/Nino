@@ -34,7 +34,8 @@ object Container {
         "phishing" to phishingAutomod,
         "raid" to raidAutomod,
         "shortlinks" to shortlinksAutomod,
-        "spam" to spamAutomod
+        "spam" to spamAutomod,
+        "toxicity" to toxicityAutomod
     )
 
     suspend fun execute(event: Event): Boolean {

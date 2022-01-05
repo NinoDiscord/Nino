@@ -21,3 +21,11 @@
  */
 
 package sh.nino.discord.slash.commands
+
+import dev.kord.core.Kord
+import sh.nino.discord.common.data.Config
+
+class SlashCommandHandler(
+    private val config: Config,
+    private val kord: Kord
+)

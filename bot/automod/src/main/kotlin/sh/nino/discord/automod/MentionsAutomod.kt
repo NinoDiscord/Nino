@@ -26,7 +26,7 @@ import sh.nino.discord.automod.core.automod
 
 val mentionsAutomod = automod {
     name = "mentions"
-    onMessage { event ->
+    onMessage {
         true
     }
 }

@@ -35,7 +35,7 @@ import sh.nino.discord.database.tables.GuildSettingsEntity
 import sh.nino.discord.database.tables.UserEntity
 
 class CommandMessage(
-    private val event: MessageCreateEvent,
+    event: MessageCreateEvent,
     val args: List<String>,
     val settings: GuildSettingsEntity,
     val userSettings: UserEntity,

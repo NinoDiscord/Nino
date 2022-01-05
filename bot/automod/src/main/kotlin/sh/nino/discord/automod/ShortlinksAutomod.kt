@@ -25,8 +25,8 @@ package sh.nino.discord.automod
 import sh.nino.discord.automod.core.automod
 
 val shortlinksAutomod = automod {
-    name = "mentions"
-    onMessage { event ->
+    name = "shortlinks"
+    onMessage {
         true
     }
 }

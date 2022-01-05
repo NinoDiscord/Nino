@@ -38,7 +38,7 @@ import sh.nino.discord.common.extensions.asSnowflake
 private val DISCORD_MESSAGE_LINK_REGEX = "(?:https?:\\/\\/)?(?:canary\\.|ptb\\.)?discord\\.com\\/channels\\/(\\d{15,21}|@me)\\/(\\d{15,21})\\/(\\d{15,21})\n".toRegex()
 
 val messageLinksAutomod = automod {
-    name = "mentions"
+    name = "messageLinks"
     onMessage { event ->
         if (event.message.content.matches(DISCORD_MESSAGE_LINK_REGEX)) {
             val matcher = DISCORD_MESSAGE_LINK_REGEX.toPattern().matcher(event.message.content)
