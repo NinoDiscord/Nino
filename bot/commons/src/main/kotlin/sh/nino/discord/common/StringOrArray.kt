@@ -35,7 +35,7 @@ class StringOrArray(private val value: Any) {
         check(value is List<*> || value is String) { "`value` is not a supplied List, Array, or a String." }
 
         if (value is List<*>) {
-            check(value.every { it is String })
+            check(value.every { it is String }) { "Not every value was a List of strings." }
         }
     }
 
