@@ -96,22 +96,30 @@ class ExportCommand(private val redis: RedisManager, private val json: Json): Ab
 
         // Save it to Redis
         val id = RandomId.generate()
-        redis.commands.hset("nino:recovery:settings", mapOf(
-            "${guild.id}:$id" to jsonData
-        )).await()
+        redis.commands.hset(
+            "nino:recovery:settings",
+            mapOf(
+                "${guild.id}:$id" to jsonData
+            )
+        ).await()
 
         message.delete()
 
         val bais = ByteArrayInputStream(jsonData.toByteArray(Charsets.UTF_8))
-        msg.replyFile(buildString {
-            appendLine(":thumbsup: **Done!** — You can import the exact settings below using the **import** command:")
-            appendLine("> **nino import $id**")
-            appendLine()
-            appendLine("If you were curious on what this data is, you can read from our docs: **https://nino.sh/docs/exporting-settings**")
-            appendLine("Curious on what we do with your data? Read our privacy policy: **https://nino.sh/privacy**")
-        }, listOf(NamedFile(
-            name = "${guild.id}-settings.json",
-            inputStream = bais
-        )))
+        msg.replyFile(
+            buildString {
+                appendLine(":thumbsup: **Done!** — You can import the exact settings below using the **import** command:")
+                appendLine("> **nino import $id**")
+                appendLine()
+                appendLine("If you were curious on what this data is, you can read from our docs: **https://nino.sh/docs/exporting-settings**")
+                appendLine("Curious on what we do with your data? Read our privacy policy: **https://nino.sh/privacy**")
+            },
+            listOf(
+                NamedFile(
+                    name = "${guild.id}-settings.json",
+                    inputStream = bais
+                )
+            )
+        )
     }
 }

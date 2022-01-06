@@ -31,8 +31,6 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
-import io.lettuce.core.RedisClient
-import io.lettuce.core.RedisURI
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import sh.nino.discord.common.NinoInfo

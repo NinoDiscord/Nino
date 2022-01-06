@@ -24,22 +24,13 @@
 package sh.nino.discord.commands.admin
 
 import dev.kord.core.Kord
-import dev.kord.core.entity.channel.TextChannel
-import kotlinx.coroutines.future.await
-import kotlinx.coroutines.future.future
-import org.jetbrains.exposed.dao.load
 import org.jetbrains.exposed.sql.update
 import sh.nino.discord.commands.AbstractCommand
 import sh.nino.discord.commands.CommandCategory
 import sh.nino.discord.commands.CommandMessage
 import sh.nino.discord.commands.annotations.Command
 import sh.nino.discord.commands.annotations.Subcommand
-import sh.nino.discord.common.extensions.asSnowflake
-import sh.nino.discord.common.getMultipleChannelsFromArgs
-import sh.nino.discord.common.getMutipleUsersFromArgs
-import sh.nino.discord.core.NinoScope
 import sh.nino.discord.database.asyncTransaction
-import sh.nino.discord.database.tables.AutomodEntity
 import sh.nino.discord.database.tables.GuildLogging
 import sh.nino.discord.database.tables.LoggingEntity
 
@@ -93,9 +84,12 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
 
             msg.reply {
                 title = msg.locale.translate("commands.admin.logging.omitUsers.embed.title")
-                description = msg.locale.translate("commands.admin.logging.omitUsers.embed.description", mapOf(
-                    "list" to msg.locale.translate("generic.lonely")
-                ))
+                description = msg.locale.translate(
+                    "commands.admin.logging.omitUsers.embed.description",
+                    mapOf(
+                        "list" to msg.locale.translate("generic.lonely")
+                    )
+                )
             }
         }
 
@@ -154,9 +148,12 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
 
             msg.reply {
                 title = msg.locale.translate("commands.admin.logging.omitUsers.embed.title")
-                description = msg.locale.translate("commands.admin.logging.omitUsers.embed.description", mapOf(
-                    "list" to msg.locale.translate("generic.lonely")
-                ))
+                description = msg.locale.translate(
+                    "commands.admin.logging.omitUsers.embed.description",
+                    mapOf(
+                        "list" to msg.locale.translate("generic.lonely")
+                    )
+                )
             }
         }
 
