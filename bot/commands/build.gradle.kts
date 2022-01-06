@@ -21,6 +21,7 @@
  */
 
 dependencies {
+    implementation("io.lettuce:lettuce-core:6.1.5.RELEASE")
     implementation("org.jetbrains.exposed:exposed-core:0.36.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
     implementation("io.insert-koin:koin-core:3.1.4")

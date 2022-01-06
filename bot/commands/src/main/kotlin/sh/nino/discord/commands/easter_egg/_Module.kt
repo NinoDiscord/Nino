@@ -29,4 +29,5 @@ import sh.nino.discord.commands.AbstractCommand
 val easterEggCommandModule = module {
     single { TestCommand() } bind AbstractCommand::class
     single { WahCommand(get()) } bind AbstractCommand::class
+    single { LonelyCommand() } bind AbstractCommand::class
 }

@@ -31,11 +31,14 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
+import io.lettuce.core.RedisClient
+import io.lettuce.core.RedisURI
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.core.localization.LocalizationManager
+import sh.nino.discord.core.redis.RedisManager
 import sh.nino.discord.timeouts.Client
 
 val globalModule = module {
@@ -102,5 +105,10 @@ val globalModule = module {
                 auth = config.timeouts.auth as String
             }
         }
+    }
+
+    // Redis manager
+    single {
+        RedisManager(get())
     }
 }

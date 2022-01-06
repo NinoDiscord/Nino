@@ -9,19 +9,64 @@
   "strings": {
     "generic.enabled": "Enabled",
     "generic.disabled": "Disabled",
+    "generic.lonely": "Heh... it's pretty empty, eh? I guess it's like a set of hearts, only one can be the chosen one! But, I shouldn't give you an extensional crisis right now. Go have fun! ...and maybe touch grass, you really seem to be lacking in that department x3",
 
     "errors.ownerOnly": "You are not allowed to invoke the **${name}** command.",
     "errors.missingPermsBot": "I am currently missing the following permissions: **${perms}**",
     "errors.missingPermsUser": "You are currently missing the following permissions: **${perms}**",
     "errors.cooldown": "You are currently on cooldown for command **${command}** for **${time}**.",
-    "errors.unknown.0": "Sorry! We were not able to execute the **${command}** ${suffix}!",
-    "errors.unknown.1": "If this is a more than one occurrence, please report it to:\n${owners}",
-    "errors.unknown.2": "Since you are in development mode, the stacktrace can be seen below and in the console:",
-    "errors.unknown.3": "Report it to Noelware under the **<#824071651486335036>** channel: https://discord.gg/ATmjFH9kMH",
+    "errors.unknown.dev": [
+      "Sorry! I was not able to execute the ${prefix} **${command}**! :<",
+      "If this keeps erroring, please report it to:",
+      "${owners}",
+      "",
+      "Since you are in development mode, the stacktrace can be seen below",
+      "and in the console!",
+      "",
+      "```kotlin",
+      "${stacktrace}",
+      "```"
+    ],
 
+    "errors.unknown.prod": [
+      "Sorry! I was not able to execute the ${prefix} **${command}**! :<",
+      "If this keeps erroring, please report it to:",
+      "${owners}",
+      "on the Noelware Discord server under the <#824071651486335036> channel:",
+      "> https://discord.gg/ATmjFH9kMH"
+    ],
+
+    "descriptions.admin.automod": "Command to update your automod settings!",
+    "descriptions.automod.messageLinks": "Toggles the Message Links automod -- read more [here](https://nino.sh/docs/automod/message-links)",
+    "descriptions.automod.accountAge": "Toggles the Account Age automod or sets a threshold -- read more [here](https://nino.sh/docs/automod/account-age)",
+    "descriptions.automod.dehoist": "Toggles the Dehoisting automod -- read more [here](https://nino.sh/docs/automod/dehoisting)",
+    "descriptions.automod.blacklist": "Toggles the Blacklist automod, or add/remove/list blacklisted words. -- read more [here](https://nino.sh/docs/automod/blacklist)",
+    "descriptions.automod.phishing": "Toggles the Phishing Links automod -- read more [here](https://nino.sh/docs/automod/phishing)",
+    "descriptions.automod.toxicity": "Toggles the Toxicity automod -- read more [here](https://nino.sh/docs/automod/toxicity)",
+    "descriptions.automod.spam": "Toggles the Spam automod -- read more [here](https://nino.sh/docs/automod/spam)",
+    "descriptions.automod.raid": "Toggles the Raid automod -- read more [here](https://nino.sh/docs/automod/raid)",
+    "descriptions.automod.invites": "Toggles the Invites automod -- read more [here](https://nino.sh/docs/automod/invites)",
+    "descriptions.automod.mentions": "Toggles the Mentions automod, or sets a mention threshold. -- read more [here](https://nino.sh/docs/automod/mentions)",
+    "descriptions.admin.export": "Exports your guild settings to be easily imported later on.",
+    "descriptions.admin.import": "Import your exported guild settings easily. You can't revert back once you import back.",
+    "descriptions.admin.logging": "Administrate your logging settings.",
+    "descriptions.logging.omitUsers": "Add or remove users to omit from being logged in the specified log channel.",
     "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use.",
 
-    "commands.automod.list.footer": "Need more information? Run \"automod describe\" to get more information. :D",
-    "commands.automod.toggle": "${emoji} ${toggle} the **${name}** automod!"
+    "commands.automod.toggle": "${emoji} ${toggle} the **${name}** automod!",
+    "commands.admin.logging.toggle": "${emoji} ${toggle} the **Logging** feature.",
+    "commands.admin.logging.omitUsers.embed.title": "[ Omitted Users ]",
+    "commands.admin.logging.omitUsers.embed.description": [
+      "Here is a list of users that are omitted from being logged.",
+      "By default, this list is pretty lonely... :c",
+      "",
+      "${list}"
+    ],
+    "commands.admin.logging.omitUsers.missingArgs": "You are missing users to omit from logging! You can use one or more mentions or user IDs.",
+    "commands.admin.logging.omitUsers.404": "I was unable to find the users to omit. Did you specify a mention or user ID?",
+    "commands.admin.logging.omitUsers.success": "Successfully added **${users}** user${suffix}!",
+    "commands.admin.logging.omitChannels.missingArgs": "You are missing channels to omit from logging! You can use one or more channel mentions or IDs.",
+    "commands.admin.logging.omitChannels.404": "I was unable to find the channels to omit. Did you specify a mention or channel ID? Did you specify only voice channels?",
+    "commands.admin.logging.omitChannels.success": "Successfully added **${channels}** text channel${suffix}!"
   }
 }

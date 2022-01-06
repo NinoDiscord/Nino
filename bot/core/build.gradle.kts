@@ -49,13 +49,16 @@ dependencies {
     implementation("com.zaxxer:HikariCP:5.0.0")
 
     // Sentry (error handling as a service :^)
-    implementation("io.sentry:sentry:5.5.0")
+    implementation("io.sentry:sentry:5.5.1")
 
     // Lettuce (Redis client)
     implementation("io.lettuce:lettuce-core:6.1.5.RELEASE")
 
-    // Timeouts client
+    // Nino projects
     implementation(project(":bot:timeouts"))
     implementation(project(":bot:database"))
     implementation(project(":bot:api"))
+
+    // owo
+    implementation("org.apache.commons:commons-lang3:3.12.0")
 }

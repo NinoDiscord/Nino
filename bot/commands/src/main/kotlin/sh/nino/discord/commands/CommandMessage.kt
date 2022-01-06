@@ -26,6 +26,7 @@ import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
+import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.allowedMentions
 import sh.nino.discord.common.COLOR
@@ -48,6 +49,16 @@ class CommandMessage(
     suspend fun createPaginationEmbed(embeds: List<EmbedBuilder>): PaginationEmbed {
         val channel = message.channel.asChannel() as TextChannel
         return PaginationEmbed(channel, author, embeds)
+    }
+
+    suspend fun replyFile(content: String, files: List<NamedFile>): Message = message.channel.createMessage {
+        this.content = content
+        this.files += files
+
+        messageReference = message.id
+        allowedMentions {
+            repliedUser = false
+        }
     }
 
     suspend fun reply(content: String, reply: Boolean = true, embedBuilder: EmbedBuilder.() -> Unit): Message {

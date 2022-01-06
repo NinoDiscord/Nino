@@ -25,6 +25,7 @@ package sh.nino.discord.core.localization
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import org.koin.core.context.GlobalContext
+import sh.nino.discord.common.StringOrArray
 import sh.nino.discord.common.extensions.retrieve
 import java.io.File
 import java.util.regex.Pattern
@@ -54,7 +55,7 @@ private val KEY_REGEX = Pattern.compile("[\$]\\{([\\w\\.]+)\\}").toRegex()
 @Serializable
 data class Locale(
     val meta: LocalizationMeta,
-    val strings: Map<String, String>
+    val strings: Map<String, StringOrArray>
 ) {
     companion object {
         fun fromFile(file: File): Locale {
@@ -65,7 +66,9 @@ data class Locale(
 
     fun translate(key: String, args: Map<String, Any> = mapOf()): String {
         val format = strings[key] ?: error("Key \"$key\" was not found.")
-        return KEY_REGEX.replace(format, transform = {
+        val stringsToTranslate = format.asListOrNull?.joinToString("\n") ?: format.asString
+
+        return KEY_REGEX.replace(stringsToTranslate, transform = {
             args[it.groups[1]!!.value].toString()
         })
     }

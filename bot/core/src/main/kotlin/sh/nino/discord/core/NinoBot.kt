@@ -50,6 +50,7 @@ import sh.nino.discord.common.data.Environment
 import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.core.listeners.applyGenericEvents
 import sh.nino.discord.core.localization.LocalizationManager
+import sh.nino.discord.core.redis.RedisManager
 import sh.nino.discord.database.asyncTransaction
 import sh.nino.discord.database.createPgEnums
 import sh.nino.discord.database.tables.*
@@ -133,6 +134,10 @@ class NinoBot {
             )
         }
 
+        logger.info("* Connecting to Redis...")
+        val redis = GlobalContext.retrieve<RedisManager>()
+        redis.connect()
+
         // Initialize localization
         GlobalContext.retrieve<LocalizationManager>()
 
@@ -212,6 +217,7 @@ class NinoBot {
                 val dataSource = GlobalContext.retrieve<HikariDataSource>()
                 val apiServer = GlobalContext.retrieve<ApiServer>()
                 val timeouts = GlobalContext.retrieve<Client>()
+                val redis = GlobalContext.retrieve<RedisManager>()
 
                 // Close off the Nino scope and detach all shards
                 runBlocking {
@@ -223,6 +229,7 @@ class NinoBot {
                 dataSource.close()
                 apiServer.shutdown()
                 timeouts.close()
+                redis.close()
 
                 logger.info("Successfully shut down! Goodbye.")
             }

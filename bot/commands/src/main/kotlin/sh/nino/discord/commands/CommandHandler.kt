@@ -349,68 +349,18 @@ class CommandHandler(
                 baos.toString(StandardCharsets.UTF_8.name())
             }
 
-            message.reply(
-                buildString {
-                    appendLine(
-                        message.locale.translate(
-                            "errors.unknown.0",
-                            mapOf(
-                                "command" to name,
-                                "suffix" to if (isSub) {
-                                    "subcommand"
-                                } else {
-                                    "command"
-                                }
-                            )
-                        )
-                    )
-
-                    appendLine(
-                        message.locale.translate(
-                            "errors.unknown.1",
-                            mapOf(
-                                "owners" to owners.joinToString(", ") { "**$it**" }
-                            )
-                        )
-                    )
-
-                    appendLine()
-                    appendLine(message.locale.translate("errors.unknown.2"))
-                    appendLine()
-                    appendLine("```kotlin")
-                    appendLine(stacktrace.elipsis(1500))
-                    appendLine("```")
-                }
-            )
+            message.replyTranslate("errors.unknown.dev", mapOf(
+                "prefix" to if (isSub) "subcommand" else "command",
+                "command" to name,
+                "owners" to owners.joinToString(", "),
+                "stacktrace" to stacktrace.elipsis(1550)
+            ))
         } else {
-            message.reply(
-                buildString {
-                    appendLine(
-                        message.locale.translate(
-                            "errors.unknown.0",
-                            mapOf(
-                                "command" to name,
-                                "suffix" to if (isSub) {
-                                    "subcommand"
-                                } else {
-                                    "command"
-                                }
-                            )
-                        )
-                    )
-
-                    appendLine(
-                        message.locale.translate(
-                            "errors.unknown.1",
-                            mapOf(
-                                "owners" to owners.joinToString(", ") { "**$it**" }
-                            )
-                        )
-                    )
-
-                    appendLine(message.locale.translate("errors.unknown.3"))
-                }
-            )
+            message.replyTranslate("errors.unknown.prod", mapOf(
+                "prefix" to if (isSub) "subcommand" else "command",
+                "command" to name,
+                "owners" to owners.joinToString(", ")
+            ))
         }
 
         logger.error("Unable to execute command $name:", exception)

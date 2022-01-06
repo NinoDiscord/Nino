@@ -28,4 +28,7 @@ import sh.nino.discord.commands.AbstractCommand
 
 val adminCommandsModule = module {
     single { AutomodCommand() } bind AbstractCommand::class
+    single { ExportCommand(get(), get()) } bind AbstractCommand::class
+    single { ImportCommand(get(), get()) } bind AbstractCommand::class
+    single { LoggingCommand(get()) } bind AbstractCommand::class
 }

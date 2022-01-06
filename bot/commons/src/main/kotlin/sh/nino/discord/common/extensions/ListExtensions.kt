@@ -45,3 +45,14 @@ fun <T, U> List<Pair<T, U>>.asMap(): Map<T, U> {
  * data left over.
  */
 fun <T> List<T>.pairUp(): Pair<T, List<T>> = Pair(first(), drop(1))
+
+/**
+ * Returns a [Boolean] if every element appears to be true from the [predicate] function.
+ */
+fun <T> List<T>.every(predicate: (T) -> Boolean): Boolean {
+    for (item in this) {
+        if (!predicate(item)) return false
+    }
+
+    return true
+}

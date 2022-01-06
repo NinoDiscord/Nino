@@ -24,6 +24,7 @@ package sh.nino.discord.common
 
 import dev.kord.core.Kord
 import dev.kord.core.entity.User
+import dev.kord.core.entity.channel.Channel
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.common.extensions.asSnowflake
 import sh.nino.discord.common.extensions.retrieve
@@ -63,4 +64,32 @@ suspend fun getMutipleUsersFromArgs(args: List<String>): List<User> {
     return users
         .distinct() // remove duplicates
         .toList() // immutable
+}
+
+suspend fun getMultipleChannelsFromArgs(args: List<String>): List<Channel> {
+    val kord = GlobalContext.retrieve<Kord>()
+    val channels = mutableListOf<Channel>()
+    val channelsByMention = args.filter {
+        it.matches(CHANNEL_REGEX.toRegex())
+    }
+
+    for (mention in channelsByMention) {
+        val matcher = CHANNEL_REGEX.matcher(mention)
+        if (!matcher.matches()) continue
+
+        val id = matcher.group(1)
+        val channel = kord.getChannel(id.asSnowflake())
+        if (channel != null) channels.add(channel)
+    }
+
+    val channelsById = args.filter {
+        it.matches(ID_REGEX.toRegex())
+    }
+
+    for (channelId in channelsById) {
+        val channel = kord.getChannel(channelId.asSnowflake())
+        if (channel != null) channels.add(channel)
+    }
+
+    return channels.distinct().toList()
 }
