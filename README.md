@@ -38,10 +38,10 @@ label!
 ### Prerequisites
 Before running your own instance of Nino, you will need the following required tools:
 
-- [cluster-operator](https://github.com/MikaBot/cluster-operator) **~** Easily manages discord clustering between multiple nodes
 - [Timeouts Microservice](https://github.com/NinoDiscord/timeouts) **~** Used for mutes, bans, and more. This will not make Nino operate successfully.
 - [PostgreSQL](https://postgresql.org) **~** Main database for holding user or guild data. Recommended version is 10 or higher.
 - [Redis](https://redis.io) **~** Open source in-memory database storage to hold entities for quick retrieval. Recommended version is 5 or higher.
+- [Java](https://java.com) **~** Language compiler for Gradle and Kotlin. Required version is JDK 16 or higher.
 
 If you're moving from **v0.x** -> **v2.x**, you will need to have your MongoDB instance and our utility for converting documents
 into JSON, [Rei](https://github.com/NinoDiscord/Rei) before contiuning.
@@ -52,7 +52,6 @@ There is tools that are *optional* but are mostly not-recommended in most cases:
 - [cluster-operator](https://github.com/MikaBot/cluster-operator) **~** Easily manages discord clustering between multiple nodes
 - [Docker](https://docker.com) **~** Containerisation tool for isolation between the host and the underlying container.
 - [Sentry](https://sentry.io) **~** Open-source application monitoring, with a focus on error reporting.
-- [Uni](https://github.com/Noelware/Uni) **~** Sidecar container to post metrics to [instatus.com](https://instatus.com)
 
 ### Setup
 You're almost there on how to run your instance! Before you frantically clone the repository and such, there is two options
@@ -67,7 +66,7 @@ on how to use Nino:
 1. **Clone the repository** using the `git clone` command:
 
 ```sh
-$ git clone https://github.com/NinoDiscord/Nino [-b edge] # If you want to use cutting edge feature,
+$ git clone https://github.com/NinoDiscord/Nino [-b edge] # If you want to use cutting edge features,
 # add the `-b edge` flag!
 ```
 
@@ -95,31 +94,31 @@ $ docker-compose up -d
 ```
 
 #### Normal Setup
-> ✏️ **Make sure you have a service to run Nino like `systemd` or `pm2`. We provide a `systemd` service file to run it on a Linux machine.**
+> ✏️ **Make sure you have a service to run Nino like `systemd` or `pm2`.**
 
 1. **Clone the repository** using the `git clone` command:
 
 ```sh
-$ git clone https://github.com/NinoDiscord/Nino [-b edge] # If you want to use cutting edge feature,
+$ git clone https://github.com/NinoDiscord/Nino [-b edge] # If you want to use cutting edge features,
 # add the `-b edge` flag!
 ```
 
 2. **Install import dependencies**
 
 ```sh
-$ yarn
+$ ./gradlew tasks
 ```
 
-3. **Build and compile** TypeScript
+3. **Build and compile** the Kotlin code
 
 ```sh
-$ yarn build # Run `yarn build:no-lint` to only cover type-checking.
+$ ./gradlew :bot:build
 ```
 
 4. **Runs the project**
 
 ```sh
-$ cd build/src && node main.js
+$ java -jar ./bot/build/libs/Nino.jar
 ```
 
 ## Migrations
@@ -132,20 +131,21 @@ If you used **v0.x** in the past and you want to use the **v2.x** version, you c
 # Convert your MongoDB database into JSON file that the migrator script can read.
 $ rei convert ...
 
-# Runs the migrator script
-$ node scripts/migrator.js --version 0.x <path to directory>
+# Runs the migrator script, if you're using Windows,
+# use PowerShell: `./scripts/migrate.ps1`
+$ ./scripts/migrate 0.x ./data
 ```
 
 ### v1.x -> v2.x
 If you wish to migrate from **v1.x** towards **v2.x**, you can run the following commands:
 
 ```sh
-# Export your PostgreSQL database
-# Docs: https://www.postgresql.org/docs/12/app-pgdump.html
-$ pg_dump
+# Runs the migrator script
+# *NIX:
+$ ./scripts/migrate 1.x --password=... --user=... --database=... --host=... --port=...
 
-# Run the migrator script
-$ node scripts/migrator.js --version 1.x <path to your dumped database>
+# PowerShell:
+$ ./scripts/migrate.ps1 1.x -Password ... -User ... -Database ... -Host ... -Port ...
 ```
 
 ## Configuration
@@ -159,24 +159,14 @@ must be replaced:
 - **Replace `<redis port>` with your Redis network port**
   - **If you are using Docker Compose, you can omit this config key since Compose will infer it to the redis container.**
   - **If you're running it locally or the config key is not present, it'll infer as `6379`**
+- **Replace `<postgres host>` with your PostgreSQL host.**
+  - **If you are using Docker Compose, replace `<postgres host>` with "postgres" since Compose will link the host with the container.**
+  - **If you're running it locally or the config key is not present, it'll infer as `localhost`**
+- **Replace `<postgres port>` with your Redis network port**
+  - **If you are using Docker Compose, you can omit this config key since Compose will infer it to the redis container.**
+  - **If you're running it locally or the config key is not present, it'll infer as `5432`**
 
 ```yml
-# Runs any pending migrations with Prisma, since Prisma doesn't have a way to run this programmatically,
-# this will be ran in a worker outside of the main thread.
-#
-# Default: true
-runPendingMigrations: true
-
-# If this config value is set, it'll run the Prometheus server, which you can collect metrics
-# and post them in a Grafana instance or whatever! Generally, this isn't really useful in
-# small instances. You can view our metrics dashboards here:
-#
-# Production: https://stats.floofy.dev/d/e3KPDLknk/nino-prod?orgId=1
-# Staging: {unknown}
-#
-# Default: Not present.
-prometheusPort: 22043
-
 # Returns the default locale Nino will use to send messages with. Our locales are managed
 # under our GitHub repository for now, but this will change.
 #
@@ -189,12 +179,6 @@ defaultLocale: "en_US" or "fr_FR" or "pt_BR"
 #
 # Default: "development"
 environment: "development" or "production"
-
-# Enables the `Relay` component to relay information from the bot
-# with the frontend. This isn't recommended for smaller instances.
-#
-# Default: false
-relay: true
 
 # Sets the DSN url for configuring Sentry, this is not recommended on smaller instances!
 #
@@ -218,7 +202,13 @@ token: ...
 # this is only for the public instances.
 ravy: ...
 
-# Returns the configuration for the botlists microservice.
+# Returns a list of prefixes to use when executing text-based commands
+prefixes:
+  - owo!
+  - uwu?
+  - pwp.
+
+# Returns the configuration for the botlists task.
 # This is not recommended for smaller instances since using Nino and adding it
 # to a public botlist will be deleted from it.
 botlists:
@@ -283,25 +273,27 @@ timeouts:
   # Returns the authentication string for authorizing.
   auth: ...
 
-# Clustering information. This is required in running Nino.
-clustering:
-  # Returns the port for connecting to the cluster operator.
-  port: ...
+# Instatus configuration for displaying the Gateway Ping
+instatus:
+  # Metric component ID
+  # Use the instatus cli to retrieve: https://github.com/auguwu/instatus-cli
+  metricId: ...
 
-  # Returns the authentication header to authorizing with the cluster operator.
-  auth: ...
-```
+  # The statuspage component ID
+  # Use the instatus cli to retrieve: https://github.com/auguwu/instatus-cli
+  component: ...
 
-You are also required to have a **.env** file when running Nino to connect to the database!
-
-```env
-# Returns the environment to run Nino in, this can be changed here
-# or in the configuration object.
-NODE_ENV=development or production
-
-# Returns the database URL to connect to Postgres. This is required
-# to run Prisma.
-DATABASE_URL=postgresql://user:password@host:port/dbName
+  # Instatus API key, fetch it here: <insert url here>
+  key: ...
+  
+# Database configuration. Required!
+database:
+  username: postgres
+  password: postgres
+  schema: public
+  host: <postgres host>
+  port: <postgres port>
+  name: nino
 ```
 
 ## Maintainers
@@ -310,7 +302,7 @@ DATABASE_URL=postgresql://user:password@host:port/dbName
 - [**Ice   ~ Ice#4710**](https://winterfox.tech) - DevOps ([GitHub](https://github.com/IceeMC))
 
 ## Hackweek Participants
-> Since Nino was a submission towards [Discord's Hackweek](https://blog.discord.com/discord-community-hack-week-build-and-create-alongside-us-6b2a7b7bba33), this is a list of the participants.
+> Since Nino was a submission towards [Discord's Hackweek](https://blog.discord.com/discord-community-hack-week-build-and-create-alongside-us-6b2a7b7bba33), this is a list of the participants that contributed to the project during June 23rd, 2019 - June 28th, 2019.
 
 - [**davidjcralph#9721**](https://davidjcralph.com) - ([GitHub](https://github.com/davidjcralph))
 - [**August#5820**](https://floofy.dev) - ([GitHub](https://github.com/auguwu))
