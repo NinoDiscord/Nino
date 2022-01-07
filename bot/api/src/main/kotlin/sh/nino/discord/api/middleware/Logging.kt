@@ -21,3 +21,67 @@
  */
 
 package sh.nino.discord.api.middleware
+
+import gay.floof.utils.slf4j.logging
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.util.*
+import io.ktor.util.pipeline.*
+import io.prometheus.client.Histogram
+import org.koin.core.context.GlobalContext
+import sh.nino.discord.common.extensions.retrieve
+import sh.nino.discord.metrics.MetricsRegistry
+
+class Logging {
+    private val logger by logging<Logging>()
+
+    companion object {
+        val StartTimePhase = PipelinePhase("StartTimePhase")
+        val LogResponsePhase = PipelinePhase("LogResponsePhase")
+
+        val PrometheusObserver = AttributeKey<Histogram.Timer>("PrometheusObserver")
+        val StartTimeKey = AttributeKey<Long>("StartTimeKey")
+
+        object Plugin: ApplicationPlugin<Application, Unit, Logging> {
+            override val key: AttributeKey<Logging> = AttributeKey("Logging")
+            override fun install(pipeline: Application, configure: Unit.() -> Unit): Logging = Logging().apply {
+                install(pipeline)
+            }
+        }
+    }
+
+    fun install(pipeline: Application) {
+        pipeline.environment.monitor.subscribe(ApplicationStopped) {
+            logger.warn("API has stopped completely. :3")
+        }
+
+        pipeline.addPhase(StartTimePhase)
+        pipeline.intercept(StartTimePhase) {
+            call.attributes.put(StartTimeKey, System.currentTimeMillis())
+        }
+
+        pipeline.addPhase(LogResponsePhase)
+        pipeline.intercept(LogResponsePhase) {
+            logResponse(call)
+        }
+
+        pipeline.intercept(ApplicationCallPipeline.Setup) {
+            // Set up the histogram, if metrics is enabled
+            val metrics = GlobalContext.retrieve<MetricsRegistry>()
+            if (metrics.enabled) {
+                val timer = metrics.apiRequestLatency!!.startTimer()
+                call.attributes.put(PrometheusObserver, timer)
+            }
+        }
+    }
+
+    private suspend fun logResponse(call: ApplicationCall) {
+        val time = System.currentTimeMillis() - call.attributes[StartTimeKey]
+        val status = call.response.status()!!
+        val body = call.receive<ByteArray>()
+        val timer = call.attributes.getOrNull(PrometheusObserver)
+
+        timer?.observeDuration()
+        logger.info("${status.value} ${status.description} - ${call.request.httpMethod.value} ${call.request.path()} (~${time}ms, ${body.size} bytes written)")
+    }
+}

@@ -187,6 +187,8 @@ class CommandHandler(
             ?: commands.values.firstOrNull { it.aliases.contains(cmdName) }
             ?: return
 
+        // collect command flags
+
         if (command.ownerOnly && !config.owners.contains(event.message.author!!.id.toString())) {
             message.reply(locale.translate("errors.ownerOnly", mapOf("name" to cmdName)))
             return

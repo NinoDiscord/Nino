@@ -20,26 +20,36 @@
  * SOFTWARE.
  */
 
-@file:Suppress("UNUSED")
-package sh.nino.discord.api.routes
+package sh.nino.discord.core.timers
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import io.prometheus.client.exporter.common.TextFormat
-import sh.nino.discord.api.Endpoint
-import sh.nino.discord.api.annotations.Route
-import sh.nino.discord.common.data.Config
-import sh.nino.discord.metrics.MetricsRegistry
+import gay.floof.utils.slf4j.logging
+import kotlinx.coroutines.*
+import sh.nino.discord.core.NinoThreadFactory
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
 
-class MetricsRoute(private val config: Config, private val metrics: MetricsRegistry): Endpoint("/metrics") {
-    @Route("/", method = "GET")
-    suspend fun metrics(call: ApplicationCall) {
-        if (!config.metrics)
-            return call.respondText("Cannot GET /metrics", status = HttpStatusCode.NotFound)
+/**
+ * The timer scope is a coroutine scope that uses a single-threaded executor pool,
+ * that it can be easily used with kotlinx.coroutines!
+ */
+internal class TimerScope: CoroutineScope {
+    private val executorPool: ExecutorService = Executors.newSingleThreadExecutor(NinoThreadFactory)
+    private val logger by logging<TimerScope>()
 
-        call.respondTextWriter(ContentType.parse(TextFormat.CONTENT_TYPE_004), HttpStatusCode.OK) {
-            TextFormat.write004(this, metrics.registry!!.metricFamilySamples())
+    override val coroutineContext: CoroutineContext = SupervisorJob() + executorPool.asCoroutineDispatcher()
+    fun launch(job: TimerJob): Job {
+        return launch(start = CoroutineStart.LAZY) {
+            delay(job.interval.toLong())
+            while (isActive) {
+                try {
+                    job.execute()
+                } catch (e: Exception) {
+                    logger.error("Unable to run job '${job.name}':", e)
+                }
+
+                delay(job.interval.toLong())
+            }
         }
     }
 }

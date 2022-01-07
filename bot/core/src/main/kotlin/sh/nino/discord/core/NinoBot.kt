@@ -37,20 +37,20 @@ import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.route.Route
 import gay.floof.utils.slf4j.logging
 import io.sentry.Sentry
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
-import sh.nino.discord.api.ApiServer
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
 import sh.nino.discord.common.extensions.retrieve
+import sh.nino.discord.common.extensions.retrieveAll
 import sh.nino.discord.core.listeners.applyGenericEvents
 import sh.nino.discord.core.localization.LocalizationManager
 import sh.nino.discord.core.redis.RedisManager
+import sh.nino.discord.core.timers.TimerJob
+import sh.nino.discord.core.timers.TimerManager
 import sh.nino.discord.database.asyncTransaction
 import sh.nino.discord.database.createPgEnums
 import sh.nino.discord.database.tables.*
@@ -58,15 +58,10 @@ import sh.nino.discord.timeouts.Client
 import java.lang.management.ManagementFactory
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
-import kotlin.concurrent.thread
 
 class NinoBot {
     private val logger by logging<NinoBot>()
     val bootTime = System.currentTimeMillis()
-
-    init {
-        addShutdownHook()
-    }
 
     @OptIn(KordUnsafe::class, KordExperimental::class, PrivilegedIntent::class)
     suspend fun start() {
@@ -168,12 +163,10 @@ class NinoBot {
             timeouts.connect()
         }
 
-        // Same with the API server, let's not block this thread
-        if (config.api != null) {
-            NinoScope.launch {
-                GlobalContext.retrieve<ApiServer>().launch()
-            }
-        }
+        // Schedule all timer jobs
+        val scheduler = GlobalContext.retrieve<TimerManager>()
+        val jobs = GlobalContext.retrieveAll<TimerJob>()
+        scheduler.bulkSchedule(*jobs.toTypedArray())
 
         // Startup Kord
         kord.applyGenericEvents()
@@ -203,37 +196,6 @@ class NinoBot {
         if (Sentry.isEnabled()) {
             Sentry.captureException(ex)
         }
-    }
-
-    private fun addShutdownHook() {
-        logger.info("Adding shutdown hook...")
-
-        val runtime = Runtime.getRuntime()
-        runtime.addShutdownHook(
-            thread(false, name = "Nino-ShutdownThread") {
-                logger.warn("Shutting down...")
-
-                val kord = GlobalContext.retrieve<Kord>()
-                val dataSource = GlobalContext.retrieve<HikariDataSource>()
-                val apiServer = GlobalContext.retrieve<ApiServer>()
-                val timeouts = GlobalContext.retrieve<Client>()
-                val redis = GlobalContext.retrieve<RedisManager>()
-
-                // Close off the Nino scope and detach all shards
-                runBlocking {
-                    kord.gateway.detachAll()
-                    NinoScope.cancel()
-                }
-
-                // Close off the database connection
-                dataSource.close()
-                apiServer.shutdown()
-                timeouts.close()
-                redis.close()
-
-                logger.info("Successfully shut down! Goodbye.")
-            }
-        )
     }
 
     companion object {

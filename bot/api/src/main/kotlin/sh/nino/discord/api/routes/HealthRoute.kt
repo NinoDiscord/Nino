@@ -23,9 +23,9 @@
 @file:Suppress("UNUSED")
 package sh.nino.discord.api.routes
 
-import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.response.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
 import sh.nino.discord.api.Endpoint
 import sh.nino.discord.api.annotations.Route
 

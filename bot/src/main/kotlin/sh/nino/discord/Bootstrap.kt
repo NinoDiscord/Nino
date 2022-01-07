@@ -23,28 +23,42 @@
 package sh.nino.discord
 
 import com.charleskorn.kaml.Yaml
+import com.zaxxer.hikari.HikariDataSource
 import dev.kord.cache.map.MapLikeCollection
 import dev.kord.cache.map.internal.MapEntryCache
 import dev.kord.core.Kord
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
 import gay.floof.utils.slf4j.logging
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import sh.nino.discord.api.ApiServer
 import sh.nino.discord.api.apiModule
 import sh.nino.discord.commands.CommandHandler
 import sh.nino.discord.commands.commandsModule
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
+import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.core.NinoBot
+import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.globalModule
+import sh.nino.discord.core.redis.RedisManager
 import sh.nino.discord.punishments.punishmentsModule
+import sh.nino.discord.timeouts.Client
 import java.io.File
+import kotlin.concurrent.thread
 import kotlin.system.exitProcess
 
 object Bootstrap {
     private val logger by logging<Bootstrap>()
+
+    init {
+        addShutdownHook()
+    }
 
     @JvmStatic
     fun main(args: Array<String>) {
@@ -100,24 +114,58 @@ object Bootstrap {
             )
         }
 
+        // implement kord events here
+        kord.on<MessageCreateEvent> {
+            val handler = koin.koin.get<CommandHandler>()
+            handler.onCommand(this)
+        }
+
+        // Same with the API server, let's not block this thread
+        if (config.api != null) {
+            NinoScope.launch {
+                GlobalContext.retrieve<ApiServer>().launch()
+            }
+        }
+
         val bot = koin.koin.get<NinoBot>()
         runBlocking {
             try {
-                // set up the command handler before the bot starts,
-                // so we don't do circular dependencies.
-                val handler = koin.koin.get<CommandHandler>()
-
-                // setup slash commands also! for the same reason above.
-                // koin.koin.get<SlashCommandHandler>()
-
-                // setup kord events here (read ABOVE >:c)
-                kord.on<MessageCreateEvent> { handler.onCommand(this) }
-
                 bot.start()
             } catch (e: Exception) {
                 logger.error("Unable to initialize Nino:", e)
                 exitProcess(1)
             }
         }
+    }
+
+    private fun addShutdownHook() {
+        logger.info("Adding shutdown hook...")
+
+        val runtime = Runtime.getRuntime()
+        runtime.addShutdownHook(
+            thread(false, name = "Nino-ShutdownThread") {
+                logger.warn("Shutting down...")
+
+                val kord = GlobalContext.retrieve<Kord>()
+                val dataSource = GlobalContext.retrieve<HikariDataSource>()
+                val apiServer = GlobalContext.retrieve<ApiServer>()
+                val timeouts = GlobalContext.retrieve<Client>()
+                val redis = GlobalContext.retrieve<RedisManager>()
+
+                // Close off the Nino scope and detach all shards
+                runBlocking {
+                    kord.gateway.detachAll()
+                    apiServer.shutdown()
+                    NinoScope.cancel()
+                }
+
+                // Close off the database connection
+                dataSource.close()
+                timeouts.close()
+                redis.close()
+
+                logger.info("Successfully shut down! Goodbye.")
+            }
+        )
     }
 }

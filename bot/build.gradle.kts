@@ -56,6 +56,14 @@ dependencies {
 
     // YAML (configuration)
     implementation("com.charleskorn.kaml:kaml:0.38.0")
+
+    // Database (Exposed, HikariCP, PostgreSQL)
+    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-core:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-jdbc:0.36.1")
+    implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
+    implementation("org.postgresql:postgresql:42.3.1")
+    implementation("com.zaxxer:HikariCP:5.0.0")
 }
 
 tasks {
@@ -75,6 +83,9 @@ tasks {
     }
 
     build {
+        dependsOn(shadowJar)
+        dependsOn(spotlessApply)
+        dependsOn(kotest)
         dependsOn(processResources)
     }
 }

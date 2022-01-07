@@ -212,13 +212,6 @@ prefixes:
 # This is not recommended for smaller instances since using Nino and adding it
 # to a public botlist will be deleted from it.
 botlists:
-  # Returns the interval (in milliseconds) to run the Node interval to
-  # post statistics (guild / shard count) to botlists.
-  #
-  # Min: 15000 - 15 seconds
-  # Max: 86400000 - 1 day
-  interval: ...
-
   # Returns the token for posting to Discord Services - https://discordservices.net
   dservices: ...
 

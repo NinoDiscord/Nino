@@ -57,8 +57,5 @@ dependencies {
     // Nino projects
     implementation(project(":bot:timeouts"))
     implementation(project(":bot:database"))
-    implementation(project(":bot:api"))
-
-    // owo
-    implementation("org.apache.commons:commons-lang3:3.12.0")
+    implementation(project(":bot:metrics"))
 }

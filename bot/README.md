@@ -8,6 +8,7 @@ This is a collection of modules that keeps the Discord bot running together.
 - [core](./core) - Core components + modules.
 - [database](./database) - Database models and utilities.
 - [markup](./markup) - Soon:tm: markup language for customizing modlogs and logging outputs.
+- [metrics](./metrics) - Prometheus metric registry.
 - [punishments](./punishments) - Core punishments module to punish users based off an action.
 - [slash-commands](./slash-commands) - Slash commands implementation.
 - [src](./src) - The main application that you run with `java -jar` or with Docker!

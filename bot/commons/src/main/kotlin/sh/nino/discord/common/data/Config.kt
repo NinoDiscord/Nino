@@ -42,6 +42,7 @@ data class Config(
     val sentryDsn: String? = null,
     val publicKey: String,
     val prefixes: List<String> = listOf("x!"),
+    val botlists: BotlistsConfig? = null,
     val database: PostgresConfig = PostgresConfig(),
     val instatus: InstatusConfig? = null,
     val timeouts: TimeoutsConfig,

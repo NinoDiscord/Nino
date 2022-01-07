@@ -20,18 +20,16 @@
  * SOFTWARE.
  */
 
-@file:Suppress("UNUSED")
-package sh.nino.discord.api.routes
+package sh.nino.discord.core.jobs
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import sh.nino.discord.api.Endpoint
-import sh.nino.discord.api.annotations.Route
+import io.ktor.client.*
+import sh.nino.discord.common.data.Config
+import sh.nino.discord.core.timers.TimerJob
 
-class MainRoute: Endpoint("/") {
-    @Route("/", method = "GET")
-    suspend fun owo(call: ApplicationCall) {
-        call.respondText("hewo world", status = HttpStatusCode.OK)
+class GatewayPingJob(private val config: Config, private val httpClient: HttpClient): TimerJob(
+    "gateway.ping",
+    5000
+) {
+    override suspend fun execute() {
     }
 }

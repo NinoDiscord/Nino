@@ -20,18 +20,13 @@
  * SOFTWARE.
  */
 
-@file:Suppress("UNUSED")
-package sh.nino.discord.api.routes
+package sh.nino.discord.core.jobs
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import sh.nino.discord.api.Endpoint
-import sh.nino.discord.api.annotations.Route
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import sh.nino.discord.core.timers.TimerJob
 
-class MainRoute: Endpoint("/") {
-    @Route("/", method = "GET")
-    suspend fun owo(call: ApplicationCall) {
-        call.respondText("hewo world", status = HttpStatusCode.OK)
-    }
+val jobsModule = module {
+    single { BotlistJob(get(), get(), get()) } bind TimerJob::class
+    single { GatewayPingJob(get(), get()) } bind TimerJob::class
 }

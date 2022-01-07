@@ -20,18 +20,27 @@
  * SOFTWARE.
  */
 
-@file:Suppress("UNUSED")
-package sh.nino.discord.api.routes
+package sh.nino.discord.core.timers
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import sh.nino.discord.api.Endpoint
-import sh.nino.discord.api.annotations.Route
+import kotlinx.coroutines.Job
 
-class MainRoute: Endpoint("/") {
-    @Route("/", method = "GET")
-    suspend fun owo(call: ApplicationCall) {
-        call.respondText("hewo world", status = HttpStatusCode.OK)
-    }
+/**
+ * Represents a base instance of a job that can be timed per basis. This abstract class
+ * takes in a [name], which is... self-explanatory and the [interval] to tick to call
+ * the [execute] function.
+ */
+abstract class TimerJob(
+    val name: String,
+    val interval: Int
+) {
+    /**
+     * Represents the current coroutine [job][Job] that is being executed. This
+     * can be `null` if the job was never scheduled or was unscheduled.
+     */
+    var coroutineJob: Job? = null
+
+    /**
+     * The executor function to call every tick of the [interval] specified.
+     */
+    abstract suspend fun execute()
 }

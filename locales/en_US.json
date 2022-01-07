@@ -51,22 +51,32 @@
     "descriptions.admin.import": "Import your exported guild settings easily. You can't revert back once you import back.",
     "descriptions.admin.logging": "Administrate your logging settings.",
     "descriptions.logging.omitUsers": "Add or remove users to omit from being logged in the specified log channel.",
+    "descriptions.logging.omitChannels": "Add or remove text channels to omit from being logged in the specified log channel.",
+    "descriptions.logging.config": "Shows the current logging configuration",
+    "descriptions.logging.events": "Toggle specific logging events -- read more [here](https://nino.sh/docs/logging)",
     "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use.",
 
     "commands.automod.toggle": "${emoji} ${toggle} the **${name}** automod!",
     "commands.admin.logging.toggle": "${emoji} ${toggle} the **Logging** feature.",
     "commands.admin.logging.omitUsers.embed.title": "[ Omitted Users ]",
     "commands.admin.logging.omitUsers.embed.description": [
-      "Here is a list of users that are omitted from being logged.",
-      "By default, this list is pretty lonely... :c",
+      "Here is a list of users that are omitted from being logged:",
       "",
       "${list}"
     ],
-    "commands.admin.logging.omitUsers.missingArgs": "You are missing users to omit from logging! You can use one or more mentions or user IDs.",
+    "commands.admin.logging.omitUsers.add.missingArgs": "You are missing users to omit from logging! You can use one or more mentions or user IDs.",
     "commands.admin.logging.omitUsers.404": "I was unable to find the users to omit. Did you specify a mention or user ID?",
-    "commands.admin.logging.omitUsers.success": "Successfully added **${users}** user${suffix}!",
-    "commands.admin.logging.omitChannels.missingArgs": "You are missing channels to omit from logging! You can use one or more channel mentions or IDs.",
+    "commands.admin.logging.omitUsers.success": "${operation} **${users}** user${suffix}!",
+    "commands.admin.logging.omitUsers.del.missingArgs": "Missing user(s) to remove from the omitted list.",
     "commands.admin.logging.omitChannels.404": "I was unable to find the channels to omit. Did you specify a mention or channel ID? Did you specify only voice channels?",
-    "commands.admin.logging.omitChannels.success": "Successfully added **${channels}** text channel${suffix}!"
+    "commands.admin.logging.omitChannels.add.missingArgs": "You are missing text channels to omit from logging! You can use one or more mentions or channel IDs.",
+    "commands.admin.logging.omitChannels.success": "${operation} **${users}** text channel${suffix}!",
+    "commands.admin.logging.omitChannels.del.missingArgs": "Missing channel(s) to remove from the omitted list.",
+    "commands.admin.logging.omitChannels.embed.title": "[ Omitted Users ]",
+    "commands.admin.logging.omitChannels.embed.description": [
+      "Here is a list of text channels that are omitted from being logged:",
+      "",
+      "${list}"
+    ]
   }
 }

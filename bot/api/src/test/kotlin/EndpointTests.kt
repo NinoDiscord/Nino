@@ -20,18 +20,25 @@
  * SOFTWARE.
  */
 
-@file:Suppress("UNUSED")
-package sh.nino.discord.api.routes
+package sh.nino.api.tests
 
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
+import io.kotest.core.spec.style.DescribeSpec
+import io.kotest.matchers.shouldBe
 import sh.nino.discord.api.Endpoint
-import sh.nino.discord.api.annotations.Route
 
-class MainRoute: Endpoint("/") {
-    @Route("/", method = "GET")
-    suspend fun owo(call: ApplicationCall) {
-        call.respondText("hewo world", status = HttpStatusCode.OK)
+class EndpointTests: DescribeSpec({
+    describe("Endpoint") {
+        it("should be equal to \"/\"") {
+            val path = Endpoint.merge("/", "/")
+            path shouldBe "/"
+        }
+
+        it("should be equal to \"/owo\" if the prefix is /owo and the path is /") {
+            Endpoint.merge("/owo", "/") shouldBe "/owo"
+        }
+
+        it("should be equal to \"/owo/uwu\" if prefix is /owo and the path is /uwu") {
+            Endpoint.merge("/owo", "/uwu") shouldBe "/owo/uwu"
+        }
     }
-}
+})

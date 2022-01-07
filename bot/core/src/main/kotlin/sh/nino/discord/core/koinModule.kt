@@ -37,6 +37,8 @@ import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.core.localization.LocalizationManager
 import sh.nino.discord.core.redis.RedisManager
+import sh.nino.discord.core.timers.TimerManager
+import sh.nino.discord.metrics.MetricsRegistry
 import sh.nino.discord.timeouts.Client
 
 val globalModule = module {
@@ -108,5 +110,13 @@ val globalModule = module {
     // Redis manager
     single {
         RedisManager(get())
+    }
+
+    single {
+        TimerManager()
+    }
+
+    single {
+        MetricsRegistry(get())
     }
 }

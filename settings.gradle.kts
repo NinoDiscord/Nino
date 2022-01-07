@@ -46,6 +46,9 @@ include(":bot:markup")
 // Common utilities + extensions
 include(":bot:commons")
 
+// Prometheus metrics registry
+include(":bot:metrics")
+
 // Core components that ties everything in
 include(":bot:core")
 

@@ -20,4 +20,37 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.api.middleware
+package sh.nino.discord.core.timers
+
+import gay.floof.utils.slf4j.logging
+import io.ktor.utils.io.*
+import kotlin.time.Duration.Companion.seconds
+
+/**
+ * The timer manager is the main manager to schedule and unschedule all the timers
+ * that were registered.
+ */
+class TimerManager {
+    private val scope = TimerScope()
+    private val logger by logging<TimerManager>()
+    private val jobs: MutableList<TimerJob> = mutableListOf()
+
+    fun schedule(job: TimerJob) {
+        logger.info("Scheduled job ${job.name} for every ${job.interval.seconds} seconds!")
+        val coroutineJob = scope.launch(job)
+
+        job.coroutineJob = coroutineJob
+        coroutineJob.start()
+
+        jobs.add(job)
+    }
+
+    fun bulkSchedule(vararg jobs: TimerJob) {
+        for (job in jobs) schedule(job)
+    }
+
+    fun unschedule() {
+        logger.warn("Unscheduled all timer jobs...")
+        for (job in jobs) job.coroutineJob!!.cancel(CancellationException("Unscheduled by program"))
+    }
+}

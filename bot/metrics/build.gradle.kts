@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,18 +20,9 @@
  * SOFTWARE.
  */
 
-@file:Suppress("UNUSED")
-package sh.nino.discord.api.routes
-
-import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
-import sh.nino.discord.api.Endpoint
-import sh.nino.discord.api.annotations.Route
-
-class MainRoute: Endpoint("/") {
-    @Route("/", method = "GET")
-    suspend fun owo(call: ApplicationCall) {
-        call.respondText("hewo world", status = HttpStatusCode.OK)
-    }
+dependencies {
+    implementation("io.prometheus:simpleclient_hotspot:0.14.1")
+    implementation("io.prometheus:simpleclient:0.14.0")
+    api("io.ktor:ktor-server-netty:1.6.7")
+    api("org.slf4j:slf4j-api:1.7.32")
 }

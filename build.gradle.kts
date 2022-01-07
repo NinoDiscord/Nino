@@ -100,6 +100,9 @@ subprojects {
         // Noel Utilities
         floof("commons", "commons-slf4j", "1.1.0")
 
+        // Apache Utilities
+        implementation("org.apache.commons:commons-lang3:3.12.0")
+
         // Testing utilities
         testImplementation("io.kotest:kotest-runner-junit5-jvm:5.0.3")
         testImplementation("io.kotest:kotest-assertions-core-jvm:5.0.3")
