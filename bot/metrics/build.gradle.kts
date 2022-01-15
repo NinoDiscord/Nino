@@ -23,6 +23,4 @@
 dependencies {
     implementation("io.prometheus:simpleclient_hotspot:0.14.1")
     implementation("io.prometheus:simpleclient:0.14.0")
-    api("io.ktor:ktor-server-netty:1.6.7")
-    api("org.slf4j:slf4j-api:1.7.32")
 }

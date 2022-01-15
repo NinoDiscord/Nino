@@ -21,19 +21,6 @@
  */
 
 dependencies {
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.36.1")
-    implementation("org.jetbrains.exposed:exposed-core:0.36.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.36.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
-    implementation("org.postgresql:postgresql:42.3.1")
-    implementation("com.zaxxer:HikariCP:5.0.0")
-
-    implementation("io.insert-koin:koin-core:3.1.4")
-
     implementation(project(":bot:database"))
-    implementation(project(":bot:commons"))
     api(project(":bot:timeouts"))
-
-    api("org.slf4j:slf4j-api:1.7.32")
-    api("dev.kord:kord-core:0.8.0-M8")
 }

@@ -25,11 +25,14 @@ package sh.nino.discord.timeouts
 import gay.floof.utils.slf4j.logging
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.websocket.*
-import io.ktor.network.sockets.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.websocket.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.*
+import kotlinx.serialization.json.Json
+import org.koin.core.context.GlobalContext
+import sh.nino.discord.common.NinoInfo
+import sh.nino.discord.common.extensions.retrieve
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
@@ -69,14 +72,15 @@ class Client(val resources: ClientResources): AutoCloseable {
                 }
             }
 
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(resources.json)
+            install(ContentNegotiation) {
+                serialization(ContentType.Application.Json, GlobalContext.retrieve<Json>())
+            }
+
+            install(UserAgent) {
+                agent = "Nino/DiscordBot (+https://github.com/NinoDiscord/Nino; v${NinoInfo.VERSION})"
             }
 
             install(WebSockets)
-            install(UserAgent) {
-                agent = "Nino/DiscordBot"
-            }
         }
 
         connection = Connection(

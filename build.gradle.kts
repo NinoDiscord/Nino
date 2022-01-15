@@ -103,6 +103,31 @@ subprojects {
         // Apache Utilities
         implementation("org.apache.commons:commons-lang3:3.12.0")
 
+        // Common dependencies that most projects need
+        // Kord, Koin, DB, etc
+        implementation("io.ktor:ktor-client-websockets:2.0.0-beta-1")
+        implementation("com.squareup.okhttp3:okhttp:4.9.3")
+        implementation("io.ktor:ktor-client-okhttp:2.0.0-beta-1")
+        implementation("io.ktor:ktor-client-core:2.0.0-beta-1")
+        implementation("io.insert-koin:koin-core:3.1.4")
+        implementation("dev.kord:kord-core:0.8.0-M8")
+        implementation("io.lettuce:lettuce-core:6.1.5.RELEASE")
+        implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.36.1")
+        implementation("org.jetbrains.exposed:exposed-core:0.36.1")
+        implementation("org.jetbrains.exposed:exposed-jdbc:0.36.1")
+        implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
+        implementation("org.postgresql:postgresql:42.3.1")
+        implementation("com.zaxxer:HikariCP:5.0.0")
+        api("org.slf4j:slf4j-api:1.7.32")
+        implementation("io.sentry:sentry:5.5.1")
+        implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0-beta-1")
+        implementation("io.ktor:ktor-client-content-negotiation:2.0.0-beta-1")
+
+        // TODO: remove this once Kord supports KTOR 2
+        implementation("io.ktor:ktor-serialization:1.6.7")
+        implementation("io.ktor:ktor-client-okhttp:1.6.7")
+        implementation("io.ktor:ktor-client-core:1.6.7")
+
         // Testing utilities
         testImplementation("io.kotest:kotest-runner-junit5-jvm:5.0.3")
         testImplementation("io.kotest:kotest-assertions-core-jvm:5.0.3")

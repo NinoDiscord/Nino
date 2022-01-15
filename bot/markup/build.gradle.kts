@@ -19,3 +19,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+val sourcesJar by tasks.registering(Jar::class) {
+    archiveClassifier.set("sources")
+    from(sourceSets["main"].allSource)
+}
+
+tasks.create<Exec>("compileRust") {
+    workingDir = file(".")
+    commandLine = listOf("cargo", "build", "--release")
+
+    copy {
+        from("build/rust/release/libmarkup.so")
+        into("src/main/resources/native/linux-x86-64")
+    }
+}

@@ -27,10 +27,10 @@ import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.util.IsolationLevel
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.websocket.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.websocket.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.*
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import sh.nino.discord.common.NinoInfo
@@ -62,8 +62,8 @@ val globalModule = module {
             }
 
             install(WebSockets)
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(get())
+            install(ContentNegotiation) {
+                serialization(ContentType.Application.Json, get<Json>())
             }
 
             install(UserAgent) {

@@ -23,6 +23,7 @@
 package sh.nino.discord.commands.easter_egg
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import kotlinx.serialization.Serializable
 import sh.nino.discord.commands.AbstractCommand
@@ -43,10 +44,12 @@ data class WahResponse(
 )
 class WahCommand(private val httpClient: HttpClient): AbstractCommand() {
     override suspend fun execute(msg: CommandMessage) {
-        val res: WahResponse = httpClient.get("https://some-random-api.ml/img/red_panda")
+        val res = httpClient.get("https://some-random-api.ml/img/red_panda")
+        val body = res.body<WahResponse>()
+
         msg.reply {
             title = "wah!"
-            image = res.link
+            image = body.link
             footer {
                 text = "good job on finding a easter egg command!"
             }

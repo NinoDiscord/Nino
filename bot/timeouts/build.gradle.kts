@@ -19,11 +19,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-dependencies {
-    implementation("io.ktor:ktor-client-serialization:1.6.7")
-    implementation("io.ktor:ktor-client-websockets:1.6.7")
-    implementation("io.ktor:ktor-client-okhttp:1.6.7")
-    api("io.ktor:ktor-client-core:1.6.7")
-    api("org.slf4j:slf4j-api:1.7.32")
-}

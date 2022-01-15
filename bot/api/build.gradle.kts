@@ -22,7 +22,7 @@
 
 dependencies {
     implementation("io.prometheus:simpleclient_hotspot:0.14.1")
-    implementation("io.prometheus:simpleclient_common:0.14.0")
+    implementation("io.prometheus:simpleclient_common:0.14.1")
     implementation("io.insert-koin:koin-core:3.1.4")
     implementation("io.prometheus:simpleclient:0.14.1")
     implementation("io.ktor:ktor-serialization:2.0.0-beta-1")
@@ -32,10 +32,6 @@ dependencies {
     implementation("io.ktor:ktor-server-cors:2.0.0-beta-1")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0-beta-1")
     implementation("io.ktor:ktor-server-double-receive:2.0.0-beta-1")
-    implementation("dev.kord:kord-core:0.8.0-M8")
     implementation(project(":bot:metrics"))
     implementation(project(":bot:core"))
-    implementation("io.lettuce:lettuce-core:6.1.5.RELEASE")
-    implementation("io.sentry:sentry:5.5.1")
-    api("org.slf4j:slf4j-api:1.7.32")
 }
