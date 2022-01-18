@@ -52,7 +52,7 @@ data class Ratelimit(
     val expired: Boolean
         get() = resetTime <= Clock.System.now()
 
-    fun consume(): Ratelimit = copy(remaining = remaining - 1)
+    fun consume(): Ratelimit = copy(remaining = (remaining - 1).coerceAtLeast(0))
 }
 
 class Ratelimiter {

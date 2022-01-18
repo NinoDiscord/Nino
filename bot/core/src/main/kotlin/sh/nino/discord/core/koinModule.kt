@@ -28,10 +28,13 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
+import io.sentry.Sentry
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
+import sh.nino.discord.core.interceptors.LoggingInterceptor
+import sh.nino.discord.core.interceptors.SentryInterceptor
 import sh.nino.discord.core.localization.LocalizationManager
 import sh.nino.discord.core.timers.TimerManager
 import sh.nino.discord.metrics.MetricsRegistry
@@ -54,6 +57,11 @@ val globalModule = module {
             engine {
                 config {
                     followRedirects(true)
+                    addInterceptor(LoggingInterceptor())
+
+                    if (Sentry.isEnabled()) {
+                        addInterceptor(SentryInterceptor())
+                    }
                 }
             }
 

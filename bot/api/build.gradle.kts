@@ -34,6 +34,7 @@ dependencies {
 //    implementation("io.ktor:ktor-server-cors:2.0.0-beta-1")
 //    implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0-beta-1")
 //    implementation("io.ktor:ktor-server-double-receive:2.0.0-beta-1")
+    implementation(project(":bot:database"))
     implementation(project(":bot:metrics"))
     implementation(project(":bot:core"))
 }

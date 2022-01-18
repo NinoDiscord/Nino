@@ -94,17 +94,9 @@ class ApiServer {
                             route(route.path, route.method) {
                                 handle {
                                     try {
-                                        route.execute(this.call)
+                                        return@handle route.execute(this.call)
                                     } catch (e: Exception) {
                                         log.error("Unable to handle request \"${route.method.value} ${route.path}\":", e)
-                                        call.response.status(HttpStatusCode.InternalServerError)
-                                        return@handle call.respond(
-                                            JsonObject(
-                                                mapOf(
-                                                    "message" to JsonPrimitive("A unknown exception has occured :<")
-                                                )
-                                            )
-                                        )
                                     }
                                 }
                             }

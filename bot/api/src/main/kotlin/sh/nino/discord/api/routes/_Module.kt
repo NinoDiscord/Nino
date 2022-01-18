@@ -25,9 +25,13 @@ package sh.nino.discord.api.routes
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import sh.nino.discord.api.Endpoint
+import sh.nino.discord.api.routes.api.ApiRoute
+import sh.nino.discord.api.routes.api.AutomodRoute
 
 val endpointModule = module {
     single { HealthRoute() } bind Endpoint::class
     single { MetricsRoute(get(), get()) } bind Endpoint::class
     single { MainRoute() } bind Endpoint::class
+    single { ApiRoute() } bind Endpoint::class
+    single { AutomodRoute() } bind Endpoint::class
 }

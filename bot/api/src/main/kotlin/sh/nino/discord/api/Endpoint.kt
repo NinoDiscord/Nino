@@ -31,8 +31,8 @@ import kotlin.reflect.full.hasAnnotation
 import sh.nino.discord.api.annotations.Route as RouteMeta
 
 class Route(val path: String, val method: HttpMethod, private val callable: KCallable<*>, private val thiz: Any) {
-    suspend fun execute(call: ApplicationCall): Any? {
-        return callable.callSuspend(thiz, call)
+    suspend fun execute(call: ApplicationCall) {
+        callable.callSuspend(thiz, call)
     }
 }
 
@@ -48,6 +48,6 @@ open class Endpoint(val prefix: String) {
     val routes: List<Route>
         get() = this::class.members.filter { it.hasAnnotation<RouteMeta>() }.map {
             val meta = it.findAnnotation<RouteMeta>()!!
-            Route(merge(this.prefix, meta.path), HttpMethod.parse(meta.method), it, this)
+            Route(merge(this.prefix, meta.path), HttpMethod.parse(meta.method.uppercase()), it, this)
         }
 }

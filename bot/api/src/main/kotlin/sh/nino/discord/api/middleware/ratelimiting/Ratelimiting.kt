@@ -23,6 +23,7 @@
 package sh.nino.discord.api.middleware.ratelimiting
 
 import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.response.*
 import io.ktor.util.*
@@ -37,7 +38,18 @@ class Ratelimiting(val ratelimiter: Ratelimiter) {
         override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): Ratelimiting {
             val ratelimiter = Ratelimiter()
             pipeline.sendPipeline.intercept(ApplicationSendPipeline.After) {
+                val ip = this.call.request.origin.remoteHost
+                if (ip == "0:0:0:0:0:0:0:1") {
+                    proceed()
+                    return@intercept
+                }
+
                 val record = ratelimiter.get(call)
+                context.response.header("X-Ratelimit-Limit", 1200)
+                context.response.header("X-Ratelimit-Remaining", record.remaining)
+                context.response.header("X-RateLimit-Reset", record.resetTime.toEpochMilliseconds())
+                context.response.header("X-RateLimit-Reset-Date", record.resetTime.toString())
+
                 if (record.exceeded) {
                     val resetAfter = (record.resetTime.epochSeconds - Clock.System.now().epochSeconds).coerceAtLeast(0)
                     context.response.header(HttpHeaders.RetryAfter, resetAfter)
@@ -54,11 +66,6 @@ class Ratelimiting(val ratelimiter: Ratelimiter) {
 
                     finish()
                 } else {
-                    context.response.header("X-Ratelimit-Limit", 1200)
-                    context.response.header("X-Ratelimit-Remaining", record.remaining)
-                    context.response.header("X-RateLimit-Reset", record.resetTime.toEpochMilliseconds())
-                    context.response.header("X-RateLimit-Reset-Date", record.resetTime.toString())
-
                     proceed()
                 }
             }

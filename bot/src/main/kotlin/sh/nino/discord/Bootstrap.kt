@@ -26,8 +26,8 @@ import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.util.IsolationLevel
-import dev.kord.cache.redis.RedisConfiguration
-import dev.kord.cache.redis.RedisEntryCache
+import dev.kord.cache.map.MapLikeCollection
+import dev.kord.cache.map.internal.MapEntryCache
 import dev.kord.core.Kord
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
@@ -145,24 +145,12 @@ object Bootstrap {
                 cache {
                     // cache members
                     members { cache, description ->
-                        RedisEntryCache(
-                            cache, description,
-                            RedisConfiguration.invoke {
-                                this.client = redis.client
-                                this.keyPrefix = "nino:cache:"
-                            }
-                        )
+                        MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
                     }
 
                     // cache users
                     users { cache, description ->
-                        RedisEntryCache(
-                            cache, description,
-                            RedisConfiguration.invoke {
-                                this.client = redis.client
-                                this.keyPrefix = "nino:cache:"
-                            }
-                        )
+                        MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
                     }
                 }
             }

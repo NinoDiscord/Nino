@@ -20,4 +20,33 @@
  * SOFTWARE.
  */
 
+@file:Suppress("UNUSED")
 package sh.nino.discord.api.routes.api
+
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.response.*
+import kotlinx.serialization.Serializable
+import sh.nino.discord.api.Endpoint
+import sh.nino.discord.api.annotations.Route
+
+@Serializable
+data class ApiResponse(
+    val message: String
+)
+
+class ApiRoute: Endpoint("/api") {
+    @Route("/", "get")
+    suspend fun main(call: ApplicationCall) {
+        call.respond(HttpStatusCode.OK, ApiResponse(
+            message = "hello world!!!!!!!"
+        ))
+    }
+
+    @Route("/v1", "get")
+    suspend fun mainV1(call: ApplicationCall) {
+        call.respond(HttpStatusCode.OK, ApiResponse(
+            message = "hello world!!!!!!!"
+        ))
+    }
+}
