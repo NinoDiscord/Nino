@@ -19,3 +19,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+dependencies {
+    testImplementation("org.slf4j:slf4j-simple:1.7.32")
+}

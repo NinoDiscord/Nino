@@ -24,20 +24,13 @@ package sh.nino.tests.timeouts
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
 import sh.nino.discord.timeouts.Client
 import java.net.ConnectException
 
 class ConnectionTest: DescribeSpec({
-    it("bleep boop") {
-        1 + 1 shouldBe 2
-    }
-
     it("should not connect due to not finding it.") {
         val client = Client {
-            // in ci + in-dev, this shouldn't exist
-            // i hope...
             uri = "localhost:6666"
             auth = "owodauwu"
         }

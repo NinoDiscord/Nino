@@ -99,12 +99,11 @@ internal class Connection(
     suspend fun send(command: Command) {
         val data = json.encodeToString(Command.Companion, command)
         logger.trace("Sending command >> ", data)
-
         session.send(Frame.Text(data))
     }
 
     private suspend fun connectionCreate(sess: DefaultClientWebSocketSession) {
-        logger.debug("Connected to WebSocket using URI - 'ws://$uri'")
+        logger.info("Connected to WebSocket using URI - 'ws://$uri'")
         session = sess
 
         val message = try {
@@ -119,6 +118,7 @@ internal class Connection(
         }
 
         val obj = json.decodeFromString(JsonObject.serializer(), message)
+        logger.info(obj.toString())
         if (obj["op"]?.jsonPrimitive?.int == 0) {
             logger.debug("Hello world!")
 
