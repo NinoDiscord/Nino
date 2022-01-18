@@ -118,7 +118,6 @@ internal class Connection(
         }
 
         val obj = json.decodeFromString(JsonObject.serializer(), message)
-        logger.info(obj.toString())
         if (obj["op"]?.jsonPrimitive?.int == 0) {
             logger.debug("Hello world!")
 
