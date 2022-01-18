@@ -22,9 +22,9 @@
 
 package sh.nino.discord.api.middleware.ratelimiting
 
+import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.response.*
+import io.ktor.response.*
 import io.ktor.util.*
 import kotlinx.datetime.Clock
 import kotlinx.serialization.json.Json
@@ -32,7 +32,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 
 class Ratelimiting(val ratelimiter: Ratelimiter) {
-    companion object: ApplicationPlugin<ApplicationCallPipeline, Unit, Ratelimiting> {
+    companion object: ApplicationFeature<ApplicationCallPipeline, Unit, Ratelimiting> {
         override val key: AttributeKey<Ratelimiting> = AttributeKey("Ratelimiting")
         override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): Ratelimiting {
             val ratelimiter = Ratelimiter()

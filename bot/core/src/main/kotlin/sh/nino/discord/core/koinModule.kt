@@ -27,10 +27,10 @@ import com.zaxxer.hikari.HikariDataSource
 import com.zaxxer.hikari.util.IsolationLevel
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.websocket.*
-import io.ktor.http.*
-import io.ktor.serialization.kotlinx.*
+import io.ktor.client.features.*
+import io.ktor.client.features.json.*
+import io.ktor.client.features.json.serializer.*
+import io.ktor.client.features.websocket.*
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
 import sh.nino.discord.common.NinoInfo
@@ -62,31 +62,14 @@ val globalModule = module {
             }
 
             install(WebSockets)
-            install(ContentNegotiation) {
-                serialization(ContentType.Application.Json, get<Json>())
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(get())
             }
 
             install(UserAgent) {
                 agent = "Nino/DiscordBot (+https://github.com/NinoDiscord/Nino; v${NinoInfo.VERSION})"
             }
         }
-    }
-
-    single {
-        val config: Config = get()
-        HikariDataSource(
-            HikariConfig().apply {
-                jdbcUrl = "jdbc:postgresql://${config.database.host}:${config.database.port}/${config.database.name}"
-                username = config.database.username
-                password = config.database.password
-                schema = config.database.schema
-                driverClassName = "org.postgresql.Driver"
-                isAutoCommit = false
-                transactionIsolation = IsolationLevel.TRANSACTION_REPEATABLE_READ.name
-                leakDetectionThreshold = 30L * 1000
-                poolName = "Nino-HikariPool"
-            }
-        )
     }
 
     single {
@@ -105,11 +88,6 @@ val globalModule = module {
                 auth = config.timeouts.auth as String
             }
         }
-    }
-
-    // Redis manager
-    single {
-        RedisManager(get())
     }
 
     single {

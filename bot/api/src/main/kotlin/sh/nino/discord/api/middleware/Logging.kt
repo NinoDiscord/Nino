@@ -23,8 +23,9 @@
 package sh.nino.discord.api.middleware
 
 import gay.floof.utils.slf4j.logging
-import io.ktor.server.application.*
-import io.ktor.server.request.*
+import io.ktor.application.*
+import io.ktor.http.*
+import io.ktor.request.*
 import io.ktor.util.*
 import io.ktor.util.pipeline.*
 import io.prometheus.client.Histogram
@@ -33,55 +34,48 @@ import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.metrics.MetricsRegistry
 
 class Logging {
-    private val logger by logging<Logging>()
+    private val log by logging<Logging>()
+    private val startTimePhase = PipelinePhase("StartTimePhase")
+    private val logResponsePhase = PipelinePhase("LogResponsePhase")
+    private val prometheusObserver = AttributeKey<Histogram.Timer>("PrometheusObserver")
+    private val startTimeKey = AttributeKey<Long>("StartTimeKey")
 
-    companion object {
-        val StartTimePhase = PipelinePhase("StartTimePhase")
-        val LogResponsePhase = PipelinePhase("LogResponsePhase")
-
-        val PrometheusObserver = AttributeKey<Histogram.Timer>("PrometheusObserver")
-        val StartTimeKey = AttributeKey<Long>("StartTimeKey")
-
-        object Plugin: ApplicationPlugin<Application, Unit, Logging> {
-            override val key: AttributeKey<Logging> = AttributeKey("Logging")
-            override fun install(pipeline: Application, configure: Unit.() -> Unit): Logging = Logging().apply {
-                install(pipeline)
-            }
-        }
-    }
-
-    fun install(pipeline: Application) {
+    private fun install(pipeline: Application) {
         pipeline.environment.monitor.subscribe(ApplicationStopped) {
-            logger.warn("API has stopped completely. :3")
+            log.warn("API has completely halted.")
         }
 
-        pipeline.addPhase(StartTimePhase)
-        pipeline.intercept(StartTimePhase) {
-            call.attributes.put(StartTimeKey, System.currentTimeMillis())
+        pipeline.addPhase(startTimePhase)
+        pipeline.intercept(startTimePhase) {
+            call.attributes.put(startTimeKey, System.currentTimeMillis())
         }
 
-        pipeline.addPhase(LogResponsePhase)
-        pipeline.intercept(LogResponsePhase) {
+        pipeline.addPhase(logResponsePhase)
+        pipeline.intercept(logResponsePhase) {
             logResponse(call)
         }
 
         pipeline.intercept(ApplicationCallPipeline.Setup) {
-            // Set up the histogram, if metrics is enabled
             val metrics = GlobalContext.retrieve<MetricsRegistry>()
             if (metrics.enabled) {
                 val timer = metrics.apiRequestLatency!!.startTimer()
-                call.attributes.put(PrometheusObserver, timer)
+                call.attributes.put(prometheusObserver, timer)
             }
         }
     }
 
     private suspend fun logResponse(call: ApplicationCall) {
-        val time = System.currentTimeMillis() - call.attributes[StartTimeKey]
+        val time = System.currentTimeMillis() - call.attributes[startTimeKey]
         val status = call.response.status()!!
         val body = call.receive<ByteArray>()
-        val timer = call.attributes.getOrNull(PrometheusObserver)
+        val timer = call.attributes.getOrNull(prometheusObserver)
 
         timer?.observeDuration()
-        logger.info("${status.value} ${status.description} - ${call.request.httpMethod.value} ${call.request.path()} (~${time}ms, ${body.size} bytes written)")
+        log.info("${status.value} ${status.description} - ${call.request.httpMethod.value} ${call.request.path()} (${body.size} bytes written) [${time}ms]")
+    }
+
+    companion object: ApplicationFeature<Application, Unit, Logging> {
+        override val key: AttributeKey<Logging> = AttributeKey("Logging")
+        override fun install(pipeline: Application, configure: Unit.() -> Unit): Logging = Logging().apply { install(pipeline) }
     }
 }

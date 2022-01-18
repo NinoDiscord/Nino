@@ -130,7 +130,7 @@ class ImportCommand(private val redis: RedisManager, private val http: HttpClien
         }
 
         val content = withContext(Dispatchers.IO) {
-            res.body<String>()
+            res.receive<String>()
         }
 
         val message = msg.reply("Now importing from file **${attachment.filename}** that is ${attachment.size} bytes.")

@@ -23,9 +23,9 @@
 package sh.nino.discord.api.middleware.ratelimiting
 
 import gay.floof.utils.slf4j.logging
+import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.server.application.*
-import io.ktor.server.plugins.*
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -112,7 +112,7 @@ class Ratelimiter {
                     }
                 }
             },
-            0, 5000
+            0, 3600000
         )
     }
 
@@ -189,7 +189,9 @@ class Ratelimiter {
 
         // weird compiler error that i have to cast this
         // but whatever...
-        val mapped = cachedRatelimits.toMap() as MutableMap<String, String>?
-        redis.commands.hmset("nino:timeouts", mapped).await()
+        val mapped = cachedRatelimits.toMap() as Map<String, String>
+        if (mapped.isNotEmpty()) {
+            redis.commands.hmset("nino:timeouts", mapped).await()
+        }
     }
 }

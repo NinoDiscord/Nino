@@ -23,15 +23,14 @@
 package sh.nino.discord.api
 
 import gay.floof.utils.slf4j.logging
+import io.ktor.application.*
+import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.serialization.kotlinx.*
-import io.ktor.server.application.*
+import io.ktor.response.*
+import io.ktor.routing.*
+import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import io.ktor.server.plugins.*
-import io.ktor.server.response.*
-import io.ktor.server.routing.*
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import org.koin.core.context.GlobalContext
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory
 import sh.nino.discord.api.middleware.ErrorHandling
 import sh.nino.discord.api.middleware.Logging
 import sh.nino.discord.api.middleware.ratelimiting.Ratelimiting
+import sh.nino.discord.common.DEDI_NODE
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
@@ -48,15 +48,15 @@ import java.util.concurrent.TimeUnit
 
 class ApiServer {
     private lateinit var server: NettyApplicationEngine
-    private val logger by logging<ApiServer>()
+    private val log by logging<ApiServer>()
 
     suspend fun launch() {
-        logger.info("Starting up API server...")
+        log.info("Launching API server...")
 
         val config = GlobalContext.retrieve<Config>()
         val environment = applicationEngineEnvironment {
             this.developmentMode = config.environment == Environment.Development
-            this.log = LoggerFactory.getLogger("sh.nino.discord.api.server.Application")
+            this.log = LoggerFactory.getLogger("sh.nino.discord.api.ktor.Application")
 
             connector {
                 host = config.api!!.host
@@ -64,12 +64,12 @@ class ApiServer {
             }
 
             module {
-                install(ErrorHandling.Plugin)
-                install(Logging.Companion.Plugin)
+                install(ErrorHandling)
                 install(Ratelimiting)
+                install(Logging)
 
                 install(ContentNegotiation) {
-                    serialization(ContentType.Application.Json, GlobalContext.retrieve<Json>())
+                    json(GlobalContext.retrieve())
                 }
 
                 install(CORS) {
@@ -79,33 +79,30 @@ class ApiServer {
 
                 install(DefaultHeaders) {
                     header("X-Powered-By", "Nino/DiscordBot (+https://github.com/NinoDiscord/Nino; ${NinoInfo.VERSION})")
-                    header("Server", "Noelware")
+                    header("Server", "Noelware${if (DEDI_NODE != "none") "/$DEDI_NODE" else ""}")
                 }
 
                 val endpoints = GlobalContext.retrieveAll<Endpoint>()
+                log.info("Found ${endpoints.size} endpoints to register.")
+
                 for (endpoint in endpoints) {
-                    logger.info("Found ${endpoint.routes.size} routes from endpoint ${endpoint.prefix}")
-                    for (route in endpoint.routes) {
-                        routing {
+                    log.info("|- Found ${endpoint.routes.size} routes to implement.")
+                    routing {
+                        for (route in endpoint.routes) {
+                            log.info("  \\- ${route.method.value} ${route.path}")
+
                             route(route.path, route.method) {
                                 handle {
                                     try {
                                         route.execute(this.call)
                                     } catch (e: Exception) {
-                                        this@ApiServer.logger.error("Unable to handle request to ${route.method.value} ${route.path}:", e)
-                                        return@handle call.respondText(
-                                            ContentType.Application.Json,
-                                            HttpStatusCode.InternalServerError
-                                        ) {
-                                            Json.encodeToString(
-                                                JsonObject.serializer(),
-                                                JsonObject(
-                                                    mapOf(
-                                                        "message" to JsonPrimitive("Unable to handle request at this time.")
-                                                    )
-                                                )
+                                        log.error("Unable to handle request \"${route.method.value} ${route.path}\":", e)
+                                        call.response.status(HttpStatusCode.InternalServerError)
+                                        return@handle call.respond(JsonObject(
+                                            mapOf(
+                                                "message" to JsonPrimitive("A unknown exception has occured :<")
                                             )
-                                        }
+                                        ))
                                     }
                                 }
                             }
@@ -121,14 +118,14 @@ class ApiServer {
 
     suspend fun shutdown() {
         if (!::server.isInitialized) {
-            logger.warn("Server was never initialized, skipping")
+            log.warn("Server was never initialized, skipping")
             return
         }
 
-        val ratelimiter = server.application.plugin(Ratelimiting).ratelimiter
-        ratelimiter.close()
+        val ratelimiter = server.application.featureOrNull(Ratelimiting)
+        ratelimiter?.ratelimiter?.close()
 
-        logger.info("Dying off connections...")
+        log.info("Dying off connections...")
         server.stop(1, 5, TimeUnit.SECONDS)
     }
 }

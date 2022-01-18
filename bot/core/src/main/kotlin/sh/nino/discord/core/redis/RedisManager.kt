@@ -37,8 +37,8 @@ import kotlin.time.toDuration
 class RedisManager(config: Config): AutoCloseable {
     private lateinit var connection: StatefulRedisConnection<String, String>
     lateinit var commands: RedisAsyncCommands<String, String>
-    private val client: RedisClient
     private val logger by logging<RedisManager>()
+    val client: RedisClient
 
     init {
         logger.info("Creating Redis client...")

@@ -22,8 +22,8 @@
 
 package sh.nino.discord.api
 
+import io.ktor.application.*
 import io.ktor.http.*
-import io.ktor.server.application.*
 import kotlin.reflect.KCallable
 import kotlin.reflect.full.callSuspend
 import kotlin.reflect.full.findAnnotation

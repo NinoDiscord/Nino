@@ -23,9 +23,11 @@
 package sh.nino.discord
 
 import com.charleskorn.kaml.Yaml
+import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
-import dev.kord.cache.map.MapLikeCollection
-import dev.kord.cache.map.internal.MapEntryCache
+import com.zaxxer.hikari.util.IsolationLevel
+import dev.kord.cache.redis.RedisConfiguration
+import dev.kord.cache.redis.RedisEntryCache
 import dev.kord.core.Kord
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.on
@@ -33,6 +35,8 @@ import gay.floof.utils.slf4j.logging
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
@@ -42,11 +46,14 @@ import sh.nino.discord.commands.CommandHandler
 import sh.nino.discord.commands.commandsModule
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
+import sh.nino.discord.common.data.Environment
 import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.core.NinoBot
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.globalModule
 import sh.nino.discord.core.redis.RedisManager
+import sh.nino.discord.database.createPgEnums
+import sh.nino.discord.database.tables.*
 import sh.nino.discord.punishments.punishmentsModule
 import sh.nino.discord.timeouts.Client
 import java.io.File
@@ -76,6 +83,61 @@ object Bootstrap {
 
         val configFile = File("./config.yml")
         val config = Yaml.default.decodeFromString(Config.serializer(), configFile.readText())
+
+        logger.info("* Connecting to PostgreSQL...")
+        val dataSource = HikariDataSource(
+            HikariConfig().apply {
+                jdbcUrl = "jdbc:postgresql://${config.database.host}:${config.database.port}/${config.database.name}"
+                username = config.database.username
+                password = config.database.password
+                schema = config.database.schema
+                driverClassName = "org.postgresql.Driver"
+                isAutoCommit = false
+                transactionIsolation = IsolationLevel.TRANSACTION_REPEATABLE_READ.name
+                leakDetectionThreshold = 30L * 1000
+                poolName = "Nino-HikariPool"
+            }
+        )
+
+        Database.connect(
+            dataSource,
+            databaseConfig = DatabaseConfig {
+                defaultRepetitionAttempts = 5
+                defaultIsolationLevel = IsolationLevel.TRANSACTION_REPEATABLE_READ.levelId
+                sqlLogger = if (config.environment == Environment.Development) {
+                    Slf4jSqlDebugLogger
+                } else {
+                    null
+                }
+            }
+        )
+
+        runBlocking {
+            createPgEnums(
+                mapOf(
+                    "BanTypeEnum" to BanType.values().map { it.key },
+                    "PunishmentTypeEnum" to PunishmentType.values().map { it.key },
+                    "LogEventEnum" to LogEvent.values().map { it.key }
+                )
+            )
+        }
+
+        transaction {
+            SchemaUtils.createMissingTablesAndColumns(
+                AutomodTable,
+                GlobalBansTable,
+                GuildCases,
+                GuildSettings,
+                GuildLogging,
+                Users,
+                Warnings
+            )
+        }
+
+        logger.info("* Connecting to Redis...")
+        val redis = RedisManager(config)
+        redis.connect()
+
         val kord = runBlocking {
             Kord(config.token) {
                 enableShutdownHook = false
@@ -83,12 +145,24 @@ object Bootstrap {
                 cache {
                     // cache members
                     members { cache, description ->
-                        MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+                        RedisEntryCache(
+                            cache, description,
+                            RedisConfiguration.invoke {
+                                this.client = redis.client
+                                this.keyPrefix = "nino:cache:"
+                            }
+                        )
                     }
 
                     // cache users
                     users { cache, description ->
-                        MapEntryCache(cache, description, MapLikeCollection.concurrentHashMap())
+                        RedisEntryCache(
+                            cache, description,
+                            RedisConfiguration.invoke {
+                                this.client = redis.client
+                                this.keyPrefix = "nino:cache:"
+                            }
+                        )
                     }
                 }
             }
@@ -108,6 +182,14 @@ object Bootstrap {
                     single {
                         kord
                     }
+
+                    single {
+                        dataSource
+                    }
+
+                    single {
+                        redis
+                    }
                 },
 
                 punishmentsModule
@@ -120,7 +202,7 @@ object Bootstrap {
             handler.onCommand(this)
         }
 
-        // Same with the API server, let's not block this thread
+        // run api here
         if (config.api != null) {
             NinoScope.launch {
                 GlobalContext.retrieve<ApiServer>().launch()

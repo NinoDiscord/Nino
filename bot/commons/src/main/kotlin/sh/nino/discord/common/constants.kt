@@ -37,3 +37,20 @@ val FLAG_REGEX = Pattern.compile(
     "(?:--?|—)([\\w]+)(=?(\\w+|['\"].*['\"]))?",
     Pattern.CASE_INSENSITIVE
 )
+
+val DEDI_NODE: String by lazy {
+    // Check if it's in the system properties, i.e, injected with `-D`
+    // This is the case with the Docker image
+    val node1 = System.getProperty("winterfox.dedi", "?")!!
+    if (node1 != "?" && node1 != "none") {
+        return@lazy node1
+    }
+
+    // Check if it is in environment variables
+    val node2 = System.getenv("WINTERFOX_DEDI_NODE") ?: "none"
+    if (node2 != "none") {
+        return@lazy node2
+    }
+
+    "none"
+}

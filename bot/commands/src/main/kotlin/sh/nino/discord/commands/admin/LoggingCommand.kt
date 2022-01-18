@@ -82,6 +82,8 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
                     "toggle" to msg.locale.translate("generic.${if (prop) "enabled" else "disabled"}")
                 )
             )
+
+            return
         }
 
         val channel = msg.args.first()
@@ -321,7 +323,7 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
         "events",
         "descriptions.logging.events",
         aliases = ["ev", "event"],
-        usage = "<\"*\" | \"list\" | \"enable [events...]\" | \"disable [events...]\">"
+        usage = "[\"*\" | \"list\" | \"enable [events...]\" | \"disable [events...]\"]"
     )
     suspend fun events(msg: CommandMessage) {
         msg.replyTranslate("generic.lonely")
@@ -333,5 +335,6 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
         aliases = ["cfg", "info", "list"]
     )
     suspend fun config(msg: CommandMessage) {
+        msg.replyTranslate("generic.lonely")
     }
 }

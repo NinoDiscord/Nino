@@ -1,26 +1,21 @@
 name: Update Sentry release on sentry.floof.gay
 on:
-  push:
-    branches:
-      - master
-      - edge
-
-    paths-ignore:
-      - '.github/**'
-      - '.husky/**'
-      - '.vscode/**'
-      - 'assets/**'
-      - 'locales/**'
-      - 'docker/**'
-      - '.dockerignore'
-      - '.eslintignore'
-      - '.gitignore'
-      - '**.md'
-      - 'LICENSE'
-      - 'renovate.json'
+  release:
+    types:
+      - created
 jobs:
   sentry-release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+
+      - name: Create Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: noelware
+          SENTRY_PROJECT: nino
+          SENTRY_URL: https://sentry.floof.gay
+        with:
+          environment: production

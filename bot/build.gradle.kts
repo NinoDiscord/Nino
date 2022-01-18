@@ -46,24 +46,16 @@ dependencies {
     implementation(project(":bot:api"))
     implementation(project(":bot:database"))
 
-    // Logging (slf4j + logback)
+    // Logging
     implementation("ch.qos.logback:logback-classic:1.2.10")
     implementation("ch.qos.logback:logback-core:1.2.10")
-    api("org.slf4j:slf4j-api:1.7.32")
-
-    // Koin
-    implementation("io.insert-koin:koin-core:3.1.4")
 
     // YAML (configuration)
     implementation("com.charleskorn.kaml:kaml:0.38.0")
 
-    // Database (Exposed, HikariCP, PostgreSQL)
-    implementation("org.jetbrains.exposed:exposed-kotlin-datetime:0.36.1")
-    implementation("org.jetbrains.exposed:exposed-core:0.36.1")
-    implementation("org.jetbrains.exposed:exposed-jdbc:0.36.1")
-    implementation("org.jetbrains.exposed:exposed-dao:0.36.1")
-    implementation("org.postgresql:postgresql:42.3.1")
-    implementation("com.zaxxer:HikariCP:5.0.0")
+    // Kord cache
+    implementation("dev.kord.cache:cache-redis:0.3.0")
+    api("dev.kord.cache:cache-api:0.3.0")
 }
 
 tasks {

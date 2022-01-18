@@ -22,22 +22,21 @@
 
 package sh.nino.discord.api.middleware
 
-import io.ktor.server.application.*
+import io.ktor.application.*
 import io.ktor.util.*
 import io.sentry.Sentry
 
 class ErrorHandling {
-    object Plugin: ApplicationPlugin<ApplicationCallPipeline, Unit, ErrorHandling> {
+    companion object: ApplicationFeature<ApplicationCallPipeline, Unit, ErrorHandling> {
         override val key: AttributeKey<ErrorHandling> = AttributeKey("ErrorHandling")
         override fun install(pipeline: ApplicationCallPipeline, configure: Unit.() -> Unit): ErrorHandling {
             pipeline.intercept(ApplicationCallPipeline.Call) {
                 try {
                     proceed()
                 } catch (e: Exception) {
-                    if (Sentry.isEnabled()) {
-                        Sentry.captureException(e)
-                        throw e
-                    }
+                    if (Sentry.isEnabled()) Sentry.captureException(e)
+
+                    throw e
                 }
             }
 

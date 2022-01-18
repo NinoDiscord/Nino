@@ -41,6 +41,7 @@ import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
+import sh.nino.discord.common.DEDI_NODE
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
@@ -80,8 +81,8 @@ class NinoBot {
         logger.info("* Kotlin: v${KotlinVersion.CURRENT}")
         logger.info("* Operating System: ${os.name} with ${os.availableProcessors} processors (${os.arch}; ${os.version})")
 
-        if (dediNode != null)
-            logger.info("* Dedi Node: $dediNode")
+        if (DEDI_NODE != "none")
+            logger.info("* Dedi Node: $DEDI_NODE")
 
         val kord = GlobalContext.retrieve<Kord>()
         val config = GlobalContext.retrieve<Config>()
@@ -91,49 +92,8 @@ class NinoBot {
         logger.info("* Shards to launch: ${gatewayInfo.shards}")
         logger.info("* Session Limit:    ${gatewayInfo.sessionStartLimit.remaining}/${gatewayInfo.sessionStartLimit.total}")
 
-        logger.info("* Connecting to PostgreSQL...")
-
-        val dataSource = GlobalContext.retrieve<HikariDataSource>()
-        Database.connect(
-            dataSource,
-            databaseConfig = DatabaseConfig {
-                defaultRepetitionAttempts = 5
-                defaultIsolationLevel = IsolationLevel.TRANSACTION_REPEATABLE_READ.levelId
-            }
-        )
-
-        if (config.environment == Environment.Development) {
-            logger.debug("* Enabling SQL logger since we're in development.")
-            transaction {
-                addLogger(StdOutSqlLogger)
-            }
-        }
-
-        createPgEnums(
-            mapOf(
-                "BanTypeEnum" to BanType.values().map { it.key },
-                "PunishmentTypeEnum" to PunishmentType.values().map { it.key },
-                "LogEventEnum" to LogEvent.values().map { it.key }
-            )
-        )
-
-        asyncTransaction {
-            SchemaUtils.createMissingTablesAndColumns(
-                AutomodTable,
-                GlobalBansTable,
-                GuildCases,
-                GuildSettings,
-                GuildLogging,
-                Users,
-                Warnings
-            )
-        }
-
-        logger.info("* Connecting to Redis...")
-        val redis = GlobalContext.retrieve<RedisManager>()
-        redis.connect()
-
         // Initialize localization
+        logger.info("* Initializing localization manager...")
         GlobalContext.retrieve<LocalizationManager>()
 
         // Setup Sentry
@@ -141,7 +101,7 @@ class NinoBot {
             logger.info("* Installing Sentry...")
             Sentry.init {
                 it.dsn = config.sentryDsn
-                it.release = "Nino v${NinoInfo.VERSION}"
+                it.release = "v${NinoInfo.VERSION} (${NinoInfo.COMMIT_SHA})"
             }
 
             Sentry.configureScope {
@@ -200,20 +160,5 @@ class NinoBot {
 
     companion object {
         val executorPool: Executor = Executors.newCachedThreadPool(NinoThreadFactory)
-        val dediNode by lazy {
-            // Check in properties (most likely in production)
-            val dediNode1 = System.getProperty("winterfox.dedi", "?")
-            if (dediNode1 != "?") {
-                return@lazy dediNode1
-            }
-
-            // Check in environment variables
-            val dediNode2 = System.getenv("WINTERFOX_DEDI_NODE") ?: ""
-            if (dediNode2 != "") {
-                return@lazy dediNode2
-            }
-
-            null
-        }
     }
 }

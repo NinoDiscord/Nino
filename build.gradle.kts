@@ -93,6 +93,7 @@ subprojects {
         // kotlinx libraries
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.5.2-native-mt")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-protobuf:1.3.1")
         implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.1")
         implementation("org.jetbrains.kotlinx:kotlinx-datetime-jvm:0.3.1")
         api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.3.1")
@@ -105,10 +106,10 @@ subprojects {
 
         // Common dependencies that most projects need
         // Kord, Koin, DB, etc
-        implementation("io.ktor:ktor-client-websockets:2.0.0-beta-1")
+//        implementation("io.ktor:ktor-client-websockets:2.0.0-beta-1")
         implementation("com.squareup.okhttp3:okhttp:4.9.3")
-        implementation("io.ktor:ktor-client-okhttp:2.0.0-beta-1")
-        implementation("io.ktor:ktor-client-core:2.0.0-beta-1")
+//        implementation("io.ktor:ktor-client-okhttp:2.0.0-beta-1")
+//        implementation("io.ktor:ktor-client-core:2.0.0-beta-1")
         implementation("io.insert-koin:koin-core:3.1.4")
         implementation("dev.kord:kord-core:0.8.0-M8")
         implementation("io.lettuce:lettuce-core:6.1.5.RELEASE")
@@ -120,8 +121,8 @@ subprojects {
         implementation("com.zaxxer:HikariCP:5.0.0")
         api("org.slf4j:slf4j-api:1.7.32")
         implementation("io.sentry:sentry:5.5.1")
-        implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0-beta-1")
-        implementation("io.ktor:ktor-client-content-negotiation:2.0.0-beta-1")
+//        implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0-beta-1")
+//        implementation("io.ktor:ktor-client-content-negotiation:2.0.0-beta-1")
 
         // TODO: remove this once Kord supports KTOR 2
         implementation("io.ktor:ktor-serialization:1.6.7")
