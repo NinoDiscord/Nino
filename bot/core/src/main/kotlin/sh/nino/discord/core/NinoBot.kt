@@ -22,8 +22,6 @@
 
 package sh.nino.discord.core
 
-import com.zaxxer.hikari.HikariDataSource
-import com.zaxxer.hikari.util.IsolationLevel
 import dev.kord.common.annotation.KordExperimental
 import dev.kord.common.annotation.KordUnsafe
 import dev.kord.common.entity.ActivityType
@@ -39,21 +37,16 @@ import gay.floof.utils.slf4j.logging
 import io.sentry.Sentry
 import kotlinx.coroutines.launch
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.common.DEDI_NODE
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
-import sh.nino.discord.common.data.Environment
 import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.common.extensions.retrieveAll
 import sh.nino.discord.core.listeners.applyGenericEvents
 import sh.nino.discord.core.localization.LocalizationManager
-import sh.nino.discord.core.redis.RedisManager
 import sh.nino.discord.core.timers.TimerJob
 import sh.nino.discord.core.timers.TimerManager
-import sh.nino.discord.database.asyncTransaction
-import sh.nino.discord.database.createPgEnums
 import sh.nino.discord.database.tables.*
 import sh.nino.discord.timeouts.Client
 import java.lang.management.ManagementFactory

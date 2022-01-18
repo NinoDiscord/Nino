@@ -22,9 +22,6 @@
 
 package sh.nino.discord.core
 
-import com.zaxxer.hikari.HikariConfig
-import com.zaxxer.hikari.HikariDataSource
-import com.zaxxer.hikari.util.IsolationLevel
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.features.*
@@ -36,7 +33,6 @@ import org.koin.dsl.module
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.core.localization.LocalizationManager
-import sh.nino.discord.core.redis.RedisManager
 import sh.nino.discord.core.timers.TimerManager
 import sh.nino.discord.metrics.MetricsRegistry
 import sh.nino.discord.timeouts.Client

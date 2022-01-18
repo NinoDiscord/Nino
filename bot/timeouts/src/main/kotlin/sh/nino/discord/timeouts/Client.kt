@@ -29,7 +29,6 @@ import io.ktor.client.features.*
 import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import io.ktor.client.features.websocket.*
-import kotlinx.serialization.json.Json
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.extensions.retrieve

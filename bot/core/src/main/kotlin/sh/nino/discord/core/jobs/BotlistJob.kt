@@ -136,7 +136,6 @@ class BotlistJob(
                     )
                 )
 
-
                 header("Authorization", config.botlists!!.discordBotsToken)
             }
 
