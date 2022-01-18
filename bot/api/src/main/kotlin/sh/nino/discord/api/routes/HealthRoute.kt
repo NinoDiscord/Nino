@@ -33,7 +33,7 @@ class HealthRoute: Endpoint("/health") {
     @Route(path = "/", method = "GET")
     suspend fun health(call: ApplicationCall) {
         call.respondText(
-            contentType = ContentType.Any,
+            contentType = ContentType.Text.Plain,
             status = HttpStatusCode.OK
         ) {
             "OK"

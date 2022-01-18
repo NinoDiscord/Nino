@@ -124,7 +124,7 @@ class Ratelimiter {
 
         for (key in ratelimits.keys) {
             // Remove it from Redis and in-memory
-            redis.commands.hdel("nino:timeouts", key).await()
+            redis.commands.hdel("nino:ratelimits", key).await()
             cachedRatelimits.remove(key)
         }
     }
@@ -154,13 +154,15 @@ class Ratelimiter {
 
     suspend fun get(call: ApplicationCall): Ratelimit {
         val ip = getRealHost(call)
-        val result = redis.commands.hget("nino:ratelimits", ip).await()
+        logger.debug("ip: $ip")
+
+        val result: String? = redis.commands.hget("nino:ratelimits", ip).await()
         if (result == null) {
             val r = Ratelimit()
 
             cachedRatelimits[ip] = r
             redis.commands.hmset(
-                "nino:timeouts",
+                "nino:ratelimits",
                 mapOf(
                     ip to json.encodeToString(Ratelimit.serializer(), r)
                 )
@@ -173,7 +175,7 @@ class Ratelimiter {
         val newRl = ratelimit.consume()
 
         redis.commands.hmset(
-            "nino:timeouts",
+            "nino:ratelimits",
             mapOf(
                 ip to json.encodeToString(Ratelimit.serializer(), newRl)
             )
@@ -189,9 +191,16 @@ class Ratelimiter {
 
         // weird compiler error that i have to cast this
         // but whatever...
-        val mapped = cachedRatelimits.toMap() as Map<String, String>
-        if (mapped.isNotEmpty()) {
-            redis.commands.hmset("nino:timeouts", mapped).await()
+        val mapped = cachedRatelimits.toMap() as Map<String, Any>
+
+        // redo cache
+        val newMap = mutableMapOf<String, String>()
+        for ((key, value) in mapped) {
+            newMap[key] = json.encodeToString(Ratelimit.serializer(), value as Ratelimit)
+        }
+
+        if (newMap.isNotEmpty()) {
+            redis.commands.hmset("nino:ratelimits", newMap).await()
         }
     }
 }
