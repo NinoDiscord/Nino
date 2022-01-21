@@ -10,6 +10,9 @@
     "generic.enabled": "Enabled",
     "generic.disabled": "Disabled",
     "generic.lonely": "Heh... it's pretty empty, eh? I guess it's like a set of hearts, only one can be the chosen one! But, I shouldn't give you an extensional crisis right now. Go have fun! ...and maybe touch grass, you really seem to be lacking in that department x3",
+    "generic.nothing": "Unknown",
+    "generic.yes": "Yes",
+    "generic.no": "No",
 
     "errors.ownerOnly": "You are not allowed to invoke the **${name}** command.",
     "errors.missingPermsBot": "I am currently missing the following permissions: **${perms}**",
@@ -75,6 +78,23 @@
     "commands.admin.logging.omitChannels.embed.title": "[ Omitted Users ]",
     "commands.admin.logging.omitChannels.embed.description": [
       "Here is a list of text channels that are omitted from being logged:",
+      "",
+      "${list}"
+    ],
+    "commands.admin.logging.success": "${emoji} Successfully set the logging channel to ${channel}!",
+    "commands.admin.logging.invalid": "Argument **${arg}** was not a valid channel mention or ID.",
+    "commands.admin.logging.config.message": [
+      "```md",
+      "# Logging Configuration for ${name}",
+      "",
+      "• Enabled: ${enabled}",
+      "• Channel: ${channel}",
+      "```"
+    ],
+    "commands.admin.logging.events.list.embed.title": "Enabled Events for ${name}",
+    "commands.admin.logging.events.list.embed.description": [
+      "This is a list of logging events that are enabled or disabled.",
+      "Read our [Terms of Service](https://nino.sh/terms) & [Privacy Policy](https://nino.sh/privacy) before enabling!",
       "",
       "${list}"
     ]

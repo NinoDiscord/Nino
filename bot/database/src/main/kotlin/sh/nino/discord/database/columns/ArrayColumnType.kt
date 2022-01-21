@@ -25,6 +25,8 @@ package sh.nino.discord.database.columns
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.jdbc.JdbcConnectionImpl
 import org.jetbrains.exposed.sql.transactions.TransactionManager
+import org.postgresql.jdbc.PgArray
+import sh.nino.discord.database.tables.LogEvent
 
 fun <T> Table.array(name: String, type: ColumnType): Column<Array<T>> = registerColumn(name, ArrayColumnType(type))
 
@@ -40,11 +42,31 @@ class ArrayColumnType(private val type: ColumnType): ColumnType() {
             super.valueToDB(value)
         }
 
-    override fun valueFromDB(value: Any): Any {
-        if (value is java.sql.Array) return value.array
+    @Suppress("UNCHECKED_CAST")
+    override fun valueFromDB(value: Any): Array<*> {
+        if (value is PgArray) {
+            return if (type.sqlType().endsWith("Enum")) {
+                (value.array as Array<*>).filterNotNull().map {
+                    type.valueFromDB(it)
+                }.toTypedArray()
+            } else {
+                value.array as Array<*>
+            }
+        }
+
+        if (value is java.sql.Array) {
+            return if (type.sqlType().endsWith("Enum")) {
+                (value.array as Array<*>).filterNotNull().map {
+                    type.valueFromDB(it)
+                }.toTypedArray()
+            } else {
+                value.array as Array<*>
+            }
+        }
+
         if (value is Array<*>) return value
 
-        error("Arrays are not supported for PostgreSQL")
+        error("Unable to return an Array from a non-array value. ($value, ${value::class})")
     }
 
     override fun notNullValueToDB(value: Any): Any {

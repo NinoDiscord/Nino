@@ -26,10 +26,19 @@ set -o pipefail
 
 . /app/noelware/nino/scripts/liblog.sh
 
-info ""
-info "  Welcome to the ${BOLD}Nino${RESET} container image!"
-info "  Subscribe to the project for updates: https://github.com/NinoDiscord/Nino"
-info "  Submit issues if any bugs occur:      https://github.com/NinoDiscord/Nino/issues"
-info ""
+info "*** Starting Nino! ***"
+debug "  => Custom Logback Location: ${NINO_CUSTOM_LOGBACK_FILE:-unknown}"
+debug "  => Using Custom Gateway:    ${NINO_USE_GATEWAY:-false}"
+debug "  => Dedicated Node:          ${WINTERFOX_DEDI_NODE:-none}"
 
-exec "$@"
+JVM_ARGS=("-XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8")
+
+if [[ -z "${NINO_CUSTOM_LOGBACK_FILE:-}" ]]
+  JVM_ARGS+=("-Dlogback.configurationFile=${NINO_CUSTOM_LOGBACK_FILE} ")
+
+if [[ -z "${WINTERFOX_DEDI_NODE:-}" ]]
+  JVM_ARGS+=("-Pwinterfox.dediNode=${WINTERFOX_DEDI_NODE} ")
+
+JVM_ARGS+=("$@")
+
+java $JVM_ARGS -jar /app/noelware/nino/Nino.jar

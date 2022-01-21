@@ -134,6 +134,9 @@ subprojects {
         testImplementation("io.kotest:kotest-assertions-core-jvm:5.0.3")
         testImplementation("io.kotest:kotest-property-jvm:5.0.3")
 
+        // Conditional logic for logback
+        implementation("org.codehaus.janino:janino:3.1.6")
+
         // do not link :bot:commons to the project itself
         if (this@subprojects.name != "commons") {
             implementation(project(":bot:commons"))

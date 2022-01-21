@@ -31,7 +31,9 @@ import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.TextChannel
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.future.future
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.update
+import org.slf4j.LoggerFactory
 import sh.nino.discord.commands.AbstractCommand
 import sh.nino.discord.commands.CommandCategory
 import sh.nino.discord.commands.CommandMessage
@@ -45,6 +47,7 @@ import sh.nino.discord.common.getMutipleUsersFromArgs
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.database.asyncTransaction
 import sh.nino.discord.database.tables.GuildLogging
+import sh.nino.discord.database.tables.LogEvent
 import sh.nino.discord.database.tables.LoggingEntity
 
 @Command(
@@ -52,6 +55,17 @@ import sh.nino.discord.database.tables.LoggingEntity
     description = "descriptions.admin.logging",
     category = CommandCategory.ADMIN,
     aliases = ["log"],
+    examples = [
+        "{prefix}logging | Toggles if logging should be enabled or not.",
+        "{prefix}logging 102569854256857 | Uses the text channel to output logging",
+        "{prefix}logging events | Views your events configuration.",
+        "{prefix}logging events enable member.boosted | Enables the **Member Boosting** logging event",
+        "{prefix}logging events disable | Disables all logging events",
+        "{prefix}logging omitUsers add 512457854563259 | Omits this user",
+        "{prefix}logging omitUsers del 512457854563259 | Removes them from the omitted list.",
+        "{prefix}logging omitChannels | Lists all the omitted channels to be logged from.",
+        "{prefix}logging config | View your logging configuration"
+    ],
     userPermissions = [0x00000020] // ManageGuild
 )
 class LoggingCommand(private val kord: Kord): AbstractCommand() {
@@ -87,8 +101,67 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
         }
 
         val channel = msg.args.first()
-        if (!ID_REGEX.toRegex().matches(channel) || !CHANNEL_REGEX.toRegex().matches(channel)) {
+        if (ID_REGEX.matcher(channel).matches()) {
+            val textChannel = try {
+                kord.getChannelOf<TextChannel>(channel.asSnowflake())
+            } catch (e: Exception) {
+                null
+            }
+
+            if (textChannel == null) {
+                msg.reply("not a text channel noob :(")
+                return
+            }
+
+            asyncTransaction {
+                GuildLogging.update({
+                    GuildLogging.id eq guild.id.value.toLong()
+                }) {
+                    it[channelId] = textChannel.id.value.toLong()
+                }
+            }
+
+            msg.replyTranslate("commands.admin.logging.success", mapOf(
+                "emoji" to "<:success:464708611260678145>",
+                "channel" to textChannel.mention
+            ))
+
+            return
         }
+
+        val channelRegexMatcher = CHANNEL_REGEX.matcher(channel)
+        if (channelRegexMatcher.matches()) {
+            val id = channelRegexMatcher.group(1)
+            val textChannel = try {
+                kord.getChannelOf<TextChannel>(id.asSnowflake())
+            } catch (e: Exception) {
+                null
+            }
+
+            if (textChannel == null) {
+                msg.reply("not a text channel noob :(")
+                return
+            }
+
+            asyncTransaction {
+                GuildLogging.update({
+                    GuildLogging.id eq guild.id.value.toLong()
+                }) {
+                    it[channelId] = textChannel.id.value.toLong()
+                }
+            }
+
+            msg.replyTranslate("commands.admin.logging.success", mapOf(
+                "emoji" to "<:success:464708611260678145>",
+                "channel" to textChannel.mention
+            ))
+
+            return
+        }
+
+        msg.replyTranslate("commands.admin.logging.invalid", mapOf(
+            "arg" to channel
+        ))
     }
 
     @Subcommand(
@@ -323,10 +396,128 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
         "events",
         "descriptions.logging.events",
         aliases = ["ev", "event"],
-        usage = "[\"*\" | \"list\" | \"enable [events...]\" | \"disable [events...]\"]"
+        usage = "[\"enable [events...]\" | \"disable [events...]\"]"
     )
     suspend fun events(msg: CommandMessage) {
-        msg.replyTranslate("generic.lonely")
+        val guild = msg.message.getGuild()
+
+        if (msg.args.isEmpty()) {
+            val events = LogEvent.values()
+            val settings = asyncTransaction {
+                LoggingEntity.findById(guild.id.value.toLong())!!
+            }
+
+            msg.reply {
+                title = msg.locale.translate("commands.admin.logging.events.list.embed.title", mapOf(
+                    "name" to guild.name
+                ))
+
+                description = msg.locale.translate("commands.admin.logging.events.list.embed.description", mapOf(
+                    "list" to events.joinToString("\n") {
+                        "• ${enabled(settings.events.contains(it.key))} ${it.key}"
+                    }
+                ))
+            }
+
+            return
+        }
+
+        when (msg.args.first()) {
+            "enable" -> {
+                val args = msg.args.drop(1)
+                if (args.isEmpty()) {
+                    val allEvents = LogEvent.values().map { it.key }.toTypedArray()
+                    asyncTransaction {
+                        GuildLogging.update({
+                            GuildLogging.id eq guild.id.value.toLong()
+                        }) {
+                            it[events] = allEvents
+                        }
+                    }
+
+                    msg.reply(":thumbsup: Enabled all logging events!")
+                    return
+                }
+
+                val all = LogEvent.values().map { it.key.replace(" ", ".") }
+                val _events = args.filter {
+                    all.contains(it)
+                }
+
+                if (_events.isEmpty()) {
+                    msg.reply(":question: Invalid events: ${args.joinToString(" ")}. View all with `nino logging events view`")
+                    return
+                }
+
+                val eventsToEnable = _events.map { LogEvent[it.replace(".", " ")] }.toTypedArray()
+                asyncTransaction {
+                    GuildLogging.update({
+                        GuildLogging.id eq guild.id.value.toLong()
+                    }) {
+                        it[events] = eventsToEnable.map { it.key }.toTypedArray()
+                    }
+                }
+
+                msg.reply("enabled ${eventsToEnable.joinToString(", ")}")
+            }
+
+            "disable" -> {
+                val args = msg.args.drop(1)
+                if (args.isEmpty()) {
+                    asyncTransaction {
+                        GuildLogging.update({
+                            GuildLogging.id eq guild.id.value.toLong()
+                        }) {
+                            it[events] = arrayOf()
+                        }
+                    }
+
+                    msg.reply(":thumbsup: Disabled all logging events!")
+                    return
+                }
+
+                val all = LogEvent.values().map { it.key.replace(" ", ".") }
+                val _events = args.filter {
+                    all.contains(it)
+                }
+
+                if (_events.isEmpty()) {
+                    msg.reply(":question: Invalid events: ${args.joinToString(" ")}. View all with `nino logging events view`")
+                    return
+                }
+
+                val eventsToDisable = _events.map { LogEvent[it.replace(".", " ")].key }.toTypedArray()
+                val settings = asyncTransaction {
+                    LoggingEntity.findById(guild.id.value.toLong())!!
+                }
+
+                asyncTransaction {
+                    GuildLogging.update({
+                        GuildLogging.id eq guild.id.value.toLong()
+                    }) {
+                        it[events] = settings.events.filter { p -> !eventsToDisable.contains(p) }.toTypedArray()
+                    }
+                }
+
+                msg.reply("disabled ${eventsToDisable.joinToString(", ")}")
+            }
+
+            "view" -> {
+                val typedEvents = LogEvent.values().map { it.key to it.key.replace(" ", "." ) }
+                msg.reply(buildString {
+                    appendLine("```md")
+                    appendLine("# Logging Events")
+                    appendLine()
+
+                    for ((key, set) in typedEvents) {
+                        appendLine("- $key (nino logging events enable $set)")
+                    }
+
+                    appendLine()
+                    appendLine("```")
+                })
+            }
+        }
     }
 
     @Subcommand(
@@ -335,6 +526,21 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
         aliases = ["cfg", "info", "list"]
     )
     suspend fun config(msg: CommandMessage) {
-        msg.replyTranslate("generic.lonely")
+        val guild = msg.message.getGuild()
+        val settings = asyncTransaction {
+            LoggingEntity.findById(guild.id.value.toLong())!!
+        }
+
+        val channel = if (settings.channelId != null) {
+            kord.getChannelOf<TextChannel>(settings.channelId!!.asSnowflake())
+        } else {
+            null
+        }
+
+        msg.replyTranslate("commands.admin.logging.config.message", mapOf(
+            "name" to guild.name,
+            "enabled" to if (settings.enabled) msg.locale.translate("generic.yes") else msg.locale.translate("generic.no"),
+            "channel" to if (channel == null) msg.locale.translate("generic.nothing") else "#${channel.name} (${channel.id})"
+        ))
     }
 }

@@ -26,25 +26,27 @@ import org.jetbrains.exposed.dao.LongEntity
 import org.jetbrains.exposed.dao.LongEntityClass
 import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.LongColumnType
-import org.jetbrains.exposed.sql.StringColumnType
+import org.jetbrains.exposed.sql.TextColumnType
 import sh.nino.discord.database.SnowflakeTable
+import sh.nino.discord.database.columns.CustomEnumerationColumn
 import sh.nino.discord.database.columns.array
-import kotlin.reflect.full.isSubclassOf
 
-enum class LogEvent(val key: String) {
-    VoiceMemberDeafen("voice member deafen"),
-    VoiceChannelLeave("voice channel leave"),
-    VoiceChannelSwitch("voice channel switch"),
-    VoiceChannelJoin("voice channel join"),
-    VoiceMemberMuted("voice member muted"),
-    MessageUpdated("message updated"),
-    MessageDeleted("message deleted"),
-    MemberBoosted("member boosted"),
-    ThreadCreated("thread created"),
-    ThreadDeleted("thread deleted");
+enum class LogEvent(val key: String, val pretty: String) {
+    VoiceMemberDeafen("voice member deafen", "Voice Member Deafened"),
+    VoiceChannelLeave("voice channel leave", "Voice Channel Leave"),
+    VoiceChannelSwitch("voice channel switch", "Voice Channel Switch"),
+    VoiceChannelJoin("voice channel join", "Voice Channel Join"),
+    VoiceMemberMuted("voice member muted", "Voice Member Muted"),
+    MessageUpdated("message updated", "Message Updates"),
+    MessageDeleted("message deleted", "Message Deletes"),
+    MemberUnboosted("member unboosted", "Member Unboosted"),
+    MemberBoosted("member boosted", "Member Boosted"),
+    ThreadArchived("thread archive", "Channel Thread Archived"),
+    ThreadCreated("thread created", "Channel Thread Created"),
+    ThreadDeleted("thread deleted", "Channel Thread Deleted");
 
     companion object {
-        operator fun get(key: String): LogEvent = values().find { it.key == key } ?: error("Unable to find key '$key' -> LogEvent")
+        operator fun get(key: String): LogEvent = values().find { it.name == key } ?: error("Unable to find key '$key' -> LogEvent")
     }
 }
 
@@ -53,20 +55,7 @@ object GuildLogging: SnowflakeTable("logging") {
     val ignoredUsers = array<Long>("ignored_users", LongColumnType()).default(arrayOf())
     val channelId = long("channel_id").nullable().default(null)
     val enabled = bool("enabled").default(false)
-    val events = array<LogEvent>(
-        "events",
-        object: StringColumnType() {
-            override fun sqlType(): String = "LogEventEnum"
-            override fun valueFromDB(value: Any): LogEvent =
-                if (value::class.isSubclassOf(Enum::class)) {
-                    value as LogEvent
-                } else {
-                    LogEvent[value as String]
-                }
-
-            override fun nonNullValueToString(value: Any): String = (value as LogEvent).key
-        }
-    ).default(arrayOf())
+    val events = array<String>("events", TextColumnType()).default(arrayOf())
 }
 
 class LoggingEntity(id: EntityID<Long>): LongEntity(id) {

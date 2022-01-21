@@ -115,9 +115,8 @@ object Bootstrap {
         runBlocking {
             createPgEnums(
                 mapOf(
-                    "BanTypeEnum" to BanType.values().map { it.key },
-                    "PunishmentTypeEnum" to PunishmentType.values().map { it.key },
-                    "LogEventEnum" to LogEvent.values().map { it.key }
+                    "BanTypeEnum" to BanType.values().map { it.name },
+                    "PunishmentTypeEnum" to PunishmentType.values().map { it.name }
                 )
             )
         }

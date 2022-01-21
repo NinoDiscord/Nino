@@ -20,16 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set -o errexit
-set -o nounset
-set -o pipefail
+BLUE='\033[38;2;81;81;140m'
+GREEN='\033[38;2;165;204;165m'
+PINK='\033[38;2;241;204;209m'
+RESET='\033[0m'
+BOLD='\033[1m'
+UNDERLINE='\033[4m'
 
-. /app/noelware/nino/scripts/liblog.sh
+info() {
+  timestamp=$(date +"%D ~ %r")
+  printf "%b\\n" "${GREEN}${BOLD}info${RESET}  | ${PINK}${BOLD}${timestamp}${RESET} ~ $1"
+}
 
-info ""
-info "  Welcome to the ${BOLD}Nino${RESET} container image!"
-info "  Subscribe to the project for updates: https://github.com/NinoDiscord/Nino"
-info "  Submit issues if any bugs occur:      https://github.com/NinoDiscord/Nino/issues"
-info ""
+debug() {
+  local debug="${NINO_DEBUG:-false}"
+  shopt -s nocasematch
+  timestamp=$(date +"%D ~%r")
 
-exec "$@"
+  if ! [[ "$debug" = "1" || "$debug" =~ ^(no|false)$ ]]; then
+    printf "%b\\n" "${BLUE}${BOLD}debug${RESET} | ${PINK}${BOLD}${timestamp}${RESET} ~ $1"
+  fi
+}

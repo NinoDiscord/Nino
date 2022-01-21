@@ -297,7 +297,7 @@ class CommandHandler(
             subcommand.execute(newMsg) { ex, success ->
                 logger.info("Subcommand \"$prefix${command.name} ${subcommand.name}\" was executed by ${newMsg.author.tag} (${newMsg.author.id}) in ${guild.name} (${guild.id})")
                 if (!success) {
-                    onCommandError(newMsg, command.name, ex!!, true)
+                    onCommandError(newMsg, subcommand.name, ex!!, true)
                 }
             }
         } else {
@@ -371,6 +371,6 @@ class CommandHandler(
             )
         }
 
-        logger.error("Unable to execute command $name:", exception)
+        logger.error("Unable to execute ${if (isSub) "subcommand" else "command"} $name:", exception)
     }
 }
