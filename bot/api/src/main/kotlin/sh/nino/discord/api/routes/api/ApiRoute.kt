@@ -38,15 +38,21 @@ data class ApiResponse(
 class ApiRoute: Endpoint("/api") {
     @Route("/", "get")
     suspend fun main(call: ApplicationCall) {
-        call.respond(HttpStatusCode.OK, ApiResponse(
-            message = "hello world!!!!!!!"
-        ))
+        call.respond(
+            HttpStatusCode.OK,
+            ApiResponse(
+                message = "hello world!!!!!!!"
+            )
+        )
     }
 
     @Route("/v1", "get")
     suspend fun mainV1(call: ApplicationCall) {
-        call.respond(HttpStatusCode.OK, ApiResponse(
-            message = "hello world!!!!!!!"
-        ))
+        call.respond(
+            HttpStatusCode.OK,
+            ApiResponse(
+                message = "hello world!!!!!!!"
+            )
+        )
     }
 }

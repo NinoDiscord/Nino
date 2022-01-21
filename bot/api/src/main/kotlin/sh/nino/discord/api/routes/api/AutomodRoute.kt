@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2019-2022 Nino
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 @file:Suppress("UNUSED")
 package sh.nino.discord.api.routes.api
 
@@ -60,9 +82,12 @@ data class AutomodData(
 class AutomodRoute: Endpoint("/api/v1/automod") {
     @Route("/", "get")
     suspend fun get(call: ApplicationCall) {
-        call.respond(HttpStatusCode.NotFound, ApiResponse(
-            message = "Cannot GET /api/v1/automod - missing guild id as key."
-        ))
+        call.respond(
+            HttpStatusCode.NotFound,
+            ApiResponse(
+                message = "Cannot GET /api/v1/automod - missing guild id as key."
+            )
+        )
     }
 
     @Route("/{guildId}", "get")
@@ -73,9 +98,12 @@ class AutomodRoute: Endpoint("/api/v1/automod") {
         }
 
         if (entity == null) {
-            call.respond(HttpStatusCode.NotFound, ApiResponse(
-                message = "Cannot find automod settings for guild '$guildId'"
-            ))
+            call.respond(
+                HttpStatusCode.NotFound,
+                ApiResponse(
+                    message = "Cannot find automod settings for guild '$guildId'"
+                )
+            )
 
             return
         }

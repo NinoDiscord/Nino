@@ -26,7 +26,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.statements.jdbc.JdbcConnectionImpl
 import org.jetbrains.exposed.sql.transactions.TransactionManager
 import org.postgresql.jdbc.PgArray
-import sh.nino.discord.database.tables.LogEvent
 
 fun <T> Table.array(name: String, type: ColumnType): Column<Array<T>> = registerColumn(name, ArrayColumnType(type))
 

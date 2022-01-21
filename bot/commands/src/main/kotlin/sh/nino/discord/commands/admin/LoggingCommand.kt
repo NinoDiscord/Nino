@@ -31,9 +31,7 @@ import dev.kord.core.entity.User
 import dev.kord.core.entity.channel.TextChannel
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.future.future
-import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.update
-import org.slf4j.LoggerFactory
 import sh.nino.discord.commands.AbstractCommand
 import sh.nino.discord.commands.CommandCategory
 import sh.nino.discord.commands.CommandMessage
@@ -121,10 +119,13 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
                 }
             }
 
-            msg.replyTranslate("commands.admin.logging.success", mapOf(
-                "emoji" to "<:success:464708611260678145>",
-                "channel" to textChannel.mention
-            ))
+            msg.replyTranslate(
+                "commands.admin.logging.success",
+                mapOf(
+                    "emoji" to "<:success:464708611260678145>",
+                    "channel" to textChannel.mention
+                )
+            )
 
             return
         }
@@ -151,17 +152,23 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
                 }
             }
 
-            msg.replyTranslate("commands.admin.logging.success", mapOf(
-                "emoji" to "<:success:464708611260678145>",
-                "channel" to textChannel.mention
-            ))
+            msg.replyTranslate(
+                "commands.admin.logging.success",
+                mapOf(
+                    "emoji" to "<:success:464708611260678145>",
+                    "channel" to textChannel.mention
+                )
+            )
 
             return
         }
 
-        msg.replyTranslate("commands.admin.logging.invalid", mapOf(
-            "arg" to channel
-        ))
+        msg.replyTranslate(
+            "commands.admin.logging.invalid",
+            mapOf(
+                "arg" to channel
+            )
+        )
     }
 
     @Subcommand(
@@ -408,15 +415,21 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
             }
 
             msg.reply {
-                title = msg.locale.translate("commands.admin.logging.events.list.embed.title", mapOf(
-                    "name" to guild.name
-                ))
+                title = msg.locale.translate(
+                    "commands.admin.logging.events.list.embed.title",
+                    mapOf(
+                        "name" to guild.name
+                    )
+                )
 
-                description = msg.locale.translate("commands.admin.logging.events.list.embed.description", mapOf(
-                    "list" to events.joinToString("\n") {
-                        "• ${enabled(settings.events.contains(it.key))} ${it.key}"
-                    }
-                ))
+                description = msg.locale.translate(
+                    "commands.admin.logging.events.list.embed.description",
+                    mapOf(
+                        "list" to events.joinToString("\n") {
+                            "• ${enabled(settings.events.contains(it.key))} ${it.key}"
+                        }
+                    )
+                )
             }
 
             return
@@ -503,19 +516,21 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
             }
 
             "view" -> {
-                val typedEvents = LogEvent.values().map { it.key to it.key.replace(" ", "." ) }
-                msg.reply(buildString {
-                    appendLine("```md")
-                    appendLine("# Logging Events")
-                    appendLine()
+                val typedEvents = LogEvent.values().map { it.key to it.key.replace(" ", ".") }
+                msg.reply(
+                    buildString {
+                        appendLine("```md")
+                        appendLine("# Logging Events")
+                        appendLine()
 
-                    for ((key, set) in typedEvents) {
-                        appendLine("- $key (nino logging events enable $set)")
+                        for ((key, set) in typedEvents) {
+                            appendLine("- $key (nino logging events enable $set)")
+                        }
+
+                        appendLine()
+                        appendLine("```")
                     }
-
-                    appendLine()
-                    appendLine("```")
-                })
+                )
             }
         }
     }
@@ -537,10 +552,13 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
             null
         }
 
-        msg.replyTranslate("commands.admin.logging.config.message", mapOf(
-            "name" to guild.name,
-            "enabled" to if (settings.enabled) msg.locale.translate("generic.yes") else msg.locale.translate("generic.no"),
-            "channel" to if (channel == null) msg.locale.translate("generic.nothing") else "#${channel.name} (${channel.id})"
-        ))
+        msg.replyTranslate(
+            "commands.admin.logging.config.message",
+            mapOf(
+                "name" to guild.name,
+                "enabled" to if (settings.enabled) msg.locale.translate("generic.yes") else msg.locale.translate("generic.no"),
+                "channel" to if (channel == null) msg.locale.translate("generic.nothing") else "#${channel.name} (${channel.id})"
+            )
+        )
     }
 }

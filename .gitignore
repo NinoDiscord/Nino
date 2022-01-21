@@ -564,5 +564,5 @@ FodyWeavers.xsd
 # other stuff
 config.yml
 docker/cluster-operator/config.json
-config/
 bot/src/main/resources/config/logging.properties
+!bot/src/main/resources/config/logging.example.properties

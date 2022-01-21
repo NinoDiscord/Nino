@@ -28,7 +28,6 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.LongColumnType
 import org.jetbrains.exposed.sql.TextColumnType
 import sh.nino.discord.database.SnowflakeTable
-import sh.nino.discord.database.columns.CustomEnumerationColumn
 import sh.nino.discord.database.columns.array
 
 enum class LogEvent(val key: String, val pretty: String) {
