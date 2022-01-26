@@ -22,14 +22,62 @@
 
 package sh.nino.discord.core.jobs
 
+import dev.kord.core.Kord
+import gay.floof.utils.slf4j.logging
 import io.ktor.client.*
+import io.ktor.client.call.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import kotlinx.serialization.Serializable
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.core.timers.TimerJob
+import sh.nino.discord.metrics.MetricsRegistry
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
-class GatewayPingJob(private val config: Config, private val httpClient: HttpClient): TimerJob(
+@Serializable
+data class InstatusPostMetricBody(
+    val timestamp: Long,
+    val value: Long
+)
+
+class GatewayPingJob(
+    private val config: Config,
+    private val httpClient: HttpClient,
+    private val metrics: MetricsRegistry,
+    private val kord: Kord
+): TimerJob(
     "gateway.ping",
     5000
 ) {
+    private val log by logging<GatewayPingJob>()
+
     override suspend fun execute() {
+        if (metrics.enabled) {
+            val averagePing = kord.gateway.averagePing ?: Duration.ZERO
+            metrics.gatewayPing?.set(averagePing.inWholeMilliseconds.toDouble())
+
+            // Log the duration for all shards
+            for ((shardId, shard) in kord.gateway.gateways) {
+                metrics.gatewayLatency?.labels("$shardId")?.set((shard.ping.value ?: Duration.ZERO).inWholeMilliseconds.toDouble())
+            }
+        }
+
+        if (config.instatus != null && config.instatus!!.gatewayMetricId != null) {
+            log.debug("Instatus configuration is available, now posting to Instatus...")
+            val res: HttpResponse = httpClient.post("") {
+                body = InstatusPostMetricBody(
+                    timestamp = System.currentTimeMillis(),
+                    value = (kord.gateway.averagePing ?: Duration.ZERO).toLong(DurationUnit.MILLISECONDS)
+                )
+
+                header("Authorization", config.instatus!!.token)
+            }
+
+            if (!res.status.isSuccess()) {
+                log.warn("Unable to post to Instatus (${res.status.value} ${res.status.description}): ${res.receive<String>()}")
+            }
+        }
     }
 }

@@ -20,4 +20,14 @@
  * SOFTWARE.
  */
 
-package sh.nino.gateway
+package sh.nino.discord.common.unions
+
+class StringOrBoolean(value: Any): XOrY<String, Boolean>(value) {
+    init {
+        check(value is String || value is Boolean) {
+            "Value was not a String or Boolean value."
+        }
+    }
+
+    override fun toString(): String = value.toString()
+}

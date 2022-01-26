@@ -42,6 +42,9 @@ class MetricsRegistry(config: Config) {
     val apiRequestLatency: Histogram?
     val apiRequests: Gauge?
     val registry: CollectorRegistry?
+    val users: Gauge?
+    val guildCount: Gauge?
+    val websocketEvents: Counter?
 
     init {
         if (enabled) {
@@ -79,6 +82,22 @@ class MetricsRegistry(config: Config) {
                 .help("Returns how many messages Nino has seen.")
                 .register(registry)
 
+            guildCount = Gauge.build()
+                .name("nino_guild_count")
+                .help("Returns how many guilds Nino is in")
+                .register(registry)
+
+            users = Gauge.build()
+                .name("nino_user_count")
+                .help("Returns how many users Nino can see")
+                .register(registry)
+
+            websocketEvents = Counter.build()
+                .name("nino_websocket_events")
+                .help("Returns how many events that are being emitted.")
+                .labelNames("shard", "event")
+                .register(registry)
+
             if (config.api != null) {
                 apiRequestLatency = Histogram.build()
                     .name("nino_api_request_latency")
@@ -105,6 +124,9 @@ class MetricsRegistry(config: Config) {
             messagesSeen = null
             apiRequests = null
             apiRequestLatency = null
+            users = null
+            guildCount = null
+            websocketEvents = null
         }
     }
 }

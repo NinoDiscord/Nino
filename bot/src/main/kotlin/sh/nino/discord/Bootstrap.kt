@@ -51,6 +51,7 @@ import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.core.NinoBot
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.globalModule
+import sh.nino.discord.core.jobs.jobsModule
 import sh.nino.discord.core.redis.RedisManager
 import sh.nino.discord.database.createPgEnums
 import sh.nino.discord.database.tables.*
@@ -161,6 +162,7 @@ object Bootstrap {
                 globalModule,
                 *apiModule.toTypedArray(),
                 *commandsModule.toTypedArray(),
+                jobsModule,
                 module {
                     single {
                         config

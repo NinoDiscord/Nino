@@ -538,7 +538,7 @@ class LoggingCommand(private val kord: Kord): AbstractCommand() {
     @Subcommand(
         "config",
         "descriptions.logging.config",
-        aliases = ["cfg", "info", "list"]
+        aliases = ["cfg", "info", "list", "view"]
     )
     suspend fun config(msg: CommandMessage) {
         val guild = msg.message.getGuild()

@@ -22,6 +22,14 @@
 
 package sh.nino.discord.core
 
+/**
+ * Represents a [AutoCloseable] interface but uses suspending functions
+ * rather than a synchronous function.
+ */
 interface AutoSuspendCloseable {
+    /**
+     * Closes this resource, possibly relinquishing any resources. This method
+     * cannot be invoked using the try-with-resources statement.
+     */
     suspend fun close()
 }

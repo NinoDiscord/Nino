@@ -20,4 +20,20 @@
  * SOFTWARE.
  */
 
-package sh.nino.gateway
+package sh.nino.discord.common.extensions
+
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.InvocationKind
+import kotlin.contracts.contract
+
+/**
+ * Runs a function [block] that is suspended to return a value.
+ * @param block The function to call in a suspended context.
+ * @return The value of [R].
+ */
+@OptIn(ExperimentalContracts::class)
+suspend inline fun <T, R> T.runSuspended(noinline block: suspend T.() -> R): R {
+    contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
+
+    return block()
+}

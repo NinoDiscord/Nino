@@ -19,8 +19,3 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-dependencies {
-    implementation("io.prometheus:simpleclient_hotspot:0.14.1")
-    implementation("io.prometheus:simpleclient:0.14.0")
-}

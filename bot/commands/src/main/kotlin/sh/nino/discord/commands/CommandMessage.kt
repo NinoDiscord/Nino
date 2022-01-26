@@ -23,24 +23,29 @@
 package sh.nino.discord.commands
 
 import dev.kord.core.behavior.channel.createMessage
+import dev.kord.core.entity.Guild
 import dev.kord.core.entity.Message
 import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.rest.NamedFile
 import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.allowedMentions
+import kotlinx.coroutines.flow.*
 import sh.nino.discord.common.COLOR
+import sh.nino.discord.common.unions.StringOrBoolean
 import sh.nino.discord.core.localization.Locale
 import sh.nino.discord.core.messaging.PaginationEmbed
 import sh.nino.discord.database.tables.GuildSettingsEntity
 import sh.nino.discord.database.tables.UserEntity
 
 class CommandMessage(
-    event: MessageCreateEvent,
+    private val event: MessageCreateEvent,
+    val flags: Map<String, StringOrBoolean>,
     val args: List<String>,
     val settings: GuildSettingsEntity,
     val userSettings: UserEntity,
-    val locale: Locale
+    val locale: Locale,
+    val guild: Guild
 ) {
     val attachments = event.message.attachments.toList()
     val message = event.message
@@ -108,4 +113,38 @@ class CommandMessage(
     }
 
     suspend fun replyTranslate(key: String, args: Map<String, Any> = mapOf()): Message = reply(locale.translate(key, args))
+
+    suspend fun readFromInput(
+        message: Message = this.message,
+        timeout: Long = 60000,
+        filter: suspend (Message) -> Boolean = {
+            true
+        }
+    ): Message? = event
+        .kord
+        .events
+        .filterIsInstance<MessageCreateEvent>()
+        .filter { it.message.author?.id == message.author!!.id }
+        .map { it.message }
+        .filter(filter)
+        .take(1)
+        .singleOrNull()
 }
+
+/*
+    suspend fun <T : Any> read(
+            argument: Argument<T, MessageCreateEvent>,
+            escape: suspend (MessageCreateEvent) -> Boolean,
+            filter: suspend (T) -> Boolean = { true }
+    ): T? = kord.events.filterIsInstance<MessageCreateEvent>()
+            .filter { it.message.author?.id == message.author!!.id }
+            .filter { it.message.channel.id == channel.id }
+            .takeWhile { !escape(it) }
+            .map { argument.parse(it.message.content, 0, it) }
+            .onEach { if (it is ArgumentResult.Failure) respond(it.reason) }
+            .filterIsInstance<ArgumentResult.Success<T>>()
+            .map { it.item }
+            .filter(filter)
+            .take(1)
+            .singleOrNull()
+ */

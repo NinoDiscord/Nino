@@ -28,5 +28,5 @@ import sh.nino.discord.core.timers.TimerJob
 
 val jobsModule = module {
     single { BotlistJob(get(), get(), get()) } bind TimerJob::class
-    single { GatewayPingJob(get(), get()) } bind TimerJob::class
+    single { GatewayPingJob(get(), get(), get(), get()) } bind TimerJob::class
 }

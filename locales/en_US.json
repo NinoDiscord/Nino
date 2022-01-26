@@ -10,7 +10,7 @@
     "generic.enabled": "Enabled",
     "generic.disabled": "Disabled",
     "generic.lonely": "Heh... it's pretty empty, eh? I guess it's like a set of hearts, only one can be the chosen one! But, I shouldn't give you an extensional crisis right now. Go have fun! ...and maybe touch grass, you really seem to be lacking in that department x3",
-    "generic.nothing": "Unknown",
+    "generic.nothing": "Nothing to show.",
     "generic.yes": "Yes",
     "generic.no": "No",
 
@@ -52,11 +52,14 @@
     "descriptions.automod.mentions": "Toggles the Mentions automod, or sets a mention threshold. -- read more [here](https://nino.sh/docs/automod/mentions)",
     "descriptions.admin.export": "Exports your guild settings to be easily imported later on.",
     "descriptions.admin.import": "Import your exported guild settings easily. You can't revert back once you import back.",
-    "descriptions.admin.logging": "Administrate your logging settings.",
+    "descriptions.admin.logging": "Administrate your logging settings here!",
     "descriptions.logging.omitUsers": "Add or remove users to omit from being logged in the specified log channel.",
     "descriptions.logging.omitChannels": "Add or remove text channels to omit from being logged in the specified log channel.",
     "descriptions.logging.config": "Shows the current logging configuration",
     "descriptions.logging.events": "Toggle specific logging events -- read more [here](https://nino.sh/docs/logging)",
+    "descriptions.prefix": "Creates, views, and deletes the guild or your prefixes.",
+    "descriptions.prefix.set": "Adds a prefix to the list of prefixes that you or the guild can use, depends on your desire!",
+    "descriptions.prefix.delete": "Removes a prefix from the list of prefixes that you or the guild doesn't like, but it doesn't hurt to delete any... right?",
     "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use.",
 
     "commands.automod.toggle": "${emoji} ${toggle} the **${name}** automod!",
@@ -97,6 +100,71 @@
       "Read our [Terms of Service](https://nino.sh/terms) & [Privacy Policy](https://nino.sh/privacy) before enabling!",
       "",
       "${list}"
+    ],
+
+    "commands.admin.prefix.user.list": [
+      "```md",
+      "# Prefixes for ${user}",
+      "${list}",
+      "",
+      "## Note",
+      "> You can also use the following default prefixes as well:",
+      "",
+      "${prefixes}",
+      "```"
+    ],
+
+    "commands.admin.prefix.guild.list": [
+      "```md",
+      "# Prefixes for ${name}",
+      "${list}",
+      "",
+      "## Note",
+      "> You can also use the following default prefixes as well:",
+      "",
+      "${prefixes}",
+      "```"
+    ],
+
+    "commands.admin.prefix.set.noPermission": "You are currently missing the **Manage Guild** permission to modify guild prefixes.",
+    "commands.admin.prefix.set.missingPrefix": "You are missing a prefix to set. You can use `\"` to use spaces in your prefixes. (example: `\"nino is the best\"` -> `nino is the best help`)",
+    "commands.admin.prefix.set.maxLengthExceeded": "You went **${chars.over}** characters over the limit with the prefix you supplied: ${prefix}",
+    "commands.admin.prefix.set.alreadySet": "Prefix ${prefix} is already available!",
+    "commands.admin.prefix.set.available": "Prefix ${prefix} is now available. :3",
+    "commands.admin.prefix.reset.alreadyRemoved": "Prefix ${prefix} is already unavailable...",
+    "commands.admin.prefix.reset.unavailable": "Prefix ${prefix} is now unavailable, if you want to add it back, then say so!",
+    "commands.admin.prefix.reset.guild.embed.title": "[ Prefixes for guild ${name} ]",
+    "commands.admin.prefix.reset.guild.embed.description": [
+      "Hello again! I am here to remind you that you are missing a prefix to remove.",
+      "But don't worry, I will list them again for you... don't expect this to happen again!",
+      "",
+      "Just specify the prefix below to remove it (example):",
+      "> prefix reset \"nino is the best\"",
+      "",
+      "```md",
+      "${prefixes}",
+      "```"
+    ],
+
+    "commands.admin.prefix.reset.user.embed.title": "[ Prefixes for ${name} ]",
+    "commands.admin.prefix.reset.user.embed.description": [
+      "Hello again! I am here to remind you that you are missing a prefix to remove.",
+      "But don't worry, I will list them again for you... don't expect this to happen again!",
+      "",
+      "Just specify the prefix below to remove it (example):",
+      "> prefix reset \"nino is the best\"",
+      "",
+      "```md",
+      "${prefixes}",
+      "```"
+    ],
+
+    "commands.admin.rolecfg.list": [
+      "```md",
+      "# Role Configuration for ${guild}",
+      "• No Threads Role: ${noThreadsRole}",
+      "• Muted Role: ${mutedRole}",
+      "```"
     ]
   }
 }

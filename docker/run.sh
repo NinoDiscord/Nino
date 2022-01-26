@@ -41,4 +41,4 @@ if [[ -z "${WINTERFOX_DEDI_NODE:-}" ]]
 
 JVM_ARGS+=("$@")
 
-java $JVM_ARGS -jar /app/noelware/nino/Nino.jar
+java -jar /app/noelware/nino/Nino.jar $JVM_ARGS

@@ -56,3 +56,26 @@ fun <T> List<T>.every(predicate: (T) -> Boolean): Boolean {
 
     return true
 }
+
+/**
+ * Returns the index of an item from a [predicate] function.
+ * @param predicate The lambda function to find the item you need.
+ * @return If the item was found, it'll return the index in the [List],
+ * or -1 if nothing was found.
+ */
+fun <T> List<T>.findIndex(predicate: (T) -> Boolean): Int {
+    for ((index, item) in this.withIndex()) {
+        if (predicate(item))
+            return index
+    }
+
+    return -1
+}
+
+/**
+ * Returns the index of an item from a [predicate] function.
+ * @param predicate The lambda function to find the item you need.
+ * @return If the item was found, it'll return the index in the [List],
+ * or -1 if nothing was found.
+ */
+fun <T> Array<T>.findIndex(predicate: (T) -> Boolean): Int = this.toList().findIndex(predicate)

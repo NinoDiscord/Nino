@@ -24,6 +24,7 @@ package sh.nino.discord.core.listeners
 
 import dev.kord.common.entity.ActivityType
 import dev.kord.core.Kord
+import dev.kord.core.event.Event
 import dev.kord.core.event.gateway.DisconnectEvent
 import dev.kord.core.event.gateway.ReadyEvent
 import dev.kord.core.on
@@ -31,8 +32,10 @@ import org.koin.core.context.GlobalContext
 import org.slf4j.LoggerFactory
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.extensions.humanize
+import sh.nino.discord.common.extensions.name
 import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.core.NinoBot
+import sh.nino.discord.metrics.MetricsRegistry
 
 fun Kord.applyGenericEvents() {
     val logger = LoggerFactory.getLogger("sh.nino.discord.core.listeners.GenericListenerKt")
@@ -91,5 +94,12 @@ fun Kord.applyGenericEvents() {
         }
 
         logger.warn("Shard #${this.shard} has disconnected from the world: $reason")
+    }
+
+    on<Event> {
+        val metrics = GlobalContext.retrieve<MetricsRegistry>()
+        if (metrics.enabled) {
+            metrics.websocketEvents?.labels("$shard", this.name)?.inc()
+        }
     }
 }

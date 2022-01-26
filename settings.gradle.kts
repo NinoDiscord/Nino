@@ -57,9 +57,3 @@ include(":bot:api")
 
 // Main bot directory
 include(":bot")
-
-// Gateway
-include(":gateway")
-
-// Cluster Operator Client for Nino
-include(":gateway:cluster-operator")

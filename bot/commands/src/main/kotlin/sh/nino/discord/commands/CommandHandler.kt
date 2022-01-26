@@ -40,9 +40,11 @@ import org.jetbrains.exposed.sql.or
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.automod.core.Container
 import sh.nino.discord.common.COLOR
+import sh.nino.discord.common.FLAG_REGEX
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
 import sh.nino.discord.common.extensions.*
+import sh.nino.discord.common.unions.StringOrBoolean
 import sh.nino.discord.core.NinoBot
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.localization.LocalizationManager
@@ -181,13 +183,29 @@ class CommandHandler(
         val (name, args) = content.split("\\s+".toRegex()).pairUp()
         val cmdName = name.lowercase()
         val locale = locales.getLocale(guildSettings.language, userSettings.language)
-        val message = CommandMessage(event, args, guildSettings, userSettings, locale)
+        val flags = parseFlags(content)
 
         val command = commands[cmdName]
             ?: commands.values.firstOrNull { it.aliases.contains(cmdName) }
             ?: return
 
-        // collect command flags
+        // omit flags from argument list
+        val rawArgs: List<String>
+        if (command.name != "eval") {
+            rawArgs = args.filter { !FLAG_REGEX.toRegex().matches(it) }
+        } else {
+            rawArgs = args
+        }
+
+        val message = CommandMessage(
+            event,
+            flags,
+            rawArgs,
+            guildSettings,
+            userSettings,
+            locale,
+            guild
+        )
 
         if (command.ownerOnly && !config.owners.contains(event.message.author!!.id.toString())) {
             message.reply(locale.translate("errors.ownerOnly", mapOf("name" to cmdName)))
@@ -288,10 +306,12 @@ class CommandHandler(
         if (subcommand != null) {
             val newMsg = CommandMessage(
                 event,
-                args.drop(1),
+                flags,
+                rawArgs.drop(1),
                 guildSettings,
                 userSettings,
-                locale
+                locale,
+                guild
             )
 
             subcommand.execute(newMsg) { ex, success ->
@@ -372,5 +392,26 @@ class CommandHandler(
         }
 
         logger.error("Unable to execute ${if (isSub) "subcommand" else "command"} $name:", exception)
+    }
+
+    private fun parseFlags(content: String): Map<String, StringOrBoolean> {
+        val flags = mutableMapOf<String, StringOrBoolean>()
+
+        // TODO: make this not ugly looking...
+        FLAG_REGEX.toRegex().replace(content) {
+            val name = it.groups[1]!!.value
+            val value = it.groups[2]?.value ?: ""
+
+            val replacedValue = if (value.isEmpty()) "" else it.value.replace("(^[='\"]+|['\"]+\$)".toRegex(), "").trim()
+            val flagValue = if (value.isBlank())
+                StringOrBoolean(true)
+            else
+                StringOrBoolean(value.replace("(^[='\"]+|['\"]+\$)".toRegex(), ""))
+
+            flags[name] = flagValue
+            replacedValue
+        }
+
+        return flags.toMap()
     }
 }

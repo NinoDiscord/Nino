@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (c) 2019-2022 Nino
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,4 +20,19 @@
  * SOFTWARE.
  */
 
+package sh.nino.discord.common.unions
 
+@Suppress("UNCHECKED_CAST")
+open class XOrY<X: Any, Y: Any>(val value: Any) {
+    val asXOrNull: X?
+        get() = value as? X
+
+    val asYOrNull: Y?
+        get() = value as? Y
+
+    val asX: X
+        get() = asXOrNull ?: error("Value cannot be casted to X")
+
+    val asY: Y
+        get() = asYOrNull ?: error("Value cannot be casted as Y")
+}

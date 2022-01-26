@@ -21,3 +21,53 @@
  */
 
 package sh.nino.discord.commands.admin
+
+import sh.nino.discord.commands.AbstractCommand
+import sh.nino.discord.commands.CommandMessage
+import sh.nino.discord.commands.annotations.Command
+import sh.nino.discord.common.extensions.asSnowflake
+import sh.nino.discord.common.extensions.runSuspended
+
+@Command(
+    name = "rolecfg",
+    description = "descriptions.admin.rolecfg",
+    aliases = ["roles", "role-config"],
+    examples = [
+        "{prefix}rolecfg | View your current role configuration",
+        "{prefix}rolecfg muted <@&roleId> | Sets the Muted role to that specific role by ID or snowflake.",
+        "{prefix}rolecfg threads reset | Resets the No Threads role in the database."
+    ],
+
+    userPermissions = [0x00000020] // ManageGuild
+)
+class RoleConfigCommand: AbstractCommand() {
+    override suspend fun execute(msg: CommandMessage) {
+        val guild = msg.message.getGuild()
+        val mutedRole = runSuspended {
+            if (msg.settings.mutedRoleId == null) {
+                msg.locale.translate("generic.nothing")
+            } else {
+                val role = guild.getRole(msg.settings.mutedRoleId!!.asSnowflake())
+                role.name
+            }
+        }
+
+        val noThreadsRole = runSuspended {
+            if (msg.settings.noThreadsRoleId == null) {
+                msg.locale.translate("generic.nothing")
+            } else {
+                val role = guild.getRole(msg.settings.noThreadsRoleId!!.asSnowflake())
+                role.name
+            }
+        }
+
+        msg.replyTranslate(
+            "commands.admin.rolecfg.message",
+            mapOf(
+                "guild" to guild.name,
+                "mutedRole" to mutedRole,
+                "noThreadsRole" to noThreadsRole
+            )
+        )
+    }
+}
