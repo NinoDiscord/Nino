@@ -114,6 +114,7 @@ class CommandMessage(
 
     suspend fun replyTranslate(key: String, args: Map<String, Any> = mapOf()): Message = reply(locale.translate(key, args))
 
+    // not finished since i can't find how to do this :(
     suspend fun readFromInput(
         message: Message = this.message,
         timeout: Long = 60000,
@@ -130,21 +131,3 @@ class CommandMessage(
         .take(1)
         .singleOrNull()
 }
-
-/*
-    suspend fun <T : Any> read(
-            argument: Argument<T, MessageCreateEvent>,
-            escape: suspend (MessageCreateEvent) -> Boolean,
-            filter: suspend (T) -> Boolean = { true }
-    ): T? = kord.events.filterIsInstance<MessageCreateEvent>()
-            .filter { it.message.author?.id == message.author!!.id }
-            .filter { it.message.channel.id == channel.id }
-            .takeWhile { !escape(it) }
-            .map { argument.parse(it.message.content, 0, it) }
-            .onEach { if (it is ArgumentResult.Failure) respond(it.reason) }
-            .filterIsInstance<ArgumentResult.Success<T>>()
-            .map { it.item }
-            .filter(filter)
-            .take(1)
-            .singleOrNull()
- */
