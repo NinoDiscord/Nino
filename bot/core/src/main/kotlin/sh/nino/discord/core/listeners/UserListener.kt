@@ -21,3 +21,8 @@
  */
 
 package sh.nino.discord.core.listeners
+
+import dev.kord.core.Kord
+
+fun Kord.applyUserEvents() {
+}

@@ -42,11 +42,19 @@ import dev.kord.core.event.role.RoleUpdateEvent
 import dev.kord.core.event.user.PresenceUpdateEvent
 import dev.kord.core.event.user.UserUpdateEvent
 import dev.kord.core.event.user.VoiceStateUpdateEvent
+import kotlinx.datetime.Instant
+import kotlin.math.floor
 import java.awt.Color as AwtColor
 
 fun AwtColor.asKordColor(): Color = Color(this.red, this.green, this.blue)
 fun String.asSnowflake(): Snowflake = Snowflake(this)
 fun Long.asSnowflake(): Snowflake = Snowflake(this)
+
+/**
+ * Returns a [Instant] on when this [Snowflake] was created at.
+ */
+val Snowflake.createdAt: Instant
+    get() = Instant.fromEpochMilliseconds(floor((this.value.toLong() / 4194304).toDouble()).toLong() + 1420070400000L)
 
 @OptIn(KordPreview::class)
 val Event.name: String

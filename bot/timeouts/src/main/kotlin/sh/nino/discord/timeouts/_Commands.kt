@@ -78,7 +78,7 @@ open class OPCode(val code: Int) {
             }
         }
 
-        private val _values = setOf(Ready)
+        private val _values = setOf(Ready, Apply, RequestAll, Stats)
         operator fun get(code: Int): OPCode = _values.find { it.code == code } ?: error("Unknown OPCode: $code")
     }
 }

@@ -43,7 +43,6 @@ import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.common.extensions.retrieveAll
-import sh.nino.discord.core.listeners.applyGenericEvents
 import sh.nino.discord.core.localization.LocalizationManager
 import sh.nino.discord.core.timers.TimerJob
 import sh.nino.discord.core.timers.TimerManager
@@ -123,6 +122,13 @@ class NinoBot {
 
         // Startup Kord
         kord.applyGenericEvents()
+        kord.applyGuildEvents()
+        kord.applyGuildMemberEvents()
+        kord.applyThreadEvents()
+        kord.applyUserEvents()
+        kord.applyVoiceStateEvents()
+        kord.applyGuildBanEvents()
+
         kord.login {
             presence = DiscordPresence(
                 status = PresenceStatus.Idle,
