@@ -26,7 +26,6 @@ import dev.kord.rest.NamedFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
-import kotlinx.datetime.Instant
 import org.apache.commons.lang3.time.StopWatch
 import sh.nino.discord.commands.AbstractCommand
 import sh.nino.discord.commands.CommandCategory
@@ -88,12 +87,18 @@ class DumpThreadInfoCommand: AbstractCommand() {
         val file = NamedFile("thread_dump.txt", stream)
         watch.stop()
 
-        msg.replyFile(buildString {
-            appendLine(":thumbsup: I have collected the thread information for you! It only took **${watch.getTime(
-                TimeUnit.MILLISECONDS)}**ms to calculate!")
+        msg.replyFile(
+            buildString {
+                appendLine(
+                    ":thumbsup: I have collected the thread information for you! It only took **${watch.getTime(
+                        TimeUnit.MILLISECONDS
+                    )}**ms to calculate!"
+                )
 
-            appendLine(":eyes: You can inspect it in the file I created for you, say thanks after, please? :3")
-            appendLine(":pencil: There is currently **${mxBean.threadCount}** threads in this current Java Virtual Machine, only ${mxBean.daemonThreadCount} are background threads.")
-        }, listOf(file))
+                appendLine(":eyes: You can inspect it in the file I created for you, say thanks after, please? :3")
+                appendLine(":pencil: There is currently **${mxBean.threadCount}** threads in this current Java Virtual Machine, only ${mxBean.daemonThreadCount} are background threads.")
+            },
+            listOf(file)
+        )
     }
 }

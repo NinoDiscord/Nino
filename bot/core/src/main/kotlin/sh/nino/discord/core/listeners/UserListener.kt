@@ -31,7 +31,6 @@ fun Kord.applyUserEvents() {
     val log = LoggerFactory.getLogger("sh.nino.discord.core.listeners.UserListenerKt")
 
     on<UserUpdateEvent> {
-
     }
 
     log.info("✔ Registered all user update events!")

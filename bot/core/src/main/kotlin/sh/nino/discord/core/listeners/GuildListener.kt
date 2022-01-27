@@ -26,7 +26,6 @@ import dev.kord.common.entity.ActivityType
 import dev.kord.core.Kord
 import dev.kord.core.behavior.channel.createMessage
 import dev.kord.core.entity.channel.TextChannel
-import dev.kord.core.event.guild.GuildCreateEvent
 import dev.kord.core.event.guild.GuildDeleteEvent
 import dev.kord.core.on
 import kotlinx.coroutines.flow.filter
@@ -37,7 +36,6 @@ import org.slf4j.LoggerFactory
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.extensions.asSnowflake
 import sh.nino.discord.common.extensions.runSuspended
-import sh.nino.discord.core.NinoBot
 import sh.nino.discord.database.asyncTransaction
 import sh.nino.discord.database.tables.*
 import sh.nino.discord.metrics.MetricsRegistry

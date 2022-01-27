@@ -165,9 +165,11 @@ class HelpCommand(private val handler: CommandHandler, private val config: Confi
 
                 if (module.isNotEmpty()) {
                     val propLen = { name: String -> name.length }
-                    val longestCommandName = propLen(module.sortedWith { a, b ->
-                        propLen(b.name) - propLen(a.name)
-                    }.first().name)
+                    val longestCommandName = propLen(
+                        module.sortedWith { a, b ->
+                            propLen(b.name) - propLen(a.name)
+                        }.first().name
+                    )
 
                     msg.reply {
                         title = "[ Module ${arg.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }} ]"

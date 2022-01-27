@@ -32,11 +32,9 @@ fun Kord.applyGuildBanEvents() {
     val log = LoggerFactory.getLogger("sh.nino.discord.core.listeners.GuildBansListenerKt")
 
     on<BanAddEvent> {
-
     }
 
     on<BanRemoveEvent> {
-
     }
 
     log.info("✔ Registered all guild ban events!")
