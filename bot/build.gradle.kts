@@ -21,13 +21,16 @@
  */
 
 import java.text.SimpleDateFormat
-import gay.floof.gradle.utils.*
 import java.util.Date
-import java.io.File
+
+plugins {
+    `nino-module`
+    application
+}
 
 val commitHash by lazy {
     val cmd = "git rev-parse --short HEAD".split("\\s".toRegex())
-    val proc = ProcessBuilder(*cmd.toTypedArray())
+    val proc = ProcessBuilder(cmd)
         .directory(File("."))
         .redirectOutput(ProcessBuilder.Redirect.PIPE)
         .redirectError(ProcessBuilder.Redirect.PIPE)
@@ -38,6 +41,8 @@ val commitHash by lazy {
 }
 
 dependencies {
+    runtimeOnly(kotlin("scripting-jsr223"))
+
     // Nino libraries + projects
     implementation(project(":bot:automod"))
     implementation(project(":bot:commands"))
@@ -61,6 +66,10 @@ dependencies {
     implementation("net.logstash.logback:logstash-logback-encoder:7.0.1")
 }
 
+application {
+    mainClass.set("sh.nino.discord.Bootstrap")
+}
+
 tasks {
     processResources {
         filesMatching("build-info.json") {
@@ -78,7 +87,6 @@ tasks {
     }
 
     build {
-        dependsOn(shadowJar)
         dependsOn(spotlessApply)
         dependsOn(kotest)
         dependsOn(processResources)

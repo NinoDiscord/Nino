@@ -25,8 +25,6 @@ package sh.nino.discord.api
 import gay.floof.utils.slf4j.logging
 import io.ktor.application.*
 import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*

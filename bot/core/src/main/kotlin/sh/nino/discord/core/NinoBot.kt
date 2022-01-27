@@ -42,6 +42,12 @@ import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.common.extensions.retrieveAll
+import sh.nino.discord.core.listeners.applyGenericEvents
+import sh.nino.discord.core.listeners.applyGuildBanEvents
+import sh.nino.discord.core.listeners.applyGuildEvents
+import sh.nino.discord.core.listeners.applyGuildMemberEvents
+import sh.nino.discord.core.listeners.applyUserEvents
+import sh.nino.discord.core.listeners.applyVoiceStateEvents
 import sh.nino.discord.core.localization.LocalizationManager
 import sh.nino.discord.core.timers.TimerJob
 import sh.nino.discord.core.timers.TimerManager
