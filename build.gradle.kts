@@ -89,6 +89,7 @@ subprojects {
         // common kotlin libraries for all projects
         implementation(kotlin("reflect", "1.6.10"))
         implementation(kotlin("stdlib", "1.6.10"))
+        runtimeOnly(kotlin("scripting-jsr223", "1.6.10"))
 
         // kotlinx libraries
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt")
@@ -124,6 +125,7 @@ subprojects {
         implementation("io.sentry:sentry-logback:5.5.1")
 //        implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0-beta-1")
 //        implementation("io.ktor:ktor-client-content-negotiation:2.0.0-beta-1")
+        implementation("dev.kord.x:emoji:0.5.0")
 
         // TODO: remove this once Kord supports KTOR 2
         implementation("io.ktor:ktor-serialization:1.6.7")

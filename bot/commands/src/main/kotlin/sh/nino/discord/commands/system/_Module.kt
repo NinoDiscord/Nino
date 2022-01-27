@@ -28,4 +28,6 @@ import sh.nino.discord.commands.AbstractCommand
 
 val systemCommandsModule = module {
     single { DumpThreadInfoCommand() } bind AbstractCommand::class
+    single { EvalCommand(get(), get(), get()) } bind AbstractCommand::class
+    single { ShellCommand(get(), get()) } bind AbstractCommand::class
 }
