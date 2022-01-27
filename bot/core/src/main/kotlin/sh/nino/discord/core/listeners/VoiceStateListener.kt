@@ -23,6 +23,16 @@
 package sh.nino.discord.core.listeners
 
 import dev.kord.core.Kord
+import dev.kord.core.event.user.VoiceStateUpdateEvent
+import dev.kord.core.on
+import org.slf4j.LoggerFactory
 
 fun Kord.applyVoiceStateEvents() {
+    val log = LoggerFactory.getLogger("sh.nino.discord.core.listeners.VoiceStateListenerKt")
+
+    on<VoiceStateUpdateEvent> {
+        // work on implementation details here :lurk:
+    }
+
+    log.info("✔ Registered all guild voice state events!")
 }

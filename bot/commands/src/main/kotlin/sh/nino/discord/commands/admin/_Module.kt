@@ -32,4 +32,5 @@ val adminCommandsModule = module {
     single { ImportCommand(get(), get()) } bind AbstractCommand::class
     single { LoggingCommand(get()) } bind AbstractCommand::class
     single { PrefixCommand(get()) } bind AbstractCommand::class
+    single { RoleConfigCommand() } bind AbstractCommand::class
 }

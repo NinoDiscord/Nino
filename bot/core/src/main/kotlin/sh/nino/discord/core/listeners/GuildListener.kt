@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.extensions.asSnowflake
 import sh.nino.discord.common.extensions.runSuspended
+import sh.nino.discord.core.NinoBot
 import sh.nino.discord.database.asyncTransaction
 import sh.nino.discord.database.tables.*
 import sh.nino.discord.metrics.MetricsRegistry
@@ -47,56 +48,59 @@ fun Kord.applyGuildEvents() {
     val metrics = koin.get<MetricsRegistry>()
     val config = koin.get<Config>()
 
-    on<GuildCreateEvent> {
-        log.info("✔ New Guild Joined - ${guild.name} (${guild.id})")
-        asyncTransaction {
-            GuildSettingsEntity.new(guild.id.value.toLong()) {}
-            AutomodEntity.new(guild.id.value.toLong()) {}
-            LoggingEntity.new(guild.id.value.toLong()) {}
-        }
+    // this is commented out due to:
+    // https://canary.discord.com/channels/556525343595298817/631147109311053844/936066300218835014
 
-        metrics.guildCount?.inc()
-        kord.getChannelOf<TextChannel>("844410521599737878".asSnowflake())?.runSuspended {
-            val humans = this@on.guild.members.filter {
-                !it.isBot
-            }.toList()
-
-            val bots = this@on.guild.members.filter {
-                it.isBot
-            }.toList()
-
-            val ratio = ((humans.size * bots.size) / this@on.guild.members.toList().size).toDouble()
-            val owner = this@on.guild.owner.asMember()
-
-            createMessage(
-                buildString {
-                    appendLine("```md")
-                    appendLine("# Joined ${this@on.guild.name} (${this@on.guild.id})")
-                    appendLine()
-                    appendLine("• Members [ Bots / Total ]: ${bots.size} / ${humans.size} ($ratio%)")
-                    appendLine("• Owner: ${owner.tag} (${owner.id})")
-                    appendLine("```")
-                }
-            )
-
-            val currStatus = config.status.status
-                .replace("{shard_id}", shard.toString())
-                .replace("{guilds}", kord.guilds.toList().size.toString())
-
-            kord.editPresence {
-                status = config.status.presence
-                when (config.status.type) {
-                    ActivityType.Listening -> listening(currStatus)
-                    ActivityType.Game -> playing(currStatus)
-                    ActivityType.Competing -> competing(currStatus)
-                    ActivityType.Watching -> watching(currStatus)
-                    else -> {
-                        playing(currStatus)
-                    }
-                }
-            }
-        }
-    }
+//    on<GuildCreateEvent> {
+//        log.info("New Guild Joined - ${guild.name} (${guild.id})")
+//        asyncTransaction {
+//            GuildSettingsEntity.new(guild.id.value.toLong()) {}
+//            AutomodEntity.new(guild.id.value.toLong()) {}
+//            LoggingEntity.new(guild.id.value.toLong()) {}
+//        }
+//
+//        metrics.guildCount?.inc()
+//        kord.getChannelOf<TextChannel>("844410521599737878".asSnowflake())?.runSuspended {
+//            val humans = this@on.guild.members.filter {
+//                !it.isBot
+//            }.toList()
+//
+//            val bots = this@on.guild.members.filter {
+//                it.isBot
+//            }.toList()
+//
+//            val ratio = ((humans.size * bots.size) / this@on.guild.members.toList().size).toDouble()
+//            val owner = this@on.guild.owner.asMember()
+//
+//            createMessage(
+//                buildString {
+//                    appendLine("```md")
+//                    appendLine("# Joined ${this@on.guild.name} (${this@on.guild.id})")
+//                    appendLine()
+//                    appendLine("• Members [ Bots / Total ]: ${bots.size} / ${humans.size} ($ratio%)")
+//                    appendLine("• Owner: ${owner.tag} (${owner.id})")
+//                    appendLine("```")
+//                }
+//            )
+//
+//            val currStatus = config.status.status
+//                .replace("{shard_id}", shard.toString())
+//                .replace("{guilds}", kord.guilds.toList().size.toString())
+//
+//            kord.editPresence {
+//                status = config.status.presence
+//                when (config.status.type) {
+//                    ActivityType.Listening -> listening(currStatus)
+//                    ActivityType.Game -> playing(currStatus)
+//                    ActivityType.Competing -> competing(currStatus)
+//                    ActivityType.Watching -> watching(currStatus)
+//                    else -> {
+//                        playing(currStatus)
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     on<GuildDeleteEvent> {
         if (unavailable) {
@@ -109,7 +113,7 @@ fun Kord.applyGuildEvents() {
             return@on
         }
 
-        log.info("✔ New Guild Joined - ${guild!!.name} (${guild!!.id})")
+        log.info("Left Guild - ${guild!!.name} (${guild!!.id})")
         asyncTransaction {
             GuildSettings.deleteWhere {
                 GuildSettings.id eq guild!!.id.value.toLong()

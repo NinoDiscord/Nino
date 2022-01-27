@@ -23,6 +23,16 @@
 package sh.nino.discord.core.listeners
 
 import dev.kord.core.Kord
+import dev.kord.core.event.user.UserUpdateEvent
+import dev.kord.core.on
+import org.slf4j.LoggerFactory
 
 fun Kord.applyUserEvents() {
+    val log = LoggerFactory.getLogger("sh.nino.discord.core.listeners.UserListenerKt")
+
+    on<UserUpdateEvent> {
+
+    }
+
+    log.info("✔ Registered all user update events!")
 }

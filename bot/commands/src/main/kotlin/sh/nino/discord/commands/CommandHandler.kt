@@ -90,15 +90,11 @@ class CommandHandler(
 
         // Get guild + user settings
         var guildSettings = asyncTransaction {
-            GuildSettingsEntity.find {
-                GuildSettings.id eq guild.id.value.toLong()
-            }.firstOrNull()
+            GuildSettingsEntity.findById(guild.id.value.toLong())
         }
 
         var userSettings = asyncTransaction {
-            UserEntity.find {
-                Users.id eq event.message.author!!.id.value.toLong()
-            }.firstOrNull()
+            UserEntity.findById(event.message.author!!.id.value.toLong())
         }
 
         // Can't find the guild or user settings?

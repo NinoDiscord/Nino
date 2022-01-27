@@ -22,6 +22,10 @@
 
 package sh.nino.discord.commands.system
 
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import sh.nino.discord.commands.AbstractCommand
 
-val systemCommandsModule = module {}
+val systemCommandsModule = module {
+    single { DumpThreadInfoCommand() } bind AbstractCommand::class
+}

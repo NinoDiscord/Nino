@@ -73,7 +73,6 @@ private suspend fun getAuditLogEntriesOf(
 fun Kord.applyGuildMemberEvents() {
     val log = LoggerFactory.getLogger("sh.nino.discord.core.listeners.GuildMemberListenerKt")
     val koin = GlobalContext.get()
-    val automod = koin.get<Container>()
     val timeouts = koin.get<Client>()
     val punishments = koin.get<PunishmentModule>()
 
@@ -82,7 +81,7 @@ fun Kord.applyGuildMemberEvents() {
         val user = member.asUser()
 
         log.info("User ${user.tag} (${user.id}) joined ${guild.name} (${guild.id}) - applying automod!")
-        val executed = automod.execute(this)
+        val executed = Container.execute(this)
         if (executed) return@on
 
         val cases = asyncTransaction {
@@ -162,7 +161,7 @@ fun Kord.applyGuildMemberEvents() {
             if (!automodSettings.dehoisting) return@on
 
             // Run the automod thingy
-            val ret = automod.execute(this)
+            val ret = Container.execute(this)
             if (ret) return@on
         }
 
@@ -229,4 +228,6 @@ fun Kord.applyGuildMemberEvents() {
             }
         }
     }
+
+    log.info("✔ Registered all guild member events!")
 }

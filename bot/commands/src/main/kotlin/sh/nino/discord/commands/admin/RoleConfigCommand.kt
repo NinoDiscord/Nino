@@ -23,6 +23,7 @@
 package sh.nino.discord.commands.admin
 
 import sh.nino.discord.commands.AbstractCommand
+import sh.nino.discord.commands.CommandCategory
 import sh.nino.discord.commands.CommandMessage
 import sh.nino.discord.commands.annotations.Command
 import sh.nino.discord.common.extensions.asSnowflake
@@ -32,6 +33,7 @@ import sh.nino.discord.common.extensions.runSuspended
     name = "rolecfg",
     description = "descriptions.admin.rolecfg",
     aliases = ["roles", "role-config"],
+    category = CommandCategory.ADMIN,
     examples = [
         "{prefix}rolecfg | View your current role configuration",
         "{prefix}rolecfg muted <@&roleId> | Sets the Muted role to that specific role by ID or snowflake.",

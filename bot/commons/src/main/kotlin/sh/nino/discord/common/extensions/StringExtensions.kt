@@ -37,7 +37,17 @@ fun String.shell(): String {
     return process.inputStream.bufferedReader().readText()
 }
 
-fun String.titleCase(): String = replaceFirstChar { it.uppercase() }
+fun String.titleCase(delim: String = ""): String {
+    if (isEmpty() || isBlank()) return ""
+
+    return split(delim).joinToString(" ") {
+        val first = it.first()
+        val second = it.slice(1..length)
+
+        "${first.uppercase()}$second"
+    }.trim()
+}
+
 fun String.elipsis(textLen: Int = 1995): String = if (this.length > textLen) {
     "${this.slice(0..textLen)}..."
 } else {

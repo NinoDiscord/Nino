@@ -31,6 +31,7 @@ import io.ktor.client.features.websocket.*
 import io.sentry.Sentry
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
+import sh.nino.discord.automod.core.Container
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.core.interceptors.LoggingInterceptor

@@ -36,17 +36,16 @@ import dev.kord.rest.route.Route
 import gay.floof.utils.slf4j.logging
 import io.sentry.Sentry
 import kotlinx.coroutines.launch
-import org.jetbrains.exposed.sql.*
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.common.DEDI_NODE
 import sh.nino.discord.common.NinoInfo
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.extensions.retrieve
 import sh.nino.discord.common.extensions.retrieveAll
+import sh.nino.discord.core.listeners.*
 import sh.nino.discord.core.localization.LocalizationManager
 import sh.nino.discord.core.timers.TimerJob
 import sh.nino.discord.core.timers.TimerManager
-import sh.nino.discord.database.tables.*
 import sh.nino.discord.timeouts.Client
 import java.lang.management.ManagementFactory
 import java.util.concurrent.Executor
@@ -124,7 +123,6 @@ class NinoBot {
         kord.applyGenericEvents()
         kord.applyGuildEvents()
         kord.applyGuildMemberEvents()
-        kord.applyThreadEvents()
         kord.applyUserEvents()
         kord.applyVoiceStateEvents()
         kord.applyGuildBanEvents()

@@ -21,3 +21,79 @@
  */
 
 package sh.nino.discord.commands.system
+
+import dev.kord.rest.NamedFile
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import org.apache.commons.lang3.time.StopWatch
+import sh.nino.discord.commands.AbstractCommand
+import sh.nino.discord.commands.CommandCategory
+import sh.nino.discord.commands.CommandMessage
+import sh.nino.discord.commands.annotations.Command
+import sh.nino.discord.common.extensions.humanize
+import java.io.ByteArrayInputStream
+import java.lang.management.ManagementFactory
+import java.util.concurrent.TimeUnit
+
+@Command(
+    "threads",
+    "Shows the thread information within the bot so far",
+    aliases = ["dump.threads", "dump"],
+    ownerOnly = true,
+    category = CommandCategory.SYSTEM
+)
+class DumpThreadInfoCommand: AbstractCommand() {
+    override suspend fun execute(msg: CommandMessage) {
+        val message = msg.reply("Now collecting thread information, this might take a while...")
+        val watch = StopWatch.createStarted()
+
+        val builder = StringBuilder()
+        val mxBean = ManagementFactory.getThreadMXBean()
+        val infos = mxBean.getThreadInfo(mxBean.allThreadIds)
+
+        builder.appendLine("-- Thread dump created by ${msg.author.tag} (${msg.author.id}) at ${Clock.System.now()} --")
+        builder.appendLine()
+
+        for (info in infos) {
+            builder.appendLine("[ Thread ${info.threadName} (#${info.threadId}) - ${info.threadState} ]")
+            if (mxBean.isThreadCpuTimeSupported) {
+                val actualCpuTime = TimeUnit.MILLISECONDS.convert(mxBean.getThreadCpuTime(info.threadId), TimeUnit.NANOSECONDS)
+                builder.appendLine("• CPU Time: ${actualCpuTime.humanize(long = true, includeMs = true)}")
+            }
+
+            builder.appendLine("• User Time: ${TimeUnit.MILLISECONDS.convert(mxBean.getThreadUserTime(info.threadId), TimeUnit.NANOSECONDS).humanize(long = true, includeMs = true)}")
+            builder.appendLine()
+
+            if (info.stackTrace.isEmpty()) {
+                builder.appendLine("-- Stacktrace is not available! --")
+            } else {
+                val stacktrace = info.stackTrace
+                for (element in stacktrace) {
+                    builder.append("\n    at ")
+                    builder.append(element)
+                }
+            }
+
+            builder.append("\n\n")
+        }
+
+        message.delete()
+
+        val stream = withContext(Dispatchers.IO) {
+            ByteArrayInputStream(builder.toString().toByteArray(Charsets.UTF_8))
+        }
+
+        val file = NamedFile("thread_dump.txt", stream)
+        watch.stop()
+
+        msg.replyFile(buildString {
+            appendLine(":thumbsup: I have collected the thread information for you! It only took **${watch.getTime(
+                TimeUnit.MILLISECONDS)}**ms to calculate!")
+
+            appendLine(":eyes: You can inspect it in the file I created for you, say thanks after, please? :3")
+            appendLine(":pencil: There is currently **${mxBean.threadCount}** threads in this current Java Virtual Machine, only ${mxBean.daemonThreadCount} are background threads.")
+        }, listOf(file))
+    }
+}

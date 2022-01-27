@@ -26,7 +26,7 @@ import org.koin.dsl.module
 import sh.nino.discord.punishments.impl.PunishmentModuleImpl
 
 val punishmentsModule = module {
-    single {
+    single<PunishmentModule> {
         PunishmentModuleImpl()
     }
 }

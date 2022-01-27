@@ -23,6 +23,21 @@
 package sh.nino.discord.core.listeners
 
 import dev.kord.core.Kord
+import dev.kord.core.event.guild.BanAddEvent
+import dev.kord.core.event.guild.BanRemoveEvent
+import dev.kord.core.on
+import org.slf4j.LoggerFactory
 
 fun Kord.applyGuildBanEvents() {
+    val log = LoggerFactory.getLogger("sh.nino.discord.core.listeners.GuildBansListenerKt")
+
+    on<BanAddEvent> {
+
+    }
+
+    on<BanRemoveEvent> {
+
+    }
+
+    log.info("✔ Registered all guild ban events!")
 }

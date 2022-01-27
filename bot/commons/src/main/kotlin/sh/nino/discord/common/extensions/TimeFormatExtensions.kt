@@ -39,9 +39,9 @@ fun Long.formatSize(): String {
 
 /**
  * Returns the humanized time for a [java.lang.Long] instance
- * @credit // Credit: https://github.com/DV8FromTheWorld/Yui/blob/master/src/main/java/net/dv8tion/discord/commands/UptimeCommand.java#L34
+ * @credit https://github.com/DV8FromTheWorld/Yui/blob/master/src/main/java/net/dv8tion/discord/commands/UptimeCommand.java#L34
  */
-fun Long.humanize(long: Boolean = false): String {
+fun Long.humanize(long: Boolean = false, includeMs: Boolean = false): String {
     val months = this / 2592000000L % 12
     val weeks = this / 604800000L % 7
     val days = this / 86400000L % 30
@@ -50,12 +50,16 @@ fun Long.humanize(long: Boolean = false): String {
     val seconds = this / 1000L % 60
 
     val str = StringBuilder()
-    if (months > 0) str.append(if (long) "$months month${if (months == 1L) "" else "s"}" else "${months}mo")
-    if (weeks > 0) str.append(if (long) "$weeks week${if (weeks == 1L) "" else "s"}" else "${weeks}w")
-    if (days > 0) str.append(if (long) "$days day${if (months == 1L) "" else "s"}" else "${days}d")
-    if (hours > 0) str.append(if (long) "$hours hour${if (months == 1L) "" else "s"}" else "${hours}h")
-    if (minutes > 0) str.append(if (long) "$minutes minute${if (months == 1L) "" else "s"}" else "${minutes}m")
-    if (seconds > 0) str.append(if (long) "$seconds second${if (months == 1L) "" else "s"}" else "${seconds}s")
+    if (months > 0) str.append(if (long) "$months month${if (months == 1L) "" else "s"}, " else "${months}mo")
+    if (weeks > 0) str.append(if (long) "$weeks week${if (weeks == 1L) "" else "s"}, " else "${weeks}w")
+    if (days > 0) str.append(if (long) "$days day${if (days == 1L) "" else "s"}, " else "${days}d")
+    if (hours > 0) str.append(if (long) "$hours hour${if (hours == 1L) "" else "s"}, " else "${hours}h")
+    if (minutes > 0) str.append(if (long) "$minutes minute${if (minutes == 1L) "" else "s"}, " else "${minutes}m")
+    if (seconds > 0) str.append(if (long) "$seconds second${if (seconds == 1L) "" else "s"}${if (includeMs && this < 1000) ", " else ""}" else "${seconds}s")
+
+    // Check if this is not over 1000 milliseconds (1 second), so we don't display
+    // 1 second, 1893 milliseconds
+    if (includeMs && this < 1000) str.append(if (long) "$this millisecond${if (this == 1L) "" else "s"}" else "${this}ms")
 
     return str.toString()
 }

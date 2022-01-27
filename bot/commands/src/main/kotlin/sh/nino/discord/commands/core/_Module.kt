@@ -22,6 +22,10 @@
 
 package sh.nino.discord.commands.core
 
+import org.koin.dsl.bind
 import org.koin.dsl.module
+import sh.nino.discord.commands.AbstractCommand
 
-val coreCommandsModule = module {}
+val coreCommandsModule = module {
+    single { HelpCommand(get(), get(), get()) } bind AbstractCommand::class
+}

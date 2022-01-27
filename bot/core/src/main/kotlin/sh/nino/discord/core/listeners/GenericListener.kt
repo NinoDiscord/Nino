@@ -28,6 +28,7 @@ import dev.kord.core.event.Event
 import dev.kord.core.event.gateway.DisconnectEvent
 import dev.kord.core.event.gateway.ReadyEvent
 import dev.kord.core.on
+import kotlinx.coroutines.flow.count
 import org.koin.core.context.GlobalContext
 import org.slf4j.LoggerFactory
 import sh.nino.discord.common.data.Config
@@ -40,15 +41,22 @@ import sh.nino.discord.metrics.MetricsRegistry
 fun Kord.applyGenericEvents() {
     val logger = LoggerFactory.getLogger("sh.nino.discord.core.listeners.GenericListenerKt")
     val nino = GlobalContext.retrieve<NinoBot>()
+    val metrics = GlobalContext.retrieve<MetricsRegistry>()
 
     on<ReadyEvent> {
         logger.info("Successfully launched bot as ${this.self.tag} (${this.self.id}) on shard #${this.shard} in ${(System.currentTimeMillis() - nino.bootTime).humanize(true)}")
         logger.info("Ready in ${this.guilds.size} guilds! | Using Discord Gateway v${this.gatewayVersion}")
 
         val config = GlobalContext.retrieve<Config>()
+        val guildCount = kord.guilds.count()
         val currStatus = config.status.status
-            .replace("{shard_id}", this.shard.toString())
-            .replace("{guilds}", this.guilds.size.toString())
+            .replace("{shard_id}", "$shard")
+            .replace("{guilds}", "$guildCount")
+
+        // Set guild count to whatever it is listed
+        if (metrics.enabled) {
+            metrics.guildCount?.set(guildCount.toDouble())
+        }
 
         kord.editPresence {
             status = config.status.presence
@@ -97,9 +105,10 @@ fun Kord.applyGenericEvents() {
     }
 
     on<Event> {
-        val metrics = GlobalContext.retrieve<MetricsRegistry>()
         if (metrics.enabled) {
             metrics.websocketEvents?.labels("$shard", this.name)?.inc()
         }
     }
+
+    logger.info("✔ Registered all generic events!")
 }
