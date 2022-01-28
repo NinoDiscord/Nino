@@ -66,14 +66,8 @@ jobs:
         with:
           distribution: temurin # Eclipse Temurin is <3
           java-version: 17
-
-      - name: Setup gradle cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-test-gradle-${{ hashFiles('**/*.gradle*') }}
-          restore-keys: |
-            ${{ runner.os }}-test-gradle-
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
 
       - name: Lets ./gradlew be executable
         run: chmod +x ./gradlew

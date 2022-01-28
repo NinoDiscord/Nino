@@ -20,20 +20,13 @@
  * SOFTWARE.
  */
 
+plugins {
+    `nino-module`
+}
+
 dependencies {
-    implementation("io.prometheus:simpleclient_hotspot:0.14.1")
     implementation("io.prometheus:simpleclient_common:0.14.1")
-    implementation("io.insert-koin:koin-core:3.1.4")
-    implementation("io.prometheus:simpleclient:0.14.1")
-    implementation("io.ktor:ktor-server-netty:1.6.7")
-    implementation("io.ktor:ktor-serialization:1.6.7")
-//    implementation("io.ktor:ktor-serialization:2.0.0-beta-1")
-//    implementation("io.ktor:ktor-server-netty:2.0.0-beta-1")
-//    implementation("io.ktor:ktor-server-content-negotiation:2.0.0-beta-1")
-//    implementation("io.ktor:ktor-server-default-headers:2.0.0-beta-1")
-//    implementation("io.ktor:ktor-server-cors:2.0.0-beta-1")
-//    implementation("io.ktor:ktor-serialization-kotlinx-json:2.0.0-beta-1")
-//    implementation("io.ktor:ktor-server-double-receive:2.0.0-beta-1")
+    implementation("io.ktor:ktor-server-netty")
     implementation(project(":bot:database"))
     implementation(project(":bot:metrics"))
     implementation(project(":bot:core"))

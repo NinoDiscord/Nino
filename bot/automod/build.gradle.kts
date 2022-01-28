@@ -20,6 +20,10 @@
  * SOFTWARE.
  */
 
+plugins {
+    `nino-module`
+}
+
 dependencies {
     implementation(project(":bot:punishments"))
     implementation(project(":bot:database"))

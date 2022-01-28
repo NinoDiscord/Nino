@@ -20,6 +20,10 @@
  * SOFTWARE.
  */
 
+plugins {
+    `nino-module`
+}
+
 dependencies {
     implementation(project(":bot:automod"))
     implementation(project(":bot:database"))

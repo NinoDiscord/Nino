@@ -31,14 +31,14 @@ debug "  => Custom Logback Location: ${NINO_CUSTOM_LOGBACK_FILE:-unknown}"
 debug "  => Using Custom Gateway:    ${NINO_USE_GATEWAY:-false}"
 debug "  => Dedicated Node:          ${WINTERFOX_DEDI_NODE:-none}"
 
-JVM_ARGS=("-XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8")
+JVM_OPTS=("-XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8")
 
 if [[ -z "${NINO_CUSTOM_LOGBACK_FILE:-}" ]]
-  JVM_ARGS+=("-Dlogback.configurationFile=${NINO_CUSTOM_LOGBACK_FILE} ")
+  JVM_OPTS+=("-Dlogback.configurationFile=${NINO_CUSTOM_LOGBACK_FILE} ")
 
 if [[ -z "${WINTERFOX_DEDI_NODE:-}" ]]
-  JVM_ARGS+=("-Pwinterfox.dediNode=${WINTERFOX_DEDI_NODE} ")
+  JVM_OPTS+=("-Pwinterfox.dediNode=${WINTERFOX_DEDI_NODE} ")
 
-JVM_ARGS+=("$@")
+JVM_OPTS+=("$@")
 
-java -jar /app/noelware/nino/Nino.jar $JVM_ARGS
+/app/noelware/nino/bot/bin/bot

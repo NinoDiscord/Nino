@@ -20,4 +20,6 @@
  * SOFTWARE.
  */
 
-// empty because all dependencies are in the root project
+plugins {
+    `nino-module`
+}
