@@ -28,4 +28,7 @@ import sh.nino.discord.commands.AbstractCommand
 
 val coreCommandsModule = module {
     single { HelpCommand(get(), get(), get()) } bind AbstractCommand::class
+    single { InviteMeCommand() } bind AbstractCommand::class
+    single { PingCommand(get()) } bind AbstractCommand::class
+    single { ShardInfoCommand() } bind AbstractCommand::class
 }

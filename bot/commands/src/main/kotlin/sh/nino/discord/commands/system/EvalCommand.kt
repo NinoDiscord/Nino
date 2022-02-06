@@ -92,6 +92,7 @@ class EvalCommand(
                 import kotlinx.serialization.json.*
                 import kotlinx.serialization.*
                 import sh.nino.discord.core.*
+                import dev.kord.core.*
 
                 $script
                 """.trimIndent()

@@ -21,3 +21,28 @@
  */
 
 package sh.nino.discord.commands.core
+
+import sh.nino.discord.commands.AbstractCommand
+import sh.nino.discord.commands.CommandMessage
+import sh.nino.discord.commands.annotations.Command
+
+@Command(
+    "invite",
+    "descriptions.core.invite",
+    aliases = ["inviteme", "i"]
+)
+class InviteMeCommand: AbstractCommand() {
+    override suspend fun execute(msg: CommandMessage) {
+        msg.reply(
+            buildString {
+                appendLine(":wave: Hello, **${msg.author.tag}**! Thanks for considering inviting me, you can invite")
+                appendLine("me using the \"Add Server\" button when you click my profile or you can use the link below:")
+                appendLine("**<https://discord.com/oauth2/authorize?client_id=${msg.kord.selfId}&scope=bot+applications.commands>**")
+                appendLine()
+                appendLine(":question: Need any help when using my moderation features? You can read the FAQ at **<https://nino.sh/faq>**")
+                appendLine("or you can directly ask in the **Noelware** Discord server:")
+                appendLine("https://discord.gg/ATmjFH9kMH")
+            }
+        )
+    }
+}

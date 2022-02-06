@@ -50,6 +50,7 @@ class CommandMessage(
     val attachments = event.message.attachments.toList()
     val message = event.message
     val author = message.author!!
+    val kord = event.kord
 
     suspend fun createPaginationEmbed(embeds: List<EmbedBuilder>): PaginationEmbed {
         val channel = message.channel.asChannel() as TextChannel
