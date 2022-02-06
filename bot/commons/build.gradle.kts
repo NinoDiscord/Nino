@@ -25,12 +25,11 @@ plugins {
 }
 
 dependencies {
-
     // common kotlin libraries for all projects
     api(kotlin("reflect"))
 
     // kotlinx libraries
-    api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.5.2-native-mt"))
+    api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.0-native-mt"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
     api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.1"))
@@ -52,8 +51,8 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.9.3")
 //        implementation("io.ktor:ktor-client-okhttp")
 //        implementation("io.ktor:ktor-client-core")
-    api("io.insert-koin:koin-core:3.1.4")
-    api("dev.kord:kord-core:0.8.0-M8")
+    api("io.insert-koin:koin-core:3.1.5")
+    api("dev.kord:kord-core:0.8.0-M9")
     api("io.lettuce:lettuce-core:6.1.6.RELEASE")
     api(platform("org.jetbrains.exposed:exposed-bom:0.36.1"))
     api("org.jetbrains.exposed:exposed-kotlin-datetime")
@@ -62,9 +61,9 @@ dependencies {
     api("org.jetbrains.exposed:exposed-dao")
     api("org.postgresql:postgresql:42.3.1")
     api("com.zaxxer:HikariCP:5.0.1")
-    api("org.slf4j:slf4j-api:1.7.32")
-    api("io.sentry:sentry:5.5.1")
-    api("io.sentry:sentry-logback:5.5.1")
+    api("org.slf4j:slf4j-api:1.7.35")
+    api("io.sentry:sentry:5.6.0")
+    api("io.sentry:sentry-logback:5.6.0")
 //        implementation("io.ktor:ktor-serialization-kotlinx-json")
 //        implementation("io.ktor:ktor-client-content-negotiation")
     api("dev.kord.x:emoji:0.5.0")
