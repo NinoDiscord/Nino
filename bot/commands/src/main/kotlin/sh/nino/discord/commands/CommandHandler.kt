@@ -55,7 +55,6 @@ import java.io.PrintStream
 import java.nio.charset.StandardCharsets
 import java.util.*
 import kotlin.math.round
-import kotlin.reflect.jvm.jvmName
 
 class CommandHandler(
     private val config: Config,
@@ -203,6 +202,12 @@ class CommandHandler(
             guild
         )
 
+        val needsHelp = (message.flags["help"] ?: message.flags["h"])?.asYOrNull ?: false
+        if (needsHelp) {
+            command.help(message)
+            return
+        }
+
         if (command.ownerOnly && !config.owners.contains(event.message.author!!.id.toString())) {
             message.reply(locale.translate("errors.ownerOnly", mapOf("name" to cmdName)))
             return
@@ -215,7 +220,7 @@ class CommandHandler(
             }
 
             if (missing.isNotEmpty()) {
-                val permList = missing.map { perm -> perm::class.jvmName.split("$").last() }
+                val permList = missing.joinToString(", ") { it.asString() }
                 message.reply(
                     locale.translate(
                         "errors.missingPermsUser",
@@ -235,7 +240,7 @@ class CommandHandler(
             }
 
             if (missing.isNotEmpty()) {
-                val permList = missing.map { perm -> perm::class.jvmName.split("$").last() }
+                val permList = missing.joinToString(", ") { it.asString() }
                 message.reply(
                     locale.translate(
                         "errors.missingPermsBot",
@@ -309,6 +314,27 @@ class CommandHandler(
                 locale,
                 guild
             )
+
+            if (subcommand.permissions.values.isNotEmpty() && guild.ownerId != event.message.author!!.id) {
+                val member = event.message.getAuthorAsMember()!!
+                val missing = subcommand.permissions.values.filter {
+                    !member.getPermissions().contains(it)
+                }
+
+                if (missing.isNotEmpty()) {
+                    val permList = missing.joinToString(", ") { it.asString() }
+                    message.reply(
+                        locale.translate(
+                            "errors.missingPermsUser",
+                            mapOf(
+                                "perms" to permList
+                            )
+                        )
+                    )
+
+                    return
+                }
+            }
 
             subcommand.execute(newMsg) { ex, success ->
                 logger.info("Subcommand \"$prefix${command.name} ${subcommand.name}\" was executed by ${newMsg.author.tag} (${newMsg.author.id}) in ${guild.name} (${guild.id})")

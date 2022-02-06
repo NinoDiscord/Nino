@@ -37,12 +37,12 @@ class Subcommand private constructor(
     val aliases: List<String> = listOf(),
     val permissions: Permissions = Permissions(),
     private val method: KCallable<*>,
-    private val thisCtx: Any
+    val parent: AbstractCommand
 ) {
     constructor(
         method: KCallable<*>,
         info: Annotation,
-        thisCtx: Any
+        thisCtx: AbstractCommand
     ): this(
         info.name,
         info.description,
@@ -57,7 +57,7 @@ class Subcommand private constructor(
         if (method.isSuspend) {
             NinoScope.launch {
                 try {
-                    method.callSuspend(thisCtx, msg)
+                    method.callSuspend(parent, msg)
                     callback(null, true)
                 } catch (e: Exception) {
                     callback(e, false)
@@ -65,7 +65,7 @@ class Subcommand private constructor(
             }
         } else {
             try {
-                method.call(thisCtx, msg)
+                method.call(parent, msg)
                 callback(null, true)
             } catch (e: Exception) {
                 callback(e, false)

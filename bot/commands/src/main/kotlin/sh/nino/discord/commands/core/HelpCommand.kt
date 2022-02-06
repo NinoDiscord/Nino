@@ -23,10 +23,7 @@
 package sh.nino.discord.commands.core
 
 import dev.kord.core.Kord
-import sh.nino.discord.commands.AbstractCommand
-import sh.nino.discord.commands.CommandCategory
-import sh.nino.discord.commands.CommandHandler
-import sh.nino.discord.commands.CommandMessage
+import sh.nino.discord.commands.*
 import sh.nino.discord.commands.annotations.Command
 import sh.nino.discord.common.data.Config
 import java.util.*
@@ -66,7 +63,7 @@ class HelpCommand(private val handler: CommandHandler, private val config: Confi
                 appendLine(":pencil2: For more documentation on a command, you can type [${prefix}help <cmdOrModule>](https://nino.sh/commands), replace **<cmdOrModule>** is the command or module you want to view.")
                 appendLine()
                 appendLine("There are currently **${handler.commands.size}** commands available.")
-                appendLine("[**Privacy Policy**](https://nino.sh/privacy) `|` [**Terms of Service**](https://nino.sh/tos)")
+                appendLine("[**Privacy Policy**](https://nino.sh/privacy) | [**Terms of Service**](https://nino.sh/tos)")
             }
 
             for ((cat, commands) in commandByCategoryCache) {
@@ -139,9 +136,7 @@ class HelpCommand(private val handler: CommandHandler, private val config: Confi
                 }
 
                 if (subcmd != null) {
-                    msg.reply {
-                        title = "blep"
-                    }
+                    subcmd.help(msg)
                 } else {
                     msg.reply("Command **$command** existed but not subcommand **$subcommand**.")
                 }
@@ -154,9 +149,7 @@ class HelpCommand(private val handler: CommandHandler, private val config: Confi
             }
 
             if (command != null) {
-                msg.reply {
-                    title = "blep"
-                }
+                command.help(msg)
             } else {
                 // Check if it is a module
                 val module = handler.commands.values.filter {
@@ -192,105 +185,3 @@ class HelpCommand(private val handler: CommandHandler, private val config: Confi
         }
     }
 }
-
-/*
-    private suspend fun renderCommandHelp(msg: CommandMessage) {
-        val command = handler.commands.values.firstOrNull {
-            (it.name == arg || it.aliases.contains(arg)) && (it.category != CommandCategory.EASTER_EGG && it.category != CommandCategory.SYSTEM)
-        }
-
-        if (command != null) {
-            msg.replyEmbed {
-                title = "[ \uD83D\uDD8C️ Command ${command.name} ]"
-                description = msg.locale.translate(command.description)
-
-                field {
-                    name = "❯ Syntax"
-                    value = "`$prefix${command.name} ${command.usage.trim()}`"
-                    inline = false
-                }
-
-                field {
-                    name = "❯ Category"
-                    value = "${command.category.emoji} **${command.category.category}**"
-                    inline = true
-                }
-
-                field {
-                    name = "❯ Alias(es)"
-                    value = command.aliases.joinToString(", ").ifEmpty { "None" }
-                    inline = true
-                }
-
-                field {
-                    name = "❯ Examples"
-                    value = command.examples.joinToString("\n") { it.replace("{prefix}", prefix) }.ifEmpty { "No examples were provided." }
-                    inline = true
-                }
-
-                field {
-                    name = "❯ Conditions"
-                    value = buildString {
-                        appendLine("• **Owner Only**: ${if (command.ownerOnly) "Yes" else "No"}")
-                    }
-
-                    inline = true
-                }
-
-                field {
-                    name = "❯ Cooldown"
-                    value = "${command.cooldown}s"
-                    inline = true
-                }
-
-                field {
-                    name = "❯ Permissions"
-                    value = buildString {
-                        appendLine("**User**:")
-                        if (command.userPermissions.values.isEmpty()) {
-                            appendLine("• **None**")
-                        } else {
-                            for (perm in command.userPermissions.values.toTypedArray()) {
-                                appendLine("• ${perm.asString()}")
-                            }
-                        }
-
-                        appendLine()
-                        appendLine("**Bot**:")
-                        if (command.botPermissions.values.isEmpty()) {
-                            appendLine("• **None**")
-                        } else {
-                            for (perm in command.botPermissions.values.toTypedArray()) {
-                                appendLine("• ${perm.asString()}")
-                            }
-                        }
-                    }
-
-                    inline = true
-                }
-            }
-        } else {
-            val module = handler.commands.values.filter {
-                it.category.category.lowercase() == arg.lowercase() && !listOf("system", "easter_egg").contains(arg.lowercase())
-            }
-
-            if (module.isNotEmpty()) {
-                val propLen = { name: String -> name.length }
-                val longestCmdName = propLen(module.sort { a, b -> propLen(b.name) - propLen(a.name) }.first().name)
-
-                msg.replyEmbed {
-                    title = "[ Module ${arg.toTitleCase()} ]"
-                    description = buildString {
-                        for (c in module) {
-                            appendLine("`${c.name.padEnd((longestCmdName * 2) - c.name.length, '\u200b')}` | \u200b \u200b**${msg.locale.translate(c.description)}**")
-                        }
-                    }
-                }
-            } else {
-                msg.reply(":question: Command or module **$arg** was not found.")
-                return
-            }
-        }
-    }
-}
- */

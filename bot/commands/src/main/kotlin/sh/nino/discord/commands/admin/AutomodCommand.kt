@@ -34,7 +34,6 @@ import sh.nino.discord.core.NinoScope
 import sh.nino.discord.database.asyncTransaction
 import sh.nino.discord.database.tables.AutomodEntity
 import sh.nino.discord.database.tables.AutomodTable
-import java.lang.NumberFormatException
 import java.util.*
 
 @Command(
