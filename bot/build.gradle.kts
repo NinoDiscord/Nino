@@ -40,6 +40,12 @@ val commitHash by lazy {
     proc.inputStream.bufferedReader().readText().trim()
 }
 
+distributions {
+    main {
+        distributionBaseName.set("Nino")
+    }
+}
+
 dependencies {
     runtimeOnly(kotlin("scripting-jsr223"))
 
@@ -90,5 +96,9 @@ tasks {
         dependsOn(spotlessApply)
         dependsOn(kotest)
         dependsOn(processResources)
+    }
+
+    run {
+
     }
 }
