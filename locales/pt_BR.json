@@ -1,6 +1,6 @@
 {
   "meta": {
-    "contributors": [],
+    "contributors": ["733418202704642078"],
     "translator": "197448151064379393",
     "aliases": ["port", "portuges", "português"],
     "code": "pt_BR",
@@ -9,124 +9,124 @@
   },
   "strings": {
     "descriptions": {
-      "help": "Returns a list of Nino's commands or documentation of a specific command or module.",
-      "invite": "Returns the invitation link to invite Nino into your guild! Also, support if you really need it.",
-      "locale": "Sets, resets, or views the current translations for Nino.",
-      "ping": "Returns the latency of anything that could cause me being... slighly un-usable...",
-      "shardinfo": "Returns shard information for Nino.",
-      "source": "Returns the source code URL of Nino, maybe to contribute or give a :star:?",
-      "statistics": "Returns nerd statistics related to Nino.",
-      "uptime": "How long I have been up for!",
+      "help": "Retorna uma lista dos comandos da Nino ou a documentação de um comando específico ou módulo",
+      "invite": "Retorna o invite para adicionar a Nino em seu servidor! Além disso, suporte se você realmente precisar.",
+      "locale": "Define, redefine ou visualiza as traduções atuais da Nino.",
+      "ping": "Retorna a latência de qualquer coisa que possa me fazer ser... Um pouco inutilizável...",
+      "shardinfo": "Retorna a informação das shards da Nino",
+      "source": "Retorna o link do código open source da Nino, talvez para contribuir ou dar um :star:?",
+      "statistics": "Retorna estatísticas nerds da Nino.",
+      "uptime": "Há quanto tempo estou acordada!",
 
-      "ban": "Bans a user from this guild or outside the guild.",
-      "case": "Returns a mini embed of the case you searched up.",
-      "kick": ":boot: Kicks a member from this guild.",
-      "mute": "Mutes a member from any textable channel.",
-      "pardon": "Removes one or multiple warnings from a user in this guild.",
-      "purge": "Purges a certain amount of messages by user(s), system account, bot(s), or specific messages.",
-      "reason": "Changes the reason of a specific case.",
-      "softban": "Softly bans a user from this guild.",
-      "timeouts": "Returns a list of timeouts based on the type of action.",
-      "unban": "Unbans a user from this guild.",
-      "unmute": "Unmutes a user from this guild.",
-      "warn": "Warns a specific user.",
-      "warnings": "Shows a list of warnings from a specific user.",
-      "voice_mute": "Mutes a person in the voice channel you're in.",
-      "voice_deafen": "Deafens a person in the voice channel you're in.",
-      "voice_undeafen": "Undeafens a person in the voice channel you're in.",
-      "voice_unmute": "Unmutes a person in the voice channel you're in.",
-      "voice_kick": "Kicks any member(s) or bot(s) in a voice channel you're in.",
+      "ban": "Bane um usuário deste servidor ou de fora do servidor.",
+      "case": "Retorna uma mini embed do caso que você pesquisou.",
+      "kick": ":boot: Expulse um membro desse servidor.",
+      "mute": "Mute um membro de qualquer canal.",
+      "pardon": "Remove um ou vários avisos de um membro neste servidor.",
+      "purge": "Limpa uma certa quantidade de mensagens por membro(s), conta do sistema, bot(s) ou mensagens específicas.",
+      "reason": "Altera o motivo de um caso específico.",
+      "softban": "Bane suavemente um usuário desta guilda.",
+      "timeouts": "Retorna uma lista de tempos limite com base no tipo de ação.",
+      "unban": "Desbane um usuário desse servidor.",
+      "unmute": "Desmuta um usuário desse servidor.",
+      "warn": "Avise um usuário específico.",
+      "warnings": "Veja uma lista de avisos de um usuário específico.",
+      "voice_mute": "Silencia um membro no canal de voz em que você está.",
+      "voice_deafen": "Ensurdece uma pessoa no canal de voz em que você está.",
+      "voice_undeafen": "Deixa uma pessoa surda no canal de voz em que você está.",
+      "voice_unmute": "Desmuta o som de uma pessoa no canal de voz em que você está.",
+      "voice_kick": "Expulse qualquer membro(s) ou bot(s) no canal de voz em que você está.",
 
-      "automod": "Enables, disables, or views any automod utility available.",
-      "logging": "Enables or disable the Logging feature.",
-      "modlog": "Set or reset the mod log channel.",
-      "muted_role": "Sets or resets the Muted role.",
-      "prefix": "View, change, or reset a guild or user prefix.",
-      "punishments": "View, change, or remove a guild punishment.",
-      "settings": "Views a list of all the settings in this guild."
+      "automod": "Ativa, desativa, ou olhe qualquer utilidade de automod disponível.",
+      "logging": "Habilita ou desabilita o recurso Logs.",
+      "modlog": "Sete ou resete o canal de mod-logs.",
+      "muted_role": "Sete ou resete o cargo de muted.",
+      "prefix": "Veja, mude, ou resete o prefixo do servidor ou do usuário.",
+      "punishments": "Visualize, altere ou remova uma punição do servidor.",
+      "settings": "Exibe uma lista de todas as configurações deste servidor."
     },
     "commands": {
       "help": {
         "embed": {
-          "title": "%s | Commands List",
+          "title": "%s | Lista de Comandos",
           "description": [
-            ":pencil2: **For more documentation, you can type `%shelp <cmdOrMod>` with `<cmdOrMod>` being the command or module in this list.**",
+            ":pencil2: **Para mais informações, você pode digitar `%shelp <cmdOuMod>` com `<cmdOuMod>` sendo o comando ou módulo nesta lista.**",
             "",
-            "More information and a prettier UI for commands or modules can be viewed on the [website](https://nino.floofy.dev).",
-            "There are currently **%d** available commands."
+            "Mais informações e uma interface de usuário mais bonita para comandos ou módulos podem ser visualizadas no [website](https://nino.floofy.dev).",
+            "Há atualmente **%d** comandos disponíveis."
           ],
           "fields": {
-            "moderation": "• Moderation [%d]",
-            "core": "• Core [%d]",
-            "settings": "• Settings [%d]"
+            "moderation": "• Moderação [%d]",
+            "core": "• Núcleo [%d]",
+            "settings": "• Configurações [%d]"
           }
         },
         "command": {
-          "not_found": ":question: Command or module **%s** was not found.",
+          "not_found": ":question: Comando ou módulo **%s** não foi encontrado.",
           "embed": {
-            "title": "[ :pencil2: Command \"%s\" ]",
+            "title": "[ :pencil2: Comando \"%s\" ]",
             "description": "> **%s**",
             "fields": {
-              "syntax": "• Syntax",
-              "category": "• Category",
+              "syntax": "• Sintaxe",
+              "category": "• Categoria",
               "aliases": "• Aliases",
-              "owner_only": "• Owner Only",
+              "owner_only": "• Apenas para o dono",
               "cooldown": "• Cooldown",
-              "user_perms": "• Required User Permissions",
-              "bot_perms": "• Required Bot Permissions",
-              "examples": "• Examples"
+              "user_perms": "• Permissões de usuário necessárias",
+              "bot_perms": "• Permissões da bot necessárias",
+              "examples": "• Exemplos"
             }
           }
         },
         "module": {
           "embed": {
-            "title": "[ ·̩̩̥͙＊*•̩̩͙✩•̩̩͙* Module \"%s\" ˚*•̩̩͙✩•̩̩͙*˚＊·̩̩̥͙ ]"
+            "title": "[ ·̩̩̥͙＊*•̩̩͙✩•̩̩͙* Módulo \"%s\" ˚*•̩̩͙✩•̩̩͙*˚＊·̩̩̥͙ ]"
           }
         },
-        "usage_title": "Command Usage",
+        "usage_title": "Usagem do comando",
         "usage": [
-          "So, if you're not familar with the command syntax, here's a breakdown:",
+          "Então, se você não estiver familiarizado com a sintaxe do comando, aqui está um detalhamento:",
           "",
-          "> A simple command might look like: `%shelp [cmdOrMod | \"usage\"]`",
+          "> Um comando simples pode parecer: `%shelp [cmdOuMod | \"usagem\"]`",
           "",
           "```",
-          "x!    help    [cmdOrMod      | \"usage\"]",
+          "x!    help    [cmdOuMod      | \"usagem\"]",
           "^       ^         ^          ^   ^",
           "|       |         |          |   |",
           "|       |         |          |   |",
           "|       |         |          |   |",
-          "prefix cmd    parameter(s)  \"or\" literal",
+          "prefix cmd    parâmetro(s)  \"ou\" literais",
           "```",
           "",
-          "Parameters are easy to understand. If they are \"piped\" with a `|`, it means it's a \"or\", or what you can provide. If they are a literal",
-          "parameter, it means if you typed \"usage\" out, it'll print something else.",
+          "Os parâmetros são fáceis de entender. Se eles são \"separados\" com `|`, significa que é um \"ou\", ou o que você pode fornecer. Se eles são literais",
+          "parâmetro, significa que se você digitou \"usage\", ele imprimirá outra coisa.",
           "",
-          "- A parameter wrapped in `[]` means it's optional, but you can add additional arguments to make it run something else",
-          "- A parameter wrapped in `<>` means it's required, which means *you* have to add that argument to make the command perform correctly.",
+          "- Um parâmetro envolvido em `[]` significa que é opcional, mas você pode adicionar argumentos adicionais para fazê-lo executar outra coisa",
+          "- Um parâmetro envolto em `<>` significa que é obrigatório, o que significa que *você* precisa adicionar esse argumento para que o comando seja executado corretamente.",
           "",
-          ":question: **Still stuck? There is always examples in the command's short overview to show how you can run that specific command.**"
+          ":question: **Ainda preso? Há sempre exemplos na breve visão geral do comando para mostrar como você pode executar esse comando específico.**"
         ]
       }
     },
     "generic": {},
     "automod": {
-      "blacklist": "Hey, I don't think you should say that here! (☍﹏⁰)｡",
-      "invites": "Hey! You're not allowed to post server links here... o(╥﹏╥)o",
-      "mentions": "Uhm, I don't think that'll get their attention... （；¬＿¬)",
-      "shortlinks": "You shouldn't send that kind of link here... (⁎˃ᆺ˂)",
-      "spam": "I don't think spamming will get you anywhere... o(╥﹏╥)o",
+      "blacklist": "Hey, eu não acho que você deveria dizer isso aqui! (☍﹏⁰)｡",
+      "invites": "Hey! Você não tem permissão para postar links de servidor aqui... o(╥﹏╥)o",
+      "mentions": "Uhm, eu não acho que isso vai chamar a atenção deles... （；¬＿¬)",
+      "shortlinks": "Você não deve enviar esse tipo de link aqui... (⁎˃ᆺ˂)",
+      "spam": "Eu não acho que o spam vai te levar a lugar nenhum... o(╥﹏╥)o",
       "raid": {
-        "locked": "Hey all! I decided to close off all channels you had access in for ~10 seconds due to someone being rude and raiding! ૮( ᵒ̌▱๋ᵒ̌ )ა",
-        "unlocked": "Heyo! I restored all channels, I hope there is no more raiders.. :3."
+        "locked": "Olá a todos! Decidi fechar todos os canais aos quais você tinha acesso por ~10 segundos devido a alguém ser rude e invadir! ૮( ᵒ̌▱๋ᵒ̌ )ა",
+        "unlocked": "Heyo! Eu restaurei todos os canais, espero que não haja mais invasores.. :3."
       }
     },
     "errors": {
       "blacklists": {
         "guild": [
-          "Guild **${guild}** is blacklisted from using me by **${user}**",
+          "Guild **${guild}** está na lista negra de me usar por **${user}**",
           "> **${reason}**",
           "",
-          ":question: If there was an issue or a misunderstanding in the blacklist, contact us here:"
+          ":question: Se houver um problema ou um mal-entendido na lista negra, entre em contato conosco aqui:"
         ],
         "user": []
       }
