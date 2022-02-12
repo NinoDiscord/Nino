@@ -47,7 +47,7 @@ import sh.nino.discord.database.tables.Users
 )
 class PrefixCommand(private val config: Config): AbstractCommand() {
     override suspend fun execute(msg: CommandMessage) {
-        val isUserFlagThere = (msg.flags["user"] ?: msg.flags["u"])?.asYOrNull ?: false
+        val isUserFlagThere = (msg.flags["user"] ?: msg.flags["u"])?.asBooleanOrNull ?: false
         if (isUserFlagThere) {
             val prefixes = msg.userSettings.prefixes.toList()
             msg.replyTranslate(
@@ -96,7 +96,7 @@ class PrefixCommand(private val config: Config): AbstractCommand() {
         usage = "<prefix{0..25}>"
     )
     suspend fun set(msg: CommandMessage) {
-        val isUser = (msg.flags["user"] ?: msg.flags["u"])?.asYOrNull ?: false
+        val isUser = (msg.flags["user"] ?: msg.flags["u"])?.asBooleanOrNull ?: false
         val permissions = msg.message.getAuthorAsMember()!!.getPermissions()
 
         if (!isUser && (!permissions.contains(Permission.ManageGuild) || !config.owners.contains("${msg.author.id}"))) {
@@ -169,7 +169,7 @@ class PrefixCommand(private val config: Config): AbstractCommand() {
 
     @Subcommand("reset", "descriptions.admin.prefix.reset")
     suspend fun reset(msg: CommandMessage) {
-        val isUser = (msg.flags["user"] ?: msg.flags["u"])?.asYOrNull ?: false
+        val isUser = (msg.flags["user"] ?: msg.flags["u"])?.asBooleanOrNull ?: false
         if (msg.args.isEmpty()) {
             return if (isUser) {
                 displaySelectionForUser(msg)

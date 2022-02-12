@@ -25,14 +25,28 @@ package sh.nino.discord.common.unions
 @Suppress("UNCHECKED_CAST")
 open class XOrY<X: Any, Y: Any>(val value: Any) {
     val asXOrNull: X?
-        get() = value as? X
+        get() = try {
+            value as? X
+        } catch (e: java.lang.ClassCastException) {
+            null
+        }
 
     val asYOrNull: Y?
-        get() = value as? Y
+        get() = try {
+            value as? Y
+        } catch (e: java.lang.ClassCastException) {
+            null
+        }
 
     val asX: X
         get() = asXOrNull ?: error("Value cannot be casted to X")
 
     val asY: Y
         get() = asYOrNull ?: error("Value cannot be casted as Y")
+
+    override fun toString(): String = buildString {
+        appendLine("value\$sh.nino.discord.common.XOrY {")
+        appendLine("    value = $value")
+        appendLine("}")
+    }
 }

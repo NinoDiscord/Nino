@@ -30,9 +30,16 @@ import io.lettuce.core.api.async.RedisAsyncCommands
 import kotlinx.coroutines.future.await
 import org.apache.commons.lang3.time.StopWatch
 import sh.nino.discord.common.data.Config
+import sh.nino.discord.common.extensions.asMap
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
+
+data class RedisStats(
+    val serverStats: Map<String, String>,
+    val stats: Map<String, String>,
+    val ping: Duration
+)
 
 class RedisManager(config: Config): AutoCloseable {
     private lateinit var connection: StatefulRedisConnection<String, String>
@@ -103,8 +110,40 @@ class RedisManager(config: Config): AutoCloseable {
 
         val watch = StopWatch.createStarted()
         commands.ping().await()
-
         watch.stop()
+
         return watch.time.toDuration(DurationUnit.MILLISECONDS)
+    }
+
+    suspend fun getStats(): RedisStats {
+        val ping = getPing()
+
+        // get stats from connection
+        val serverStats = commands.info("server").await()
+        val stats = commands.info("stats").await()
+
+        val mappedServerStats = serverStats!!
+            .split("\r\n?".toRegex())
+            .drop(1)
+            .dropLast(1)
+            .map {
+                val (key, value) = it.split(":")
+                key to value
+            }.asMap()
+
+        val mappedStats = stats!!
+            .split("\r\n?".toRegex())
+            .drop(1)
+            .dropLast(1)
+            .map {
+                val (key, value) = it.split(":")
+                key to value
+            }.asMap()
+
+        return RedisStats(
+            mappedServerStats,
+            mappedStats,
+            ping
+        )
     }
 }

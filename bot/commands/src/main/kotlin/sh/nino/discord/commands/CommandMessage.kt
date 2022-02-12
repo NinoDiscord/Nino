@@ -32,7 +32,7 @@ import dev.kord.rest.builder.message.EmbedBuilder
 import dev.kord.rest.builder.message.create.allowedMentions
 import kotlinx.coroutines.flow.*
 import sh.nino.discord.common.COLOR
-import sh.nino.discord.common.unions.StringOrBoolean
+import sh.nino.discord.common.FlagValue
 import sh.nino.discord.core.localization.Locale
 import sh.nino.discord.core.messaging.PaginationEmbed
 import sh.nino.discord.database.tables.GuildSettingsEntity
@@ -40,7 +40,7 @@ import sh.nino.discord.database.tables.UserEntity
 
 class CommandMessage(
     private val event: MessageCreateEvent,
-    val flags: Map<String, StringOrBoolean>,
+    val flags: Map<String, FlagValue>,
     val args: List<String>,
     val settings: GuildSettingsEntity,
     val userSettings: UserEntity,

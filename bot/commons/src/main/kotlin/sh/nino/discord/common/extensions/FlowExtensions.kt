@@ -36,3 +36,14 @@ fun <T> Flow<T>.sortWith(comparator: (T, T) -> Int): Flow<T> = flow {
  * Returns if the original Flow contains an entity
  */
 suspend fun <T> Flow<T>.contains(value: T): Boolean = filter { it == value }.firstOrNull() != null
+
+suspend fun <T, U> Flow<T>.reduceWith(initialValue: U, operation: suspend (U, T) -> U): U {
+    var value: Any? = initialValue
+    collect {
+        @Suppress("UNCHECKED_CAST")
+        value = operation(value as U, it)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return value as U
+}

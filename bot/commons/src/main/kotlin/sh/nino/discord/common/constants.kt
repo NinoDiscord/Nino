@@ -33,10 +33,7 @@ val USER_MENTION_REGEX = Pattern.compile("^<@!?([0-9]+)>$")!!
 val CHANNEL_REGEX = Pattern.compile("<#([0-9]+)>$")!!
 val QUOTES_REGEX = Pattern.compile("['\"]")!!
 val ID_REGEX = Pattern.compile("^\\d+\$")!!
-val FLAG_REGEX = Pattern.compile(
-    "(?:--?|—)([\\w]+)(=?(\\w+|['\"].*['\"]))?",
-    Pattern.CASE_INSENSITIVE
-)!!
+val FLAG_REGEX = Pattern.compile("(?:--?|—)([\\w]+)(=?(\\w+|['\"].*['\"]))?", Pattern.CASE_INSENSITIVE)
 
 val DEDI_NODE: String by lazy {
     // Check if it's in the system properties, i.e, injected with `-D`

@@ -79,3 +79,5 @@ fun <T> List<T>.findIndex(predicate: (T) -> Boolean): Int {
  * or -1 if nothing was found.
  */
 fun <T> Array<T>.findIndex(predicate: (T) -> Boolean): Int = this.toList().findIndex(predicate)
+
+fun <T> List<T>.removeFirst(): List<T> = drop(1)

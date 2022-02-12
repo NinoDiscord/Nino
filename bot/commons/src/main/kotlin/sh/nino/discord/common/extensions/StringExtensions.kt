@@ -23,6 +23,7 @@
 package sh.nino.discord.common.extensions
 
 import java.io.File
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 fun String.shell(): String {
@@ -37,15 +38,24 @@ fun String.shell(): String {
     return process.inputStream.bufferedReader().readText()
 }
 
-fun String.titleCase(delim: String = ""): String {
-    if (isEmpty() || isBlank()) return ""
+fun String.titleCase(): String {
+    if (isNotEmpty()) {
+        val first = this[0]
+        if (first.isLowerCase()) {
+            return buildString {
+                val titleChar = first.titlecaseChar()
+                if (titleChar != first.uppercaseChar()) {
+                    append(titleChar)
+                } else {
+                    append(this@titleCase.substring(0, 1).uppercase(Locale.getDefault()))
+                }
 
-    return split(delim).joinToString(" ") {
-        val first = it.first()
-        val second = it.slice(1..length)
+                append(this@titleCase.substring(1))
+            }
+        }
+    }
 
-        "${first.uppercase()}$second"
-    }.trim()
+    return this
 }
 
 fun String.elipsis(textLen: Int = 1995): String = if (this.length > textLen) {

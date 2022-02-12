@@ -21,3 +21,20 @@
  */
 
 package sh.nino.discord.commands.core
+
+import sh.nino.discord.commands.AbstractCommand
+import sh.nino.discord.commands.CommandMessage
+import sh.nino.discord.commands.annotations.Command
+import sh.nino.discord.common.extensions.humanize
+import sh.nino.discord.core.NinoBot
+
+@Command(
+    "uptime",
+    "descriptions.core.uptime",
+    aliases = ["upfor", "alive", "rualive"]
+)
+class UptimeCommand(private val nino: NinoBot): AbstractCommand() {
+    override suspend fun execute(msg: CommandMessage) {
+        msg.reply(":gear: **${(System.currentTimeMillis() - nino.bootTime).humanize(true, includeMs = false)}**")
+    }
+}

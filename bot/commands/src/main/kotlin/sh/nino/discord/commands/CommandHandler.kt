@@ -41,10 +41,10 @@ import org.koin.core.context.GlobalContext
 import sh.nino.discord.automod.core.Container
 import sh.nino.discord.common.COLOR
 import sh.nino.discord.common.FLAG_REGEX
+import sh.nino.discord.common.FlagValue
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
 import sh.nino.discord.common.extensions.*
-import sh.nino.discord.common.unions.StringOrBoolean
 import sh.nino.discord.core.NinoBot
 import sh.nino.discord.core.NinoScope
 import sh.nino.discord.core.localization.LocalizationManager
@@ -185,11 +185,10 @@ class CommandHandler(
             ?: return
 
         // omit flags from argument list
-        val rawArgs: List<String>
-        if (command.name != "eval") {
-            rawArgs = args.filter { !FLAG_REGEX.toRegex().matches(it) }
+        val rawArgs = if (command.name != "eval") {
+            args.filter { !FLAG_REGEX.toRegex().matches(it) }
         } else {
-            rawArgs = args
+            args
         }
 
         val message = CommandMessage(
@@ -202,7 +201,7 @@ class CommandHandler(
             guild
         )
 
-        val needsHelp = (message.flags["help"] ?: message.flags["h"])?.asYOrNull ?: false
+        val needsHelp = (message.flags["help"] ?: message.flags["h"])?.asBooleanOrNull ?: false
         if (needsHelp) {
             command.help(message)
             return
@@ -416,24 +415,24 @@ class CommandHandler(
         logger.error("Unable to execute ${if (isSub) "subcommand" else "command"} $name:", exception)
     }
 
-    private fun parseFlags(content: String): Map<String, StringOrBoolean> {
-        val flags = mutableMapOf<String, StringOrBoolean>()
+    private fun parseFlags(content: String): Map<String, FlagValue> {
+        val flags = mutableMapOf<String, FlagValue>()
+        val found = FLAG_REGEX.toRegex().findAll(content)
 
-        // TODO: make this not ugly looking...
-        FLAG_REGEX.toRegex().replace(content) {
-            val name = it.groups[1]!!.value
-            val value = it.groups[2]?.value ?: ""
+        if (found.toList().isEmpty())
+            return flags
 
-            val replacedValue = if (value.isEmpty()) "" else it.value.replace("(^[='\"]+|['\"]+\$)".toRegex(), "").trim()
-            val flagValue = if (value.isBlank())
-                StringOrBoolean(true)
-            else
-                StringOrBoolean(value.replace("(^[='\"]+|['\"]+\$)".toRegex(), ""))
+        for (match in found) {
+            val name = match.groups[1]!!.value
+            val value = match.groups[2]?.value ?: ""
 
-            flags[name] = flagValue
-            replacedValue
+            val flagValue = if (value.isEmpty() || value.isBlank()) "" else value.replace("(^[='\"]+|['\"]+\$)".toRegex(), "").trim()
+            val flag =
+                if (value.isEmpty() || value.isBlank()) FlagValue(true) else FlagValue(flagValue)
+
+            flags[name] = flag
         }
 
-        return flags.toMap()
+        return flags
     }
 }

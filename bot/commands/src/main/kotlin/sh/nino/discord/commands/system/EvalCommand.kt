@@ -71,7 +71,7 @@ class EvalCommand(
         }
 
         var script = msg.args.joinToString(" ")
-        val silent = (msg.flags["silent"] ?: msg.flags["s"])?.asYOrNull ?: false
+        val silent = (msg.flags["silent"] ?: msg.flags["s"])?.asBooleanOrNull ?: false
         val stopwatch = StopWatch.createStarted()
 
         if (script.startsWith("```kt") && script.endsWith("```")) {
