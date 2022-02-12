@@ -61,6 +61,12 @@
     "descriptions.prefix.set": "Adds a prefix to the list of prefixes that you or the guild can use, depends on your desire!",
     "descriptions.prefix.delete": "Removes a prefix from the list of prefixes that you or the guild doesn't like, but it doesn't hurt to delete any... right?",
     "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use.",
+    "descriptions.core.invite": "Returns the link to invite me to your guild, master!",
+    "descriptions.core.ping": "Returns the latency from Discord to us",
+    "descriptions.core.shardinfo": "Returns dedicated information about all shards available.",
+    "descriptions.core.source": "Returns the link to Nino's source code",
+    "descriptions.core.statistics": "Returns miscellanous statistics about Nino, useless or not!",
+    "descriptions.core.uptime": "Returns how long Nino has been up.",
 
     "commands.automod.toggle": "${emoji} ${toggle} the **${name}** automod!",
     "commands.admin.logging.toggle": "${emoji} ${toggle} the **Logging** feature.",
@@ -165,6 +171,15 @@
       "• No Threads Role: ${noThreadsRole}",
       "• Muted Role: ${mutedRole}",
       "```"
-    ]
+    ],
+
+    "commands.admin.rolecfg.muted.noArgs": "You must provide a role ID to set a Muted role or you can use the reset subcommand to reset it.",
+    "commands.admin.rolecfg.muted.noMutedRole": "Cannot reset muted role due to one being reset or not configured.",
+    "commands.admin.rolecfg.muted.set.success": "Successfully set the Muted role to **${name}**",
+    "commands.admin.rolecfg.muted.reset.success": "Successfully reset the Muted role.",
+    "commands.admin.rolecfg.noThreads.noArgs": "You must provide a role ID to set a Muted role or you can use the reset subcommand to reset it.",
+    "commands.admin.rolecfg.noThreads.noRoleId": "Cannot reset No Threads role due to one being reset or not configured.",
+    "commands.admin.rolecfg.noThreads.set.success": "Successfully set the No Threads role to **${name}**",
+    "commands.admin.rolecfg.noThreads.reset.success": "Successfully reset the No Threads role."
   }
 }

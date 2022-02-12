@@ -22,12 +22,17 @@
 
 package sh.nino.discord.commands.admin
 
+import org.jetbrains.exposed.sql.update
 import sh.nino.discord.commands.AbstractCommand
 import sh.nino.discord.commands.CommandCategory
 import sh.nino.discord.commands.CommandMessage
 import sh.nino.discord.commands.annotations.Command
+import sh.nino.discord.commands.annotations.Subcommand
+import sh.nino.discord.common.ID_REGEX
 import sh.nino.discord.common.extensions.asSnowflake
 import sh.nino.discord.common.extensions.runSuspended
+import sh.nino.discord.database.asyncTransaction
+import sh.nino.discord.database.tables.GuildSettings
 
 @Command(
     name = "rolecfg",
@@ -71,5 +76,139 @@ class RoleConfigCommand: AbstractCommand() {
                 "noThreadsRole" to noThreadsRole
             )
         )
+    }
+
+    @Subcommand(
+        "muted",
+        "descriptions.admin.rolecfg.muted",
+        aliases = ["m", "moot", "shutup"],
+        usage = "<snowflake | \"reset\">"
+    )
+    suspend fun muted(msg: CommandMessage) {
+        if (msg.args.isEmpty()) {
+            msg.replyTranslate("commands.admin.rolecfg.muted.noArgs")
+            return
+        }
+
+        when (msg.args.first()) {
+            "reset" -> {
+                // Check if a muted role was not already defined
+                if (msg.settings.mutedRoleId == null) {
+                    msg.replyTranslate("commands.admin.rolecfg.muted.noMutedRole")
+                    return
+                }
+
+                asyncTransaction {
+                    GuildSettings.update({
+                        GuildSettings.id eq msg.guild.id.value.toLong()
+                    }) {
+                        it[mutedRoleId] = null
+                    }
+                }
+
+                msg.replyTranslate("commands.admin.rolecfg.muted.reset.success")
+            }
+
+            else -> {
+                val roleId = msg.args.first()
+                val role = msg.kord.defaultSupplier.getRoleOrNull(msg.guild.id, roleId.asSnowflake())
+
+                // Check if it's a valid snowflake
+                if (ID_REGEX.toRegex().matches(roleId)) {
+                    if (role == null) {
+                        msg.replyTranslate(
+                            "commands.admin.rolecfg.unknownRole",
+                            mapOf(
+                                "roleId" to roleId
+                            )
+                        )
+
+                        return
+                    }
+
+                    asyncTransaction {
+                        GuildSettings.update({
+                            GuildSettings.id eq msg.guild.id.value.toLong()
+                        }) {
+                            it[mutedRoleId] = roleId.toLong()
+                        }
+                    }
+
+                    msg.replyTranslate(
+                        "commands.admin.rolecfg.muted.set.success",
+                        mapOf(
+                            "name" to role.name
+                        )
+                    )
+                }
+            }
+        }
+    }
+
+    @Subcommand(
+        "noThreads",
+        "descriptions.admin.rolecfg.noThreads",
+        aliases = ["threads", "t"],
+        usage = "<snowflake | \"reset\">"
+    )
+    suspend fun noThreads(msg: CommandMessage) {
+        if (msg.args.isEmpty()) {
+            msg.replyTranslate("commands.admin.rolecfg.noThreads.noArgs")
+            return
+        }
+
+        when (msg.args.first()) {
+            "reset" -> {
+                // Check if a no threads role was not already defined
+                if (msg.settings.noThreadsRoleId == null) {
+                    msg.replyTranslate("commands.admin.rolecfg.noThreads.noRoleId")
+                    return
+                }
+
+                asyncTransaction {
+                    GuildSettings.update({
+                        GuildSettings.id eq msg.guild.id.value.toLong()
+                    }) {
+                        it[noThreadsRoleId] = null
+                    }
+                }
+
+                msg.replyTranslate("commands.admin.rolecfg.noThreads.reset.success")
+            }
+
+            else -> {
+                val roleId = msg.args.first()
+                val role = msg.kord.defaultSupplier.getRoleOrNull(msg.guild.id, roleId.asSnowflake())
+
+                // Check if it's a valid snowflake
+                if (ID_REGEX.toRegex().matches(roleId)) {
+                    if (role == null) {
+                        msg.replyTranslate(
+                            "commands.admin.rolecfg.unknownRole",
+                            mapOf(
+                                "roleId" to roleId
+                            )
+                        )
+
+                        return
+                    }
+
+                    asyncTransaction {
+                        GuildSettings.update({
+                            GuildSettings.id eq msg.guild.id.value.toLong()
+                        }) {
+                            it[mutedRoleId] = roleId.toLong()
+                        }
+                    }
+
+                    msg.replyTranslate(
+                        "commands.admin.rolecfg.noThreads.set.success",
+                        mapOf(
+                            "name" to role.name
+                        )
+                    )
+                }
+            }
+        }
     }
 }
