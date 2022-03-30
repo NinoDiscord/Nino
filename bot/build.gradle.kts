@@ -58,7 +58,7 @@ dependencies {
     implementation(project(":bot:database"))
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.2.10")
+    implementation("ch.qos.logback:logback-classic:1.2.11")
     implementation("ch.qos.logback:logback-core:1.2.10")
 
     // YAML (configuration)
