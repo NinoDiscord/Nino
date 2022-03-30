@@ -1,17 +1,17 @@
-FROM node:17-alpine
+FROM eclipse-temurin:17-alpine AS builder
 
-LABEL MAINTAINER="Nino <cutie@floofy.dev>"
 RUN apk update && apk add git ca-certificates
-
-WORKDIR /opt/Nino
+WORKDIR /
 COPY . .
-RUN apk add --no-cache git
-RUN npm i -g typescript eslint typeorm
-RUN yarn
-RUN yarn build:no-lint
-RUN yarn cache clean
+RUN chmod +x gradlew && ./gradlew :bot:installDist --stacktrace
 
-# Give it executable permissions
-RUN chmod +x ./scripts/run-docker.sh
+FROM eclipse-temurin:17-alpine AS builder
 
-ENTRYPOINT [ "sh", "./scripts/run-docker.sh" ]
+WORKDIR /app/noelware/nino
+COPY --from=builder /docker/run.sh               /app/noelware/nino/run.sh
+COPY --from=builder /bot/build/install/bot       /app/noelware/nino/bot
+COPY --from=builder /docker/scripts/liblog.sh    /app/noelware/nino/scripts/liblog.sh
+COPY --from=builder /docker/docker-entrypoint.sh /app/noelware/nino/docker-entrypoint.sh
+
+ENTRYPOINT [ "/app/noelware/nino/docker-entrypoint.sh" ]
+CMD [ "/app/noelware/nino/run.sh" ]

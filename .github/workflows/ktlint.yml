@@ -1,0 +1,82 @@
+name: ktlint
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'issue/gh-**'
+      - master
+      - edge
+
+    paths-ignore:
+      - '.github/**'
+      - '.husky/**'
+      - '.vscode/**'
+      - 'assets/**'
+      - 'locales/**'
+      - 'docker/**'
+      - '.dockerignore'
+      - '.eslintignore'
+      - '.gitignore'
+      - '**.md'
+      - 'LICENSE'
+      - 'renovate.json'
+
+  pull_request:
+    branches:
+      - 'feature/**'
+      - 'issue/gh-**'
+      - master
+      - edge
+
+    paths-ignore:
+      - '.github/**'
+      - '.husky/**'
+      - '.vscode/**'
+      - 'assets/**'
+      - 'locales/**'
+      - 'docker/**'
+      - '.dockerignore'
+      - '.eslintignore'
+      - '.gitignore'
+      - '**.md'
+      - 'LICENSE'
+      - 'renovate.json'
+jobs:
+  ktlint:
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: bitnami/redis:latest
+        ports:
+          - 6379:6379
+      timeouts:
+        image: ghcr.io/ninodiscord/timeouts/timeouts:latest
+        env:
+          AUTH: owodauwu
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
+        ports:
+          - 4025:4025
+    steps:
+      - name: Checks out the repository
+        uses: actions/checkout@v2
+
+      - name: Sets up Java 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: temurin # Eclipse Temurin is <3
+          java-version: 17
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Lets ./gradlew be executable
+        run: chmod +x ./gradlew
+
+      - name: Lints the repository for any code errors
+        run: ./gradlew spotlessCheck
+
+      - name: Builds the project for any errors
+        run: ./gradlew compileKotlin
+
+      - name: Unit test project
+        run: ./gradlew kotest

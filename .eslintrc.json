@@ -1,8 +1,0 @@
-{
-  "extends": ["prettier", "@augu/eslint-config/ts.js"],
-  "plugins": ["prettier"],
-  "rules": {
-    "@typescript-eslint/indent": "off",
-    "quotes": ["error", "single", { "avoidEscape": true, "allowTemplateLiterals": true }]
-  }
-}
