@@ -46,7 +46,7 @@ dependencies {
 
     // Common dependencies that most projects need
     // Kord, Koin, DB, etc
-    api(platform("io.ktor:ktor-bom:1.6.7"))
+    api(platform("io.ktor:ktor-bom:1.6.8"))
 //        implementation("io.ktor:ktor-client-websockets")
     api("com.squareup.okhttp3:okhttp:4.9.3")
 //        implementation("io.ktor:ktor-client-okhttp")
