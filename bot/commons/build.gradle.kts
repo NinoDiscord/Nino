@@ -39,7 +39,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-serialization-core")
 
     // Noel Utilities
-    api("gay.floof.commons", "commons-slf4j", "1.1.0")
+    api("gay.floof.commons", "commons-slf4j", "1.3.0")
 
     // Apache Utilities
     api("org.apache.commons:commons-lang3:3.12.0")
