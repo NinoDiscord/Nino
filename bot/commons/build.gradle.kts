@@ -61,7 +61,7 @@ dependencies {
     api("org.jetbrains.exposed:exposed-dao")
     api("org.postgresql:postgresql:42.3.3")
     api("com.zaxxer:HikariCP:5.0.1")
-    api("org.slf4j:slf4j-api:1.7.35")
+    api("org.slf4j:slf4j-api:1.7.36")
     api("io.sentry:sentry:5.6.0")
     api("io.sentry:sentry-logback:5.6.0")
 //        implementation("io.ktor:ktor-serialization-kotlinx-json")
