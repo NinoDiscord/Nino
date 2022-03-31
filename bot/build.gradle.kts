@@ -62,7 +62,7 @@ dependencies {
     implementation("ch.qos.logback:logback-core:1.2.11")
 
     // YAML (configuration)
-    implementation("com.charleskorn.kaml:kaml:0.40.0")
+    implementation("com.charleskorn.kaml:kaml:0.43.0")
 
     // Kord cache
     implementation("dev.kord.cache:cache-redis:0.3.0")
