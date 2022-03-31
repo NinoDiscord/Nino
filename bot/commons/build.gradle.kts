@@ -79,5 +79,5 @@ dependencies {
 
     // Prometheus
     api("io.prometheus:simpleclient_hotspot:0.14.1")
-    api("io.prometheus:simpleclient:0.14.0")
+    api("io.prometheus:simpleclient:0.15.0")
 }
