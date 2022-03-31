@@ -29,7 +29,7 @@ dependencies {
     api(kotlin("reflect"))
 
     // kotlinx libraries
-    api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.0-native-mt"))
+    api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.0"))
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
     api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.1"))
