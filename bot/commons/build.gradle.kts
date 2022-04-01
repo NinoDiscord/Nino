@@ -78,6 +78,6 @@ dependencies {
     api("org.codehaus.janino:janino:3.1.6")
 
     // Prometheus
-    api("io.prometheus:simpleclient_hotspot:0.14.1")
+    api("io.prometheus:simpleclient_hotspot:0.15.0")
     api("io.prometheus:simpleclient:0.15.0")
 }
