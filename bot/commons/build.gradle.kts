@@ -54,7 +54,7 @@ dependencies {
     api("io.insert-koin:koin-core:3.1.5")
     api("dev.kord:kord-core:0.8.0-M9")
     api("io.lettuce:lettuce-core:6.1.8.RELEASE")
-    api(platform("org.jetbrains.exposed:exposed-bom:0.36.1"))
+    api(platform("org.jetbrains.exposed:exposed-bom:0.37.3"))
     api("org.jetbrains.exposed:exposed-kotlin-datetime")
     api("org.jetbrains.exposed:exposed-core")
     api("org.jetbrains.exposed:exposed-jdbc")
