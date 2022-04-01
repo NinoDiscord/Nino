@@ -25,7 +25,7 @@ plugins {
 }
 
 dependencies {
-    implementation("io.prometheus:simpleclient_common:0.14.1")
+    implementation("io.prometheus:simpleclient_common:0.15.0")
     implementation("io.ktor:ktor-server-netty")
     implementation(project(":bot:database"))
     implementation(project(":bot:metrics"))
