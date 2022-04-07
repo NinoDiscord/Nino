@@ -51,7 +51,7 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.9.3")
 //        implementation("io.ktor:ktor-client-okhttp")
 //        implementation("io.ktor:ktor-client-core")
-    api("io.insert-koin:koin-core:3.1.5")
+    api("io.insert-koin:koin-core:3.1.6")
     api("dev.kord:kord-core:0.8.0-M9")
     api("io.lettuce:lettuce-core:6.1.8.RELEASE")
     api(platform("org.jetbrains.exposed:exposed-bom:0.37.3"))
