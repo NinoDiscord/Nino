@@ -32,6 +32,7 @@ const hearts: { [P in ShardStatus]: string } = {
   disconnected: ':heart:',
   handshaking: ':yellow_heart:',
   connecting: ':yellow_heart:',
+  identifying: ':blue_heart:',
   resuming: ':blue_heart:',
   ready: ':green_heart:',
 };

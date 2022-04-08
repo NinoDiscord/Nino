@@ -101,7 +101,7 @@ export default class RaidAutomod implements Automod {
       return false;
 
     // A raid can happen with 25-100+ pings
-    const joinedAt = luxon.DateTime.fromJSDate(new Date(msg.member.joinedAt));
+    const joinedAt = luxon.DateTime.fromJSDate(new Date(msg.member.joinedAt ?? new Date()));
     const now = luxon.DateTime.now();
     const difference = Math.floor(now.diff(joinedAt, ['days']).days);
     //const language = this.locales.get(msg.guildID, msg.author.id);

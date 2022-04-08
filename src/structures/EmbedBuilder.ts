@@ -89,8 +89,8 @@ export default class EmbedBuilder {
     return this;
   }
 
-  setAuthor(name: string, url?: string, iconUrl?: string) {
-    this.author = { name, url, icon_url: iconUrl };
+  setAuthor(name: string, url?: string, iconUrl?: string | null) {
+    this.author = { name, url, icon_url: iconUrl === null ? undefined : iconUrl };
     return this;
   }
 

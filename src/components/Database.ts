@@ -123,7 +123,7 @@ export default class Database {
       } catch (ex) {
         this.logger.fatal(ex);
 
-        if (ex.message.indexOf('already exists') !== -1) {
+        if ((ex as any).message.indexOf('already exists') !== -1) {
           this.logger.warn('Seems like relations or indexes existed!');
           return Promise.resolve();
         }
