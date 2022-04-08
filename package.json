@@ -1,7 +1,7 @@
 {
   "name": "nino",
   "description": "🔨 Advanced and cute moderation discord bot as an entry of Discord's Hack Week",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "private": true,
   "homepage": "https://nino.floofy.dev",
   "license": "MIT",
@@ -27,7 +27,7 @@
     "migrations": "yarn build && typeorm migration:run",
     "shortlinks": "node scripts/shortlinks.js",
     "licenses": "node scripts/add-license.js",
-    "prepare": "husky install && yarn clean:node_modules",
+    "prepare": "yarn clean:node_modules",
     "build": "yarn lint && yarn format && rm -rf build && tsc",
     "format": "prettier --write --parser typescript --config ./prettierrc.js src/**/*.ts",
     "start": "cd build && node main.js",

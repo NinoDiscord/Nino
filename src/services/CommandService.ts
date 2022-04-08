@@ -273,7 +273,7 @@ export default class CommandService extends Collection<string, NinoCommand> {
         ex
       );
 
-      this.sentry?.report(ex);
+      this.sentry?.report(ex as any);
     }
   }
 

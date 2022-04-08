@@ -52,8 +52,13 @@ export default class GuildSettingsController {
     entry.guildID = id;
 
     await this.repository.save(entry);
-    await this.database.logging.create(id);
-    await this.database.automod.create(id);
+
+    try {
+      await this.database.logging.create(id);
+      await this.database.automod.create(id);
+    } catch {
+      // swallow for now
+    }
 
     return entry;
   }

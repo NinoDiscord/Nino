@@ -39,7 +39,12 @@ export default class UserSettingsController {
       entry.language = 'en_US';
       entry.id = id;
 
-      await this.repository.save(entry);
+      try {
+        await this.repository.save(entry);
+      } catch {
+        // swallow the error for now
+      }
+
       return entry;
     }
 
