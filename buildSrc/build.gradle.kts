@@ -1,5 +1,6 @@
-/**
- * Copyright (c) 2019-2022 Nino
+/*
+ * 🔨 Nino: Cute, advanced discord moderation bot made in Kord.
+ * Copyright (c) 2019-2022 Nino Team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,8 +33,8 @@ repositories {
 }
 
 dependencies {
-    implementation(kotlin("gradle-plugin", version = "1.6.10"))
-    implementation(kotlin("serialization", version = "1.6.10"))
+    implementation(kotlin("gradle-plugin", version = "1.6.20"))
+    implementation(kotlin("serialization", version = "1.6.20"))
     implementation("org.jetbrains.kotlinx:atomicfu-gradle-plugin:0.17.1")
     implementation("gay.floof.utils:gradle-utils:1.3.0")
     implementation("com.diffplug.spotless:spotless-plugin-gradle:6.4.2")
