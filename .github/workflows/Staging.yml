@@ -21,40 +21,31 @@
 
 name: Updating Beta instance
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - edge
-
-    paths-ignore:
-      - '.github/**'
-      - '.husky/**'
-      - '.vscode/**'
-      - 'assets/**'
-      - 'locales/**'
-      - 'docker/**'
-      - '.dockerignore'
-      - '.eslintignore'
-      - '.gitignore'
-      - '**.md'
-      - 'LICENSE'
-      - 'renovate.json'
+  release:
+    types:
+      - prereleased
 
 jobs:
   build-container:
     runs-on: ubuntu-latest
     steps:
       - name: Checks out the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+
+      - name: Get the current git tag to use
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          strip_v: true
 
       - name: Login to the registry
         run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login registry.floofy.dev -u august --password-stdin
 
       - name: Build the container
-        run: docker build --no-cache . -t registry.floofy.dev/noelware/nino:edge-${{github.sha}}
+        run: docker build --no-cache . -t registry.floofy.dev/nino/bot:${{ steps.tag.outputs.tag }}
 
       - name: Push to the registry
-        run: docker push registry.floofy.dev/noelware/nino:edge-${{github.sha}}
+        run: docker push registry.floofy.dev/nino/bot:${{ steps.tag.outputs.tag }}
 
   deploy:
     needs: build-container
@@ -65,8 +56,14 @@ jobs:
           mkdir ~/.kube
           echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
 
+      - name: Get the current git tag to use
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          strip_v: true
+
       - name: Set tag
-        run: kubectl set image deployment/nino-edge nino-edge=registry.floofy.dev/noelware/nino:edge-${{github.sha}}
+        run: kubectl set image deployment/nino-edge nino-edge=registry.floofy.dev/nino/bot:${{ steps.tag.outputs.tag }}
 
       - name: Deploy to the bot
         run: kubectl rollout status deployment/nino-edge
