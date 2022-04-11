@@ -1,5 +1,6 @@
-/**
- * Copyright (c) 2019-2022 Nino
+/*
+ * 🔨 Nino: Cute, advanced discord moderation bot made in Kord.
+ * Copyright (c) 2019-2022 Nino Team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +21,10 @@
  * SOFTWARE.
  */
 
-rootProject.name = "Nino"
+plugins {
+    `nino-module`
+}
 
-include(
-    // old modules so i dont forget to refactor it
-    ":bot",
-    //":bot:api",
-    //":bot:automod",
-    //":bot:commands",
-    //":bot:commons",
-    ":bot:core",
-    ":bot:database",
-    ":bot:markup",
-    ":bot:metrics",
-    ":bot:punishments",
-    //":bot:slash-commands",
-    ":bot:timeouts",
-
-    // new modules that are refactor-ed
-    ":api",
-    ":automod",
-    ":commands:legacy",
-    ":commands:slash",
-    ":commons",
-    ":modules",
-    ":modules:localisation",
-    ":modules:punishments",
-    ":modules:scripting",
-    ":modules:timeouts"
-)
+dependencies {
+    implementation(project(":modules"))
+}
