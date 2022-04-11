@@ -35,7 +35,7 @@ include(
     ":bot:metrics",
     ":bot:punishments",
     //":bot:slash-commands",
-    ":bot:timeouts",
+    //":bot:timeouts",
 
     // new modules that are refactor-ed
     ":api",

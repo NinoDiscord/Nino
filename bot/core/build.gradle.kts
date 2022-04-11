@@ -25,7 +25,7 @@ plugins {
 
 dependencies {
     implementation(project(":bot:punishments"))
-    implementation(project(":bot:timeouts"))
+    //implementation(project(":bot:timeouts"))
     implementation(project(":bot:database"))
     implementation(project(":bot:metrics"))
     //implementation(project(":bot:automod"))

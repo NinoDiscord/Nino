@@ -26,5 +26,5 @@ plugins {
 
 dependencies {
     implementation(project(":bot:database"))
-    api(project(":bot:timeouts"))
+    //api(project(":bot:timeouts"))
 }
