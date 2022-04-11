@@ -21,6 +21,8 @@
  * SOFTWARE.
  */
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     groovy
     `kotlin-dsl`

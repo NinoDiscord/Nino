@@ -567,3 +567,5 @@ docker/cluster-operator/config.json
 logs/*.log
 bot/src/main/resources/config/logging.properties
 !bot/src/main/resources/config/logging.example.properties
+api/src/main/resources/config/logging.properties
+!api/src/main/resources/config/logging.example.properties

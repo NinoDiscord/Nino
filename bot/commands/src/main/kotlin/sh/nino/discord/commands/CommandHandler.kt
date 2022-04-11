@@ -41,8 +41,8 @@ import org.jetbrains.exposed.sql.or
 import org.koin.core.context.GlobalContext
 import sh.nino.discord.automod.core.Container
 import sh.nino.discord.common.COLOR
+import sh.nino.discord.common.CommandFlag
 import sh.nino.discord.common.FLAG_REGEX
-import sh.nino.discord.common.FlagValue
 import sh.nino.discord.common.data.Config
 import sh.nino.discord.common.data.Environment
 import sh.nino.discord.common.extensions.*
@@ -416,8 +416,8 @@ class CommandHandler(
         logger.error("Unable to execute ${if (isSub) "subcommand" else "command"} $name:", exception)
     }
 
-    private fun parseFlags(content: String): Map<String, FlagValue> {
-        val flags = mutableMapOf<String, FlagValue>()
+    private fun parseFlags(content: String): Map<String, CommandFlag> {
+        val flags = mutableMapOf<String, CommandFlag>()
         val found = FLAG_REGEX.toRegex().findAll(content)
 
         if (found.toList().isEmpty())
@@ -429,7 +429,7 @@ class CommandHandler(
 
             val flagValue = if (value.isEmpty() || value.isBlank()) "" else value.replace("(^[='\"]+|['\"]+\$)".toRegex(), "").trim()
             val flag =
-                if (value.isEmpty() || value.isBlank()) FlagValue(true) else FlagValue(flagValue)
+                if (value.isEmpty() || value.isBlank()) CommandFlag(true) else CommandFlag(flagValue)
 
             flags[name] = flag
         }

@@ -50,11 +50,11 @@ dependencies {
     runtimeOnly(kotlin("scripting-jsr223"))
 
     // Nino libraries + projects
-    implementation(project(":bot:automod"))
-    implementation(project(":bot:commands"))
+    //implementation(project(":bot:automod"))
+    //implementation(project(":bot:commands"))
     implementation(project(":bot:core"))
     implementation(project(":bot:punishments"))
-    implementation(project(":bot:api"))
+    //implementation(project(":bot:api"))
     implementation(project(":bot:database"))
 
     // Logging

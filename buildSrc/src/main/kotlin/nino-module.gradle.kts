@@ -38,6 +38,8 @@ group = "sh.nino.bot"
 version = if (project.version != "unspecified") project.version else "$current"
 
 repositories {
+    //noelware(snapshots = true)
+    maven("https://repo.perfectdreams.net/")
     mavenCentral()
     mavenLocal()
     noel()
@@ -52,7 +54,7 @@ dependencies {
 
     // do not link :bot:commons to the project itself
     if (name != "commons") {
-        implementation(project(":bot:commons"))
+        implementation(project(":commons"))
     }
 }
 
@@ -66,15 +68,14 @@ spotless {
         // We can't use the .editorconfig file, so we'll have to specify it here
         // issue: https://github.com/diffplug/spotless/issues/142
         // ktlint 0.35.0 (default for Spotless) doesn't support trailing commas
-        ktlint("0.43.0")
-            .userData(
-                mapOf(
-                    "no-consecutive-blank-lines" to "true",
-                    "no-unit-return" to "true",
-                    "disabled_rules" to "no-wildcard-imports,colon-spacing",
-                    "indent_size" to "4"
-                )
+        ktlint("0.43.0").userData(
+            mapOf(
+                "no-consecutive-blank-lines" to "true",
+                "no-unit-return" to "true",
+                "disabled_rules" to "no-wildcard-imports,colon-spacing",
+                "indent_size" to "4"
             )
+        )
     }
 }
 
@@ -83,12 +84,14 @@ tasks {
         kotlinOptions {
             jvmTarget = javaVersion.toString()
             javaParameters = true
-            freeCompilerArgs += listOf("-Xopt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
         }
     }
 }
 
 java {
-    sourceCompatibility = javaVersion
-    targetCompatibility = javaVersion
+//    sourceCompatibility = javaVersion
+//    targetCompatibility = javaVersion
+
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
 }

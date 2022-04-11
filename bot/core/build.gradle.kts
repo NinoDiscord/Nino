@@ -28,5 +28,5 @@ dependencies {
     implementation(project(":bot:timeouts"))
     implementation(project(":bot:database"))
     implementation(project(":bot:metrics"))
-    implementation(project(":bot:automod"))
+    //implementation(project(":bot:automod"))
 }

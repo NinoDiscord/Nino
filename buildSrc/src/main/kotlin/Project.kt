@@ -22,5 +22,18 @@
  */
 
 import gay.floof.gradle.utils.*
+import java.io.File
+import java.util.concurrent.TimeUnit
 
 val current = Version(2, 0, 0, 0, ReleaseType.Beta)
+val commitHash by lazy {
+    val cmd = "git rev-parse --short HEAD".split("\\s".toRegex())
+    val proc = ProcessBuilder(cmd)
+        .directory(File("."))
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .redirectError(ProcessBuilder.Redirect.PIPE)
+        .start()
+
+    proc.waitFor(1, TimeUnit.MINUTES)
+    proc.inputStream.bufferedReader().readText().trim()
+}
