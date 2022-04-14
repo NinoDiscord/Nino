@@ -1,3 +1,26 @@
+/*
+ * 🔨 Nino: Cute, advanced discord moderation bot made in Kord.
+ * Copyright (c) 2019-2022 Nino Team
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package sh.nino.modules.timeouts
 
 import gay.floof.utils.slf4j.logging
@@ -5,15 +28,12 @@ import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.client.request.*
 import io.ktor.http.cio.websocket.*
-import io.sentry.Sentry
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.*
-import sh.nino.modules.timeouts.types.*
-import java.net.ConnectException
-import kotlin.properties.Delegates
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Represents the main gateway connection towards the Timeouts microservice.
@@ -24,13 +44,12 @@ class Client(
     private val httpClient: HttpClient,
     private val coroutineScope: CoroutineScope,
     private val eventFlow: MutableSharedFlow<Event>,
-    private val json: Json,
-    private val module: TimeoutsModule
+    private val json: Json
 ): CoroutineScope by coroutineScope, AutoCloseable {
     private val closeDeferred = CompletableDeferred<Unit>()
     private var messageFlowJob: Job? = null
     private val log by logging<Client>()
-    private var session by Delegates.notNull<DefaultWebSocketSession>()
+    private var session: DefaultWebSocketSession? = null
 
     private val coroutineExceptionHandler = CoroutineExceptionHandler { ctx, t ->
         log.error("Exception in coroutine $ctx:", t)
@@ -41,11 +60,27 @@ class Client(
     private suspend fun createMessageFlow() {
         log.debug("Creating event loop...")
 
-        session.incoming.receiveAsFlow().collect {
+        session!!.incoming.receiveAsFlow().collect {
+            if ((it as? Frame.Close) != null) {
+                onClose(it)
+                return@collect
+            }
+
             val raw = (it as? Frame.Text)?.readText() ?: error("Frame was not `Frame.Text`")
             val decoded = json.decodeFromString(JsonObject.serializer(), raw)
 
             onMessage(decoded, raw)
+        }
+    }
+
+    private suspend fun onClose(frame: Frame.Close) {
+        val reason = frame.readReason() ?: return
+        log.warn("Server closed connection (${reason.code} ${reason.message}), re-connecting in 5 minutes...")
+
+        closed = true
+        session = null
+        withTimeout(5.seconds) {
+            connect()
         }
     }
 
@@ -75,7 +110,16 @@ class Client(
             sess.incoming.receive().readBytes().decodeToString()
         } catch (e: Exception) {
             null
-        } ?: throw ConnectException("Unable to read first message from connection: Connection closed.")
+        }
+
+        if (message == null) {
+            onClose(Frame.Close(CloseReason(CloseReason.Codes.CANNOT_ACCEPT, "Server still down.")))
+            return
+        }
+
+        // If it was closed, let's not make it closed. >:(
+        if (closed)
+            closed = false
 
         val obj = json.decodeFromString(JsonObject.serializer(), message)
         if (obj["op"]?.jsonPrimitive?.int == 0) {
@@ -98,16 +142,16 @@ class Client(
         val data = json.encodeToString(Command.Companion, command)
         log.trace("Sending data >> $data")
 
-        session.send(Frame.Text(data))
+        session!!.send(Frame.Text(data))
     }
 
     suspend fun <T: Response> sendAndReceive(command: Command): T {
         val data = json.encodeToString(Command.Companion, command)
         log.trace("Sending data >> $data")
 
-        session.send(Frame.Text(data))
+        session!!.send(Frame.Text(data))
 
-        val resp = session.incoming.receive().readBytes().decodeToString()
+        val resp = session!!.incoming.receive().readBytes().decodeToString()
         val obj = json.decodeFromString(JsonObject.serializer(), resp)
 
         when (val op = obj["op"]?.jsonPrimitive?.int) {

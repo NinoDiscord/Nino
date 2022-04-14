@@ -24,3 +24,9 @@
 plugins {
     `nino-module`
 }
+
+dependencies {
+    implementation(project(":modules"))
+    implementation(project(":database"))
+    api(project(":modules:timeouts"))
+}

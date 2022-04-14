@@ -1,17 +1,44 @@
+/*
+ * 🔨 Nino: Cute, advanced discord moderation bot made in Kord.
+ * Copyright (c) 2019-2022 Nino Team
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
 package sh.nino.modules.timeouts
 
 import gay.floof.utils.slf4j.logging
 import io.ktor.client.*
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.flow.MutableSharedFlow
+import io.sentry.Sentry
+import io.sentry.kotlin.SentryContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.*
 import kotlinx.serialization.json.Json
+import org.slf4j.LoggerFactory
 import sh.nino.modules.annotations.Action
 import sh.nino.modules.annotations.Closeable
 import sh.nino.modules.annotations.ModuleMeta
 import sh.nino.modules.timeouts.types.Command
 import sh.nino.modules.timeouts.types.Event
 import sh.nino.modules.timeouts.types.Response
+import kotlin.coroutines.CoroutineContext
 
 /**
  * The main module that can call the Timeouts microservice.
@@ -28,7 +55,7 @@ class TimeoutsModule(
     private val json: Json
 ) {
     private val log by logging<TimeoutsModule>()
-    private lateinit var client: Client
+    lateinit var client: Client
 
     /**
      * Returns if the connection was already closed.
@@ -54,8 +81,7 @@ class TimeoutsModule(
             httpClient,
             GlobalScope,
             events,
-            json,
-            this
+            json
         )
 
         return client.connect()
@@ -91,3 +117,23 @@ class TimeoutsModule(
         return client.sendAndReceive(command)
     }
 }
+
+@OptIn(DelicateCoroutinesApi::class)
+inline fun <reified T: Event> TimeoutsModule.on(scope: CoroutineScope = client, noinline consume: suspend T.() -> Unit): Job =
+    events.buffer(Channel.UNLIMITED).filterIsInstance<T>()
+        .onEach { event ->
+            val ctx: CoroutineContext = if (Sentry.isEnabled()) {
+                SentryContext() + GlobalScope.coroutineContext
+            } else {
+                GlobalScope.coroutineContext
+            }
+
+            scope.launch(ctx) {
+                kotlin.runCatching {
+                    consume(event)
+                }.onFailure {
+                    val log = LoggerFactory.getLogger(TimeoutsModule::class.java)
+                    log.error("Unable to run event ${event::class}:", it)
+                }
+            }
+        }.launchIn(scope)

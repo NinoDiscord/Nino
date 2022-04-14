@@ -24,3 +24,8 @@
 plugins {
     `nino-module`
 }
+
+dependencies {
+    implementation("com.charleskorn.kaml:kaml:0.43.0")
+    implementation(project(":modules"))
+}

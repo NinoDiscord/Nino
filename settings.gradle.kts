@@ -1,5 +1,6 @@
-/**
- * Copyright (c) 2019-2022 Nino
+/*
+ * 🔨 Nino: Cute, advanced discord moderation bot made in Kord.
+ * Copyright (c) 2019-2022 Nino Team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +44,7 @@ include(
     ":commands:legacy",
     ":commands:slash",
     ":commons",
+    ":database",
     ":modules",
     ":modules:localisation",
     ":modules:punishments",
