@@ -21,28 +21,26 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.core.interceptors
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import gay.floof.utils.slf4j.logging
+import okhttp3.Interceptor
+import okhttp3.Response
+import org.apache.commons.lang3.time.StopWatch
+import java.util.concurrent.TimeUnit
 
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
+class LogInterceptor: Interceptor {
+    private val log by logging<LogInterceptor>()
 
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val request = chain.request()
+        val watch = StopWatch.createStarted()
 
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
+        log.info("-> ${request.method.uppercase()} ${request.url}")
+        val res = chain.proceed(request)
+        watch.stop()
 
-    @SerialName("topgg")
-    val topGGToken: String? = null,
-
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+        log.info("<- [${res.code} ${res.message.ifEmpty { "OK" }} / ${res.protocol.toString().replace("h2", "http/2")}] ${request.method.uppercase()} ${request.url} [${watch.getTime(TimeUnit.MILLISECONDS)}ms]")
+        return res
+    }
+}

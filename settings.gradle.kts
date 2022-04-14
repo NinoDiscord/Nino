@@ -24,29 +24,18 @@
 rootProject.name = "Nino"
 
 include(
-    // old modules so i dont forget to refactor it
-    ":bot",
-    //":bot:api",
-    //":bot:automod",
-    //":bot:commands",
-    //":bot:commons",
-    ":bot:core",
-    ":bot:database",
-    ":bot:markup",
-    ":bot:metrics",
-    ":bot:punishments",
-    //":bot:slash-commands",
-    //":bot:timeouts",
-
     // new modules that are refactor-ed
     ":api",
+    ":bot",
     ":automod",
     ":commands:legacy",
     ":commands:slash",
     ":commons",
+    ":core",
     ":database",
     ":modules",
     ":modules:localisation",
+    ":modules:metrics",
     ":modules:punishments",
     ":modules:scripting",
     ":modules:timeouts"

@@ -21,28 +21,13 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.core.jobs
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import org.koin.dsl.bind
+import org.koin.dsl.module
+import sh.nino.core.timers.Job
 
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
-
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
-
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
-
-    @SerialName("topgg")
-    val topGGToken: String? = null,
-
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+val jobsModule = module {
+    single { GatewayPingJob(get(), get(), get()) } bind Job::class
+    single { BotListsJob(get(), get(), get()) } bind Job::class
+}

@@ -26,12 +26,11 @@ package sh.nino.database
 import io.sentry.Sentry
 import io.sentry.kotlin.SentryContext
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.future.await
 import kotlinx.coroutines.future.future
 import org.jetbrains.exposed.sql.Transaction
 import org.jetbrains.exposed.sql.transactions.transaction
+import sh.nino.core.NinoScope
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -44,10 +43,8 @@ class AsyncTransaction<T>(val block: Transaction.() -> T) {
      *
      * @return The represented object of this [transaction][AsyncTransaction]
      */
-    @OptIn(DelicateCoroutinesApi::class)
     suspend fun execute(): T {
-        // TODO: use NinoScope.coroutineContext for fun
-        var coroutineContext: CoroutineContext = GlobalScope.coroutineContext
+        var coroutineContext: CoroutineContext = NinoScope.coroutineContext
 
         if (Sentry.isEnabled()) {
             val newCtx = SentryContext() + coroutineContext

@@ -45,7 +45,7 @@ dependencies {
     implementation("io.ktor:ktor-server-netty")
 
     // Sentry (logback)
-    implementation("io.sentry:sentry-logback:5.7.2")
+    implementation("io.sentry:sentry-logback:5.7.3")
 }
 
 application {

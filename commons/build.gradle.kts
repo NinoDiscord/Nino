@@ -32,7 +32,7 @@ dependencies {
     // BOMs
     api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.2"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.1"))
-    api(platform("org.jetbrains.exposed:exposed-bom:0.37.3"))
+    api(platform("org.jetbrains.exposed:exposed-bom:0.38.1"))
     api(platform("io.ktor:ktor-bom:1.6.8"))
 
     // kotlinx.coroutines
@@ -81,8 +81,8 @@ dependencies {
     api("org.slf4j:slf4j-api:1.7.36")
 
     // Sentry
-    api("io.sentry:sentry-kotlin-extensions:5.7.2")
-    api("io.sentry:sentry:5.7.2")
+    api("io.sentry:sentry-kotlin-extensions:5.7.3")
+    api("io.sentry:sentry:5.7.3")
 
     // Conditional logic for logback
     api("org.codehaus.janino:janino:3.1.6")

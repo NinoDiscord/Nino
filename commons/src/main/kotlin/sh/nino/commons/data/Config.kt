@@ -22,3 +22,41 @@
  */
 
 package sh.nino.commons.data
+
+import dev.kord.common.entity.ActivityType
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+enum class Environment {
+    @SerialName("development")
+    Development,
+
+    @SerialName("production")
+    Production
+}
+
+@Serializable
+data class Config(
+    @SerialName("default_locale")
+    val defaultLocale: String = "en_US",
+    val environment: Environment = Environment.Development,
+
+    @SerialName("sentry_dsn")
+    val sentryDsn: String? = null,
+    val prefixes: List<String> = listOf("x!"),
+    val botlists: BotlistsConfig? = null,
+    val database: PostgresConfig = PostgresConfig(),
+    val instatus: InstatusConfig? = null,
+    val timeouts: TimeoutsConfig,
+    val metrics: Boolean = false,
+    val owners: List<String> = listOf(),
+    val status: StatusConfig = StatusConfig(
+        type = ActivityType.Game,
+        status = "with {guilds} guilds [#{shard_id}] https://nino.sh"
+    ),
+    val redis: RedisConfig,
+    val token: String,
+    val ravy: String? = null,
+    val api: APIConfig? = null
+)

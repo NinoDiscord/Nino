@@ -21,28 +21,12 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+plugins {
+    `nino-module`
+}
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
-
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
-
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
-
-    @SerialName("topgg")
-    val topGGToken: String? = null,
-
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+dependencies {
+    implementation(project(":modules"))
+    api("io.prometheus:simpleclient_hotspot:0.15.0")
+    api("io.prometheus:simpleclient:0.15.0")
+}

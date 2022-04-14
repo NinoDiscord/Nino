@@ -21,28 +21,34 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.commons
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.json.*
 
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
+@OptIn(ExperimentalSerializationApi::class)
+object NinoInfo {
+    /**
+     * Returns the version of **helm-server**.
+     */
+    val VERSION: String
 
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
+    /**
+     * Returns the commit SHA of **helm-server** that was built.
+     */
+    val COMMIT_HASH: String
 
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
+    /**
+     * Returns when **helm-server** was built at.
+     */
+    val BUILD_DATE: String
 
-    @SerialName("topgg")
-    val topGGToken: String? = null,
+    init {
+        val stream = this::class.java.getResourceAsStream("/build-info.json")!!
+        val data = Json.decodeFromStream(JsonObject.serializer(), stream)
 
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+        VERSION = data["version"]?.jsonPrimitive?.content ?: error("Unable to retrieve `version` from build-info.json!")
+        COMMIT_HASH = data["commit.sha"]?.jsonPrimitive?.content ?: error("Unable to retrieve `commit.sha` from build-info.json!")
+        BUILD_DATE = data["build.date"]?.jsonPrimitive?.content ?: error("Unable to retrieve `build.date` from build-info.json!")
+    }
+}

@@ -22,3 +22,14 @@
  */
 
 package sh.nino.commons.data
+
+import dev.kord.common.entity.ActivityType
+import dev.kord.common.entity.PresenceStatus
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class StatusConfig(
+    val presence: PresenceStatus = PresenceStatus.Online,
+    val status: String,
+    val type: ActivityType
+)

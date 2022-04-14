@@ -21,28 +21,37 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.core.timers
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import gay.floof.utils.slf4j.logging
+import kotlinx.coroutines.*
+import sh.nino.core.NinoThreadFactory
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
+import kotlinx.coroutines.Job as CoroutineJob
 
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
+/**
+ * The timer scope is a coroutine scope that uses a single-threaded executor pool,
+ * that it can be easily used with kotlinx.coroutines!
+ */
+internal class Scope: CoroutineScope {
+    private val executorPool: ExecutorService = Executors.newSingleThreadExecutor(NinoThreadFactory)
+    private val logger by logging<Scope>()
 
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
+    override val coroutineContext: CoroutineContext = SupervisorJob() + executorPool.asCoroutineDispatcher()
+    fun launch(job: Job): CoroutineJob {
+        return launch(start = CoroutineStart.LAZY) {
+            delay(job.interval.toLong())
+            while (isActive) {
+                try {
+                    job.execute()
+                } catch (e: Exception) {
+                    logger.error("Unable to run job '${job.name}':", e)
+                }
 
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
-
-    @SerialName("topgg")
-    val topGGToken: String? = null,
-
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+                delay(job.interval.toLong())
+            }
+        }
+    }
+}

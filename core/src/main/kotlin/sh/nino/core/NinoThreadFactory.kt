@@ -21,28 +21,22 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.core
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.atomicfu.atomic
+import java.util.concurrent.ThreadFactory
 
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
+object NinoThreadFactory: ThreadFactory {
+    private val threadIdCounter = atomic(0)
+    private val threadGroup: ThreadGroup = Thread.currentThread().threadGroup
 
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
+    override fun newThread(r: Runnable): Thread {
+        val name = "Nino-ExecutorThread[${threadIdCounter.incrementAndGet()}]"
+        val thread = Thread(threadGroup, r, name)
 
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
+        if (thread.priority != Thread.NORM_PRIORITY)
+            thread.priority = Thread.NORM_PRIORITY
 
-    @SerialName("topgg")
-    val topGGToken: String? = null,
-
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+        return thread
+    }
+}

@@ -21,28 +21,13 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.core
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.asCoroutineDispatcher
+import kotlin.coroutines.CoroutineContext
 
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
-
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
-
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
-
-    @SerialName("topgg")
-    val topGGToken: String? = null,
-
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+object NinoScope: CoroutineScope {
+    override val coroutineContext: CoroutineContext = SupervisorJob() + NinoBot.executorPool.asCoroutineDispatcher()
+}

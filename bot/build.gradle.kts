@@ -52,10 +52,10 @@ dependencies {
     // Nino libraries + projects
     //implementation(project(":bot:automod"))
     //implementation(project(":bot:commands"))
-    implementation(project(":bot:core"))
-    implementation(project(":bot:punishments"))
+    //implementation(project(":bot:core"))
+    //implementation(project(":bot:punishments"))
     //implementation(project(":bot:api"))
-    implementation(project(":bot:database"))
+    //implementation(project(":bot:database"))
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.2.11")
@@ -69,7 +69,8 @@ dependencies {
     api("dev.kord.cache:cache-api:0.3.0")
 
     // Logstash encoder for Logback
-    implementation("net.logstash.logback:logstash-logback-encoder:7.1")
+    implementation("net.logstash.logback:logstash-logback-encoder:7.1.1")
+    implementation("io.sentry:sentry-logback:5.7.3")
 }
 
 application {

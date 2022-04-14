@@ -22,3 +22,16 @@
  */
 
 package sh.nino.commons.data
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class InstatusConfig(
+    @SerialName("gateway_metric_id")
+    val gatewayMetricId: String? = null,
+
+    @SerialName("page_id")
+    val pageId: String = "",
+    val token: String
+)

@@ -22,3 +22,11 @@
  */
 
 package sh.nino.commons.data
+
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class TimeoutsConfig(
+    val auth: String? = null,
+    val uri: String
+)

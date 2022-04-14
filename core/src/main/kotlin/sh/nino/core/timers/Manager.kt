@@ -21,28 +21,37 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.core.timers
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import gay.floof.utils.slf4j.logging
+import io.ktor.utils.io.*
+import kotlin.time.Duration.Companion.seconds
 
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
+/**
+ * The timer manager is the main manager to schedule and unschedule all the timers
+ * that were registered.
+ */
+class Manager {
+    private val scope = Scope()
+    private val logger by logging<Manager>()
+    private val jobs: MutableList<Job> = mutableListOf()
 
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
+    fun schedule(job: Job) {
+        logger.info("Scheduled job ${job.name} for every ${job.interval.seconds} seconds!")
+        val coroutineJob = scope.launch(job)
 
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
+        job.coroutineJob = coroutineJob
+        coroutineJob.start()
 
-    @SerialName("topgg")
-    val topGGToken: String? = null,
+        jobs.add(job)
+    }
 
-    @SerialName("delly")
-    val dellyToken: String? = null,
+    fun bulkSchedule(vararg jobs: Job) {
+        for (job in jobs) schedule(job)
+    }
 
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+    fun unschedule() {
+        logger.warn("Unscheduled all timer jobs...")
+        for (job in jobs) job.coroutineJob!!.cancel(CancellationException("Unscheduled by program"))
+    }
+}

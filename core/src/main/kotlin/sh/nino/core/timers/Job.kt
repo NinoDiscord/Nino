@@ -21,28 +21,27 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.core.timers
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
+import kotlinx.coroutines.Job as CoroutineJob
 
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
+/**
+ * Represents a base instance of a job that can be timed per basis. This abstract class
+ * takes in a [name], which is... self-explanatory and the [interval] to tick to call
+ * the [execute] function.
+ */
+abstract class Job(
+    val name: String,
+    val interval: Int
+) {
+    /**
+     * Represents the current coroutine [job][CoroutineJob] that is being executed. This
+     * can be `null` if the job was never scheduled or was unscheduled.
+     */
+    var coroutineJob: CoroutineJob? = null
 
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
-
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
-
-    @SerialName("topgg")
-    val topGGToken: String? = null,
-
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+    /**
+     * The executor function to call every tick of the [interval] specified.
+     */
+    abstract suspend fun execute()
+}

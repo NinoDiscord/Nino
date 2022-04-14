@@ -21,28 +21,14 @@
  * SOFTWARE.
  */
 
-package sh.nino.commons.data
+package sh.nino.modules.metrics
 
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class BotlistsConfig(
-    @SerialName("dservices")
-    val discordServicesToken: String? = null,
-
-    @SerialName("dboats")
-    val discordBoatsToken: String? = null,
-
-    @SerialName("dbots")
-    val discordBotsToken: String? = null,
-
-    @SerialName("topgg")
-    val topGGToken: String? = null,
-
-    @SerialName("delly")
-    val dellyToken: String? = null,
-
-    @SerialName("discords")
-    val discordsToken: String? = null
-)
+enum class MetricType {
+    API_REQUEST_LATENCY,
+    COMMANDS_EXECUTED,
+    API_REQUEST_COUNT,
+    COMMAND_LATENCY,
+    MESSAGES_SEEN,
+    GATEWAY_LATENCY,
+    GUILD_COUNT;
+}
