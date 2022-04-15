@@ -48,7 +48,7 @@ object NinoInfo {
         val data = Json.decodeFromStream(JsonObject.serializer(), stream)
 
         VERSION = data["version"]?.jsonPrimitive?.content ?: error("Unable to retrieve `version` from build-info.json!")
-        COMMIT_HASH = data["commit.sha"]?.jsonPrimitive?.content ?: error("Unable to retrieve `commit.sha` from build-info.json!")
-        BUILD_DATE = data["build.date"]?.jsonPrimitive?.content ?: error("Unable to retrieve `build.date` from build-info.json!")
+        COMMIT_HASH = data["commit_sha"]?.jsonPrimitive?.content ?: error("Unable to retrieve `commit.sha` from build-info.json!")
+        BUILD_DATE = data["build_date"]?.jsonPrimitive?.content ?: error("Unable to retrieve `build.date` from build-info.json!")
     }
 }

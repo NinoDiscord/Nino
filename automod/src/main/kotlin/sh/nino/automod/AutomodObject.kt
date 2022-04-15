@@ -21,50 +21,49 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.automod.core
+package sh.nino.automod
 
 import dev.kord.common.entity.Permission
 import dev.kord.core.Kord
 import dev.kord.core.entity.channel.TextChannel
+import dev.kord.core.event.Event
 import dev.kord.core.event.guild.MemberJoinEvent
 import dev.kord.core.event.guild.MemberUpdateEvent
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.user.UserUpdateEvent
 import org.koin.core.context.GlobalContext
-import sh.nino.discord.common.extensions.retrieve
-import sh.nino.discord.common.isMemberAbove
+import sh.nino.commons.extensions.retrieve
+import sh.nino.commons.isMemberAbove
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
 
-@OptIn(ExperimentalContracts::class)
-fun automod(builder: AutomodBuilder.() -> Unit): Automod {
-    contract {
-        callsInPlace(builder, InvocationKind.EXACTLY_ONCE)
-    }
+/**
+ * Represents a callable function that can be reflected upon an [AutomodObject].
+ */
+typealias AutomodCallable<C> = suspend (C) -> Boolean
 
-    val obj = AutomodBuilder().apply(builder)
-    return obj.build()
+@OptIn(ExperimentalContracts::class)
+fun automod(builder: AutomodBuilder.() -> Unit): AutomodObject {
+    contract { callsInPlace(builder, InvocationKind.EXACTLY_ONCE) }
+
+    return AutomodBuilder().apply(builder).build()
 }
 
-class Automod(
+class AutomodObject(
     val name: String,
-    private val onMessageCall: AutomodCallable<MessageCreateEvent>?,
-    private val onUserUpdateCall: AutomodCallable<UserUpdateEvent>?,
-    private val onMemberJoinCall: AutomodCallable<MemberJoinEvent>?,
-    private val onMemberNickUpdateCall: AutomodCallable<MemberUpdateEvent>?
+    private val onMessageCallback: AutomodCallable<MessageCreateEvent>? = null,
+    private val onUserUpdateCallback: AutomodCallable<UserUpdateEvent>? = null,
+    private val onGuildMemberJoinCallback: AutomodCallable<MemberJoinEvent>? = null,
+    private val onGuildMemberNickCallback: AutomodCallable<MemberUpdateEvent>? = null
 ) {
     init {
-        require(name != "") { "Name cannot be empty." }
+        check(name != "") { "Automod name cannot be empty. :(" }
     }
 
-    // Why is `event` dynamic?
-    // So you can pass in any event-driven class from Kord,
-    // and the `execute` function will cast the [event]
-    // so its corresponding event or else it'll fail.
-    suspend fun execute(event: Any): Boolean = when {
-        onMessageCall != null -> {
-            val ev = event as? MessageCreateEvent ?: error("Unable to cast ${event::class} -> MessageCreateEvent")
+    suspend fun execute(event: Event): Boolean = when {
+        onMessageCallback != null -> {
+            val ev = (event as? MessageCreateEvent) ?: error("Unable to cast ${event::class} -> MessageCreateEvent")
             val guild = event.getGuild()!!
             val kord = GlobalContext.retrieve<Kord>()
             val channel = event.message.getChannel() as? TextChannel
@@ -73,29 +72,29 @@ class Automod(
                 (event.member != null && !isMemberAbove(guild.getMember(kord.selfId), event.member!!)) ||
                 (channel != null && channel.getEffectivePermissions(kord.selfId).contains(Permission.ManageMessages)) ||
                 (event.message.author == null || event.message.author!!.isBot) ||
-                (channel != null && channel.getEffectivePermissions(event.message.author!!.id).contains(Permission.BanMembers))
+                (channel != null && channel.getEffectivePermissions(event.message.author!!.id).contains(Permission.ModerateMembers))
             ) {
                 false
             } else {
-                onMessageCall.invoke(ev)
+                onMessageCallback.invoke(ev)
             }
         }
 
-        onUserUpdateCall != null -> {
-            val ev = event as? UserUpdateEvent ?: error("Unable to cast ${event::class} -> UserUpdateEvent")
-            onUserUpdateCall.invoke(ev)
+        onUserUpdateCallback != null -> {
+            val ev = (event as? UserUpdateEvent) ?: error("Unable to cast ${event::class} -> UserUpdateEvent")
+            onUserUpdateCallback.invoke(ev)
         }
 
-        onMemberJoinCall != null -> {
-            val ev = event as? MemberJoinEvent ?: error("Unable to cast ${event::class} -> MemberJoinEvent")
-            onMemberJoinCall.invoke(ev)
+        onGuildMemberJoinCallback != null -> {
+            val ev = (event as? MemberJoinEvent) ?: error("Unable to cast ${event::class} -> MemberJoinEvent")
+            onGuildMemberJoinCallback.invoke(ev)
         }
 
-        onMemberNickUpdateCall != null -> {
-            val ev = event as? MemberUpdateEvent ?: error("Unable to cast ${event::class} -> MemberUpdateEvent")
-            onMemberNickUpdateCall.invoke(ev)
+        onGuildMemberNickCallback != null -> {
+            val ev = (event as? MemberUpdateEvent) ?: error("Unable to cast ${event::class} -> MemberUpdateEvent")
+            onGuildMemberNickCallback.invoke(ev)
         }
 
-        else -> error("Automod $name doesn't implement any automod callables. (Used event ${event::class})")
+        else -> false
     }
 }

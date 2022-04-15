@@ -33,6 +33,8 @@ import dev.kord.core.entity.Member
 val MemberLikeObject.isPartial: Boolean
     get() = member == null
 
+fun Member?.toMemberLikeObject(id: Snowflake, guild: Guild): MemberLikeObject = MemberLikeObject(this, guild, id)
+
 /**
  * Represents a "partial" member object.
  */

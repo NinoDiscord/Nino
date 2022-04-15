@@ -24,7 +24,6 @@
 rootProject.name = "Nino"
 
 include(
-    // new modules that are refactor-ed
     ":api",
     ":bot",
     ":automod",

@@ -21,13 +21,36 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.automod
+package sh.nino.automod
 
-import sh.nino.discord.automod.core.automod
+import dev.kord.core.event.Event
+import sh.nino.automod.automods.AccountAgeAutomod
+import sh.nino.automod.automods.BlacklistAutomod
+import sh.nino.automod.automods.MentionsAutomod
+import sh.nino.automod.automods.MessageLinksAutomod
 
-val shortlinksAutomod = automod {
-    name = "shortlinks"
-    onMessage {
-        true
+/**
+ * Represents the global container for the auto moderation objects.
+ */
+class Container {
+    private val automods = listOf(
+        AccountAgeAutomod,
+        BlacklistAutomod,
+        MentionsAutomod,
+        MessageLinksAutomod
+    )
+
+    suspend fun run(event: Event): Boolean {
+        var ret = true
+        for (automod in automods) {
+            try {
+                ret = automod.execute(event)
+                if (ret) break
+            } catch (e: Exception) {
+                continue
+            }
+        }
+
+        return ret
     }
 }

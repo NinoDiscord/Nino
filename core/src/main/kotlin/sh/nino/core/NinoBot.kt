@@ -35,14 +35,13 @@ import dev.kord.gateway.Intents
 import dev.kord.gateway.PrivilegedIntent
 import dev.kord.rest.route.Route
 import gay.floof.utils.slf4j.logging
-import io.sentry.Sentry
 import org.koin.core.context.GlobalContext
 import sh.nino.commons.Constants
 import sh.nino.commons.NinoInfo
-import sh.nino.commons.data.Config
 import sh.nino.commons.extensions.formatSize
 import sh.nino.commons.extensions.retrieve
 import sh.nino.commons.extensions.retrieveAll
+import sh.nino.core.listeners.applyGenericEvents
 import sh.nino.core.timers.Job
 import sh.nino.core.timers.Manager
 import java.lang.management.ManagementFactory
@@ -64,7 +63,7 @@ class NinoBot {
         val threads = ManagementFactory.getThreadMXBean()
 
         log.info("+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+")
-        log.info("        :: Runtime Information ::      ")
+        log.info("Runtime Information:")
         log.info("  * Free / Total Memory [Max]: ${runtime.freeMemory().formatSize()}/${runtime.totalMemory().formatSize()} [${runtime.maxMemory().formatSize()}]")
         log.info("  * Threads: ${threads.threadCount} (${threads.daemonThreadCount} background threads)")
         log.info("  * Operating System: ${os.name} with ${os.availableProcessors} processors (${os.arch}; ${os.version})")
@@ -79,36 +78,14 @@ class NinoBot {
         log.info("+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+")
 
         val kord = GlobalContext.retrieve<Kord>()
-        val config = GlobalContext.retrieve<Config>()
         val gatewayInfo = kord.rest.unsafe(Route.GatewayBotGet) {}
 
         log.info("+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+")
-        log.info("       :: Sharding Information ::      ")
+        log.info("Sharding Information:")
         log.info("  * Using shard orchestrator: <unknown>")
         log.info("  * Shards to Launch:         ${gatewayInfo.shards}")
         log.info("  * Session Limit:            ${gatewayInfo.sessionStartLimit.remaining} / ${gatewayInfo.sessionStartLimit.total}")
         log.info("+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+~+")
-
-        // Setup Sentry
-        if (config.sentryDsn != null) {
-            log.info("Installing Sentry...")
-
-            Sentry.init {
-                it.dsn = config.sentryDsn
-                it.release = "v${NinoInfo.VERSION} (${NinoInfo.COMMIT_HASH})"
-            }
-
-            Sentry.configureScope {
-                it.tags += mutableMapOf(
-                    "nino.environment" to config.environment.toString(),
-                    "nino.build.date" to NinoInfo.BUILD_DATE,
-                    "nino.commitSha" to NinoInfo.COMMIT_HASH,
-                    "nino.version" to NinoInfo.VERSION,
-                    "system.user" to System.getProperty("user.name"),
-                    "system.os" to "${os.name} (${os.arch}; ${os.version})"
-                )
-            }
-        }
 
         // Schedule all timers
         val scheduler = GlobalContext.retrieve<Manager>()
@@ -116,7 +93,7 @@ class NinoBot {
         scheduler.bulkSchedule(*jobs.toTypedArray())
 
         // Apply Kord events we need
-//        kord.applyGenericEvents()
+        kord.applyGenericEvents()
 //        kord.applyGuildEvents()
 //        kord.applyGuildMemberEvents()
 //        kord.applyUserEvents()

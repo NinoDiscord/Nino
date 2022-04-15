@@ -22,3 +22,12 @@
  */
 
 package sh.nino.core
+
+import org.koin.dsl.module
+import sh.nino.core.timers.Manager
+
+val globalModule = module {
+    single {
+        Manager()
+    }
+}

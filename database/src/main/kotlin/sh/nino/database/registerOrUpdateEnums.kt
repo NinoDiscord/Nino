@@ -32,10 +32,14 @@ suspend fun registerOrUpdateEnums() {
     asyncTransaction {
         // GlobalBanType
         createOrUpdatePostgreSQLEnum(GlobalBanType.values())
+    }
 
+    asyncTransaction {
         // PunishmentType
         createOrUpdatePostgreSQLEnum(PunishmentType.values())
+    }
 
+    asyncTransaction {
         // LogEvent
         createOrUpdatePostgreSQLEnum(LogEvent.values())
     }

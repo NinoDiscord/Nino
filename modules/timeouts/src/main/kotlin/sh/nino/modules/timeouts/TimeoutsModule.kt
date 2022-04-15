@@ -68,6 +68,7 @@ class TimeoutsModule(
     val events = MutableSharedFlow<Event>(extraBufferCapacity = Int.MAX_VALUE)
 
     @OptIn(DelicateCoroutinesApi::class)
+    @Suppress("UNUSED")
     @Action
     suspend fun init() {
         if (::client.isInitialized) {
@@ -84,7 +85,11 @@ class TimeoutsModule(
             json
         )
 
-        return client.connect()
+        // Create a new coroutine scope for this, so it doesn't
+        // block the main thread :>
+        GlobalScope.launch {
+            client.connect()
+        }
     }
 
     @Closeable

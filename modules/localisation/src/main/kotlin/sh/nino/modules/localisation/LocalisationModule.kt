@@ -24,12 +24,13 @@
 package sh.nino.modules.localisation
 
 import gay.floof.utils.slf4j.logging
+import kotlinx.serialization.json.Json
 import sh.nino.modules.annotations.Action
 import sh.nino.modules.annotations.ModuleMeta
 import java.io.File
 
 @ModuleMeta("localisation", "Implements localisation to Nino", version = "2.0.0")
-class LocalisationModule(private val configDefaultLocale: String) {
+class LocalisationModule(private val configDefaultLocale: String, private val json: Json) {
     private val localeDirectory = File("./locales")
     private lateinit var defaultLocale: Locale
     private val log by logging<LocalisationModule>()
@@ -46,7 +47,7 @@ class LocalisationModule(private val configDefaultLocale: String) {
         val found = mutableMapOf<String, Locale>()
 
         for (file in files) {
-            val locale = Locale.fromFile(file)
+            val locale = Locale.fromFile(file, json)
             log.info("Found language ${locale.meta.code} by ${locale.meta.translator}!")
             found[locale.meta.code] = locale
 

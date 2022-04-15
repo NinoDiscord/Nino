@@ -228,6 +228,12 @@ class Registry {
         modules.remove(module)
     }
 
+    fun unregisterAll() {
+        for (module in modules.values) {
+            module.close()
+        }
+    }
+
     companion object {
         var CURRENT: Registry? = null
 

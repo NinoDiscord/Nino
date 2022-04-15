@@ -21,44 +21,43 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.automod
+package sh.nino.automod.automods
 
 import dev.kord.core.Kord
 import kotlinx.datetime.toJavaInstant
 import org.koin.core.context.GlobalContext
-import sh.nino.discord.automod.core.automod
-import sh.nino.discord.common.extensions.retrieve
-import sh.nino.discord.database.asyncTransaction
-import sh.nino.discord.database.tables.AutomodEntity
-import sh.nino.discord.database.tables.PunishmentType
-import sh.nino.discord.punishments.MemberLike
-import sh.nino.discord.punishments.PunishmentModule
+import sh.nino.automod.automod
+import sh.nino.commons.extensions.retrieve
+import sh.nino.database.PunishmentType
+import sh.nino.database.asyncTransaction
+import sh.nino.database.entities.AutomodEntity
+import sh.nino.modules.Registry
+import sh.nino.modules.punishments.PunishmentModule
+import sh.nino.modules.punishments.toMemberLikeObject
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
 
-val accountAgeAutomod = automod {
+val AccountAgeAutomod = automod {
     name = "accountAge"
     onMemberJoin { event ->
+        // TODO: Implement Registry#currentOrNull?
+        val punishments = Registry.CURRENT!!.getOrNull<PunishmentModule>()!!.current
+        val kord = GlobalContext.retrieve<Kord>()
+
         val settings = asyncTransaction {
-            AutomodEntity.findById(event.guild.id.value.toLong())!!
+            AutomodEntity.findById(event.guildId.value.toLong())!!
         }
 
-        if (!settings.accountAge)
-            return@onMemberJoin false
+        // If it is disabled, do not continue
+        if (!settings.accountAge) return@onMemberJoin false
 
-        val totalDays = ChronoUnit.DAYS.between(event.member.joinedAt.toJavaInstant(), OffsetDateTime.now().toLocalDate())
-        if (totalDays <= settings.accountAgeDayThreshold) {
-            val punishments = GlobalContext.retrieve<PunishmentModule>()
-            val kord = GlobalContext.retrieve<Kord>()
+        val total = ChronoUnit.DAYS.between(event.member.joinedAt.toJavaInstant(), OffsetDateTime.now().toLocalDate())
+        if (total <= settings.accountAgeThreshold) {
             val guild = event.getGuild()
             val selfMember = guild.getMember(kord.selfId)
 
-            punishments.apply(
-                MemberLike(event.member, event.getGuild(), event.member.id),
-                selfMember,
-                PunishmentType.KICK
-            ) {
-                reason = "[Automod] Account threshold for member was under ${settings.accountAgeDayThreshold} days."
+            punishments.apply(event.member.toMemberLikeObject(event.member.id, guild), selfMember, PunishmentType.KICK) {
+                reason = "[Automod :: Account Age] Join date threshold was under ${settings.accountAgeThreshold} days."
             }
 
             return@onMemberJoin true

@@ -1,8 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<configuration debug="false">
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+<!--
+~ 🔨 Nino: Cute, advanced discord moderation bot made in Kord.
+~ Copyright (c) 2019-2022 Nino Team
+~
+~ Permission is hereby granted, free of charge, to any person obtaining a copy
+~ of this software and associated documentation files (the "Software"), to deal
+~ in the Software without restriction, including without limitation the rights
+~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+~ copies of the Software, and to permit persons to whom the Software is
+~ furnished to do so, subject to the following conditions:
+~
+~ The above copyright notice and this permission notice shall be included in all
+~ copies or substantial portions of the Software.
+~
+~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+~ SOFTWARE.
+-->
 
-    <!-- Add the properties from the "bot/src/main/resources/config/logging.example.properties" file -->
+<configuration debug="false" packagingData="true">
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
     <property resource="config/logging.properties" />
 
     <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
@@ -11,50 +31,53 @@
         </encoder>
     </appender>
 
-    <!-- You can customize this using the "bot/src/main/resources/config/logging.example.properties" file -->
-    <if condition='property("nino.logging.appenders").contains("file")'>
-        <then>
-            <appender name="File" class="ch.qos.logback.core.FileAppender">
-                <file>${nino.logging.filename:-logs/Nino.out.log}</file>
-                <encoder>
-                    <pattern>
-                        <pattern>[%d{yyyy-MM-dd | HH:mm:ss, +10}] [%thread] [%logger{36}] %-5level :: %msg%n</pattern>
-                    </pattern>
-                </encoder>
-
-                <if condition='isDefined("nino.logging.file.rollingPolicy")'>
-                    <fileNamePattern>${nino.logging.file.rollingPolicy.pattern:-./logs/Nino.%d{yyyy-MM-dd}.log}</fileNamePattern>
-                    <maxHistory>${nino.logging.file.rollingPolicy.maxHistory:-7}</maxHistory>
-                </if>
-            </appender>
-        </then>
-    </if>
-
-    <!--
-    Allows you to output logging towards Sentry. This is only available for
-    the `ERROR` level.
-    -->
-    <if condition='property("nino.logging.appenders").contains("sentry")'>
+    <if condition='property("nino.encoders").contains("sentry")'>
         <then>
             <appender name="Sentry" class="io.sentry.logback.SentryAppender">
                 <options>
-                    <dsn>${nino.sentryDsn}</dsn>
+                    <dsn>${nino.dsn}</dsn>
                 </options>
             </appender>
         </then>
     </if>
 
-    <!--
-    This allows you to embed Logstash with Logback to visualize logging with Kibana, which
-    will be outputted in ElasticSearch.
-    -->
-    <if condition='property("nino.logging.appenders").contains("logstash")'>
+    <if condition='property("nino.encoders").contains("logstash")'>
         <then>
             <appender name="Logstash" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
-                <destination>${nino.logging.logstash.urls}</destination>
-                <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
+                <destination>${nino.logstash.endpoint}</destination>
+                <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                    <providers>
+                        <timestamp />
+                        <message />
+                        <loggerName />
+                        <threadName />
+                        <logLevel />
+                        <callerData />
+                        <stackTrace />
+                        <contextName />
+                        <mdc />
+                        <tags />
+                        <logstashMarkers />
+                        <throwableClassName />
+                        <throwableMessage />
+                        <throwableRootCauseClassName />
+                        <throwableRootCauseMessage />
+                    </providers>
+
+                    <customFields>{"project":"Nino","application":"bot"}</customFields>
+                </encoder>
+
                 <keepAliveDuration>5 minutes</keepAliveDuration>
+                <writeVersionAsInteger>true</writeVersionAsInteger>
             </appender>
+        </then>
+    </if>
+
+    <if condition='property("nino.encoders").contains("sentry")'>
+        <then>
+            <root level="ERROR">
+                <appender-ref ref="Sentry" />
+            </root>
         </then>
     </if>
 
@@ -62,19 +85,8 @@
         <then>
             <logger name="sh.nino" level="debug" additivity="false">
                 <appender-ref ref="Console" />
-                <if condition='property("nino.logging.appenders").contains("file")'>
-                    <then>
-                        <appender-ref ref="File" />
-                    </then>
-                </if>
 
-                <if condition='property("nino.logging.appenders").contains("sentry")'>
-                    <then>
-                        <appender-ref ref="Sentry" />
-                    </then>
-                </if>
-
-                <if condition='property("nino.logging.appenders").contains("logstash")'>
+                <if condition='property("nino.encoders").contains("logstash")'>
                     <then>
                         <appender-ref ref="Logstash" />
                     </then>
@@ -83,19 +95,8 @@
 
             <root level="DEBUG">
                 <appender-ref ref="Console" />
-                <if condition='property("nino.logging.appenders").contains("file")'>
-                    <then>
-                        <appender-ref ref="File" />
-                    </then>
-                </if>
 
-                <if condition='property("nino.logging.appenders").contains("sentry")'>
-                    <then>
-                        <appender-ref ref="Sentry" />
-                    </then>
-                </if>
-
-                <if condition='property("nino.logging.appenders").contains("logstash")'>
+                <if condition='property("nino.encoders").contains("logstash")'>
                     <then>
                         <appender-ref ref="Logstash" />
                     </then>
@@ -105,19 +106,8 @@
         <else>
             <logger name="sh.nino" level="info" additivity="false">
                 <appender-ref ref="Console" />
-                <if condition='property("nino.logging.appenders").contains("file")'>
-                    <then>
-                        <appender-ref ref="File" />
-                    </then>
-                </if>
 
-                <if condition='property("nino.logging.appenders").contains("sentry")'>
-                    <then>
-                        <appender-ref ref="Sentry" />
-                    </then>
-                </if>
-
-                <if condition='property("nino.logging.appenders").contains("logstash")'>
+                <if condition='property("nino.encoders").contains("logstash")'>
                     <then>
                         <appender-ref ref="Logstash" />
                     </then>
@@ -126,19 +116,8 @@
 
             <root level="INFO">
                 <appender-ref ref="Console" />
-                <if condition='property("nino.logging.appenders").contains("file")'>
-                    <then>
-                        <appender-ref ref="File" />
-                    </then>
-                </if>
 
-                <if condition='property("nino.logging.appenders").contains("sentry")'>
-                    <then>
-                        <appender-ref ref="Sentry" />
-                    </then>
-                </if>
-
-                <if condition='property("nino.logging.appenders").contains("logstash")'>
+                <if condition='property("nino.encoders").contains("logstash")'>
                     <then>
                         <appender-ref ref="Logstash" />
                     </then>

@@ -50,12 +50,13 @@ dependencies {
     runtimeOnly(kotlin("scripting-jsr223"))
 
     // Nino libraries + projects
-    //implementation(project(":bot:automod"))
-    //implementation(project(":bot:commands"))
-    //implementation(project(":bot:core"))
-    //implementation(project(":bot:punishments"))
-    //implementation(project(":bot:api"))
-    //implementation(project(":bot:database"))
+    implementation(project(":core"))
+    implementation(project(":database"))
+    implementation(project(":modules"))
+    implementation(project(":modules:localisation"))
+    implementation(project(":modules:metrics"))
+    implementation(project(":modules:timeouts"))
+    implementation(project(":modules:punishments"))
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.2.11")
@@ -64,17 +65,13 @@ dependencies {
     // YAML (configuration)
     implementation("com.charleskorn.kaml:kaml:0.43.0")
 
-    // Kord cache
-    implementation("dev.kord.cache:cache-redis:0.3.0")
-    api("dev.kord.cache:cache-api:0.3.0")
-
     // Logstash encoder for Logback
     implementation("net.logstash.logback:logstash-logback-encoder:7.1.1")
     implementation("io.sentry:sentry-logback:5.7.3")
 }
 
 application {
-    mainClass.set("sh.nino.discord.Bootstrap")
+    mainClass.set("sh.nino.bot.Bootstrap")
 }
 
 tasks {
@@ -94,12 +91,9 @@ tasks {
     }
 
     build {
-        dependsOn(spotlessApply)
-        dependsOn(kotest)
         dependsOn(processResources)
-    }
-
-    run {
-
+        dependsOn(spotlessApply)
+        dependsOn(installDist)
+        dependsOn(kotest)
     }
 }

@@ -68,13 +68,13 @@ class MetricsModule(val enabled: Boolean, val apiEnabled: Boolean) {
 
             gatewayLatency = Histogram.build()
                 .name("nino_gateway_latency")
-                .help("Returns the gateway latency per shard. Use the `gatewayPing` gauge for all shards combined.")
-                .labelNames("shard")
+                .help("Returns the gateway latency for all shards, use `gatewayPing` per-shard.")
                 .register(registry)
 
             gatewayPing = Histogram.build()
                 .name("nino_gateway_ping")
                 .help("Returns the gateway latency for all shards.")
+                .labelNames("shard")
                 .register(registry)
 
             messagesSeen = Counter.build()

@@ -21,14 +21,12 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.automod.core
+package sh.nino.automod
 
 import dev.kord.core.event.guild.MemberJoinEvent
 import dev.kord.core.event.guild.MemberUpdateEvent
 import dev.kord.core.event.message.MessageCreateEvent
 import dev.kord.core.event.user.UserUpdateEvent
-
-typealias AutomodCallable<T> = suspend (T) -> Boolean
 
 /**
  * Represents a builder class for constructing automod objects.
@@ -64,7 +62,7 @@ class AutomodBuilder {
         onMemberNickUpdateCall = callable
     }
 
-    fun build(): Automod = Automod(
+    fun build(): AutomodObject = AutomodObject(
         this.name,
         onMessageCall,
         onUserUpdateCall,

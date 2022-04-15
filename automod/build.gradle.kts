@@ -24,3 +24,9 @@
 plugins {
     `nino-module`
 }
+
+dependencies {
+    implementation(project(":modules:punishments"))
+    implementation(project(":modules"))
+    implementation(project(":database"))
+}

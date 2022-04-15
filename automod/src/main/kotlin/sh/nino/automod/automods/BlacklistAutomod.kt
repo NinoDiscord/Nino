@@ -21,18 +21,23 @@
  * SOFTWARE.
  */
 
-package sh.nino.discord.automod
+package sh.nino.automod.automods
 
+import dev.kord.core.Kord
 import org.koin.core.context.GlobalContext
-import sh.nino.discord.automod.core.automod
-import sh.nino.discord.common.extensions.retrieve
-import sh.nino.discord.database.asyncTransaction
-import sh.nino.discord.database.tables.AutomodEntity
-import sh.nino.discord.punishments.PunishmentModule
+import sh.nino.automod.automod
+import sh.nino.commons.extensions.retrieve
+import sh.nino.database.asyncTransaction
+import sh.nino.database.entities.AutomodEntity
+import sh.nino.modules.Registry
+import sh.nino.modules.punishments.PunishmentModule
 
-val blacklistAutomod = automod {
+val BlacklistAutomod = automod {
     name = "blacklist"
     onMessage { event ->
+        // TODO: Implement Registry#currentOrNull?
+        val punishments = Registry.CURRENT!!.getOrNull<PunishmentModule>()!!.current
+        val kord = GlobalContext.retrieve<Kord>()
         val guild = event.message.getGuild()
         val settings = asyncTransaction {
             AutomodEntity.findById(guild.id.value.toLong())!!
@@ -41,15 +46,14 @@ val blacklistAutomod = automod {
         if (!settings.blacklist)
             return@onMessage false
 
+        // TODO: is regex better for this?
         val content = event.message.content.split(" ")
         for (word in settings.blacklistedWords) {
             if (content.any { it.lowercase() == word.lowercase() }) {
                 event.message.delete()
-                event.message.channel.createMessage("Hey! You are not allowed to say that here! qwq")
+                event.message.channel.createMessage("Hey, **${event.message.author!!.tag}**! You're not allowed to say that... :<")
 
-                val punishments = GlobalContext.retrieve<PunishmentModule>()
-                punishments.addWarning(event.member!!, guild.getMember(event.kord.selfId), "[Automod] User said a blacklisted word in their message. qwq")
-
+                punishments.addWarning(event.member!!, guild.getMember(kord.selfId), 1, "[Automod :: Blacklisted Words] User said blacklisted word in <#${event.message.channel.id}>.")
                 return@onMessage true
             }
         }

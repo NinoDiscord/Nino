@@ -25,9 +25,7 @@ package sh.nino.modules.localisation
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.koin.core.context.GlobalContext
 import sh.nino.commons.StringOrList
-import sh.nino.commons.extensions.retrieve
 import java.io.File
 import java.util.regex.Pattern
 
@@ -59,8 +57,7 @@ data class Locale(
     val strings: Map<String, StringOrList>
 ) {
     companion object {
-        fun fromFile(file: File): Locale {
-            val json = GlobalContext.retrieve<Json>()
+        fun fromFile(file: File, json: Json): Locale {
             return json.decodeFromString(serializer(), file.readText())
         }
     }
