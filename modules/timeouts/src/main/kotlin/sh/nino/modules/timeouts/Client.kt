@@ -33,6 +33,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.json.*
+import sh.nino.modules.timeouts.types.ApplyEvent
+import sh.nino.modules.timeouts.types.Command
+import sh.nino.modules.timeouts.types.Event
+import sh.nino.modules.timeouts.types.OperationType
+import sh.nino.modules.timeouts.types.ReadyEvent
+import sh.nino.modules.timeouts.types.Response
+import sh.nino.modules.timeouts.types.StatsResponse
+import sh.nino.modules.timeouts.types.Timeout
+import sh.nino.modules.timeouts.types.TimeoutsResponse
+import sh.nino.modules.timeouts.types.fromJsonObject
 import kotlin.time.Duration.Companion.seconds
 
 /**

@@ -104,7 +104,7 @@ fun String.toPunishmentType(): PunishmentType = when (this) {
     "voice mute" -> PunishmentType.VOICE_MUTE
     "voice unmute" -> PunishmentType.VOICE_UNMUTE
     "voice deafen" -> PunishmentType.VOICE_DEAFEN
-    "voice deafen" -> PunishmentType.VOICE_UNDEAFEN
+    "voice undeafen" -> PunishmentType.VOICE_UNDEAFEN
     "thread messages added" -> PunishmentType.THREAD_MESSAGES_ADDED
     "thread messages removed" -> PunishmentType.THREAD_MESSAGES_REMOVED
     else -> error("Unknown punishment type: $this")

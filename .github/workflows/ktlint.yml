@@ -96,10 +96,10 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Lints the repository for any code errors
-        run: ./gradlew spotlessCheck
+        run: ./gradlew spotlessCheck --no-daemon
 
       - name: Builds the project for any errors
-        run: ./gradlew compileKotlin
+        run: ./gradlew compileKotlin --no-daemon
 
       - name: Unit test project
         run: ./gradlew kotest

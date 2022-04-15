@@ -260,6 +260,7 @@ class PunishmentModule {
         if (warnings.toList().isEmpty() || ifZero < 0)
             throw IllegalStateException("Member ${member.tag} doesn't have any warnings to be removed.")
 
+        val guild = member.getGuild()
         if (amount == null) {
             asyncTransaction {
                 WarningsTable.deleteWhere {
@@ -276,6 +277,14 @@ class PunishmentModule {
 
                     this.reason = "Moderator cleared all warnings.${if (reason != null) " ($reason)" else ""}"
                 }
+            }
+
+            publishModlog(case) {
+                this.moderator = moderator
+                this.guild = guild
+
+                warningsRemoved = -1
+                victim = member
             }
         } else {
             asyncTransaction {
@@ -295,6 +304,14 @@ class PunishmentModule {
 
                     this.reason = "Moderator removed **$amount** warnings.${if (reason != null) " ($reason)" else ""}"
                 }
+            }
+
+            publishModlog(case) {
+                this.moderator = moderator
+                this.guild = guild
+
+                warningsRemoved = amount
+                victim = member
             }
         }
     }
