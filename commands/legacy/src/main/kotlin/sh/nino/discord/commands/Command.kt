@@ -22,3 +22,8 @@
  */
 
 package sh.nino.discord.commands
+
+/**
+ * **Command** is represented as the main center of a "legacy command."
+ */
+class Command

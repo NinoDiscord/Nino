@@ -22,3 +22,11 @@
  */
 
 package sh.nino.discord.commands
+
+import org.koin.dsl.module
+import sh.nino.discord.commands.components.InteractionsHandler
+
+val legacyCommandsModule = module {
+    single { CommandHandler() }
+    single { InteractionsHandler(get(), get()) }
+}

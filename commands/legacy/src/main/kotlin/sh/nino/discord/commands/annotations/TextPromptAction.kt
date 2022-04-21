@@ -22,3 +22,14 @@
  */
 
 package sh.nino.discord.commands.annotations
+
+/**
+ * Represents an action that a select menu option was clicked on when a select menu prompt
+ * has been executed by the command. The ID of the selection menu must be the suffix after
+ * `nino:text.prompt:<command name>:<id>`, the prefix `nino:text.prompt:<command name>` is already
+ * auto-generated when you use the [sh.nino.discord.commands.CommandMessage.promptTextPrompt]
+ *
+ * This is a method annotation and the method MUST have a `suspend` modifier.
+ */
+@Target(AnnotationTarget.FUNCTION)
+annotation class TextPromptAction(val id: String)

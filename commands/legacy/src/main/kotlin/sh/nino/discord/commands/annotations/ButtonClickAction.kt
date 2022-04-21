@@ -22,3 +22,14 @@
  */
 
 package sh.nino.discord.commands.annotations
+
+/**
+ * Represents an action that is represented when a button component was executed by the command. The [id] has
+ * to be the suffix after `nino:button:<command name>`.
+ *
+ * - If the full ID was `nino:button:<command name>:accepted`, then [id] must be "accepted"
+ *
+ * This is a method annotation and the method MUST have a `suspend` modifier.
+ */
+@Target(AnnotationTarget.FUNCTION)
+annotation class ButtonClickAction(val id: String)

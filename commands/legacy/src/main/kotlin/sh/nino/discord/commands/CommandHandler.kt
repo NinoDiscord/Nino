@@ -22,3 +22,9 @@
  */
 
 package sh.nino.discord.commands
+
+/**
+ * Represents the handler for all commands, and where the legacy-based command
+ * execution is at.
+ */
+class CommandHandler

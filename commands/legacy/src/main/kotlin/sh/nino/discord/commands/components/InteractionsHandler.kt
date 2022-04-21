@@ -22,3 +22,22 @@
  */
 
 package sh.nino.discord.commands.components
+
+import dev.kord.core.Kord
+import gay.floof.utils.slf4j.logging
+import sh.nino.discord.commands.CommandHandler
+
+/**
+ * Represents the handler for handling button clicks, select menu and text prompts.
+ */
+class InteractionsHandler(private val kord: Kord, private val commandHandler: CommandHandler) {
+    private val log by logging<InteractionsHandler>()
+
+    init {
+        install()
+    }
+
+    private fun install() {
+        log.debug("Installing the interactions handler...")
+    }
+}

@@ -22,3 +22,9 @@
  */
 
 package sh.nino.discord.commands
+
+/**
+ * Represents the message that is represented when the [CommandHandler] has proceeded
+ * with the constraints that returned `false`.
+ */
+class CommandMessage

@@ -22,3 +22,13 @@
  */
 
 package sh.nino.discord.commands
+
+/**
+ * Represents a main entrypoint for constructing commands.
+ */
+abstract class AbstractCommand {
+    /**
+     * The main execution point of this legacy command.
+     */
+    abstract suspend fun execute()
+}

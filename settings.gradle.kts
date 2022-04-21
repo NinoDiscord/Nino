@@ -36,6 +36,7 @@ include(
     ":modules:localisation",
     ":modules:metrics",
     ":modules:punishments",
+    ":modules:ravy",
     ":modules:scripting",
     ":modules:timeouts"
 )
