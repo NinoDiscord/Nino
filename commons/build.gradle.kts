@@ -32,7 +32,7 @@ dependencies {
     // BOMs
     api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.2"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.1"))
-    api(platform("org.jetbrains.exposed:exposed-bom:0.38.1"))
+    api(platform("org.jetbrains.exposed:exposed-bom:0.38.2"))
     api(platform("io.ktor:ktor-bom:1.6.8"))
 
     // kotlinx.coroutines
@@ -72,7 +72,7 @@ dependencies {
     api("org.jetbrains.exposed:exposed-dao")
 
     // PostgreSQL driver
-    api("org.postgresql:postgresql:42.3.3")
+    api("org.postgresql:postgresql:42.3.4")
 
     // Connection pooling
     api("com.zaxxer:HikariCP:5.0.1")
@@ -85,7 +85,7 @@ dependencies {
     api("io.sentry:sentry:5.7.3")
 
     // Conditional logic for logback
-    api("org.codehaus.janino:janino:3.1.6")
+    api("org.codehaus.janino:janino:3.1.7")
 
     // Redis (Lettuce)
     api("io.lettuce:lettuce-core:6.1.8.RELEASE")
