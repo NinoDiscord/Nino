@@ -21,10 +21,22 @@
  * SOFTWARE.
  */
 
-plugins {
-    `nino-module`
-}
+package sh.nino.api.endpoints
 
-dependencies {
-    implementation(project(":modules"))
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+
+class MainEndpoint: AbstractEndpoint("/", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        call.respond(
+            HttpStatusCode.OK,
+            buildJsonObject {
+                put("success", true)
+                put("message", "Hello, world!")
+            }
+        )
+    }
 }

@@ -21,10 +21,4 @@
  * SOFTWARE.
  */
 
-plugins {
-    `nino-module`
-}
-
-dependencies {
-    implementation(project(":modules"))
-}
+package sh.nino.api.endpoints

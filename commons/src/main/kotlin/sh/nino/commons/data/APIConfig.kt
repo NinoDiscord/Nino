@@ -32,6 +32,13 @@ import kotlinx.serialization.*
 @Serializable
 data class APIConfig(
     /**
+     * Represents the secret key for JWT signing, this CANNOT BE EMPTY
+     * OR A VALUE THAT IS EASY TO REMEMBER.
+     */
+    @SerialName("jwt_secret_key")
+    val jwtSecretKey: String,
+
+    /**
      * If we should add additional security headers to the response.
      */
     @SerialName("security_headers")
@@ -82,6 +89,7 @@ data class APIConfig(
     /**
      * Append extra headers when sending out a response.
      */
+    @SerialName("extra_headers")
     val extraHeaders: Map<String, String> = mapOf(),
 
     /**

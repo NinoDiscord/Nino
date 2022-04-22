@@ -21,10 +21,20 @@
  * SOFTWARE.
  */
 
-plugins {
-    `nino-module`
-}
+package sh.nino.modules.ravy
 
-dependencies {
-    implementation(project(":modules"))
+import io.ktor.client.*
+import io.ktor.client.request.*
+import sh.nino.modules.annotations.ModuleMeta
+import sh.nino.modules.ravy.data.GetUserResult
+
+/**
+ * Represents the module for interacting with the [ravy.org](https://ravy.org) API.
+ */
+@ModuleMeta("ravy", "Module to interact with the ravy.org API, used for automod")
+class RavyModule(private val token: String, private val httpClient: HttpClient) {
+    suspend fun getUserData(id: String): GetUserResult = httpClient.get("https://ravy.org/api/v1/users/$id") {
+        header("Authorization", token)
+        header("Accept", "application/json; charset=utf-8")
+    }
 }

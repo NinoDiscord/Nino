@@ -57,6 +57,7 @@ dependencies {
     implementation(project(":modules:metrics"))
     implementation(project(":modules:timeouts"))
     implementation(project(":modules:punishments"))
+    implementation(project(":modules:ravy"))
 
     // Logging
     implementation("ch.qos.logback:logback-classic:1.2.11")

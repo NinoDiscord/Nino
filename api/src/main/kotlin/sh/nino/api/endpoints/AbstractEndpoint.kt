@@ -21,10 +21,27 @@
  * SOFTWARE.
  */
 
-plugins {
-    `nino-module`
-}
+package sh.nino.api.endpoints
 
-dependencies {
-    implementation(project(":modules"))
+import io.ktor.http.*
+import io.ktor.server.application.*
+
+/**
+ * Represents an abstraction for creating API endpoints. This is collected in the Koin module.
+ * @param path The path to use for this endpoint
+ * @param methods A list of methods to call this path on.
+ */
+abstract class AbstractEndpoint(val path: String, val methods: List<HttpMethod> = listOf(HttpMethod.Get)) {
+    /**
+     * Represents an abstraction for creating API endpoints. This is collected in the Koin module.
+     * @param path The path to use for this endpoint
+     * @param method A single [HttpMethod] this endpoint supports.
+     */
+    constructor(path: String, method: HttpMethod): this(path, listOf(method))
+
+    /**
+     * Runs the endpoint once the router has reached it.
+     * @param call The [ApplicationCall] from the handler.
+     */
+    abstract suspend fun call(call: ApplicationCall)
 }

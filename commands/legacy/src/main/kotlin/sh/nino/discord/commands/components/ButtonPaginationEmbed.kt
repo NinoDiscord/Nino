@@ -162,11 +162,13 @@ class ButtonPaginationEmbed(
                 if (index < 0) index = embeds.size - 1
 
                 message.edit {
-                    embeds?.plusAssign(self.embeds[index].apply {
-                        footer {
-                            text = "Page ${index + 1}/${self.embeds.size}"
+                    embeds?.plusAssign(
+                        self.embeds[index].apply {
+                            footer {
+                                text = "Page ${index + 1}/${self.embeds.size}"
+                            }
                         }
-                    })
+                    )
 
                     actionRow {
                         // Since when the embed is constructed, `disabled` for the first button
@@ -201,11 +203,13 @@ class ButtonPaginationEmbed(
                 if (index == embeds.size) index = 0
 
                 message.edit {
-                    embeds?.plusAssign(self.embeds[index].apply {
-                        footer {
-                            text = "Page ${index + 1}/${self.embeds.size}"
+                    embeds?.plusAssign(
+                        self.embeds[index].apply {
+                            footer {
+                                text = "Page ${index + 1}/${self.embeds.size}"
+                            }
                         }
-                    })
+                    )
 
                     actionRow {
                         // Since when the embed is constructed, `disabled` for the first button
@@ -242,11 +246,13 @@ class ButtonPaginationEmbed(
 
                 index = 0
                 message.edit {
-                    embeds?.plusAssign(self.embeds[index].apply {
-                        footer {
-                            text = "Page ${index + 1}/${self.embeds.size}"
+                    embeds?.plusAssign(
+                        self.embeds[index].apply {
+                            footer {
+                                text = "Page ${index + 1}/${self.embeds.size}"
+                            }
                         }
-                    })
+                    )
 
                     actionRow {
                         // Since when the embed is constructed, `disabled` for the first button
@@ -282,11 +288,13 @@ class ButtonPaginationEmbed(
 
                 index = lastIndex
                 message.edit {
-                    embeds?.plusAssign(self.embeds[index].apply {
-                        footer {
-                            text = "Page ${index + 1}/${self.embeds.size}"
+                    embeds?.plusAssign(
+                        self.embeds[index].apply {
+                            footer {
+                                text = "Page ${index + 1}/${self.embeds.size}"
+                            }
                         }
-                    })
+                    )
 
                     actionRow {
                         // Since when the embed is constructed, `disabled` for the first button

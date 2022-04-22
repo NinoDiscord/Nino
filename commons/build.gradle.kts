@@ -33,7 +33,7 @@ dependencies {
     api(platform("org.jetbrains.kotlinx:kotlinx-serialization-bom:1.3.2"))
     api(platform("org.jetbrains.kotlinx:kotlinx-coroutines-bom:1.6.1"))
     api(platform("org.jetbrains.exposed:exposed-bom:0.38.2"))
-    api(platform("io.ktor:ktor-bom:1.6.8"))
+    api(platform("io.ktor:ktor-bom:2.0.0"))
 
     // kotlinx.coroutines
     api("org.jetbrains.kotlinx:kotlinx-coroutines-core")
@@ -63,7 +63,7 @@ dependencies {
     api("com.squareup.okhttp3:okhttp:4.9.3")
 
     // Kord
-    api("dev.kord:kord-core:0.8.0-M12")
+    api("dev.kord:kord-core:0.8.0-M13")
     api("dev.kord.x:emoji:0.5.0")
 
     // Database (PostgreSQL)

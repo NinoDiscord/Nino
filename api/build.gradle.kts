@@ -21,57 +21,28 @@
  * SOFTWARE.
  */
 
-import java.text.SimpleDateFormat
-import java.util.Date
+import gay.floof.gradle.utils.*
 
 plugins {
     `nino-module`
-    application
 }
 
 dependencies {
-    // Logging
-    implementation("ch.qos.logback:logback-classic:1.2.11")
-    implementation("ch.qos.logback:logback-core:1.2.11")
-
-    // YAML (configuration)
-    implementation("com.charleskorn.kaml:kaml:0.43.0")
-
-    // Logstash encoder for Logback
-    implementation("net.logstash.logback:logstash-logback-encoder:7.1.1")
-
     // Ktor (server)
-    implementation("io.prometheus:simpleclient_common:0.15.0")
+    implementation("io.ktor:ktor-serialization-kotlinx-json")
+    implementation("io.ktor:ktor-server-content-negotiation")
+    implementation("io.ktor:ktor-server-auto-head-response")
+    implementation("io.ktor:ktor-server-default-headers")
+    implementation("io.ktor:ktor-server-double-receive")
+    implementation("io.ktor:ktor-server-call-logging")
+    implementation("io.ktor:ktor-server-status-pages")
+    implementation("io.ktor:ktor-serialization")
     implementation("io.ktor:ktor-server-netty")
+    implementation("io.ktor:ktor-server-cors")
 
-    // Sentry (logback)
-    implementation("io.sentry:sentry-logback:5.7.3")
-}
+    // JWT (for authentication)
+    implementation("com.auth0:java-jwt:3.19.1")
 
-application {
-    mainClass.set("sh.nino.api.Bootstrap")
-}
-
-tasks {
-    processResources {
-        filesMatching("build-info.json") {
-            val date = Date()
-            val formatter = SimpleDateFormat("EEE, MMM d, YYYY - HH:mm:ss a")
-
-            expand(
-                mapOf(
-                    "version" to rootProject.version,
-                    "commitSha" to commitHash,
-                    "buildDate" to formatter.format(date)
-                )
-            )
-        }
-    }
-
-    build {
-        dependsOn(processResources)
-        dependsOn(spotlessApply)
-        dependsOn(installDist)
-        dependsOn(kotest)
-    }
+    // Ktor Sentry plugin (because yes >:3)
+    floofy("ktor", "ktor-sentry", "0.0.1")
 }

@@ -21,35 +21,4 @@
  * SOFTWARE.
  */
 
-package sh.nino.api
-
-import ch.qos.logback.classic.LoggerContext
-import gay.floof.utils.slf4j.logging
-import org.slf4j.LoggerFactory
-import kotlin.concurrent.thread
-
-object Bootstrap {
-    private val log by logging<Bootstrap>()
-
-    init {
-        Runtime.getRuntime().addShutdownHook(
-            thread(start = false, name = "Nino-ApiShutdownThread") {
-                close()
-            }
-        )
-    }
-
-    @JvmStatic
-    fun main(args: Array<String>) {
-        Thread.currentThread().name = "Nino-ApiBootstrapThread"
-
-        log.info("beep >w<")
-    }
-
-    private fun close() {
-        log.warn("Shutting down the API...")
-
-        val loggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
-        loggerContext.stop() // make sure it shutdowns the Logstash TCP encoder, if it's enabled
-    }
-}
+package sh.nino.api.sessions

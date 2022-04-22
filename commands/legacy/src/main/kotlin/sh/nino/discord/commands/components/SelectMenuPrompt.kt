@@ -34,7 +34,6 @@ import dev.kord.core.entity.channel.TextChannel
 import dev.kord.core.event.interaction.ComponentInteractionCreateEvent
 import dev.kord.core.event.interaction.InteractionCreateEvent
 import dev.kord.core.on
-import dev.kord.rest.builder.message.create.MessageCreateBuilder
 import dev.kord.rest.builder.message.create.UserMessageCreateBuilder
 import dev.kord.rest.builder.message.create.actionRow
 import kotlinx.coroutines.Job

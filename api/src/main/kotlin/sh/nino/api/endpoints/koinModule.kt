@@ -21,4 +21,11 @@
  * SOFTWARE.
  */
 
-package sh.nino.api
+package sh.nino.api.endpoints
+
+import org.koin.dsl.bind
+import org.koin.dsl.module
+
+val apiEndpointsModule = module {
+    single { MainEndpoint() } bind AbstractEndpoint::class
+}

@@ -21,10 +21,29 @@
  * SOFTWARE.
  */
 
-plugins {
-    `nino-module`
-}
+package sh.nino.api.endpoints.api
 
-dependencies {
-    implementation(project(":modules"))
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.put
+import sh.nino.api.endpoints.AbstractEndpoint
+
+class ApiV1Endpoint: AbstractEndpoint("/v1", HttpMethod.Get) {
+    override suspend fun call(call: ApplicationCall) {
+        call.respond(
+            HttpStatusCode.OK,
+            buildJsonObject {
+                put("success", true)
+                put(
+                    "data",
+                    buildJsonObject {
+                        put("docs_uri", "https://nino.sh/docs/api/v1")
+                        put("tagline", "You know, for moderation at scale")
+                    }
+                )
+            }
+        )
+    }
 }

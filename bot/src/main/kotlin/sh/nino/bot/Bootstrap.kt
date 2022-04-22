@@ -23,6 +23,7 @@
 
 package sh.nino.bot
 
+import ch.qos.logback.classic.LoggerContext
 import com.charleskorn.kaml.Yaml
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
@@ -49,6 +50,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
+import org.slf4j.LoggerFactory
 import sh.nino.commons.NinoInfo
 import sh.nino.commons.data.Config
 import sh.nino.commons.data.Environment
@@ -67,6 +69,7 @@ import sh.nino.modules.Registry
 import sh.nino.modules.localisation.LocalisationModule
 import sh.nino.modules.metrics.MetricsModule
 import sh.nino.modules.punishments.PunishmentModule
+import sh.nino.modules.ravy.RavyModule
 import sh.nino.modules.timeouts.TimeoutsModule
 import java.io.File
 import java.io.IOError
@@ -208,11 +211,17 @@ object Bootstrap {
         }
 
         log.info("Created Kord instance! Initializing modules...")
+
         val registry = Registry()
         registry.register(MetricsModule(config.metrics, config.api != null))
         registry.register(LocalisationModule(config.defaultLocale, json))
         registry.register(TimeoutsModule(config.timeouts.uri, config.timeouts.auth, httpClient, json))
         registry.register(PunishmentModule())
+
+        if (config.ravy != null) {
+            log.info("Found configuration token for Ravy API!")
+            registry.register(RavyModule(config.ravy!!, httpClient))
+        }
 
         log.info("Initialized modules! Initializing Koin...")
         val koin = startKoin {
@@ -270,6 +279,10 @@ object Bootstrap {
                 }
 
                 log.info("We are going offline, bye!")
+
+                // Dispose TCP connection with Logstash (if any)
+                val logCtx = LoggerFactory.getILoggerFactory() as? LoggerContext
+                logCtx?.stop()
             }
         )
     }
