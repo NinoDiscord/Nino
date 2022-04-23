@@ -69,10 +69,12 @@ class GatewayPingJob(
         if (config.instatus != null && config.instatus?.gatewayMetricId != null) {
             log.debug("Instatus configuration is available, now posting to Instatus...")
             val res: HttpResponse = httpClient.post("https://api.instatus.com/v1/${config.instatus!!.pageId}/metrics/${config.instatus!!.gatewayMetricId}") {
-                setBody(InstatusPostMetricBody(
-                    timestamp = System.currentTimeMillis(),
-                    value = (kord.gateway.averagePing ?: Duration.ZERO).toLong(DurationUnit.MILLISECONDS)
-                ))
+                setBody(
+                    InstatusPostMetricBody(
+                        timestamp = System.currentTimeMillis(),
+                        value = (kord.gateway.averagePing ?: Duration.ZERO).toLong(DurationUnit.MILLISECONDS)
+                    )
+                )
 
                 header("Authorization", config.instatus!!.token)
             }
