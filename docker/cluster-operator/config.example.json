@@ -1,0 +1,11 @@
+{
+  "env": "Prod",
+  "clusters": 1,
+  "shards": 1,
+  "auth": "",
+  "webhook": "",
+  "metricsPrefix": "nino_",
+  "mergeMetrics": true,
+  "logEvents": false,
+  "exportDefaultMetrics": false
+}

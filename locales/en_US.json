@@ -2,146 +2,184 @@
   "meta": {
     "contributors": ["239790360728043520"],
     "translator": "280158289667555328",
-    "aliases": ["en", "en_us", "english"],
-    "code": "en_US",
-    "full": "English (US)",
-    "flag": ":flag_us:"
+    "name": "English (United States)",
+    "flag": ":flag_us:",
+    "code": "en_US"
   },
   "strings": {
-    "descriptions": {
-      "unknown": "This command doesn't have a description tied.",
+    "generic.enabled": "Enabled",
+    "generic.disabled": "Disabled",
+    "generic.lonely": "Heh... it's pretty empty, eh? I guess it's like a set of hearts, only one can be the chosen one! But, I shouldn't give you an extensional crisis right now. Go have fun! ...and maybe touch grass, you really seem to be lacking in that department x3",
+    "generic.nothing": "Nothing to show.",
+    "generic.yes": "Yes",
+    "generic.no": "No",
 
-      "help": "Returns a list of Nino's commands or documentation of a specific command or module.",
-      "invite": "Returns the invitation link to invite Nino into your guild! Also, support if you really need it.",
-      "locale": "Sets, resets, or views the current translations for Nino.",
-      "ping": "Returns the latency of anything that could cause me being... slighly un-usable...",
-      "shardinfo": "Returns shard information for Nino.",
-      "source": "Returns the source code URL of Nino, maybe to contribute or give a :star:?",
-      "statistics": "Returns nerd statistics related to Nino.",
-      "uptime": "How long I have been up for!",
+    "errors.ownerOnly": "You are not allowed to invoke the **${name}** command.",
+    "errors.missingPermsBot": "I am currently missing the following permissions: **${perms}**",
+    "errors.missingPermsUser": "You are currently missing the following permissions: **${perms}**",
+    "errors.cooldown": "You are currently on cooldown for command **${command}** for **${time}**.",
+    "errors.unknown.dev": [
+      "Sorry! I was not able to execute the ${prefix} **${command}**! :<",
+      "If this keeps erroring, please report it to:",
+      "${owners}",
+      "",
+      "Since you are in development mode, the stacktrace can be seen below",
+      "and in the console!",
+      "",
+      "```kotlin",
+      "${stacktrace}",
+      "```"
+    ],
 
-      "ban": "Bans a user from this guild or outside the guild.",
-      "case": "Returns a mini embed of the case you searched up.",
-      "kick": ":boot: Kicks a member from this guild.",
-      "mute": "Mutes a member from any textable channel.",
-      "pardon": "Removes one or multiple warnings from a user in this guild.",
-      "purge": "Purges a certain amount of messages by user(s), system account, bot(s), or specific messages.",
-      "reason": "Changes the reason of a specific case.",
-      "softban": "Softly bans a user from this guild.",
-      "timeouts": "Returns a list of timeouts based on the type of action.",
-      "unban": "Unbans a user from this guild.",
-      "unmute": "Unmutes a user from this guild.",
-      "warn": "Warns a specific user.",
-      "warnings": "Shows a list of warnings from a specific user.",
-      "voice_mute": "Mutes a person in the voice channel you're in.",
-      "voice_deafen": "Deafens a person in the voice channel you're in.",
-      "voice_undeafen": "Undeafens a person in the voice channel you're in.",
-      "voice_unmute": "Unmutes a person in the voice channel you're in.",
-      "voice_kick": "Kicks any member(s) or bot(s) in a voice channel you're in.",
+    "errors.unknown.prod": [
+      "Sorry! I was not able to execute the ${prefix} **${command}**! :<",
+      "If this keeps erroring, please report it to:",
+      "${owners}",
+      "on the Noelware Discord server under the <#824071651486335036> channel:",
+      "> https://discord.gg/ATmjFH9kMH"
+    ],
 
-      "automod": "Enables, disables, or views any automod utility available.",
-      "logging": "Enables or disable the Logging feature.",
-      "modlog": "Set or reset the mod log channel.",
-      "muted_role": "Sets or resets the Muted role.",
-      "prefix": "View, change, or reset a guild or user prefix.",
-      "punishments": "View, change, or remove a guild punishment.",
-      "settings": "Views a list of all the settings in this guild."
-    },
-    "commands": {
-      "help": {
-        "embed": {
-          "title": "%s | Commands List",
-          "description": [
-            ":pencil2: **For more documentation, you can type `%shelp <cmdOrMod>` with `<cmdOrMod>` being the command or module in this list.**",
-            "",
-            "More information and a prettier UI for commands or modules can be viewed on the [website](https://nino.floofy.dev).",
-            "There are currently **%d** available commands."
-          ],
-          "fields": {
-            "moderation": "• Moderation [%d]",
-            "core": "• Core [%d]",
-            "settings": "• Settings [%d]"
-          }
-        },
-        "command": {
-          "not_found": ":question: Command or module **%s** was not found.",
-          "embed": {
-            "title": "[ :pencil2: Command \"%s\" ]",
-            "description": "> **%s**",
-            "fields": {
-              "syntax": "• Syntax",
-              "category": "• Category",
-              "aliases": "• Aliases",
-              "owner_only": "• Owner Only",
-              "cooldown": "• Cooldown",
-              "user_perms": "• Required User Permissions",
-              "bot_perms": "• Required Bot Permissions",
-              "examples": "• Examples"
-            }
-          }
-        },
-        "module": {
-          "embed": {
-            "title": "[ ·̩̩̥͙＊*•̩̩͙✩•̩̩͙* Module \"%s\" ˚*•̩̩͙✩•̩̩͙*˚＊·̩̩̥͙ ]"
-          }
-        },
-        "usage_title": "Command Usage",
-        "usage": [
-          "So, if you're not familar with the command syntax, here's a breakdown:",
-          "",
-          "> A simple command might look like: `%shelp [cmdOrMod | \"usage\"]`",
-          "",
-          "```",
-          "x!    help    [cmdOrMod      | \"usage\"]",
-          "^       ^         ^          ^   ^",
-          "|       |         |          |   |",
-          "|       |         |          |   |",
-          "|       |         |          |   |",
-          "prefix cmd    parameter(s)  \"or\" literal",
-          "```",
-          "",
-          "Parameters are easy to understand. If they are \"piped\" with a `|`, it means it's a \"or\", or what you can provide. If they are a literal",
-          "parameter, it means if you typed \"usage\" out, it'll print something else.",
-          "",
-          "- A parameter wrapped in `[]` means it's optional, but you can add additional arguments to make it run something else",
-          "- A parameter wrapped in `<>` means it's required, which means *you* have to add that argument to make the command perform correctly.",
-          "",
-          ":question: **Still stuck? There is always examples in the command's short overview to show how you can run that specific command.**"
-        ]
-      },
-      "invite": [
-        ":wave: Heyo **%s**! You want to invite me into your own server? That's pretty cool if I do say so myself~",
-        "You can do so by clicking this link: **%s**",
-        "",
-        "If you want to see bleeding edge features, you can also invite the beta instance:",
-        "**%s**",
-        "",
-        "Need any support? Join the **Noelware** Discord server under <#824071651486335036> to get help with me!",
-        "%s"
-      ]
-    },
-    "generic": {},
-    "automod": {
-      "blacklist": "Hey, I don't think you should say that here! (☍﹏⁰)｡",
-      "invites": "Hey! You're not allowed to post server links here... o(╥﹏╥)o",
-      "mentions": "Uhm, I don't think that'll get their attention... （；¬＿¬)",
-      "shortlinks": "You shouldn't send that kind of link here... (⁎˃ᆺ˂)",
-      "spam": "I don't think spamming will get you anywhere... o(╥﹏╥)o",
-      "raid": {
-        "locked": "Hey all! I decided to close off all channels you had access in for ~10 seconds due to someone being rude and raiding! ૮( ᵒ̌▱๋ᵒ̌ )ა",
-        "unlocked": "Heyo! I restored all channels, I hope there is no more raiders.. :3."
-      }
-    },
-    "errors": {
-      "blacklists": {
-        "guild": [
-          "Guild **${guild}** is blacklisted from using me by **${user}**",
-          "> **${reason}**",
-          "",
-          ":question: If there was an issue or a misunderstanding in the blacklist, contact us here:"
-        ],
-        "user": []
-      }
-    }
+    "descriptions.admin.automod": "Command to update your automod settings!",
+    "descriptions.automod.messageLinks": "Toggles the Message Links automod -- read more [here](https://nino.sh/docs/automod/message-links)",
+    "descriptions.automod.accountAge": "Toggles the Account Age automod or sets a threshold -- read more [here](https://nino.sh/docs/automod/account-age)",
+    "descriptions.automod.dehoist": "Toggles the Dehoisting automod -- read more [here](https://nino.sh/docs/automod/dehoisting)",
+    "descriptions.automod.blacklist": "Toggles the Blacklist automod, or add/remove/list blacklisted words. -- read more [here](https://nino.sh/docs/automod/blacklist)",
+    "descriptions.automod.phishing": "Toggles the Phishing Links automod -- read more [here](https://nino.sh/docs/automod/phishing)",
+    "descriptions.automod.toxicity": "Toggles the Toxicity automod -- read more [here](https://nino.sh/docs/automod/toxicity)",
+    "descriptions.automod.spam": "Toggles the Spam automod -- read more [here](https://nino.sh/docs/automod/spam)",
+    "descriptions.automod.raid": "Toggles the Raid automod -- read more [here](https://nino.sh/docs/automod/raid)",
+    "descriptions.automod.invites": "Toggles the Invites automod -- read more [here](https://nino.sh/docs/automod/invites)",
+    "descriptions.automod.mentions": "Toggles the Mentions automod, or sets a mention threshold. -- read more [here](https://nino.sh/docs/automod/mentions)",
+    "descriptions.admin.export": "Exports your guild settings to be easily imported later on.",
+    "descriptions.admin.import": "Import your exported guild settings easily. You can't revert back once you import back.",
+    "descriptions.admin.logging": "Administrate your logging settings here!",
+    "descriptions.logging.omitUsers": "Add or remove users to omit from being logged in the specified log channel.",
+    "descriptions.logging.omitChannels": "Add or remove text channels to omit from being logged in the specified log channel.",
+    "descriptions.logging.config": "Shows the current logging configuration",
+    "descriptions.logging.events": "Toggle specific logging events -- read more [here](https://nino.sh/docs/logging)",
+    "descriptions.prefix": "Creates, views, and deletes the guild or your prefixes.",
+    "descriptions.prefix.set": "Adds a prefix to the list of prefixes that you or the guild can use, depends on your desire!",
+    "descriptions.prefix.delete": "Removes a prefix from the list of prefixes that you or the guild doesn't like, but it doesn't hurt to delete any... right?",
+    "descriptions.core.help": "Returns documentation on a command or module, or a list of commands you can use.",
+    "descriptions.core.invite": "Returns the link to invite me to your guild, master!",
+    "descriptions.core.ping": "Returns the latency from Discord to us",
+    "descriptions.core.shardinfo": "Returns dedicated information about all shards available.",
+    "descriptions.core.source": "Returns the link to Nino's source code",
+    "descriptions.core.statistics": "Returns miscellanous statistics about Nino, useless or not!",
+    "descriptions.core.uptime": "Returns how long Nino has been up.",
+
+    "commands.automod.toggle": "${emoji} ${toggle} the **${name}** automod!",
+    "commands.admin.logging.toggle": "${emoji} ${toggle} the **Logging** feature.",
+    "commands.admin.logging.omitUsers.embed.title": "[ Omitted Users ]",
+    "commands.admin.logging.omitUsers.embed.description": [
+      "Here is a list of users that are omitted from being logged:",
+      "",
+      "${list}"
+    ],
+    "commands.admin.logging.omitUsers.add.missingArgs": "You are missing users to omit from logging! You can use one or more mentions or user IDs.",
+    "commands.admin.logging.omitUsers.404": "I was unable to find the users to omit. Did you specify a mention or user ID?",
+    "commands.admin.logging.omitUsers.success": "${operation} **${users}** user${suffix}!",
+    "commands.admin.logging.omitUsers.del.missingArgs": "Missing user(s) to remove from the omitted list.",
+    "commands.admin.logging.omitChannels.404": "I was unable to find the channels to omit. Did you specify a mention or channel ID? Did you specify only voice channels?",
+    "commands.admin.logging.omitChannels.add.missingArgs": "You are missing text channels to omit from logging! You can use one or more mentions or channel IDs.",
+    "commands.admin.logging.omitChannels.success": "${operation} **${users}** text channel${suffix}!",
+    "commands.admin.logging.omitChannels.del.missingArgs": "Missing channel(s) to remove from the omitted list.",
+    "commands.admin.logging.omitChannels.embed.title": "[ Omitted Users ]",
+    "commands.admin.logging.omitChannels.embed.description": [
+      "Here is a list of text channels that are omitted from being logged:",
+      "",
+      "${list}"
+    ],
+    "commands.admin.logging.success": "${emoji} Successfully set the logging channel to ${channel}!",
+    "commands.admin.logging.invalid": "Argument **${arg}** was not a valid channel mention or ID.",
+    "commands.admin.logging.config.message": [
+      "```md",
+      "# Logging Configuration for ${name}",
+      "",
+      "• Enabled: ${enabled}",
+      "• Channel: ${channel}",
+      "```"
+    ],
+    "commands.admin.logging.events.list.embed.title": "Enabled Events for ${name}",
+    "commands.admin.logging.events.list.embed.description": [
+      "This is a list of logging events that are enabled or disabled.",
+      "Read our [Terms of Service](https://nino.sh/terms) & [Privacy Policy](https://nino.sh/privacy) before enabling!",
+      "",
+      "${list}"
+    ],
+
+    "commands.admin.prefix.user.list": [
+      "```md",
+      "# Prefixes for ${user}",
+      "${list}",
+      "",
+      "## Note",
+      "> You can also use the following default prefixes as well:",
+      "",
+      "${prefixes}",
+      "```"
+    ],
+
+    "commands.admin.prefix.guild.list": [
+      "```md",
+      "# Prefixes for ${name}",
+      "${list}",
+      "",
+      "## Note",
+      "> You can also use the following default prefixes as well:",
+      "",
+      "${prefixes}",
+      "```"
+    ],
+
+    "commands.admin.prefix.set.noPermission": "You are currently missing the **Manage Guild** permission to modify guild prefixes.",
+    "commands.admin.prefix.set.missingPrefix": "You are missing a prefix to set. You can use `\"` to use spaces in your prefixes. (example: `\"nino is the best\"` -> `nino is the best help`)",
+    "commands.admin.prefix.set.maxLengthExceeded": "You went **${chars.over}** characters over the limit with the prefix you supplied: ${prefix}",
+    "commands.admin.prefix.set.alreadySet": "Prefix ${prefix} is already available!",
+    "commands.admin.prefix.set.available": "Prefix ${prefix} is now available. :3",
+    "commands.admin.prefix.reset.alreadyRemoved": "Prefix ${prefix} is already unavailable...",
+    "commands.admin.prefix.reset.unavailable": "Prefix ${prefix} is now unavailable, if you want to add it back, then say so!",
+    "commands.admin.prefix.reset.guild.embed.title": "[ Prefixes for guild ${name} ]",
+    "commands.admin.prefix.reset.guild.embed.description": [
+      "Hello again! I am here to remind you that you are missing a prefix to remove.",
+      "But don't worry, I will list them again for you... don't expect this to happen again!",
+      "",
+      "Just specify the prefix below to remove it (example):",
+      "> prefix reset \"nino is the best\"",
+      "",
+      "```md",
+      "${prefixes}",
+      "```"
+    ],
+
+    "commands.admin.prefix.reset.user.embed.title": "[ Prefixes for ${name} ]",
+    "commands.admin.prefix.reset.user.embed.description": [
+      "Hello again! I am here to remind you that you are missing a prefix to remove.",
+      "But don't worry, I will list them again for you... don't expect this to happen again!",
+      "",
+      "Just specify the prefix below to remove it (example):",
+      "> prefix reset \"nino is the best\"",
+      "",
+      "```md",
+      "${prefixes}",
+      "```"
+    ],
+
+    "commands.admin.rolecfg.list": [
+      "```md",
+      "# Role Configuration for ${guild}",
+      "• No Threads Role: ${noThreadsRole}",
+      "• Muted Role: ${mutedRole}",
+      "```"
+    ],
+
+    "commands.admin.rolecfg.muted.noArgs": "You must provide a role ID to set a Muted role or you can use the reset subcommand to reset it.",
+    "commands.admin.rolecfg.muted.noMutedRole": "Cannot reset muted role due to one being reset or not configured.",
+    "commands.admin.rolecfg.muted.set.success": "Successfully set the Muted role to **${name}**",
+    "commands.admin.rolecfg.muted.reset.success": "Successfully reset the Muted role.",
+    "commands.admin.rolecfg.noThreads.noArgs": "You must provide a role ID to set a Muted role or you can use the reset subcommand to reset it.",
+    "commands.admin.rolecfg.noThreads.noRoleId": "Cannot reset No Threads role due to one being reset or not configured.",
+    "commands.admin.rolecfg.noThreads.set.success": "Successfully set the No Threads role to **${name}**",
+    "commands.admin.rolecfg.noThreads.reset.success": "Successfully reset the No Threads role."
   }
 }

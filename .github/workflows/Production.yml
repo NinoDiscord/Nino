@@ -1,0 +1,69 @@
+# 🔨 Nino: Cute, advanced discord moderation bot made in Kord.
+# Copyright (c) 2019-2022 Nino Team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: Update Production instance
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build-container:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checks out the repository
+        uses: actions/checkout@v3
+
+      - name: Get the current git tag to use
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          strip_v: true
+
+      - name: Login to the registry
+        run: echo "${{ secrets.REGISTRY_PASSWORD }}" | docker login registry.floofy.dev -u august --password-stdin
+
+      - name: Build the container
+        run: docker build --no-cache . -t registry.floofy.dev/nino/bot:${{ steps.tag.outputs.tag }}
+
+      - name: Push to the registry
+        run: docker push registry.floofy.dev/nino/bot:${{ steps.tag.outputs.tag }}
+
+  deploy:
+    needs: build-container
+    runs-on: ubuntu-latest
+    steps:
+      - name: Login to Kubernetes
+        run: |
+          mkdir ~/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+
+      - name: Get the current git tag to use
+        id: tag
+        uses: dawidd6/action-get-tag@v1
+        with:
+          strip_v: true
+
+      - name: Set tag
+        run: kubectl set image deployment/nino-prod nino-prod=registry.floofy.dev/nino/bot:${{ steps.tag.outputs.tag }}
+
+      - name: Deploy to the bot
+        run: kubectl rollout status deployment/nino-prod

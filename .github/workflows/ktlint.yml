@@ -1,0 +1,105 @@
+# 🔨 Nino: Cute, advanced discord moderation bot made in Kord.
+# Copyright (c) 2019-2022 Nino Team
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+name: ktlint
+on:
+  push:
+    branches:
+      - 'feature/**'
+      - 'issue/gh-**'
+      - master
+      - edge
+
+    paths-ignore:
+      - '.github/**'
+      - '.husky/**'
+      - '.vscode/**'
+      - 'assets/**'
+      - 'locales/**'
+      - 'docker/**'
+      - '.dockerignore'
+      - '.eslintignore'
+      - '.gitignore'
+      - '**.md'
+      - 'LICENSE'
+      - 'renovate.json'
+
+  pull_request:
+    branches:
+      - 'feature/**'
+      - 'issue/gh-**'
+      - master
+      - edge
+
+    paths-ignore:
+      - '.github/**'
+      - '.husky/**'
+      - '.vscode/**'
+      - 'assets/**'
+      - 'locales/**'
+      - 'docker/**'
+      - '.dockerignore'
+      - '.eslintignore'
+      - '.gitignore'
+      - '**.md'
+      - 'LICENSE'
+      - 'renovate.json'
+jobs:
+  ktlint:
+    name: Linting and Unit Tests
+    runs-on: ubuntu-latest
+    services:
+      redis:
+        image: bitnami/redis:latest
+        ports:
+          - 6379:6379
+      timeouts:
+        image: ghcr.io/ninodiscord/timeouts/timeouts:latest
+        env:
+          AUTH: owodauwu
+          REDIS_HOST: redis
+          REDIS_PORT: 6379
+        ports:
+          - 4025:4025
+    steps:
+      - name: Checks out the repository
+        uses: actions/checkout@v3
+
+      - name: Sets up Java 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin # Eclipse Temurin is <3
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Lets ./gradlew be executable
+        run: chmod +x ./gradlew
+
+      - name: Lints the repository for any code errors
+        run: ./gradlew spotlessCheck --no-daemon
+
+      - name: Builds the project for any errors
+        run: ./gradlew compileKotlin --no-daemon
+
+      - name: Unit test project
+        run: ./gradlew kotest
