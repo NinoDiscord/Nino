@@ -91,7 +91,7 @@ private val WEBHOOK_URI_REGEX = "(?:https?:\\/\\/)?(?:canary\\.|ptb\\.)?discord\
 class PunishmentModule {
     // The queue is where the timeouts get issued if the server is closed.
     private val queue = mutableMapOf<Snowflake, Timeout>()
-    private val timeouts: TimeoutsModule by Registry.inject()
+    private val timeouts: TimeoutsModule? by Registry.inject()
     private val kord: Kord by inject()
     private val log by logging<PunishmentModule>()
 
@@ -100,7 +100,7 @@ class PunishmentModule {
     fun onInit() {
         log.info("Initializing events...")
 
-        timeouts.on<ApplyEvent> {
+        timeouts!!.on<ApplyEvent> {
             val timeout = this.timeout
             val issuedAt = LocalDateTime.ofInstant(Instant.ofEpochMilli(timeout.issuedAt), ZoneId.systemDefault())
 
@@ -112,7 +112,7 @@ class PunishmentModule {
      * Resolves the [member] to get the actual [Member] object out of it, this only calls
      * REST or cache if the member object isn't a partial one.
      */
-    suspend fun resolveMember(member: MemberLikeObject, useRest: Boolean = false): Member {
+    private suspend fun resolveMember(member: MemberLikeObject, useRest: Boolean = false): Member {
         if (!member.isPartial) {
             return member.member!!
         }
@@ -776,11 +776,11 @@ class PunishmentModule {
                 PunishmentType.UNBAN.toKey()
             )
 
-            if (timeouts.closed) {
+            if (timeouts!!.closed) {
                 log.warn("Server is currently closed, adding it to queue...")
                 queue[member.id] = timeout
             } else {
-                timeouts.send(RequestCommand(timeout))
+                timeouts!!.send(RequestCommand(timeout))
             }
         }
     }
@@ -817,11 +817,11 @@ class PunishmentModule {
                 PunishmentType.UNMUTE.toKey()
             )
 
-            if (timeouts.closed) {
+            if (timeouts!!.closed) {
                 log.warn("Server is currently closed, adding it to queue...")
                 queue[member.id] = timeout
             } else {
-                timeouts.send(RequestCommand(timeout))
+                timeouts!!.send(RequestCommand(timeout))
             }
         }
     }
@@ -848,11 +848,11 @@ class PunishmentModule {
                 PunishmentType.THREAD_MESSAGES_ADDED.toKey()
             )
 
-            if (timeouts.closed) {
+            if (timeouts!!.closed) {
                 log.warn("Server is currently closed, adding it to queue...")
                 queue[member.id] = timeout
             } else {
-                timeouts.send(RequestCommand(timeout))
+                timeouts!!.send(RequestCommand(timeout))
             }
         }
     }
@@ -883,11 +883,11 @@ class PunishmentModule {
                 PunishmentType.VOICE_UNMUTE.toKey()
             )
 
-            if (timeouts.closed) {
+            if (timeouts!!.closed) {
                 log.warn("Server is currently closed, adding it to queue...")
                 queue[member.id] = timeout
             } else {
-                timeouts.send(RequestCommand(timeout))
+                timeouts!!.send(RequestCommand(timeout))
             }
         }
     }
@@ -918,11 +918,11 @@ class PunishmentModule {
                 PunishmentType.VOICE_UNDEAFEN.toKey()
             )
 
-            if (timeouts.closed) {
+            if (timeouts!!.closed) {
                 log.warn("Server is currently closed, adding it to queue...")
                 queue[member.id] = timeout
             } else {
-                timeouts.send(RequestCommand(timeout))
+                timeouts!!.send(RequestCommand(timeout))
             }
         }
     }

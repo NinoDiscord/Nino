@@ -42,8 +42,10 @@ import io.sentry.Sentry
 import kotlinx.serialization.json.*
 import org.koin.core.context.GlobalContext
 import org.slf4j.LoggerFactory
-import org.slf4j.event.Level
+import sh.nino.api.endpoints.AbstractEndpoint
+import sh.nino.api.exceptions.add401Exception
 import sh.nino.api.plugins.KtorLoggingPlugin
+import sh.nino.api.plugins.UserAgentPlugin
 import sh.nino.commons.NinoInfo
 import sh.nino.commons.data.Config
 import sh.nino.commons.data.Environment
@@ -55,6 +57,7 @@ import sh.nino.commons.extensions.retrieveAll
  */
 class ApiServer(private val config: Config) {
     private lateinit var server: NettyApplicationEngine
+    private val registeredEndpoints = mutableListOf<Pair<HttpMethod, String>>()
     private val log by logging<ApiServer>()
 
     suspend fun launch() {
@@ -62,6 +65,7 @@ class ApiServer(private val config: Config) {
 
         val apiConfig = config.api!!
         val self = this // so i don't have to `this@ApiServer.config`...
+
         val environment = applicationEngineEnvironment {
             this.developmentMode = self.config.environment == Environment.Development
             this.log = LoggerFactory.getLogger("sh.nino.api.ktor.KtorService")
@@ -74,21 +78,9 @@ class ApiServer(private val config: Config) {
             module {
                 val json: Json by inject()
 
+                install(UserAgentPlugin)
                 install(KtorLoggingPlugin)
                 install(AutoHeadResponse)
-                install(CallLogging) {
-                    level = if (self.config.environment == Environment.Development) {
-                        Level.DEBUG
-                    } else {
-                        Level.INFO
-                    }
-
-                    mdc("user-agent") {
-                        val userAgent = it.request.userAgent()
-                        userAgent
-                    }
-                }
-
                 install(ContentNegotiation) {
                     this.json(json)
                 }
@@ -136,12 +128,14 @@ class ApiServer(private val config: Config) {
                         )
                     }
 
+                    add401Exception()
+
                     exception<Exception> { call, cause ->
                         if (Sentry.isEnabled()) {
                             Sentry.captureException(cause)
                         }
 
-                        this@ApiServer.log.error("Unable to handle request ${call.request.httpMethod.value} ${call.request.uri}:", cause)
+                        self.log.error("Unable to handle request ${call.request.httpMethod.value} ${call.request.uri}:", cause)
                         call.respond(
                             HttpStatusCode.InternalServerError,
                             buildJsonObject {
@@ -155,24 +149,7 @@ class ApiServer(private val config: Config) {
                                                 put("code", "INTERNAL_SERVER_ERROR")
 
                                                 if (self.config.environment == Environment.Development) {
-                                                    put(
-                                                        "detail",
-                                                        buildJsonObject {
-                                                            put("message", cause.message ?: cause.localizedMessage)
-                                                            put(
-                                                                "stacktrace",
-                                                                buildJsonArray {
-                                                                    for (stacktrace in cause.stackTrace) {
-                                                                        println(stacktrace)
-                                                                    }
-                                                                }
-                                                            )
-
-                                                            if (cause.cause != null) {
-                                                                put("caused_by", cause.cause!!.message ?: cause.cause!!.localizedMessage)
-                                                            }
-                                                        }
-                                                    )
+                                                    put("detail", cause.message)
                                                 }
                                             }
                                         )
@@ -184,61 +161,53 @@ class ApiServer(private val config: Config) {
                 }
 
                 routing {
-                    val endpoints = GlobalContext.retrieveAll<Any>()
-                }
-            }
-        }
-    }
-}
-
-/*
-            module {
-                routing {
-                    val endpoints = koin.getAll<AbstractEndpoint>()
-                    log.info("Found ${endpoints.size} endpoints to register.")
+                    val endpoints = GlobalContext.retrieveAll<AbstractEndpoint>()
+                    self.log.info("Found ${endpoints.size} to register!")
 
                     for (endpoint in endpoints) {
-                        val pathMethodPair = Pair(endpoint.path, endpoint.method)
-                        if (routesRegistered.contains(pathMethodPair))
-                            continue
+                        for (method in endpoint.methods) {
+                            if (self.registeredEndpoints.contains(Pair(method, endpoint.path)))
+                                continue
 
-                        routesRegistered.add(pathMethodPair)
-                        log.info("Registering endpoint ${endpoint.method.value} ${endpoint.path}")
-                        route(endpoint.path, endpoint.method) {
-                            handle {
-                                val metrics: MetricsHandler by inject()
-                                metrics.requestsCount?.labels(endpoint.path, endpoint.method.value)?.inc()
+                            self.registeredEndpoints.add(Pair(method, endpoint.path))
+                            self.log.info("Registering endpoint ${method.value} ${endpoint.path}!")
 
-                                endpoint.call(call)
+                            route(endpoint.path, method) {
+                                for ((plugin, configure) in endpoint.pluginsToRegister) {
+                                    install(plugin) {
+                                        configure.invoke(this)
+                                    }
+                                }
+
+                                handle {
+                                    endpoint.call(call)
+                                }
                             }
                         }
                     }
-
-                    log.info("Registered all endpoints! Now registering Discord Interactions...")
-                    installDiscordInteractions(
-                        config.publicKey,
-                        "/api/interactions",
-                        DefaultInteractionRequestHandler(applicationId, commandManager, restClient)
-                    )
                 }
             }
         }
 
-        server = embeddedServer(
-            Netty,
-            environment,
-            configure = {
-                requestQueueLimit = config.server.requestQueueLimit
-                runningLimit = config.server.runningLimit
-                shareWorkGroup = config.server.shareWorkGroup
-                responseWriteTimeoutSeconds = config.server.responseWriteTimeoutSeconds
-                requestReadTimeoutSeconds = config.server.requestReadTimeout
-                tcpKeepAlive = config.server.tcpKeepAlive
-            }
-        )
+        server = embeddedServer(Netty, environment, configure = {
+            requestQueueLimit = apiConfig.requestQueueLimit
+            runningLimit = apiConfig.runningLimit
+            shareWorkGroup = apiConfig.shareWorkGroup
+            responseWriteTimeoutSeconds = apiConfig.responseWriteTimeoutSeconds
+            requestReadTimeoutSeconds = apiConfig.requestReadTimeout
+            tcpKeepAlive = apiConfig.tcpKeepAlive
+        })
 
-        if (!config.server.securityHeaders)
-            log.warn("It is not recommended to disable security headers when requesting to the API. :)")
+        if (!apiConfig.securityHeaders)
+            log.warn("It is not recommended disabling security headers :3")
 
         server.start(wait = true)
- */
+    }
+
+    fun destroy() {
+        if (!::server.isInitialized) return
+
+        log.warn("Destroying API server...")
+        server.stop(1000, 5000)
+    }
+}

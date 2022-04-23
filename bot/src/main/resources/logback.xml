@@ -62,6 +62,8 @@
                         <throwableMessage />
                         <throwableRootCauseClassName />
                         <throwableRootCauseMessage />
+                        <includeMdcKeyName>user_agent</includeMdcKeyName>
+                        <includeMdcKeyName>user_id</includeMdcKeyName>
                     </providers>
 
                     <customFields>{"project":"Nino","application":"bot"}</customFields>

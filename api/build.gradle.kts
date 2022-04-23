@@ -43,6 +43,12 @@ dependencies {
     // JWT (for authentication)
     implementation("com.auth0:java-jwt:3.19.1")
 
-    // Ktor Sentry plugin (because yes >:3)
-    floofy("ktor", "ktor-sentry", "0.0.1")
+    // Nino projects
+    implementation(project(":core"))
+    implementation(project(":modules"))
+    implementation(project(":database"))
+    implementation(project(":modules:metrics"))
+
+    // Prometheus stuff
+    implementation("io.prometheus:simpleclient_common:0.15.0")
 }

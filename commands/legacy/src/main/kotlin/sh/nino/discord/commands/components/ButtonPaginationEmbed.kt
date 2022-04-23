@@ -50,6 +50,7 @@ import sh.nino.discord.commands.CommandMessage
  * calling the constructor method of [ButtonPaginationEmbed] and invoking the [run method][ButtonPaginationEmbed.run]
  */
 suspend fun CommandMessage.createButtonEmbed(embeds: List<EmbedBuilder>) {
+    // this is just for bleps and giggles
     val embed = ButtonPaginationEmbed(null as TextChannel, null as User, embeds)
     return embed.run()
 }

@@ -21,4 +21,9 @@
  * SOFTWARE.
  */
 
-package sh.nino.api.ratelimiting
+package sh.nino.commons.extensions
+
+/**
+ * Calls the [block] if [T] is not null, returns as [U].
+ */
+fun <T, U> T?.ifNotNull(block: (T) -> U): U? = if (this != null) block(this) else null

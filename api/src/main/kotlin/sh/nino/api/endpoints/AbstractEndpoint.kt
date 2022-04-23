@@ -25,6 +25,7 @@ package sh.nino.api.endpoints
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.routing.*
 
 /**
  * Represents an abstraction for creating API endpoints. This is collected in the Koin module.
@@ -32,12 +33,29 @@ import io.ktor.server.application.*
  * @param methods A list of methods to call this path on.
  */
 abstract class AbstractEndpoint(val path: String, val methods: List<HttpMethod> = listOf(HttpMethod.Get)) {
+    // TODO: type `Plugin` so the receiving `configure` can be configured successfully.
+    val pluginsToRegister = mutableMapOf<Plugin<Route, *, *>, Any.() -> Unit>()
+
     /**
      * Represents an abstraction for creating API endpoints. This is collected in the Koin module.
      * @param path The path to use for this endpoint
      * @param method A single [HttpMethod] this endpoint supports.
      */
     constructor(path: String, method: HttpMethod): this(path, listOf(method))
+
+    /**
+     * Registers a [Plugin] to this route only, this can be useful for sessions and such. :3
+     * @param plugin The plugin to register
+     * @param configure The configuration of the plugin which will be called when `install` is placed
+     * on the route.
+     *
+     * @return This endpoint to chain methods :)
+     */
+    fun <B: Any, C: Any> addPlugin(plugin: Plugin<Route, B, C>, configure: B.() -> Unit): AbstractEndpoint {
+        @Suppress("UNCHECKED_CAST")
+        pluginsToRegister[plugin] = configure as Any.() -> Unit
+        return this
+    }
 
     /**
      * Runs the endpoint once the router has reached it.

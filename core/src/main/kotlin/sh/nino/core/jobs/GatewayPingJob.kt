@@ -52,33 +52,33 @@ class GatewayPingJob(
     "gateway.ping",
     5000
 ) {
-    private val metrics: MetricsModule by Registry.inject()
+    private val metrics: MetricsModule? by Registry.inject()
     private val log by logging<GatewayPingJob>()
 
     override suspend fun execute() {
-        if (metrics.enabled) {
+        if (metrics?.enabled == true) {
             val averagePing = kord.gateway.averagePing ?: Duration.ZERO
-            metrics.gatewayLatency.observe(averagePing.inWholeMilliseconds.toDouble())
+            metrics?.gatewayLatency?.observe(averagePing.inWholeMilliseconds.toDouble())
 
             // Log the duration for all shards
             for ((shardId, shard) in kord.gateway.gateways) {
-                metrics.gatewayPing.labels("$shardId").observe((shard.ping.value ?: Duration.ZERO).inWholeMilliseconds.toDouble())
+                metrics?.gatewayPing?.labels("$shardId")?.observe((shard.ping.value ?: Duration.ZERO).inWholeMilliseconds.toDouble())
             }
         }
 
         if (config.instatus != null && config.instatus?.gatewayMetricId != null) {
             log.debug("Instatus configuration is available, now posting to Instatus...")
             val res: HttpResponse = httpClient.post("https://api.instatus.com/v1/${config.instatus!!.pageId}/metrics/${config.instatus!!.gatewayMetricId}") {
-                body = InstatusPostMetricBody(
+                setBody(InstatusPostMetricBody(
                     timestamp = System.currentTimeMillis(),
                     value = (kord.gateway.averagePing ?: Duration.ZERO).toLong(DurationUnit.MILLISECONDS)
-                )
+                ))
 
                 header("Authorization", config.instatus!!.token)
             }
 
             if (!res.status.isSuccess()) {
-                log.warn("Unable to post to Instatus (${res.status.value} ${res.status.description}): ${res.receive<String>()}")
+                log.warn("Unable to post to Instatus (${res.status.value} ${res.status.description}): ${res.body<String>()}")
             }
         }
     }

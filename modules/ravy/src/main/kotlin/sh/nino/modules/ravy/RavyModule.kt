@@ -24,6 +24,7 @@
 package sh.nino.modules.ravy
 
 import io.ktor.client.*
+import io.ktor.client.call.*
 import io.ktor.client.request.*
 import sh.nino.modules.annotations.ModuleMeta
 import sh.nino.modules.ravy.data.GetUserResult
@@ -36,5 +37,5 @@ class RavyModule(private val token: String, private val httpClient: HttpClient) 
     suspend fun getUserData(id: String): GetUserResult = httpClient.get("https://ravy.org/api/v1/users/$id") {
         header("Authorization", token)
         header("Accept", "application/json; charset=utf-8")
-    }
+    }.body()
 }

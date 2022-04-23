@@ -22,3 +22,13 @@
  */
 
 package sh.nino.api.endpoints
+
+import io.ktor.http.*
+import io.ktor.server.application.*
+import io.ktor.server.response.*
+
+class HeartbeatEndpoint: AbstractEndpoint("/heartbeat") {
+    override suspend fun call(call: ApplicationCall) {
+        call.respond(HttpStatusCode.OK, "pong!")
+    }
+}

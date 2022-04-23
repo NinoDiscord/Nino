@@ -92,17 +92,20 @@ class Registry {
      * registry.register(MyModule())
      *
      * val mod by registry.inject<MyModule>()
-     * // => MyModule
+     * // => MyModule?
      *
      * val mod2: MyModule by registry.inject()
-     * // => MyModule
+     * // => MyModule?
      *
      * val mod3: Module<MyModule> by registry[MyModule::class]
      * // => Module<MyModule>
      * ```
      */
-    inline fun <reified T: Any> inject(): ReadOnlyProperty<Any?, T> = ReadOnlyProperty { _, _ ->
-        this[T::class].current as T
+    inline fun <reified T: Any> inject(): ReadOnlyProperty<Any?, T?> = ReadOnlyProperty { _, _ ->
+        if (modules.containsKey(T::class))
+            return@ReadOnlyProperty this[T::class].current as T
+
+        null
     }
 
     /**

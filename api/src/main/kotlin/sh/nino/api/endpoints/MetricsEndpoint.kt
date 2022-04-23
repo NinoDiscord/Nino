@@ -21,29 +21,45 @@
  * SOFTWARE.
  */
 
-package sh.nino.api.endpoints.api
+package sh.nino.api.endpoints
 
 import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.request.*
 import io.ktor.server.response.*
+import io.prometheus.client.exporter.common.TextFormat
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import sh.nino.api.endpoints.AbstractEndpoint
+import sh.nino.modules.Registry
+import sh.nino.modules.metrics.MetricsModule
+import java.io.StringWriter
 
-class ApiV1Endpoint: AbstractEndpoint("/v1", HttpMethod.Get) {
+class MetricsEndpoint: AbstractEndpoint("/metrics") {
+    private val metrics by Registry.inject<MetricsModule>()
+
     override suspend fun call(call: ApplicationCall) {
-        call.respond(
-            HttpStatusCode.OK,
-            buildJsonObject {
-                put("success", true)
-                put(
-                    "data",
-                    buildJsonObject {
-                        put("docs_uri", "https://nino.sh/docs/api/v1")
-                        put("tagline", "You know, for moderation at scale™️ totally rad bro")
-                    }
-                )
-            }
-        )
+        if (metrics == null) {
+            call.respond(
+                HttpStatusCode.NotFound,
+                buildJsonObject {
+                    put("success", false)
+                    put("message", "Prometheus Metrics is not enabled.")
+                }
+            )
+
+            return
+        }
+
+        val accept = call.request.header("Accept") ?: TextFormat.CONTENT_TYPE_004
+        val contentType = TextFormat.chooseContentType(accept)
+
+        val stream = StringWriter()
+        stream.use {
+            TextFormat.writeFormat(contentType, it, metrics!!.registry.metricFamilySamples())
+        }
+
+        call.respondOutputStream(ContentType.parse(contentType), HttpStatusCode.OK) {
+            TextFormat.writeFormat(contentType, writer(), metrics!!.registry.metricFamilySamples())
+        }
     }
 }

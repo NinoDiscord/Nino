@@ -57,7 +57,9 @@ dependencies {
     api("io.insert-koin:koin-core:3.1.6")
 
     // Ktor (client)
-    api("io.ktor:ktor-serialization")
+    api("io.ktor:ktor-serialization-kotlinx-json")
+    api("io.ktor:ktor-client-content-negotiation")
+    api("io.ktor:ktor-client-websockets")
     api("io.ktor:ktor-client-okhttp")
     api("io.ktor:ktor-client-core")
     api("com.squareup.okhttp3:okhttp:4.9.3")

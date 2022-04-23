@@ -50,6 +50,7 @@ dependencies {
     runtimeOnly(kotlin("scripting-jsr223"))
 
     // Nino libraries + projects
+    implementation(project(":api"))
     implementation(project(":core"))
     implementation(project(":database"))
     implementation(project(":modules"))

@@ -21,29 +21,46 @@
  * SOFTWARE.
  */
 
-package sh.nino.api.endpoints.api
+package sh.nino.api.exceptions
 
 import io.ktor.http.*
-import io.ktor.server.application.*
+import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
+import io.sentry.Sentry
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.buildJsonArray
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
-import sh.nino.api.endpoints.AbstractEndpoint
 
-class ApiV1Endpoint: AbstractEndpoint("/v1", HttpMethod.Get) {
-    override suspend fun call(call: ApplicationCall) {
-        call.respond(
-            HttpStatusCode.OK,
-            buildJsonObject {
-                put("success", true)
-                put(
-                    "data",
+fun StatusPagesConfig.add401Exception() {
+    exception<UnauthorisedException> { call, cause ->
+        if (Sentry.isEnabled()) {
+            Sentry.captureException(cause)
+        }
+
+        call.respond(cause.asStatusCode(), cause.toJsonObject())
+    }
+}
+
+/**
+ * Exception when the user is unauthorized to do a specific action.
+ */
+class UnauthorisedException(override val message: String): Exception() {
+    fun toJsonObject(): JsonObject = buildJsonObject {
+        put("success", false)
+        put(
+            "errors",
+            buildJsonArray {
+                add(
                     buildJsonObject {
-                        put("docs_uri", "https://nino.sh/docs/api/v1")
-                        put("tagline", "You know, for moderation at scale™️ totally rad bro")
+                        put("code", "UNAUTHORIZED")
+                        put("message", message)
+                        put("detail", "You are not authorized to do this specific action.")
                     }
                 )
             }
         )
     }
+
+    fun asStatusCode(): HttpStatusCode = HttpStatusCode.Unauthorized
 }

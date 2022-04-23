@@ -23,11 +23,14 @@
 
 package sh.nino.core
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.asCoroutineDispatcher
+import io.sentry.Sentry
+import io.sentry.kotlin.SentryContext
+import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
 object NinoScope: CoroutineScope {
     override val coroutineContext: CoroutineContext = SupervisorJob() + NinoBot.executorPool.asCoroutineDispatcher()
 }
+
+fun NinoScope.launchIn(start: CoroutineStart = CoroutineStart.DEFAULT, block: suspend CoroutineScope.() -> Unit): Job =
+    if (Sentry.isEnabled()) launch(SentryContext() + coroutineContext, start, block) else launch(coroutineContext, start, block)

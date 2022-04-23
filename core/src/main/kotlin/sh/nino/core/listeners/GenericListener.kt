@@ -59,8 +59,8 @@ fun Kord.applyGenericEvents() {
             .replace("{shard_id}", "$shard")
             .replace("{guilds}", "$guildCount")
 
-        if (metrics.enabled) {
-            metrics.guildCount.set(guildCount.toDouble())
+        if (metrics?.enabled == true) {
+            metrics?.guildCount?.set(guildCount.toDouble())
         }
 
         kord.editPresence {
@@ -110,7 +110,7 @@ fun Kord.applyGenericEvents() {
     }
 
     on<Event> {
-        metrics.incEvent(shard, name)
+        metrics?.incEvent(shard, name)
     }
 
     log.info("✔ Registered all generic events :3")

@@ -34,10 +34,10 @@ import dev.kord.core.Kord
 import gay.floof.utils.slf4j.logging
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import io.ktor.client.features.*
-import io.ktor.client.features.json.*
-import io.ktor.client.features.json.serializer.*
-import io.ktor.client.features.websocket.*
+import io.ktor.client.plugins.*
+import io.ktor.client.plugins.contentnegotiation.*
+import io.ktor.client.plugins.websocket.*
+import io.ktor.serialization.kotlinx.json.*
 import io.sentry.Sentry
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
@@ -51,9 +51,12 @@ import org.koin.core.context.GlobalContext
 import org.koin.core.context.startKoin
 import org.koin.dsl.module
 import org.slf4j.LoggerFactory
+import sh.nino.api.ApiServer
+import sh.nino.api.endpoints.apiEndpointsModule
 import sh.nino.commons.NinoInfo
 import sh.nino.commons.data.Config
 import sh.nino.commons.data.Environment
+import sh.nino.commons.extensions.ifNotNull
 import sh.nino.commons.extensions.retrieve
 import sh.nino.core.NinoBot
 import sh.nino.core.NinoScope
@@ -61,6 +64,7 @@ import sh.nino.core.globalModule
 import sh.nino.core.interceptors.LogInterceptor
 import sh.nino.core.interceptors.SentryInterceptor
 import sh.nino.core.jobs.jobsModule
+import sh.nino.core.launchIn
 import sh.nino.core.redis.Manager
 import sh.nino.core.sentry.SentryLogger
 import sh.nino.database.registerOrUpdateEnums
@@ -201,8 +205,9 @@ object Bootstrap {
             }
 
             install(WebSockets)
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(json)
+
+            install(ContentNegotiation) {
+                this.json(json)
             }
 
             install(UserAgent) {
@@ -223,11 +228,18 @@ object Bootstrap {
             registry.register(RavyModule(config.ravy!!, httpClient))
         }
 
+        var api: ApiServer? = null
+        if (config.api != null) {
+            log.info("API server is enabled! Registering to Koin...")
+            api = ApiServer(config)
+        }
+
         log.info("Initialized modules! Initializing Koin...")
         val koin = startKoin {
             modules(
                 jobsModule,
                 globalModule,
+                apiEndpointsModule,
                 module {
                     single { config }
                     single { kord }
@@ -237,6 +249,10 @@ object Bootstrap {
                     single { json }
                     single { httpClient }
                     single { NinoBot() }
+
+                    api.ifNotNull { server ->
+                        single { server }
+                    }
                 }
             )
         }
@@ -244,6 +260,12 @@ object Bootstrap {
         log.info("Initialized modules! Launching Nino...")
         addShutdownHook()
         installGlobalUnhandledExceptionHandler()
+
+        api.ifNotNull { s ->
+            NinoScope.launchIn {
+                s.launch()
+            }
+        }
 
         runBlocking {
             val bot = koin.koin.get<NinoBot>()
@@ -267,12 +289,14 @@ object Bootstrap {
                     val ds = GlobalContext.retrieve<HikariDataSource>()
                     val redis = GlobalContext.retrieve<Manager>()
                     val registry = GlobalContext.retrieve<Registry>()
+                    val apiServer = GlobalContext.get().getOrNull<ApiServer>()
 
                     runBlocking {
                         kord.gateway.stopAll()
                         NinoScope.cancel()
                     }
 
+                    apiServer?.destroy()
                     ds.close()
                     redis.close()
                     registry.unregisterAll()

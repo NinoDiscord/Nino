@@ -70,11 +70,7 @@ class BotListsJob(
 
             val stopwatch = StopWatch.createStarted()
             val res: HttpResponse = httpClient.post("https://api.discordservices.net/bot/${kord.selfId}/stats") {
-                body = JsonObject(
-                    mapOf(
-                        "server_count" to JsonPrimitive(guilds)
-                    )
-                )
+                body
 
                 header("Authorization", config.botlists!!.discordServicesToken)
             }
@@ -82,7 +78,7 @@ class BotListsJob(
             stopwatch.stop()
             val success = res.status.isSuccess()
             val json = withContext(Dispatchers.IO) {
-                res.receive<JsonObject>()
+                res.body<JsonObject>()
             }
 
             data.add(
@@ -100,11 +96,11 @@ class BotListsJob(
 
             val stopwatch = StopWatch.createStarted()
             val res: HttpResponse = httpClient.post("https://discord.boats/api/bot/${kord.selfId}") {
-                body = JsonObject(
+                setBody(JsonObject(
                     mapOf(
                         "server_count" to JsonPrimitive(guilds)
                     )
-                )
+                ))
 
                 header("Authorization", config.botlists!!.discordBoatsToken)
             }
@@ -112,7 +108,7 @@ class BotListsJob(
             stopwatch.stop()
             val success = res.status.isSuccess()
             val json = withContext(Dispatchers.IO) {
-                res.receive<JsonObject>()
+                res.body<JsonObject>()
             }
 
             data.add(
@@ -130,10 +126,12 @@ class BotListsJob(
 
             val stopwatch = StopWatch.createStarted()
             val res: HttpResponse = httpClient.post("https://discord.bots.gg/api/v1/bots/${kord.selfId}/stats") {
-                body = JsonObject(
-                    mapOf(
-                        "guildCount" to JsonPrimitive(guilds),
-                        "shardCount" to JsonPrimitive(shardCount)
+                setBody(
+                    JsonObject(
+                        mapOf(
+                            "guildCount" to JsonPrimitive(guilds),
+                            "shardCount" to JsonPrimitive(shardCount)
+                        )
                     )
                 )
 
@@ -143,7 +141,7 @@ class BotListsJob(
             stopwatch.stop()
             val success = res.status.isSuccess()
             val json = withContext(Dispatchers.IO) {
-                res.receive<JsonObject>()
+                res.body<JsonObject>()
             }
 
             data.add(
@@ -161,11 +159,11 @@ class BotListsJob(
 
             val stopwatch = StopWatch.createStarted()
             val res: HttpResponse = httpClient.post("https://discords.com/bots/api/${kord.selfId}") {
-                body = JsonObject(
+                setBody(JsonObject(
                     mapOf(
                         "server_count" to JsonPrimitive(guilds)
                     )
-                )
+                ))
 
                 header("Authorization", config.botlists!!.discordsToken)
             }
@@ -173,7 +171,7 @@ class BotListsJob(
             stopwatch.stop()
             val success = res.status.isSuccess()
             val json = withContext(Dispatchers.IO) {
-                res.receive<JsonObject>()
+                res.body<JsonObject>()
             }
 
             data.add(
@@ -191,12 +189,12 @@ class BotListsJob(
 
             val stopwatch = StopWatch.createStarted()
             val res: HttpResponse = httpClient.post("https://top.gg/api/bots/${kord.selfId}/stats") {
-                body = JsonObject(
+                setBody(JsonObject(
                     mapOf(
                         "server_count" to JsonPrimitive(guilds),
                         "shard_count" to JsonPrimitive(shardCount)
                     )
-                )
+                ))
 
                 header("Authorization", config.botlists!!.topGGToken)
             }
@@ -204,7 +202,7 @@ class BotListsJob(
             stopwatch.stop()
             val success = res.status.isSuccess()
             val json = withContext(Dispatchers.IO) {
-                res.receive<JsonObject>()
+                res.body<JsonObject>()
             }
 
             data.add(
@@ -223,12 +221,12 @@ class BotListsJob(
 
             val stopwatch = StopWatch.createStarted()
             val res: HttpResponse = httpClient.post("https://api.discordextremelist.xyz/v2/bot/${kord.selfId}/stats") {
-                body = JsonObject(
+                setBody(JsonObject(
                     mapOf(
                         "guildCount" to JsonPrimitive(guilds),
                         "shardCount" to JsonPrimitive(shardCount)
                     )
-                )
+                ))
 
                 header("Authorization", config.botlists!!.dellyToken)
             }
@@ -236,7 +234,7 @@ class BotListsJob(
             stopwatch.stop()
             val success = res.status.isSuccess()
             val json = withContext(Dispatchers.IO) {
-                res.receive<JsonObject>()
+                res.body<JsonObject>()
             }
 
             data.add(

@@ -27,5 +27,8 @@ import org.koin.dsl.bind
 import org.koin.dsl.module
 
 val apiEndpointsModule = module {
+    single { HeartbeatEndpoint() } bind AbstractEndpoint::class
+    single { InfoEndpoint(get()) } bind AbstractEndpoint::class
+    single { MetricsEndpoint() } bind AbstractEndpoint::class
     single { MainEndpoint() } bind AbstractEndpoint::class
 }
